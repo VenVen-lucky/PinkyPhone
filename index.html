@@ -19,7 +19,7 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Satisfy&display=swap"
       rel="stylesheet"
     />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js?v=1.1"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
     <style>
       * {
         margin: 0;
@@ -1697,6 +1697,64 @@
         padding-top: 16px;
         border-top: 1px solid #efefef;
       }
+
+      /* 可见范围选择器 */
+      .ig-visibility-section {
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid #efefef;
+      }
+
+      .ig-visibility-label {
+        font-size: 13px;
+        color: #666;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .ig-visibility-options {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .ig-visibility-option {
+        padding: 8px 14px;
+        border-radius: 20px;
+        border: 1px solid #ddd;
+        background: #fff;
+        font-size: 13px;
+        color: #666;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .ig-visibility-option:hover {
+        border-color: #f48fb1;
+        color: #c2185b;
+      }
+
+      .ig-visibility-option.selected {
+        background: linear-gradient(135deg, #fce4ec, #f8bbd9);
+        border-color: #f48fb1;
+        color: #c2185b;
+        font-weight: 500;
+      }
+
+      .ig-visibility-option .check-icon {
+        display: none;
+        font-size: 12px;
+      }
+
+      .ig-visibility-option.selected .check-icon {
+        display: inline;
+      }
+
       .ig-image-option {
         flex: 1;
         display: flex;
@@ -3596,6 +3654,125 @@
         font-weight: 600;
       }
 
+      /* Tab Badge 小红点 */
+      .tab-badge {
+        position: absolute;
+        top: 2px;
+        right: 50%;
+        transform: translateX(12px);
+        min-width: 16px;
+        height: 16px;
+        background: #ff3b30;
+        color: white;
+        font-size: 10px;
+        font-weight: 600;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 4px;
+        box-shadow: 0 2px 4px rgba(255, 59, 48, 0.4);
+        animation: badgePop 0.3s ease;
+      }
+
+      .chat-tab {
+        position: relative;
+      }
+
+      @keyframes badgePop {
+        0% { transform: translateX(12px) scale(0); }
+        50% { transform: translateX(12px) scale(1.2); }
+        100% { transform: translateX(12px) scale(1); }
+      }
+
+      /* 新消息通知弹窗 - 可爱小卡片风格 */
+      .message-notification {
+        position: fixed;
+        top: max(16px, env(safe-area-inset-top));
+        left: 50%;
+        transform: translateX(-50%) translateY(-150%);
+        width: calc(100% - 32px);
+        max-width: 340px;
+        background: linear-gradient(135deg, #fff 0%, #fff5f8 100%);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        padding: 14px 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        border-radius: 20px;
+        box-shadow: 0 8px 32px rgba(244, 143, 177, 0.25),
+                    0 2px 8px rgba(0, 0, 0, 0.08),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(244, 143, 177, 0.2);
+        z-index: 9999;
+        transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        cursor: pointer;
+      }
+
+      .message-notification.show {
+        transform: translateX(-50%) translateY(0);
+      }
+
+      .notification-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #fce4ec, #f8bbd9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        flex-shrink: 0;
+        box-shadow: 0 4px 12px rgba(244, 143, 177, 0.3);
+        overflow: hidden;
+      }
+
+      .notification-avatar img {
+        width: 100%;
+        height: 100%;
+        border-radius: 14px;
+        object-fit: cover;
+      }
+
+      .notification-content {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .notification-name {
+        font-size: 15px;
+        font-weight: 600;
+        color: #c2185b;
+        margin-bottom: 3px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .notification-name::after {
+        content: '💕';
+        font-size: 12px;
+      }
+
+      .notification-text {
+        font-size: 13px;
+        color: #666;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        line-height: 1.4;
+      }
+
+      .notification-time {
+        font-size: 11px;
+        color: #f48fb1;
+        flex-shrink: 0;
+        background: rgba(244, 143, 177, 0.1);
+        padding: 4px 8px;
+        border-radius: 10px;
+      }
+
       /* Create Character Modal */
       .create-char-content {
         background: white;
@@ -4396,6 +4573,41 @@
         color: var(--text-hint);
         margin-top: 4px;
         padding: 0 4px;
+      }
+
+      /* 系统消息卡片样式 - 用于督促助手绑定等系统事件 */
+      .msg-system-card {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        margin: 16px 0;
+      }
+
+      .system-card {
+        background: linear-gradient(135deg, #fff5f8 0%, #fce4ec 100%);
+        border-radius: 16px;
+        padding: 14px 18px;
+        max-width: 280px;
+        box-shadow: 0 4px 16px rgba(244, 143, 177, 0.15);
+        border: 1px solid rgba(244, 143, 177, 0.2);
+        text-align: center;
+      }
+
+      .system-card-icon {
+        font-size: 28px;
+        margin-bottom: 8px;
+      }
+
+      .system-card-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #c2185b;
+        margin-bottom: 4px;
+      }
+
+      .system-card-desc {
+        font-size: 12px;
+        color: #888;
       }
 
       .msg-typing {
@@ -7706,6 +7918,21 @@
                     >❌ 移除图片</span
                   >
                 </div>
+
+                <!-- 可见范围选择 -->
+                <div class="ig-visibility-section">
+                  <div class="ig-visibility-label">👁️ 谁可以看</div>
+                  <div class="ig-visibility-options" id="visibilityOptions">
+                    <div
+                      class="ig-visibility-option selected"
+                      data-value="all"
+                      onclick="selectVisibility('all', this)"
+                    >
+                      <span class="check-icon">✓</span> 公开
+                    </div>
+                    <!-- 分组选项会通过JS动态渲染 -->
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -8268,10 +8495,16 @@
         <div class="chat-tab-bar">
           <div class="chat-tab active" onclick="switchChatTab('messages')">
             <span class="tab-icon">💬</span>
+            <span class="tab-badge" id="messagesBadge" style="display: none"
+              >0</span
+            >
             <span class="tab-label">Message</span>
           </div>
           <div class="chat-tab" onclick="switchChatTab('moments')">
             <span class="tab-icon">🌟</span>
+            <span class="tab-badge" id="momentsBadge" style="display: none"
+              >0</span
+            >
             <span class="tab-label">Moment</span>
           </div>
           <div class="chat-tab" onclick="switchChatTab('todo')">
@@ -10624,6 +10857,11 @@
         };
         document.getElementById("chatHeaderBtn").textContent = buttons[tabName];
 
+        // 切换到moments时清除朋友圈小红点
+        if (tabName === "moments") {
+          if (typeof clearUnreadMoments === "function") clearUnreadMoments();
+        }
+
         // 背景和滚动控制
         const chatApp = document.querySelector(".chat-app");
         const tabBar = document.querySelector(".chat-tab-bar");
@@ -10794,6 +11032,12 @@
           if (char.flameData && char.flameData.active) {
             sparkHtml = `<span class="spark-badge">${char.flameData.icon} ${char.flameData.days}</span>`;
           }
+          // 获取未读消息数
+          const unreadCount =
+            (typeof unreadMessages !== "undefined" &&
+              unreadMessages[char.id]) ||
+            char.unread ||
+            0;
           return `
             <div class="message-item ${isPinned ? "pinned" : ""}" data-id="${
             char.id
@@ -10815,8 +11059,8 @@
                 }</div>
               </div>
               ${
-                char.unread > 0
-                  ? `<div class="message-badge">${char.unread}</div>`
+                unreadCount > 0
+                  ? `<div class="message-badge">${unreadCount}</div>`
                   : ""
               }
             </div>
@@ -11273,6 +11517,11 @@
         currentChatCharId = charId;
         const char = characters.find((c) => c.id === charId);
         if (!char) return;
+
+        // 清除该角色的未读消息
+        if (typeof clearUnreadForChar === "function") {
+          clearUnreadForChar(charId);
+        }
 
         // Set header info
         document.getElementById("convName").textContent = char.name;
@@ -12445,6 +12694,128 @@
                               `;
       document.head.appendChild(toastStyle);
 
+      // ========== 新消息通知系统 ==========
+      var unreadMessages = {}; // { charId: count }
+      var unreadMoments = 0;
+      var notificationTimeout = null;
+      var pendingNotificationCharId = null;
+
+      // 显示新消息通知弹窗
+      function showMessageNotification(
+        charId,
+        charName,
+        charAvatar,
+        messageText
+      ) {
+        const notification = document.getElementById("messageNotification");
+        const avatarEl = document.getElementById("notificationAvatar");
+        const nameEl = document.getElementById("notificationName");
+        const textEl = document.getElementById("notificationText");
+        const timeEl = document.getElementById("notificationTime");
+
+        // 设置内容
+        if (charAvatar) {
+          avatarEl.innerHTML = `<img src="${charAvatar}" alt="">`;
+        } else {
+          avatarEl.innerHTML = charName ? charName.charAt(0) : "🤖";
+        }
+        nameEl.textContent = charName || "未知";
+        textEl.textContent = messageText || "发来一条消息";
+        timeEl.textContent = "刚刚";
+
+        pendingNotificationCharId = charId;
+
+        // 显示通知
+        notification.classList.add("show");
+
+        // 清除之前的定时器
+        if (notificationTimeout) {
+          clearTimeout(notificationTimeout);
+        }
+
+        // 4秒后自动隐藏
+        notificationTimeout = setTimeout(() => {
+          notification.classList.remove("show");
+        }, 4000);
+      }
+
+      // 点击通知跳转到对应聊天
+      function handleNotificationClick() {
+        const notification = document.getElementById("messageNotification");
+        notification.classList.remove("show");
+
+        if (pendingNotificationCharId) {
+          // 切换到消息tab
+          switchChatTab("messages");
+          // 打开对应聊天
+          setTimeout(() => {
+            openConversation(pendingNotificationCharId);
+            // 清除该角色的未读
+            clearUnreadForChar(pendingNotificationCharId);
+          }, 100);
+        }
+        pendingNotificationCharId = null;
+      }
+
+      // 增加未读消息计数
+      function addUnreadMessage(charId) {
+        unreadMessages[charId] = (unreadMessages[charId] || 0) + 1;
+        updateMessagesBadge();
+        // 刷新消息列表显示红点
+        if (typeof renderCharacters === "function") {
+          renderCharacters();
+        }
+      }
+
+      // 清除某个角色的未读消息
+      function clearUnreadForChar(charId) {
+        if (unreadMessages[charId]) {
+          delete unreadMessages[charId];
+          updateMessagesBadge();
+          // 刷新消息列表移除红点
+          if (typeof renderCharacters === "function") {
+            renderCharacters();
+          }
+        }
+      }
+
+      // 更新消息tab的小红点
+      function updateMessagesBadge() {
+        const badge = document.getElementById("messagesBadge");
+        const total = Object.values(unreadMessages).reduce((a, b) => a + b, 0);
+
+        if (total > 0) {
+          badge.textContent = total > 99 ? "99+" : total;
+          badge.style.display = "flex";
+        } else {
+          badge.style.display = "none";
+        }
+      }
+
+      // 增加朋友圈未读
+      function addUnreadMoment() {
+        unreadMoments++;
+        updateMomentsBadge();
+      }
+
+      // 清除朋友圈未读
+      function clearUnreadMoments() {
+        unreadMoments = 0;
+        updateMomentsBadge();
+      }
+
+      // 更新朋友圈tab的小红点
+      function updateMomentsBadge() {
+        const badge = document.getElementById("momentsBadge");
+
+        if (unreadMoments > 0) {
+          badge.textContent = unreadMoments > 99 ? "99+" : unreadMoments;
+          badge.style.display = "flex";
+        } else {
+          badge.style.display = "none";
+        }
+      }
+
       // Placeholder functions for settings actions
       function manageFriendGroups() {
         alert("好友分组管理功能开发中...");
@@ -13521,6 +13892,30 @@
             html += `<div class="msg-system-tip">${
               msg.role === "user" ? "你" : "对方"
             }撤回了一条消息</div>`;
+            lastRole = null;
+            return;
+          }
+
+          // 处理系统卡片
+          if (msg.type === "system-card") {
+            if (currentGroup.length > 0) {
+              html += renderMessageGroup(
+                currentGroup,
+                lastRole,
+                aiAvatarSrc,
+                userAvatarSrc
+              );
+              currentGroup = [];
+            }
+            html += `<div class="msg-system-card">
+              <div class="system-card">
+                <div class="system-card-icon">${msg.cardIcon || "📌"}</div>
+                <div class="system-card-title">${
+                  msg.cardTitle || "系统消息"
+                }</div>
+                <div class="system-card-desc">${msg.cardDesc || ""}</div>
+              </div>
+            </div>`;
             lastRole = null;
             return;
           }
@@ -16460,6 +16855,8 @@
         const char = characters.find((c) => String(c.id) === charId);
         if (!char) return;
 
+        console.log("AI督促助手问候开始:", char.name);
+
         const pending = window.todoList.filter((t) => !t.done);
         const todoSummary =
           pending.length > 0
@@ -16494,36 +16891,147 @@
             return;
           }
 
-          const response = await fetch(apiPreset.url, {
+          // 处理API URL - 确保以/chat/completions结尾
+          let apiUrl = apiPreset.url.replace(/\/$/, "");
+          if (!apiUrl.endsWith("/chat/completions")) {
+            if (apiUrl.endsWith("/v1")) {
+              apiUrl += "/chat/completions";
+            } else if (apiUrl.includes("/v1/")) {
+              // URL中间有/v1/但不是结尾，可能已经是完整路径
+              if (!apiUrl.includes("/chat/completions")) {
+                apiUrl += "/chat/completions";
+              }
+            } else {
+              apiUrl += "/v1/chat/completions";
+            }
+          }
+
+          console.log("API调用URL:", apiUrl);
+
+          // 构建系统提示词 - 强调只输出一条回复
+          const systemPrompt = `${persona}
+
+【重要规则】你必须直接用1-2句话回应，不要列举多个选项，不要编号，不要解释，不要任何前缀。`;
+
+          const userMessage = `用户刚刚选你当待办督促助手。待办列表: ${todoSummary}。请直接回应（1-2句话）:`;
+
+          // 构建请求body - 使用system+user的标准格式，添加stream:false
+          const requestBody = {
+            model: apiPreset.model,
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: userMessage },
+            ],
+            temperature: 0.8,
+            stream: false,
+          };
+
+          console.log("请求参数:", JSON.stringify(requestBody));
+
+          const response = await fetch(apiUrl, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${apiPreset.key}`,
             },
-            body: JSON.stringify({
-              model: apiPreset.model,
-              messages: [{ role: "user", content: prompt }],
-              max_tokens: 150,
-              temperature: apiConfig.temperature || 0.8,
-            }),
+            body: JSON.stringify(requestBody),
           });
 
           if (!response.ok) {
-            console.error("API请求失败:", response.status);
+            const errText = await response.text();
+            console.error("API请求失败:", response.status, errText);
             return;
           }
 
           const data = await response.json();
-          const aiReply = data.choices?.[0]?.message?.content;
+          console.log("API完整返回:", JSON.stringify(data));
+
+          // 兼容不同模型的返回格式
+          const choice = data.choices?.[0];
+          let aiReply = choice?.message?.content;
+
+          // 如果content为空，尝试其他可能的字段（推理模型可能把内容放在其他地方）
+          if (!aiReply && choice?.message?.reasoning_content) {
+            aiReply = choice.message.reasoning_content;
+          }
+          if (!aiReply && choice?.message?.reasoning) {
+            aiReply = choice.message.reasoning;
+          }
+          if (!aiReply && choice?.text) {
+            aiReply = choice.text;
+          }
+          // 某些API会返回delta格式
+          if (!aiReply && choice?.delta?.content) {
+            aiReply = choice.delta.content;
+          }
+
+          console.log("AI回复:", aiReply);
+
+          // 如果还是空的，检测是否是推理模型问题
+          if (!aiReply) {
+            const hasReasoningTokens =
+              data.usage?.reasoning_tokens > 0 ||
+              data.usage?.completion_tokens_details?.reasoning_tokens > 0;
+            if (hasReasoningTokens) {
+              console.warn(
+                "检测到推理模型返回空内容，这可能是API中转的问题。建议更换为非推理模型（如gpt-4o-mini, claude-3-haiku等）"
+              );
+              showToast(
+                `${char.name}已成为督促助手（推理模型暂不支持自动回复）`
+              );
+
+              // 仍然保存绑定状态
+              const historyKey = `chat_${charId}`;
+              let history = (await localforage.getItem(historyKey)) || [];
+              history.push({
+                role: "assistant",
+                content: `[我现在是你的待办督促助手啦！有什么需要帮忙的随时找我~]`,
+                timestamp: Date.now(),
+              });
+              await localforage.setItem(historyKey, history);
+              return;
+            }
+          }
+
+          // 如果还是空的，可能是推理模型需要更多token或不同的请求方式
+          if (!aiReply) {
+            console.log("AI回复为空，尝试使用简化prompt重新请求");
+            // 用更简单的prompt再试一次
+            const simplePrompt = `你是${char.name}。用户刚刚选你当待办督促助手，请用1句话简短回应，表示你会帮助督促他完成待办事项。直接说话，不要任何前缀。`;
+
+            const retryResponse = await fetch(apiUrl, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${apiPreset.key}`,
+              },
+              body: JSON.stringify({
+                model: apiPreset.model,
+                messages: [{ role: "user", content: simplePrompt }],
+                max_tokens: 100,
+                temperature: 0.7,
+              }),
+            });
+
+            if (retryResponse.ok) {
+              const retryData = await retryResponse.json();
+              console.log("重试API返回:", JSON.stringify(retryData));
+              aiReply = retryData.choices?.[0]?.message?.content;
+            }
+          }
 
           if (aiReply) {
             const historyKey = `chat_${charId}`;
             let history = (await localforage.getItem(historyKey)) || [];
 
+            // 使用系统卡片形式而不是普通消息
             history.push({
-              role: "user",
-              content: "[用户将你设为待办督促助手]",
-              isSystemHint: true,
+              role: "system",
+              type: "system-card",
+              cardType: "todo-binding",
+              cardIcon: "📋",
+              cardTitle: "已设为待办督促助手",
+              cardDesc: "Ta 将帮你督促完成待办事项",
               timestamp: Date.now(),
             });
 
@@ -16534,11 +17042,29 @@
             });
 
             await localforage.setItem(historyKey, history);
-            showToast(
-              `${char.name}: ${aiReply.slice(0, 30)}${
-                aiReply.length > 30 ? "..." : ""
-              }`
-            );
+
+            // 更新内存中的聊天记录
+            if (chatHistories) {
+              chatHistories[charId] = history;
+            }
+
+            // 更新角色的lastMessage用于消息列表显示
+            const charIndex = characters.findIndex((c) => c.id === charId);
+            if (charIndex !== -1) {
+              characters[charIndex].lastMessage =
+                aiReply.slice(0, 30) + (aiReply.length > 30 ? "..." : "");
+              characters[charIndex].lastTime = "刚刚";
+              await localforage.setItem("characters", characters);
+            }
+
+            // 显示通知弹窗
+            showMessageNotification(charId, char.name, char.avatar, aiReply);
+
+            // 增加未读消息计数
+            addUnreadMessage(charId);
+          } else {
+            console.log("AI回复最终为空");
+            showToast(`${char.name}已成为你的督促助手~`);
           }
         } catch (e) {
           console.error("AI问候失败:", e);
@@ -17219,6 +17745,10 @@
       }
 
       // 打开发布弹窗
+      // 当前选中的可见范围
+      var selectedVisibility = "all";
+      var selectedVisibilityGroups = [];
+
       function openPostModal() {
         document.getElementById("igPostModal").classList.add("active");
         document.getElementById("igPostText").value = "";
@@ -17228,7 +17758,84 @@
         document.getElementById("imgOptionAlbum").classList.remove("selected");
         document.getElementById("imgOptionText").classList.remove("selected");
         window.selectedPostImage = null;
+
+        // 初始化可见范围选择
+        selectedVisibility = "all";
+        selectedVisibilityGroups = [];
+        renderVisibilityOptions();
+
         checkPostValid();
+      }
+
+      // 渲染可见范围选项
+      function renderVisibilityOptions() {
+        const container = document.getElementById("visibilityOptions");
+        if (!container) return;
+
+        // 获取所有分组
+        const groups = new Set();
+        characters.forEach((char) => {
+          const settings = chatSettings[char.id] || {};
+          if (settings.group && settings.group !== "none") {
+            groups.add(settings.group);
+          }
+        });
+
+        let html = `<div class="ig-visibility-option ${
+          selectedVisibility === "all" ? "selected" : ""
+        }" data-value="all" onclick="selectVisibility('all', this)">
+          <span class="check-icon">✓</span> 公开
+        </div>`;
+
+        groups.forEach((group) => {
+          const isSelected = selectedVisibilityGroups.includes(group);
+          html += `<div class="ig-visibility-option ${
+            isSelected ? "selected" : ""
+          }" data-value="${group}" onclick="toggleVisibilityGroup('${group}', this)">
+            <span class="check-icon">✓</span> ${group}
+          </div>`;
+        });
+
+        container.innerHTML = html;
+      }
+
+      // 选择可见范围
+      function selectVisibility(value, el) {
+        if (value === "all") {
+          selectedVisibility = "all";
+          selectedVisibilityGroups = [];
+          // 取消所有其他选中
+          document.querySelectorAll(".ig-visibility-option").forEach((opt) => {
+            opt.classList.remove("selected");
+          });
+          el.classList.add("selected");
+        }
+      }
+
+      // 切换分组可见
+      function toggleVisibilityGroup(group, el) {
+        // 取消"公开"的选中
+        const allOption = document.querySelector(
+          '.ig-visibility-option[data-value="all"]'
+        );
+        if (allOption) allOption.classList.remove("selected");
+        selectedVisibility = "groups";
+
+        if (selectedVisibilityGroups.includes(group)) {
+          selectedVisibilityGroups = selectedVisibilityGroups.filter(
+            (g) => g !== group
+          );
+          el.classList.remove("selected");
+
+          // 如果没有选中任何分组，默认回到公开
+          if (selectedVisibilityGroups.length === 0) {
+            selectedVisibility = "all";
+            if (allOption) allOption.classList.add("selected");
+          }
+        } else {
+          selectedVisibilityGroups.push(group);
+          el.classList.add("selected");
+        }
       }
 
       // 关闭发布弹窗
@@ -17304,6 +17911,12 @@
           authorId: "user",
           likes: [],
           comments: [],
+          // 可见范围
+          visibility: selectedVisibility,
+          visibleGroups:
+            selectedVisibility === "groups"
+              ? [...selectedVisibilityGroups]
+              : [],
         };
 
         window.momentsData.posts.unshift(post);
@@ -17313,10 +17926,10 @@
         renderMomentsUI();
         showToast("✨ 动态发布成功！");
 
-        // AI角色可能会来互动
+        // AI角色会来互动 - 根据可见范围筛选
         setTimeout(() => {
           aiInteractWithPost(post);
-        }, 3000 + Math.random() * 5000);
+        }, 2000 + Math.random() * 2000);
       }
 
       // AI与用户动态互动 - 使用API生成符合人设的评论
@@ -17328,80 +17941,112 @@
 
         console.log("开始AI互动，角色数量:", window.characters.length);
 
-        // 随机选择1-2个AI来互动
-        const shuffled = [...window.characters].sort(() => 0.5 - Math.random());
-        const interactors = shuffled.slice(
-          0,
-          Math.min(2, Math.ceil(Math.random() * 2))
-        );
+        // 根据可见范围筛选可以看到动态的AI
+        let eligibleChars = [...window.characters];
 
-        console.log(
-          "选中互动的AI:",
-          interactors.map((c) => c.name)
-        );
+        if (
+          post.visibility === "groups" &&
+          post.visibleGroups &&
+          post.visibleGroups.length > 0
+        ) {
+          // 只有指定分组的AI可以看到
+          eligibleChars = window.characters.filter((char) => {
+            const settings = chatSettings[char.id] || {};
+            return post.visibleGroups.includes(settings.group);
+          });
+          console.log(
+            "可见分组:",
+            post.visibleGroups,
+            "符合条件的AI:",
+            eligibleChars.map((c) => c.name)
+          );
+        }
 
-        for (const char of interactors) {
+        if (eligibleChars.length === 0) {
+          console.log("没有符合条件的AI可以看到这条动态");
+          return;
+        }
+
+        // 所有符合条件的AI都会来互动（100%）
+        for (const char of eligibleChars) {
           await new Promise((resolve) =>
-            setTimeout(resolve, 2000 + Math.random() * 3000)
+            setTimeout(resolve, 1500 + Math.random() * 2000)
           );
 
-          // 90% 概率点赞
-          if (Math.random() > 0.1) {
-            const postIndex = window.momentsData.posts.findIndex(
-              (p) => p.id === post.id
-            );
-            if (
-              postIndex !== -1 &&
-              !window.momentsData.posts[postIndex].likes.includes(
-                String(char.id)
-              )
-            ) {
-              window.momentsData.posts[postIndex].likes.push(String(char.id));
-              await localforage.setItem("momentsData", window.momentsData);
-              renderMomentsUI();
-              console.log(char.name, "点赞了");
-            }
+          // 100% 点赞
+          const postIndex = window.momentsData.posts.findIndex(
+            (p) => p.id === post.id
+          );
+          if (
+            postIndex !== -1 &&
+            !window.momentsData.posts[postIndex].likes.includes(String(char.id))
+          ) {
+            window.momentsData.posts[postIndex].likes.push(String(char.id));
+            await localforage.setItem("momentsData", window.momentsData);
+            renderMomentsUI();
+            console.log(char.name, "点赞了");
           }
 
-          // 80% 概率评论
-          if (Math.random() > 0.2) {
-            try {
-              console.log(char.name, "正在生成评论...");
-              const comment = await generateAiCommentWithAPI(char, post);
-              if (comment) {
-                const postIndex = window.momentsData.posts.findIndex(
-                  (p) => p.id === post.id
-                );
-                if (postIndex !== -1) {
-                  window.momentsData.posts[postIndex].comments.push({
-                    id: Date.now(),
-                    authorId: String(char.id),
-                    authorName: char.note || char.name,
-                    authorAvatar: char.avatar || "🤖",
-                    content: comment,
-                    timestamp: Date.now(),
-                    replyTo: null,
-                  });
-                  await localforage.setItem("momentsData", window.momentsData);
-                  renderMomentsUI();
-                  console.log(char.name, "评论成功:", comment);
-                }
+          // 100% 评论
+          console.log(char.name, "准备评论，开始调用API...");
+          try {
+            console.log(char.name, "正在生成评论...");
+            const comment = await generateAiCommentWithAPI(char, post);
+            console.log(char.name, "API返回评论:", comment);
+            if (comment) {
+              const postIndex = window.momentsData.posts.findIndex(
+                (p) => p.id === post.id
+              );
+              if (postIndex !== -1) {
+                window.momentsData.posts[postIndex].comments.push({
+                  id: Date.now(),
+                  authorId: String(char.id),
+                  authorName: char.note || char.name,
+                  authorAvatar: char.avatar || "🤖",
+                  content: comment,
+                  timestamp: Date.now(),
+                  replyTo: null,
+                });
+                await localforage.setItem("momentsData", window.momentsData);
+                renderMomentsUI();
+                console.log(char.name, "评论成功:", comment);
+
+                // 增加朋友圈未读提醒
+                addUnreadMoment();
               }
-            } catch (e) {
-              console.error("AI评论生成失败:", e);
+            } else {
+              console.log(char.name, "评论内容为空");
             }
+          } catch (e) {
+            console.error("AI评论生成失败:", e);
           }
         }
       }
 
       // 使用API生成AI评论 - 符合角色人设
       async function generateAiCommentWithAPI(char, post) {
-        // 获取当前激活的API配置
-        const apiConfig = apiPresets.find((p) => p.id === activePresetId);
-        if (!apiConfig) {
-          console.log("没有激活的API，跳过AI评论");
+        // 获取当前激活的API配置，优先使用角色设置的API，否则用全局激活的
+        const charSettings = chatSettings[char.id] || {};
+        let apiConfigToUse = null;
+
+        if (charSettings.apiPreset) {
+          apiConfigToUse = apiPresets.find(
+            (p) => p.id === charSettings.apiPreset
+          );
+        }
+        if (!apiConfigToUse) {
+          apiConfigToUse = apiPresets.find((p) => p.id === activePresetId);
+        }
+        if (!apiConfigToUse && apiPresets.length > 0) {
+          apiConfigToUse = apiPresets[0];
+        }
+
+        if (!apiConfigToUse || !apiConfigToUse.key) {
+          console.log("没有可用的API配置，跳过AI评论");
           return null;
         }
+
+        console.log("使用API配置:", apiConfigToUse.name, apiConfigToUse.model);
 
         // 构建动态内容描述
         let postDescription = "";
@@ -17419,11 +18064,14 @@
 
         const userName = window.momentsData.userProfile.name || "用户";
 
+        // 获取角色人设
+        const persona = charSettings.persona || char.description || "";
+
         // 构建系统提示词
         const systemPrompt = `你是${
           char.note || char.name
         }，正在社交媒体上看到${userName}发布的一条动态。
-${char.description ? `你的人设: ${char.description}` : ""}
+${persona ? `你的人设: ${persona}` : ""}
 
 请根据你的性格和人设，对这条动态写一条简短的评论回复。
 
@@ -17437,33 +18085,36 @@ ${char.description ? `你的人设: ${char.description}` : ""}
         const userPrompt = `${userName}发布了一条动态:\n${postDescription}\n\n请写一条评论:`;
 
         try {
-          // 确保URL格式正确
-          let apiUrl = apiConfig.url;
-          if (
-            !apiUrl.includes("/chat/completions") &&
-            !apiUrl.includes("/v1/")
-          ) {
-            apiUrl = apiUrl.replace(/\/$/, "") + "/v1/chat/completions";
-          } else if (!apiUrl.includes("/chat/completions")) {
-            apiUrl = apiUrl.replace(/\/$/, "") + "/chat/completions";
+          // 确保URL格式正确 - 以/chat/completions结尾
+          let apiUrl = apiConfigToUse.url.replace(/\/$/, "");
+          if (!apiUrl.endsWith("/chat/completions")) {
+            if (apiUrl.endsWith("/v1")) {
+              apiUrl += "/chat/completions";
+            } else if (apiUrl.includes("/v1/")) {
+              if (!apiUrl.includes("/chat/completions")) {
+                apiUrl += "/chat/completions";
+              }
+            } else {
+              apiUrl += "/v1/chat/completions";
+            }
           }
 
-          console.log("AI评论API调用:", apiUrl, apiConfig.model);
+          console.log("AI评论API调用:", apiUrl, apiConfigToUse.model);
 
           const response = await fetch(apiUrl, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${apiConfig.key}`,
+              Authorization: `Bearer ${apiConfigToUse.key}`,
             },
             body: JSON.stringify({
-              model: apiConfig.model,
+              model: apiConfigToUse.model,
               messages: [
                 { role: "system", content: systemPrompt },
                 { role: "user", content: userPrompt },
               ],
-              max_tokens: 100,
               temperature: 0.8,
+              stream: false,
             }),
           });
 
@@ -17474,8 +18125,66 @@ ${char.description ? `你的人设: ${char.description}` : ""}
           }
 
           const data = await response.json();
-          const comment = data.choices?.[0]?.message?.content?.trim();
-          console.log("AI评论生成成功:", comment);
+          console.log("评论API完整返回:", JSON.stringify(data));
+
+          // 兼容不同模型的返回格式
+          const choice = data.choices?.[0];
+          let comment = choice?.message?.content?.trim();
+
+          // 如果content为空，尝试其他可能的字段
+          if (!comment && choice?.message?.reasoning_content) {
+            comment = choice.message.reasoning_content.trim();
+          }
+          if (!comment && choice?.message?.reasoning) {
+            comment = choice.message.reasoning.trim();
+          }
+          if (!comment && choice?.text) {
+            comment = choice.text.trim();
+          }
+          if (!comment && choice?.delta?.content) {
+            comment = choice.delta.content.trim();
+          }
+
+          // 如果还是空的，检测是否是推理模型问题
+          if (!comment) {
+            const hasReasoningTokens =
+              data.usage?.reasoning_tokens > 0 ||
+              data.usage?.completion_tokens_details?.reasoning_tokens > 0;
+            if (hasReasoningTokens) {
+              console.warn("检测到推理模型返回空内容，跳过评论");
+              return null;
+            }
+          }
+
+          // 如果还是空的，用简化prompt重试
+          if (!comment) {
+            console.log("评论为空，尝试简化prompt重试");
+            const simplePrompt = `看到朋友发的动态："${
+              post.content || "(图片)"
+            }"，写一句简短评论（10字以内），直接输出评论内容：`;
+
+            const retryResponse = await fetch(apiUrl, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${apiConfigToUse.key}`,
+              },
+              body: JSON.stringify({
+                model: apiConfigToUse.model,
+                messages: [{ role: "user", content: simplePrompt }],
+                max_tokens: 50,
+                temperature: 0.7,
+              }),
+            });
+
+            if (retryResponse.ok) {
+              const retryData = await retryResponse.json();
+              console.log("重试API返回:", JSON.stringify(retryData));
+              comment = retryData.choices?.[0]?.message?.content?.trim();
+            }
+          }
+
+          console.log("AI评论最终结果:", comment);
           return comment || null;
         } catch (e) {
           console.error("API调用失败:", e);
@@ -17706,13 +18415,26 @@ ${char.description ? `你的人设: ${char.description}` : ""}
       // 使用API生成AI回复评论
       async function generateAiReplyWithAPI(char, userComment, post) {
         // 获取当前激活的API配置
-        const apiConfig = apiPresets.find((p) => p.id === activePresetId);
+        const charSettings = chatSettings[char.id] || {};
+        let apiConfig = null;
+
+        if (charSettings.apiPreset) {
+          apiConfig = apiPresets.find((p) => p.id === charSettings.apiPreset);
+        }
         if (!apiConfig) {
-          console.log("没有激活的API，跳过AI回复");
+          apiConfig = apiPresets.find((p) => p.id === activePresetId);
+        }
+        if (!apiConfig && apiPresets.length > 0) {
+          apiConfig = apiPresets[0];
+        }
+
+        if (!apiConfig || !apiConfig.key) {
+          console.log("没有可用的API配置，跳过AI回复");
           return null;
         }
 
         const userName = window.momentsData.userProfile.name || "用户";
+        const persona = charSettings.persona || char.description || "";
 
         // 构建动态内容描述
         let postDescription = "";
@@ -17726,7 +18448,7 @@ ${char.description ? `你的人设: ${char.description}` : ""}
         }
 
         const systemPrompt = `你是${char.note || char.name}。
-${char.description ? `你的人设: ${char.description}` : ""}
+${persona ? `你的人设: ${persona}` : ""}
 
 ${userName}在你的动态下留言了，你需要回复。
 
@@ -17742,7 +18464,23 @@ ${userName}在你的动态下留言了，你需要回复。
         const userPrompt = `${userName}的评论: "${userComment}"\n\n请回复:`;
 
         try {
-          const response = await fetch(`${apiConfig.url}/chat/completions`, {
+          // 处理API URL
+          let apiUrl = apiConfig.url.replace(/\/$/, "");
+          if (!apiUrl.endsWith("/chat/completions")) {
+            if (apiUrl.endsWith("/v1")) {
+              apiUrl += "/chat/completions";
+            } else if (apiUrl.includes("/v1/")) {
+              if (!apiUrl.includes("/chat/completions")) {
+                apiUrl += "/chat/completions";
+              }
+            } else {
+              apiUrl += "/v1/chat/completions";
+            }
+          }
+
+          console.log("AI回复评论API调用:", apiUrl);
+
+          const response = await fetch(apiUrl, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -17754,16 +18492,19 @@ ${userName}在你的动态下留言了，你需要回复。
                 { role: "system", content: systemPrompt },
                 { role: "user", content: userPrompt },
               ],
-              max_tokens: 100,
               temperature: 0.8,
+              stream: false,
             }),
           });
 
           if (!response.ok) {
+            const errText = await response.text();
+            console.error(`API请求失败: ${response.status}`, errText);
             throw new Error(`API请求失败: ${response.status}`);
           }
 
           const data = await response.json();
+          console.log("AI回复评论返回:", JSON.stringify(data));
           const reply = data.choices?.[0]?.message?.content?.trim();
           return reply || null;
         } catch (e) {
@@ -18661,6 +19402,15 @@ ${userName}在你的动态下留言了，你需要回复。
         clearSettingsAvatar,
         selectRadio,
         showToast,
+        // 新消息通知系统
+        showMessageNotification,
+        handleNotificationClick,
+        addUnreadMessage,
+        clearUnreadForChar,
+        updateMessagesBadge,
+        addUnreadMoment,
+        clearUnreadMoments,
+        updateMomentsBadge,
         // 聊天功能
         sendUserMessage,
         clearChatHistory,
@@ -18787,6 +19537,9 @@ ${userName}在你的动态下留言了，你需要回复。
         removeImage,
         checkPostValid,
         submitPost,
+        renderVisibilityOptions,
+        selectVisibility,
+        toggleVisibilityGroup,
         toggleLike,
         toggleBookmark,
         openComments,
@@ -18881,6 +19634,20 @@ ${userName}在你的动态下留言了，你需要回复。
       >
         🗑️ 删除
       </button>
+    </div>
+
+    <!-- 新消息通知弹窗 -->
+    <div
+      class="message-notification"
+      id="messageNotification"
+      onclick="handleNotificationClick()"
+    >
+      <div class="notification-avatar" id="notificationAvatar">🤖</div>
+      <div class="notification-content">
+        <div class="notification-name" id="notificationName">角色名</div>
+        <div class="notification-text" id="notificationText">消息内容</div>
+      </div>
+      <div class="notification-time" id="notificationTime">刚刚</div>
     </div>
   </body>
 </html>
