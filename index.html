@@ -326,7 +326,7 @@
       }
 
       .app-name {
-        font-size: 0.7rem;
+        font-size: 0.85rem;
         font-weight: 500;
         color: var(--text-primary);
         text-align: center;
@@ -488,6 +488,7 @@
         cursor: pointer;
         box-shadow: 0 2px 8px var(--shadow);
         transition: transform 0.2s;
+        color: #000;
       }
 
       .back-btn:active {
@@ -926,6 +927,25 @@
         background: linear-gradient(180deg, #f5f5f5 0%, #efefef 100%);
         min-height: 100%;
         padding-bottom: 100px;
+      }
+
+      /* Moment和Me页面底栏透明 */
+      #momentsTab ~ .chat-tab-bar,
+      #profileTab ~ .chat-tab-bar {
+        background: transparent;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        border: none;
+        box-shadow: none;
+      }
+
+      .chat-app[data-active-tab="moments"] .chat-tab-bar,
+      .chat-app[data-active-tab="profile"] .chat-tab-bar {
+        background: transparent !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        border: none !important;
+        box-shadow: none !important;
       }
 
       /* Stories 横向滚动区 - 保留但简化 */
@@ -3293,8 +3313,8 @@
       /* 待办设置按钮 */
       .todo-settings-btn {
         position: absolute;
-        top: 12px;
-        right: 12px;
+        top: 50px;
+        right: 20px;
         width: 32px;
         height: 32px;
         border-radius: 50%;
@@ -3745,7 +3765,7 @@
 
       /* ==================== API SETTINGS STYLES ==================== */
       .api-settings-page {
-        background: #f5f5f5 !important;
+        background: linear-gradient(180deg, #fff5f8 0%, #ffeef5 100%) !important;
       }
 
       .api-settings-page::before {
@@ -3755,10 +3775,14 @@
       .api-settings-page .page-header {
         display: flex;
         align-items: center;
-        background: white;
+        background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%);
         padding: 12px 16px;
         padding-top: max(12px, env(safe-area-inset-top));
-        border-bottom: 1px solid #eee;
+        border-bottom: 1px solid rgba(244, 143, 177, 0.2);
+      }
+
+      .api-settings-page .page-title {
+        color: #c2185b;
       }
 
       .page-header-add {
@@ -4526,7 +4550,7 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: linear-gradient(180deg, #f8f4f0 0%, #f0ebe5 100%);
+        background: linear-gradient(180deg, #fff5f8 0%, #ffeef5 100%);
         z-index: 350;
         flex-direction: column;
         overflow: hidden;
@@ -4554,14 +4578,14 @@
         justify-content: space-between;
         padding: 16px 20px;
         padding-top: max(16px, env(safe-area-inset-top));
-        background: linear-gradient(135deg, #e8d5c4 0%, #d4c4b0 100%);
+        background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%);
         border-bottom: 1px solid rgba(0, 0, 0, 0.05);
       }
 
       .settings-header-title {
         font-size: 1.15rem;
         font-weight: 700;
-        color: #5d4e37;
+        color: #c2185b;
         display: flex;
         align-items: center;
         gap: 8px;
@@ -4580,7 +4604,7 @@
         border-radius: 50%;
         font-size: 18px;
         cursor: pointer;
-        color: #5d4e37;
+        color: #c2185b;
         transition: all 0.2s;
       }
 
@@ -4601,7 +4625,7 @@
         border-radius: 20px;
         margin-bottom: 16px;
         overflow: hidden;
-        box-shadow: 0 2px 12px rgba(93, 78, 55, 0.08);
+        box-shadow: 0 2px 12px rgba(244, 143, 177, 0.15);
       }
 
       .section-header {
@@ -4609,7 +4633,7 @@
         align-items: center;
         gap: 10px;
         padding: 16px 20px;
-        background: linear-gradient(135deg, #f5efe8 0%, #ebe3d9 100%);
+        background: linear-gradient(135deg, #fff0f5 0%, #fce4ec 100%);
         border-bottom: 1px solid rgba(0, 0, 0, 0.03);
       }
 
@@ -4624,25 +4648,25 @@
       }
 
       .section-icon.brown {
-        background: linear-gradient(135deg, #d4a574, #c4956a);
+        background: linear-gradient(135deg, #f48fb1, #f06292);
       }
       .section-icon.purple {
-        background: linear-gradient(135deg, #b8a5d4, #a090c4);
+        background: linear-gradient(135deg, #ce93d8, #ba68c8);
       }
       .section-icon.teal {
-        background: linear-gradient(135deg, #7cb8a8, #6aa898);
+        background: linear-gradient(135deg, #80deea, #4dd0e1);
       }
       .section-icon.orange {
-        background: linear-gradient(135deg, #e8b88a, #d8a07a);
+        background: linear-gradient(135deg, #ffcc80, #ffb74d);
       }
       .section-icon.blue {
-        background: linear-gradient(135deg, #8ab8e8, #7aa8d8);
+        background: linear-gradient(135deg, #90caf9, #64b5f6);
       }
 
       .section-title {
         font-size: 0.95rem;
         font-weight: 700;
-        color: #5d4e37;
+        color: #c2185b;
       }
 
       .section-body {
@@ -6304,7 +6328,7 @@
         border: none;
         background: none;
         font-size: 24px;
-        color: #4caf50;
+        color: #000;
         cursor: pointer;
       }
       .read-header-title {
@@ -6536,7 +6560,6 @@
         display: none;
         flex-direction: column;
         overflow: hidden;
-        resize: both;
       }
       .read-floating-panel.active {
         display: flex;
@@ -7649,6 +7672,20 @@
                   placeholder="分享你的想法..."
                   oninput="checkPostValid()"
                 ></textarea>
+                
+                <!-- 可见范围选择 -->
+                <div class="ig-visibility-section" style="margin: 12px 0; padding: 12px; background: #fafafa; border-radius: 12px;">
+                  <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #262626; margin-bottom: 8px;">👀 谁可以看到</label>
+                  <div style="display: flex; flex-wrap: wrap; gap: 8px;" id="igVisibilityOptions">
+                    <label class="ig-visibility-option" style="display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: white; border: 2px solid #dbdbdb; border-radius: 20px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s;">
+                      <input type="radio" name="postVisibility" value="public" checked style="display: none;" onchange="updateVisibilityUI()">
+                      <span class="ig-vis-icon">🌍</span>
+                      <span>公开</span>
+                    </label>
+                    <!-- AI角色选项会动态渲染 -->
+                  </div>
+                </div>
+                
                 <div class="ig-image-options">
                   <div
                     class="ig-image-option"
@@ -8744,11 +8781,14 @@
       </div>
 
       <div id="appearancePage" class="page">
-        <div class="page-header">
+        <div class="page-header" style="position: sticky; top: 0; z-index: 100; background: var(--bg-pink); padding-bottom: 12px;">
           <button class="back-btn" onclick="closePage('appearancePage')">
             ←
           </button>
           <h1 class="page-title">外观设置</h1>
+          <button class="appearance-save-btn-top" onclick="saveAppearanceSettings()" style="padding: 8px 16px; background: linear-gradient(135deg, #f48fb1, #f06292); color: white; border: none; border-radius: 20px; font-size: 0.85rem; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px rgba(244, 143, 177, 0.4);">
+            保存
+          </button>
         </div>
         <div
           class="page-content"
@@ -8980,14 +9020,6 @@
               </div>
             </div>
           </div>
-
-          <!-- 保存按钮 -->
-          <button
-            class="appearance-save-btn"
-            onclick="saveAppearanceSettings()"
-          >
-            ✨ 保存设置
-          </button>
         </div>
       </div>
 
@@ -9284,9 +9316,7 @@
           ←
         </button>
         <div class="read-header-title">📚 一起读书</div>
-        <button class="read-header-action" onclick="startFloatingMode()">
-          📌
-        </button>
+        <div style="width: 36px;"></div>
       </div>
       <div class="read-content">
         <!-- 我的书架 -->
@@ -10632,6 +10662,24 @@
             renderTodoAiCharList();
           if (typeof updateTodoDate === "function") updateTodoDate();
           if (typeof updateTodoStats === "function") updateTodoStats();
+        }
+        
+        // 控制底栏透明度 - Moment和Me页面透明，其他页面正常
+        const tabBar = document.querySelector(".chat-tab-bar");
+        if (tabBar) {
+          if (tabName === "moments" || tabName === "profile") {
+            tabBar.style.background = "transparent";
+            tabBar.style.backdropFilter = "none";
+            tabBar.style.webkitBackdropFilter = "none";
+            tabBar.style.border = "none";
+            tabBar.style.boxShadow = "none";
+          } else {
+            tabBar.style.background = "rgba(255, 255, 255, 0.7)";
+            tabBar.style.backdropFilter = "blur(25px) saturate(180%)";
+            tabBar.style.webkitBackdropFilter = "blur(25px) saturate(180%)";
+            tabBar.style.border = "1px solid rgba(255, 255, 255, 0.5)";
+            tabBar.style.boxShadow = "0 4px 20px rgba(0, 0, 0, 0.08)";
+          }
         }
       }
 
@@ -15833,10 +15881,36 @@
       // 暂停阅读（回到书架）
       function stopCurrentReading() {
         const charId = currentChatCharId;
-        if (window.readTogetherData[charId]) {
+        const readData = window.readTogetherData[charId];
+        
+        if (readData && readData.active) {
+          // 获取书籍信息用于通知AI
+          const book = window.bookshelfData.find((b) => b.id === readData.bookId);
+          const bookName = book ? book.bookName : "书籍";
+          const progress = book ? Math.round(((book.currentIndex + 1) / book.chunks.length) * 100) : 0;
+          
+          // 标记阅读状态为已结束
           window.readTogetherData[charId].active = false;
+          window.readTogetherData[charId].endedAt = Date.now();
+          window.readTogetherData[charId].endProgress = progress;
           localforage.setItem("readTogetherData", window.readTogetherData);
+          
+          // 记录到聊天历史，让AI知道用户结束了阅读
+          if (chatHistories[charId]) {
+            chatHistories[charId].push({
+              role: "system",
+              content: `[系统提示: 用户刚刚结束了和你一起阅读《${bookName}》的活动，阅读进度为${progress}%。你可以自然地对此做出回应，比如询问用户的阅读感受、讨论书中内容等。]`,
+              time: new Date().toLocaleTimeString("zh-CN", {
+                hour: "2-digit",
+                minute: "2-digit",
+              }),
+              timestamp: Date.now(),
+              isSystemHint: true, // 标记为系统提示，不显示在界面上但AI能看到
+            });
+            localforage.setItem("chatHistories", chatHistories);
+          }
         }
+        
         renderBookshelf();
         renderCurrentReading();
         hideFloatingBtn();
@@ -16038,6 +16112,101 @@
             document.removeEventListener("mouseup", stopDrag);
             document.removeEventListener("touchmove", onDrag);
             document.removeEventListener("touchend", stopDrag);
+          }
+        });
+      })();
+      
+      // 悬浮窗手机端缩放功能
+      (function initFloatingPanelResize() {
+        document.addEventListener("DOMContentLoaded", function () {
+          const panel = document.getElementById("readFloatingPanel");
+          if (!panel) return;
+          
+          // 创建缩放手柄
+          const resizeHandle = document.createElement("div");
+          resizeHandle.className = "read-float-resize-handle";
+          resizeHandle.style.cssText = `
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 30px;
+            height: 30px;
+            cursor: se-resize;
+            background: linear-gradient(135deg, transparent 50%, rgba(76, 175, 80, 0.3) 50%);
+            border-radius: 0 0 16px 0;
+            z-index: 10;
+            touch-action: none;
+          `;
+          panel.appendChild(resizeHandle);
+          
+          let isResizing = false;
+          let startWidth, startHeight, startX, startY;
+          
+          resizeHandle.addEventListener("mousedown", startResize);
+          resizeHandle.addEventListener("touchstart", startResize, { passive: false });
+          
+          function startResize(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            isResizing = true;
+            
+            startWidth = panel.offsetWidth;
+            startHeight = panel.offsetHeight;
+            
+            if (e.type === "touchstart") {
+              startX = e.touches[0].clientX;
+              startY = e.touches[0].clientY;
+            } else {
+              startX = e.clientX;
+              startY = e.clientY;
+            }
+            
+            // 确保使用固定定位
+            const rect = panel.getBoundingClientRect();
+            panel.style.left = rect.left + "px";
+            panel.style.top = rect.top + "px";
+            panel.style.right = "auto";
+            panel.style.bottom = "auto";
+            
+            document.addEventListener("mousemove", onResize);
+            document.addEventListener("mouseup", stopResize);
+            document.addEventListener("touchmove", onResize, { passive: false });
+            document.addEventListener("touchend", stopResize);
+          }
+          
+          function onResize(e) {
+            if (!isResizing) return;
+            e.preventDefault();
+            
+            let currentX, currentY;
+            if (e.type === "touchmove") {
+              currentX = e.touches[0].clientX;
+              currentY = e.touches[0].clientY;
+            } else {
+              currentX = e.clientX;
+              currentY = e.clientY;
+            }
+            
+            const deltaX = currentX - startX;
+            const deltaY = currentY - startY;
+            
+            let newWidth = startWidth + deltaX;
+            let newHeight = startHeight + deltaY;
+            
+            // 限制最小和最大尺寸
+            newWidth = Math.max(200, Math.min(newWidth, window.innerWidth - 20));
+            newHeight = Math.max(150, Math.min(newHeight, window.innerHeight - 100));
+            
+            panel.style.width = newWidth + "px";
+            panel.style.height = newHeight + "px";
+          }
+          
+          function stopResize() {
+            isResizing = false;
+            document.removeEventListener("mousemove", onResize);
+            document.removeEventListener("mouseup", stopResize);
+            document.removeEventListener("touchmove", onResize);
+            document.removeEventListener("touchend", stopResize);
           }
         });
       })();
@@ -17076,6 +17245,62 @@
         document.getElementById("imgOptionText").classList.remove("selected");
         window.selectedPostImage = null;
         checkPostValid();
+        
+        // 渲染可见范围选项
+        renderVisibilityOptions();
+      }
+      
+      // 渲染可见范围选项
+      function renderVisibilityOptions() {
+        const container = document.getElementById("igVisibilityOptions");
+        let html = `
+          <label class="ig-visibility-option" style="display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: white; border: 2px solid #f48fb1; border-radius: 20px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s;">
+            <input type="radio" name="postVisibility" value="public" checked style="display: none;" onchange="updateVisibilityUI()">
+            <span class="ig-vis-icon">🌍</span>
+            <span>公开</span>
+          </label>
+        `;
+        
+        // 添加每个AI角色作为可选项
+        if (window.characters && window.characters.length > 0) {
+          window.characters.forEach(char => {
+            html += `
+              <label class="ig-visibility-option" style="display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: white; border: 2px solid #dbdbdb; border-radius: 20px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s;">
+                <input type="checkbox" name="postVisibleTo" value="${char.id}" style="display: none;" onchange="updateVisibilityUI()">
+                <span class="ig-vis-icon">${char.avatar ? '👤' : '🤖'}</span>
+                <span>${char.note || char.name}</span>
+              </label>
+            `;
+          });
+        }
+        
+        container.innerHTML = html;
+      }
+      
+      // 更新可见范围UI
+      function updateVisibilityUI() {
+        const publicRadio = document.querySelector('input[name="postVisibility"][value="public"]');
+        const charCheckboxes = document.querySelectorAll('input[name="postVisibleTo"]');
+        
+        // 检查是否有任何角色被选中
+        const anyCharSelected = Array.from(charCheckboxes).some(cb => cb.checked);
+        
+        // 如果选中了角色，取消公开选项
+        if (anyCharSelected) {
+          publicRadio.checked = false;
+        }
+        
+        // 更新UI样式
+        document.querySelectorAll('.ig-visibility-option').forEach(label => {
+          const input = label.querySelector('input');
+          if (input.checked) {
+            label.style.borderColor = '#f48fb1';
+            label.style.background = '#fff0f5';
+          } else {
+            label.style.borderColor = '#dbdbdb';
+            label.style.background = 'white';
+          }
+        });
       }
 
       // 关闭发布弹窗
@@ -17140,6 +17365,22 @@
       async function submitPost() {
         const text = document.getElementById("igPostText").value.trim();
         const textImg = document.getElementById("igTextImgInput").value.trim();
+        
+        // 获取可见范围
+        const publicRadio = document.querySelector('input[name="postVisibility"][value="public"]');
+        const charCheckboxes = document.querySelectorAll('input[name="postVisibleTo"]:checked');
+        
+        let visibleTo = [];
+        if (publicRadio && publicRadio.checked) {
+          visibleTo = ['public']; // 公开
+        } else {
+          visibleTo = Array.from(charCheckboxes).map(cb => cb.value);
+        }
+        
+        // 如果没有选择任何选项，默认公开
+        if (visibleTo.length === 0) {
+          visibleTo = ['public'];
+        }
 
         const post = {
           id: Date.now(),
@@ -17151,6 +17392,7 @@
           authorId: "user",
           likes: [],
           comments: [],
+          visibleTo: visibleTo, // 可见范围
         };
 
         window.momentsData.posts.unshift(post);
@@ -17160,18 +17402,35 @@
         renderMomentsUI();
         showToast("✨ 动态发布成功！");
 
-        // AI角色可能会来互动
+        // AI角色可能会来互动（只有能看到的角色才会互动）
         setTimeout(() => {
           aiInteractWithPost(post);
-        }, 3000 + Math.random() * 5000);
+        }, 2000 + Math.random() * 3000);
       }
 
       // AI与用户动态互动 - 使用API生成符合人设的评论
       async function aiInteractWithPost(post) {
         if (!window.characters || window.characters.length === 0) return;
+        
+        // 获取API配置
+        const apiConfig = apiPresets.find((p) => p.id === activePresetId);
+        if (!apiConfig) {
+          console.log("没有激活的API，跳过AI互动");
+          return;
+        }
+
+        // 根据可见范围筛选可以互动的角色
+        let eligibleChars = [...window.characters];
+        if (post.visibleTo && !post.visibleTo.includes('public')) {
+          eligibleChars = window.characters.filter(char => 
+            post.visibleTo.includes(String(char.id))
+          );
+        }
+        
+        if (eligibleChars.length === 0) return;
 
         // 随机选择1-2个AI来互动
-        const shuffled = [...window.characters].sort(() => 0.5 - Math.random());
+        const shuffled = eligibleChars.sort(() => 0.5 - Math.random());
         const interactors = shuffled.slice(
           0,
           Math.min(2, Math.ceil(Math.random() * 2))
@@ -17179,11 +17438,11 @@
 
         for (const char of interactors) {
           await new Promise((resolve) =>
-            setTimeout(resolve, 3000 + Math.random() * 5000)
+            setTimeout(resolve, 2000 + Math.random() * 3000)
           );
 
-          // 80% 概率点赞
-          if (Math.random() > 0.2) {
+          // 90% 概率点赞
+          if (Math.random() > 0.1) {
             const postIndex = window.momentsData.posts.findIndex(
               (p) => p.id === post.id
             );
@@ -17199,9 +17458,10 @@
             }
           }
 
-          // 60% 概率评论 - 使用API生成符合人设的评论
-          if (Math.random() > 0.4) {
+          // 80% 概率评论 - 使用API生成符合人设的评论
+          if (Math.random() > 0.2) {
             try {
+              console.log(`正在为角色 ${char.name} 生成评论...`);
               const comment = await generateAiCommentWithAPI(char, post);
               if (comment) {
                 const postIndex = window.momentsData.posts.findIndex(
@@ -17219,6 +17479,7 @@
                   });
                   await localforage.setItem("momentsData", window.momentsData);
                   renderMomentsUI();
+                  console.log(`角色 ${char.name} 评论成功: ${comment}`);
                 }
               }
             } catch (e) {
@@ -17252,12 +17513,17 @@
         }
 
         const userName = window.momentsData.userProfile.name || "用户";
+        
+        // 获取角色的完整人设信息
+        const charSettings = window.chatSettings ? window.chatSettings[char.id] : null;
+        let personaInfo = "";
+        if (charSettings && charSettings.persona) {
+          personaInfo = charSettings.persona;
+        }
 
         // 构建系统提示词
-        const systemPrompt = `你是${
-          char.note || char.name
-        }，正在社交媒体上看到${userName}发布的一条动态。
-${char.description ? `你的人设: ${char.description}` : ""}
+        const systemPrompt = `你是${char.note || char.name}，正在社交媒体上看到${userName}发布的一条动态。
+${personaInfo ? `你的人设:\n${personaInfo}` : ""}
 
 请根据你的性格和人设，对这条动态写一条简短的评论回复。
 
@@ -17271,6 +17537,7 @@ ${char.description ? `你的人设: ${char.description}` : ""}
         const userPrompt = `${userName}发布了一条动态:\n${postDescription}\n\n请写一条评论:`;
 
         try {
+          console.log(`调用API为角色 ${char.name} 生成评论...`);
           const response = await fetch(`${apiConfig.url}/chat/completions`, {
             method: "POST",
             headers: {
@@ -17283,17 +17550,19 @@ ${char.description ? `你的人设: ${char.description}` : ""}
                 { role: "system", content: systemPrompt },
                 { role: "user", content: userPrompt },
               ],
-              max_tokens: 100,
-              temperature: 0.8,
+              max_tokens: 150,
+              temperature: apiConfig.temperature || 0.8,
             }),
           });
 
           if (!response.ok) {
-            throw new Error(`API请求失败: ${response.status}`);
+            const errorText = await response.text();
+            throw new Error(`API请求失败: ${response.status} - ${errorText}`);
           }
 
           const data = await response.json();
           const comment = data.choices?.[0]?.message?.content?.trim();
+          console.log(`API返回评论: ${comment}`);
           return comment || null;
         } catch (e) {
           console.error("API调用失败:", e);
@@ -18623,6 +18892,8 @@ ${userName}在你的动态下留言了，你需要回复。
         saveProfile,
         showCharacterPosts,
         generateMomentsPromptForAi,
+        renderVisibilityOptions,
+        updateVisibilityUI,
         // 外观设置
         previewWallpaper,
         resetWallpaper,
