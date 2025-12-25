@@ -19,7 +19,7 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Satisfy&display=swap"
       rel="stylesheet"
     />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js?v=1.1"></script>
     <style>
       * {
         margin: 0;
@@ -7672,20 +7672,61 @@
                   placeholder="分享你的想法..."
                   oninput="checkPostValid()"
                 ></textarea>
-                
+
                 <!-- 可见范围选择 -->
-                <div class="ig-visibility-section" style="margin: 12px 0; padding: 12px; background: #fafafa; border-radius: 12px;">
-                  <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #262626; margin-bottom: 8px;">👀 谁可以看到</label>
-                  <div style="display: flex; flex-wrap: wrap; gap: 8px;" id="igVisibilityOptions">
-                    <label class="ig-visibility-option" style="display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: white; border: 2px solid #dbdbdb; border-radius: 20px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s;">
-                      <input type="radio" name="postVisibility" value="public" checked style="display: none;" onchange="updateVisibilityUI()">
+                <div
+                  class="ig-visibility-section"
+                  style="
+                    margin: 12px 0;
+                    padding: 12px;
+                    background: #fafafa;
+                    border-radius: 12px;
+                  "
+                >
+                  <label
+                    style="
+                      display: block;
+                      font-size: 0.85rem;
+                      font-weight: 600;
+                      color: #262626;
+                      margin-bottom: 8px;
+                    "
+                    >👀 谁可以看到</label
+                  >
+                  <div
+                    style="display: flex; flex-wrap: wrap; gap: 8px"
+                    id="igVisibilityOptions"
+                  >
+                    <label
+                      class="ig-visibility-option"
+                      style="
+                        display: flex;
+                        align-items: center;
+                        gap: 6px;
+                        padding: 8px 12px;
+                        background: white;
+                        border: 2px solid #dbdbdb;
+                        border-radius: 20px;
+                        cursor: pointer;
+                        font-size: 0.85rem;
+                        transition: all 0.2s;
+                      "
+                    >
+                      <input
+                        type="radio"
+                        name="postVisibility"
+                        value="public"
+                        checked
+                        style="display: none"
+                        onchange="updateVisibilityUI()"
+                      />
                       <span class="ig-vis-icon">🌍</span>
                       <span>公开</span>
                     </label>
                     <!-- AI角色选项会动态渲染 -->
                   </div>
                 </div>
-                
+
                 <div class="ig-image-options">
                   <div
                     class="ig-image-option"
@@ -8781,12 +8822,35 @@
       </div>
 
       <div id="appearancePage" class="page">
-        <div class="page-header" style="position: sticky; top: 0; z-index: 100; background: var(--bg-pink); padding-bottom: 12px;">
+        <div
+          class="page-header"
+          style="
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--bg-pink);
+            padding-bottom: 12px;
+          "
+        >
           <button class="back-btn" onclick="closePage('appearancePage')">
             ←
           </button>
           <h1 class="page-title">外观设置</h1>
-          <button class="appearance-save-btn-top" onclick="saveAppearanceSettings()" style="padding: 8px 16px; background: linear-gradient(135deg, #f48fb1, #f06292); color: white; border: none; border-radius: 20px; font-size: 0.85rem; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px rgba(244, 143, 177, 0.4);">
+          <button
+            class="appearance-save-btn-top"
+            onclick="saveAppearanceSettings()"
+            style="
+              padding: 8px 16px;
+              background: linear-gradient(135deg, #f48fb1, #f06292);
+              color: white;
+              border: none;
+              border-radius: 20px;
+              font-size: 0.85rem;
+              font-weight: 600;
+              cursor: pointer;
+              box-shadow: 0 2px 8px rgba(244, 143, 177, 0.4);
+            "
+          >
             保存
           </button>
         </div>
@@ -9316,7 +9380,7 @@
           ←
         </button>
         <div class="read-header-title">📚 一起读书</div>
-        <div style="width: 36px;"></div>
+        <div style="width: 36px"></div>
       </div>
       <div class="read-content">
         <!-- 我的书架 -->
@@ -10663,7 +10727,7 @@
           if (typeof updateTodoDate === "function") updateTodoDate();
           if (typeof updateTodoStats === "function") updateTodoStats();
         }
-        
+
         // 控制底栏透明度 - Moment和Me页面透明，其他页面正常
         const tabBar = document.querySelector(".chat-tab-bar");
         if (tabBar) {
@@ -15882,19 +15946,23 @@
       function stopCurrentReading() {
         const charId = currentChatCharId;
         const readData = window.readTogetherData[charId];
-        
+
         if (readData && readData.active) {
           // 获取书籍信息用于通知AI
-          const book = window.bookshelfData.find((b) => b.id === readData.bookId);
+          const book = window.bookshelfData.find(
+            (b) => b.id === readData.bookId
+          );
           const bookName = book ? book.bookName : "书籍";
-          const progress = book ? Math.round(((book.currentIndex + 1) / book.chunks.length) * 100) : 0;
-          
+          const progress = book
+            ? Math.round(((book.currentIndex + 1) / book.chunks.length) * 100)
+            : 0;
+
           // 标记阅读状态为已结束
           window.readTogetherData[charId].active = false;
           window.readTogetherData[charId].endedAt = Date.now();
           window.readTogetherData[charId].endProgress = progress;
           localforage.setItem("readTogetherData", window.readTogetherData);
-          
+
           // 记录到聊天历史，让AI知道用户结束了阅读
           if (chatHistories[charId]) {
             chatHistories[charId].push({
@@ -15910,7 +15978,7 @@
             localforage.setItem("chatHistories", chatHistories);
           }
         }
-        
+
         renderBookshelf();
         renderCurrentReading();
         hideFloatingBtn();
@@ -16115,13 +16183,13 @@
           }
         });
       })();
-      
+
       // 悬浮窗手机端缩放功能
       (function initFloatingPanelResize() {
         document.addEventListener("DOMContentLoaded", function () {
           const panel = document.getElementById("readFloatingPanel");
           if (!panel) return;
-          
+
           // 创建缩放手柄
           const resizeHandle = document.createElement("div");
           resizeHandle.className = "read-float-resize-handle";
@@ -16138,21 +16206,23 @@
             touch-action: none;
           `;
           panel.appendChild(resizeHandle);
-          
+
           let isResizing = false;
           let startWidth, startHeight, startX, startY;
-          
+
           resizeHandle.addEventListener("mousedown", startResize);
-          resizeHandle.addEventListener("touchstart", startResize, { passive: false });
-          
+          resizeHandle.addEventListener("touchstart", startResize, {
+            passive: false,
+          });
+
           function startResize(e) {
             e.preventDefault();
             e.stopPropagation();
             isResizing = true;
-            
+
             startWidth = panel.offsetWidth;
             startHeight = panel.offsetHeight;
-            
+
             if (e.type === "touchstart") {
               startX = e.touches[0].clientX;
               startY = e.touches[0].clientY;
@@ -16160,24 +16230,26 @@
               startX = e.clientX;
               startY = e.clientY;
             }
-            
+
             // 确保使用固定定位
             const rect = panel.getBoundingClientRect();
             panel.style.left = rect.left + "px";
             panel.style.top = rect.top + "px";
             panel.style.right = "auto";
             panel.style.bottom = "auto";
-            
+
             document.addEventListener("mousemove", onResize);
             document.addEventListener("mouseup", stopResize);
-            document.addEventListener("touchmove", onResize, { passive: false });
+            document.addEventListener("touchmove", onResize, {
+              passive: false,
+            });
             document.addEventListener("touchend", stopResize);
           }
-          
+
           function onResize(e) {
             if (!isResizing) return;
             e.preventDefault();
-            
+
             let currentX, currentY;
             if (e.type === "touchmove") {
               currentX = e.touches[0].clientX;
@@ -16186,21 +16258,27 @@
               currentX = e.clientX;
               currentY = e.clientY;
             }
-            
+
             const deltaX = currentX - startX;
             const deltaY = currentY - startY;
-            
+
             let newWidth = startWidth + deltaX;
             let newHeight = startHeight + deltaY;
-            
+
             // 限制最小和最大尺寸
-            newWidth = Math.max(200, Math.min(newWidth, window.innerWidth - 20));
-            newHeight = Math.max(150, Math.min(newHeight, window.innerHeight - 100));
-            
+            newWidth = Math.max(
+              200,
+              Math.min(newWidth, window.innerWidth - 20)
+            );
+            newHeight = Math.max(
+              150,
+              Math.min(newHeight, window.innerHeight - 100)
+            );
+
             panel.style.width = newWidth + "px";
             panel.style.height = newHeight + "px";
           }
-          
+
           function stopResize() {
             isResizing = false;
             document.removeEventListener("mousemove", onResize);
@@ -17245,11 +17323,11 @@
         document.getElementById("imgOptionText").classList.remove("selected");
         window.selectedPostImage = null;
         checkPostValid();
-        
+
         // 渲染可见范围选项
         renderVisibilityOptions();
       }
-      
+
       // 渲染可见范围选项
       function renderVisibilityOptions() {
         const container = document.getElementById("igVisibilityOptions");
@@ -17260,45 +17338,53 @@
             <span>公开</span>
           </label>
         `;
-        
+
         // 添加每个AI角色作为可选项
         if (window.characters && window.characters.length > 0) {
-          window.characters.forEach(char => {
+          window.characters.forEach((char) => {
             html += `
               <label class="ig-visibility-option" style="display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: white; border: 2px solid #dbdbdb; border-radius: 20px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s;">
-                <input type="checkbox" name="postVisibleTo" value="${char.id}" style="display: none;" onchange="updateVisibilityUI()">
-                <span class="ig-vis-icon">${char.avatar ? '👤' : '🤖'}</span>
+                <input type="checkbox" name="postVisibleTo" value="${
+                  char.id
+                }" style="display: none;" onchange="updateVisibilityUI()">
+                <span class="ig-vis-icon">${char.avatar ? "👤" : "🤖"}</span>
                 <span>${char.note || char.name}</span>
               </label>
             `;
           });
         }
-        
+
         container.innerHTML = html;
       }
-      
+
       // 更新可见范围UI
       function updateVisibilityUI() {
-        const publicRadio = document.querySelector('input[name="postVisibility"][value="public"]');
-        const charCheckboxes = document.querySelectorAll('input[name="postVisibleTo"]');
-        
+        const publicRadio = document.querySelector(
+          'input[name="postVisibility"][value="public"]'
+        );
+        const charCheckboxes = document.querySelectorAll(
+          'input[name="postVisibleTo"]'
+        );
+
         // 检查是否有任何角色被选中
-        const anyCharSelected = Array.from(charCheckboxes).some(cb => cb.checked);
-        
+        const anyCharSelected = Array.from(charCheckboxes).some(
+          (cb) => cb.checked
+        );
+
         // 如果选中了角色，取消公开选项
         if (anyCharSelected) {
           publicRadio.checked = false;
         }
-        
+
         // 更新UI样式
-        document.querySelectorAll('.ig-visibility-option').forEach(label => {
-          const input = label.querySelector('input');
+        document.querySelectorAll(".ig-visibility-option").forEach((label) => {
+          const input = label.querySelector("input");
           if (input.checked) {
-            label.style.borderColor = '#f48fb1';
-            label.style.background = '#fff0f5';
+            label.style.borderColor = "#f48fb1";
+            label.style.background = "#fff0f5";
           } else {
-            label.style.borderColor = '#dbdbdb';
-            label.style.background = 'white';
+            label.style.borderColor = "#dbdbdb";
+            label.style.background = "white";
           }
         });
       }
@@ -17365,21 +17451,25 @@
       async function submitPost() {
         const text = document.getElementById("igPostText").value.trim();
         const textImg = document.getElementById("igTextImgInput").value.trim();
-        
+
         // 获取可见范围
-        const publicRadio = document.querySelector('input[name="postVisibility"][value="public"]');
-        const charCheckboxes = document.querySelectorAll('input[name="postVisibleTo"]:checked');
-        
+        const publicRadio = document.querySelector(
+          'input[name="postVisibility"][value="public"]'
+        );
+        const charCheckboxes = document.querySelectorAll(
+          'input[name="postVisibleTo"]:checked'
+        );
+
         let visibleTo = [];
         if (publicRadio && publicRadio.checked) {
-          visibleTo = ['public']; // 公开
+          visibleTo = ["public"]; // 公开
         } else {
-          visibleTo = Array.from(charCheckboxes).map(cb => cb.value);
+          visibleTo = Array.from(charCheckboxes).map((cb) => cb.value);
         }
-        
+
         // 如果没有选择任何选项，默认公开
         if (visibleTo.length === 0) {
-          visibleTo = ['public'];
+          visibleTo = ["public"];
         }
 
         const post = {
@@ -17411,7 +17501,7 @@
       // AI与用户动态互动 - 使用API生成符合人设的评论
       async function aiInteractWithPost(post) {
         if (!window.characters || window.characters.length === 0) return;
-        
+
         // 获取API配置
         const apiConfig = apiPresets.find((p) => p.id === activePresetId);
         if (!apiConfig) {
@@ -17421,12 +17511,12 @@
 
         // 根据可见范围筛选可以互动的角色
         let eligibleChars = [...window.characters];
-        if (post.visibleTo && !post.visibleTo.includes('public')) {
-          eligibleChars = window.characters.filter(char => 
+        if (post.visibleTo && !post.visibleTo.includes("public")) {
+          eligibleChars = window.characters.filter((char) =>
             post.visibleTo.includes(String(char.id))
           );
         }
-        
+
         if (eligibleChars.length === 0) return;
 
         // 随机选择1-2个AI来互动
@@ -17513,16 +17603,20 @@
         }
 
         const userName = window.momentsData.userProfile.name || "用户";
-        
+
         // 获取角色的完整人设信息
-        const charSettings = window.chatSettings ? window.chatSettings[char.id] : null;
+        const charSettings = window.chatSettings
+          ? window.chatSettings[char.id]
+          : null;
         let personaInfo = "";
         if (charSettings && charSettings.persona) {
           personaInfo = charSettings.persona;
         }
 
         // 构建系统提示词
-        const systemPrompt = `你是${char.note || char.name}，正在社交媒体上看到${userName}发布的一条动态。
+        const systemPrompt = `你是${
+          char.note || char.name
+        }，正在社交媒体上看到${userName}发布的一条动态。
 ${personaInfo ? `你的人设:\n${personaInfo}` : ""}
 
 请根据你的性格和人设，对这条动态写一条简短的评论回复。
