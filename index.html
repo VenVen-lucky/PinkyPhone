@@ -19,7 +19,7 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Satisfy&display=swap"
       rel="stylesheet"
     />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js?v=1.1"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js?v=1.2"></script>
     <style>
       * {
         margin: 0;
@@ -326,7 +326,7 @@
       }
 
       .app-name {
-        font-size: 0.85rem;
+        font-size: 0.6rem;
         font-weight: 500;
         color: var(--text-primary);
         text-align: center;
@@ -340,10 +340,9 @@
         bottom: 24px;
         left: 50%;
         transform: translateX(-50%);
-        width: auto;
-        min-width: 200px;
-        max-width: calc(100% - 40px);
-        padding: 8px 20px;
+        width: calc(100% - 40px);
+        max-width: 360px;
+        padding: 8px 24px;
         background: rgba(255, 255, 255, 0.25);
         backdrop-filter: blur(30px) saturate(180%);
         -webkit-backdrop-filter: blur(30px) saturate(180%);
@@ -351,9 +350,8 @@
         border: 1px solid rgba(255, 255, 255, 0.3);
         box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
         display: flex;
-        justify-content: center;
+        justify-content: space-between;
         align-items: center;
-        gap: 8px;
         z-index: 100;
       }
 
@@ -488,7 +486,6 @@
         cursor: pointer;
         box-shadow: 0 2px 8px var(--shadow);
         transition: transform 0.2s;
-        color: #000;
       }
 
       .back-btn:active {
@@ -926,26 +923,9 @@
       #momentsTab {
         background: linear-gradient(180deg, #f5f5f5 0%, #efefef 100%);
         min-height: 100%;
-        padding-bottom: 100px;
-      }
-
-      /* Moment和Me页面底栏透明 */
-      #momentsTab ~ .chat-tab-bar,
-      #profileTab ~ .chat-tab-bar {
-        background: transparent;
-        backdrop-filter: none;
-        -webkit-backdrop-filter: none;
-        border: none;
-        box-shadow: none;
-      }
-
-      .chat-app[data-active-tab="moments"] .chat-tab-bar,
-      .chat-app[data-active-tab="profile"] .chat-tab-bar {
-        background: transparent !important;
-        backdrop-filter: none !important;
-        -webkit-backdrop-filter: none !important;
-        border: none !important;
-        box-shadow: none !important;
+        padding-bottom: 80px;
+        box-sizing: border-box;
+        position: relative;
       }
 
       /* Stories 横向滚动区 - 保留但简化 */
@@ -2242,10 +2222,11 @@
       /* ==================== Todo Tab - 超可爱小夹板设计 ==================== */
       #todoTab {
         padding: 16px;
-        padding-bottom: 120px;
+        padding-bottom: 80px;
         background: linear-gradient(180deg, #fff0f5 0%, #ffeef5 30%, #fff5f8 60%, #fffafa 100%);
         min-height: 100%;
         position: relative;
+        box-sizing: border-box;
       }
 
       /* 背景装饰 */
@@ -3313,8 +3294,8 @@
       /* 待办设置按钮 */
       .todo-settings-btn {
         position: absolute;
-        top: 50px;
-        right: 20px;
+        top: 12px;
+        right: 12px;
         width: 32px;
         height: 32px;
         border-radius: 50%;
@@ -3458,6 +3439,15 @@
       /* Profile Tab (我的) */
       #profileTab {
         background: #f5f5f5;
+        min-height: 100vh;
+        padding-bottom: 100px;
+        box-sizing: border-box;
+        overflow: hidden;
+      }
+
+      /* 禁止Me页面滚动 */
+      .chat-content:has(#profileTab.active) {
+        overflow: hidden !important;
       }
 
       .profile-header-card {
@@ -3765,7 +3755,7 @@
 
       /* ==================== API SETTINGS STYLES ==================== */
       .api-settings-page {
-        background: linear-gradient(180deg, #fff5f8 0%, #ffeef5 100%) !important;
+        background: #f5f5f5 !important;
       }
 
       .api-settings-page::before {
@@ -3775,14 +3765,10 @@
       .api-settings-page .page-header {
         display: flex;
         align-items: center;
-        background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%);
+        background: white;
         padding: 12px 16px;
         padding-top: max(12px, env(safe-area-inset-top));
-        border-bottom: 1px solid rgba(244, 143, 177, 0.2);
-      }
-
-      .api-settings-page .page-title {
-        color: #c2185b;
+        border-bottom: 1px solid #eee;
       }
 
       .page-header-add {
@@ -4550,7 +4536,7 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: linear-gradient(180deg, #fff5f8 0%, #ffeef5 100%);
+        background: linear-gradient(180deg, #f8f4f0 0%, #f0ebe5 100%);
         z-index: 350;
         flex-direction: column;
         overflow: hidden;
@@ -4578,14 +4564,14 @@
         justify-content: space-between;
         padding: 16px 20px;
         padding-top: max(16px, env(safe-area-inset-top));
-        background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%);
+        background: linear-gradient(135deg, #e8d5c4 0%, #d4c4b0 100%);
         border-bottom: 1px solid rgba(0, 0, 0, 0.05);
       }
 
       .settings-header-title {
         font-size: 1.15rem;
         font-weight: 700;
-        color: #c2185b;
+        color: #5d4e37;
         display: flex;
         align-items: center;
         gap: 8px;
@@ -4604,7 +4590,7 @@
         border-radius: 50%;
         font-size: 18px;
         cursor: pointer;
-        color: #c2185b;
+        color: #5d4e37;
         transition: all 0.2s;
       }
 
@@ -4625,7 +4611,7 @@
         border-radius: 20px;
         margin-bottom: 16px;
         overflow: hidden;
-        box-shadow: 0 2px 12px rgba(244, 143, 177, 0.15);
+        box-shadow: 0 2px 12px rgba(93, 78, 55, 0.08);
       }
 
       .section-header {
@@ -4633,7 +4619,7 @@
         align-items: center;
         gap: 10px;
         padding: 16px 20px;
-        background: linear-gradient(135deg, #fff0f5 0%, #fce4ec 100%);
+        background: linear-gradient(135deg, #f5efe8 0%, #ebe3d9 100%);
         border-bottom: 1px solid rgba(0, 0, 0, 0.03);
       }
 
@@ -4648,25 +4634,25 @@
       }
 
       .section-icon.brown {
-        background: linear-gradient(135deg, #f48fb1, #f06292);
+        background: linear-gradient(135deg, #d4a574, #c4956a);
       }
       .section-icon.purple {
-        background: linear-gradient(135deg, #ce93d8, #ba68c8);
+        background: linear-gradient(135deg, #b8a5d4, #a090c4);
       }
       .section-icon.teal {
-        background: linear-gradient(135deg, #80deea, #4dd0e1);
+        background: linear-gradient(135deg, #7cb8a8, #6aa898);
       }
       .section-icon.orange {
-        background: linear-gradient(135deg, #ffcc80, #ffb74d);
+        background: linear-gradient(135deg, #e8b88a, #d8a07a);
       }
       .section-icon.blue {
-        background: linear-gradient(135deg, #90caf9, #64b5f6);
+        background: linear-gradient(135deg, #8ab8e8, #7aa8d8);
       }
 
       .section-title {
         font-size: 0.95rem;
         font-weight: 700;
-        color: #c2185b;
+        color: #5d4e37;
       }
 
       .section-body {
@@ -5738,6 +5724,24 @@
       }
 
       /* ==================== 外观设置页面样式 ==================== */
+      #appearancePage {
+        padding-top: 0 !important;
+      }
+
+      #appearancePage .page-header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%);
+        margin: 0 -16px 16px -16px;
+        padding: 16px;
+        padding-top: max(16px, env(safe-area-inset-top));
+      }
+
+      #appearancePage .page-title {
+        color: #c2185b;
+      }
+
       #appearancePage .page-content {
         display: flex !important;
         flex-direction: column !important;
@@ -6328,7 +6332,7 @@
         border: none;
         background: none;
         font-size: 24px;
-        color: #000;
+        color: #4caf50;
         cursor: pointer;
       }
       .read-header-title {
@@ -6560,6 +6564,7 @@
         display: none;
         flex-direction: column;
         overflow: hidden;
+        resize: both;
       }
       .read-floating-panel.active {
         display: flex;
@@ -7672,61 +7677,6 @@
                   placeholder="分享你的想法..."
                   oninput="checkPostValid()"
                 ></textarea>
-
-                <!-- 可见范围选择 -->
-                <div
-                  class="ig-visibility-section"
-                  style="
-                    margin: 12px 0;
-                    padding: 12px;
-                    background: #fafafa;
-                    border-radius: 12px;
-                  "
-                >
-                  <label
-                    style="
-                      display: block;
-                      font-size: 0.85rem;
-                      font-weight: 600;
-                      color: #262626;
-                      margin-bottom: 8px;
-                    "
-                    >👀 谁可以看到</label
-                  >
-                  <div
-                    style="display: flex; flex-wrap: wrap; gap: 8px"
-                    id="igVisibilityOptions"
-                  >
-                    <label
-                      class="ig-visibility-option"
-                      style="
-                        display: flex;
-                        align-items: center;
-                        gap: 6px;
-                        padding: 8px 12px;
-                        background: white;
-                        border: 2px solid #dbdbdb;
-                        border-radius: 20px;
-                        cursor: pointer;
-                        font-size: 0.85rem;
-                        transition: all 0.2s;
-                      "
-                    >
-                      <input
-                        type="radio"
-                        name="postVisibility"
-                        value="public"
-                        checked
-                        style="display: none"
-                        onchange="updateVisibilityUI()"
-                      />
-                      <span class="ig-vis-icon">🌍</span>
-                      <span>公开</span>
-                    </label>
-                    <!-- AI角色选项会动态渲染 -->
-                  </div>
-                </div>
-
                 <div class="ig-image-options">
                   <div
                     class="ig-image-option"
@@ -7924,13 +7874,6 @@
             </div>
 
             <div class="clipboard-container">
-              <!-- 设置按钮 -->
-              <button
-                class="todo-settings-btn"
-                onclick="openTodoSettingsModal()"
-              >
-                ⚙️
-              </button>
               <!-- 夹子 -->
               <div class="clipboard-clip"></div>
               <!-- 木板 -->
@@ -8164,20 +8107,6 @@
                     <div class="greeting-preview-sub" id="greetingPreviewSub">
                       新的一天，新的开始~
                     </div>
-                  </div>
-                  <div class="greeting-input-row">
-                    <select
-                      class="greeting-time-select"
-                      id="greetingTimeSelect"
-                      onchange="loadGreetingForEdit()"
-                    >
-                      <option value="morning">早晨 (6-9点)</option>
-                      <option value="forenoon">上午 (9-12点)</option>
-                      <option value="noon">中午 (12-14点)</option>
-                      <option value="afternoon">下午 (14-18点)</option>
-                      <option value="evening">晚上 (18-21点)</option>
-                      <option value="night">深夜 (21点后)</option>
-                    </select>
                   </div>
                   <div class="greeting-input-row">
                     <input
@@ -8822,37 +8751,11 @@
       </div>
 
       <div id="appearancePage" class="page">
-        <div
-          class="page-header"
-          style="
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: var(--bg-pink);
-            padding-bottom: 12px;
-          "
-        >
+        <div class="page-header">
           <button class="back-btn" onclick="closePage('appearancePage')">
             ←
           </button>
           <h1 class="page-title">外观设置</h1>
-          <button
-            class="appearance-save-btn-top"
-            onclick="saveAppearanceSettings()"
-            style="
-              padding: 8px 16px;
-              background: linear-gradient(135deg, #f48fb1, #f06292);
-              color: white;
-              border: none;
-              border-radius: 20px;
-              font-size: 0.85rem;
-              font-weight: 600;
-              cursor: pointer;
-              box-shadow: 0 2px 8px rgba(244, 143, 177, 0.4);
-            "
-          >
-            保存
-          </button>
         </div>
         <div
           class="page-content"
@@ -9084,6 +8987,14 @@
               </div>
             </div>
           </div>
+
+          <!-- 保存按钮 -->
+          <button
+            class="appearance-save-btn"
+            onclick="saveAppearanceSettings()"
+          >
+            ✨ 保存设置
+          </button>
         </div>
       </div>
 
@@ -9380,7 +9291,9 @@
           ←
         </button>
         <div class="read-header-title">📚 一起读书</div>
-        <div style="width: 36px"></div>
+        <button class="read-header-action" onclick="startFloatingMode()">
+          📌
+        </button>
       </div>
       <div class="read-content">
         <!-- 我的书架 -->
@@ -10715,10 +10628,56 @@
         const buttons = {
           messages: "➕",
           moments: "📷",
-          todo: "➕",
+          todo: "⚙️",
           profile: "⚙️",
         };
         document.getElementById("chatHeaderBtn").textContent = buttons[tabName];
+
+        // 为moments、todo和profile页面移除波点背景，改为dock栏风格
+        const chatApp = document.querySelector(".chat-app");
+        const tabBar = document.querySelector(".chat-tab-bar");
+        const chatContent = document.querySelector(".chat-content");
+
+        if (tabName === "messages") {
+          // 只有messages页面保留波点背景
+          chatApp.style.background = "#fdf5f7";
+          chatApp.style.backgroundImage =
+            "radial-gradient(circle, rgba(244,143,177,0.15) 2px, transparent 2px)";
+          chatApp.style.backgroundSize = "20px 20px";
+          chatContent.style.background = "transparent";
+          // 恢复底栏原有样式
+          tabBar.style.background = "rgba(255, 255, 255, 0.7)";
+          tabBar.style.backdropFilter = "blur(25px) saturate(180%)";
+          tabBar.style.webkitBackdropFilter = "blur(25px) saturate(180%)";
+          // 允许滚动
+          chatContent.style.overflowY = "auto";
+        } else if (tabName === "moments") {
+          chatApp.style.backgroundImage = "none";
+          chatApp.style.background = "#efefef";
+          chatContent.style.background = "#efefef";
+          tabBar.style.background = "rgba(255, 255, 255, 0.25)";
+          tabBar.style.backdropFilter = "blur(30px) saturate(180%)";
+          tabBar.style.webkitBackdropFilter = "blur(30px) saturate(180%)";
+          chatContent.style.overflowY = "auto";
+        } else if (tabName === "todo") {
+          chatApp.style.backgroundImage = "none";
+          chatApp.style.background = "#fffafa";
+          chatContent.style.background = "#fffafa";
+          tabBar.style.background = "rgba(255, 255, 255, 0.25)";
+          tabBar.style.backdropFilter = "blur(30px) saturate(180%)";
+          tabBar.style.webkitBackdropFilter = "blur(30px) saturate(180%)";
+          chatContent.style.overflowY = "auto";
+        } else {
+          // profile页面
+          chatApp.style.backgroundImage = "none";
+          chatApp.style.background = "#f5f5f5";
+          chatContent.style.background = "#f5f5f5";
+          tabBar.style.background = "rgba(255, 255, 255, 0.25)";
+          tabBar.style.backdropFilter = "blur(30px) saturate(180%)";
+          tabBar.style.webkitBackdropFilter = "blur(30px) saturate(180%)";
+          // Me页面禁止滚动
+          chatContent.style.overflowY = "hidden";
+        }
 
         // 切换到待办标签时刷新AI角色列表和日期
         if (tabName === "todo") {
@@ -10726,24 +10685,6 @@
             renderTodoAiCharList();
           if (typeof updateTodoDate === "function") updateTodoDate();
           if (typeof updateTodoStats === "function") updateTodoStats();
-        }
-
-        // 控制底栏透明度 - Moment和Me页面透明，其他页面正常
-        const tabBar = document.querySelector(".chat-tab-bar");
-        if (tabBar) {
-          if (tabName === "moments" || tabName === "profile") {
-            tabBar.style.background = "transparent";
-            tabBar.style.backdropFilter = "none";
-            tabBar.style.webkitBackdropFilter = "none";
-            tabBar.style.border = "none";
-            tabBar.style.boxShadow = "none";
-          } else {
-            tabBar.style.background = "rgba(255, 255, 255, 0.7)";
-            tabBar.style.backdropFilter = "blur(25px) saturate(180%)";
-            tabBar.style.webkitBackdropFilter = "blur(25px) saturate(180%)";
-            tabBar.style.border = "1px solid rgba(255, 255, 255, 0.5)";
-            tabBar.style.boxShadow = "0 4px 20px rgba(0, 0, 0, 0.08)";
-          }
         }
       }
 
@@ -10759,6 +10700,8 @@
         ).textContent;
         if (currentTab === "Message") {
           openCreateCharModal();
+        } else if (currentTab === "To Do") {
+          openTodoSettingsModal();
         }
       }
 
@@ -15945,40 +15888,10 @@
       // 暂停阅读（回到书架）
       function stopCurrentReading() {
         const charId = currentChatCharId;
-        const readData = window.readTogetherData[charId];
-
-        if (readData && readData.active) {
-          // 获取书籍信息用于通知AI
-          const book = window.bookshelfData.find(
-            (b) => b.id === readData.bookId
-          );
-          const bookName = book ? book.bookName : "书籍";
-          const progress = book
-            ? Math.round(((book.currentIndex + 1) / book.chunks.length) * 100)
-            : 0;
-
-          // 标记阅读状态为已结束
+        if (window.readTogetherData[charId]) {
           window.readTogetherData[charId].active = false;
-          window.readTogetherData[charId].endedAt = Date.now();
-          window.readTogetherData[charId].endProgress = progress;
           localforage.setItem("readTogetherData", window.readTogetherData);
-
-          // 记录到聊天历史，让AI知道用户结束了阅读
-          if (chatHistories[charId]) {
-            chatHistories[charId].push({
-              role: "system",
-              content: `[系统提示: 用户刚刚结束了和你一起阅读《${bookName}》的活动，阅读进度为${progress}%。你可以自然地对此做出回应，比如询问用户的阅读感受、讨论书中内容等。]`,
-              time: new Date().toLocaleTimeString("zh-CN", {
-                hour: "2-digit",
-                minute: "2-digit",
-              }),
-              timestamp: Date.now(),
-              isSystemHint: true, // 标记为系统提示，不显示在界面上但AI能看到
-            });
-            localforage.setItem("chatHistories", chatHistories);
-          }
         }
-
         renderBookshelf();
         renderCurrentReading();
         hideFloatingBtn();
@@ -16184,111 +16097,6 @@
         });
       })();
 
-      // 悬浮窗手机端缩放功能
-      (function initFloatingPanelResize() {
-        document.addEventListener("DOMContentLoaded", function () {
-          const panel = document.getElementById("readFloatingPanel");
-          if (!panel) return;
-
-          // 创建缩放手柄
-          const resizeHandle = document.createElement("div");
-          resizeHandle.className = "read-float-resize-handle";
-          resizeHandle.style.cssText = `
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 30px;
-            height: 30px;
-            cursor: se-resize;
-            background: linear-gradient(135deg, transparent 50%, rgba(76, 175, 80, 0.3) 50%);
-            border-radius: 0 0 16px 0;
-            z-index: 10;
-            touch-action: none;
-          `;
-          panel.appendChild(resizeHandle);
-
-          let isResizing = false;
-          let startWidth, startHeight, startX, startY;
-
-          resizeHandle.addEventListener("mousedown", startResize);
-          resizeHandle.addEventListener("touchstart", startResize, {
-            passive: false,
-          });
-
-          function startResize(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            isResizing = true;
-
-            startWidth = panel.offsetWidth;
-            startHeight = panel.offsetHeight;
-
-            if (e.type === "touchstart") {
-              startX = e.touches[0].clientX;
-              startY = e.touches[0].clientY;
-            } else {
-              startX = e.clientX;
-              startY = e.clientY;
-            }
-
-            // 确保使用固定定位
-            const rect = panel.getBoundingClientRect();
-            panel.style.left = rect.left + "px";
-            panel.style.top = rect.top + "px";
-            panel.style.right = "auto";
-            panel.style.bottom = "auto";
-
-            document.addEventListener("mousemove", onResize);
-            document.addEventListener("mouseup", stopResize);
-            document.addEventListener("touchmove", onResize, {
-              passive: false,
-            });
-            document.addEventListener("touchend", stopResize);
-          }
-
-          function onResize(e) {
-            if (!isResizing) return;
-            e.preventDefault();
-
-            let currentX, currentY;
-            if (e.type === "touchmove") {
-              currentX = e.touches[0].clientX;
-              currentY = e.touches[0].clientY;
-            } else {
-              currentX = e.clientX;
-              currentY = e.clientY;
-            }
-
-            const deltaX = currentX - startX;
-            const deltaY = currentY - startY;
-
-            let newWidth = startWidth + deltaX;
-            let newHeight = startHeight + deltaY;
-
-            // 限制最小和最大尺寸
-            newWidth = Math.max(
-              200,
-              Math.min(newWidth, window.innerWidth - 20)
-            );
-            newHeight = Math.max(
-              150,
-              Math.min(newHeight, window.innerHeight - 100)
-            );
-
-            panel.style.width = newWidth + "px";
-            panel.style.height = newHeight + "px";
-          }
-
-          function stopResize() {
-            isResizing = false;
-            document.removeEventListener("mousemove", onResize);
-            document.removeEventListener("mouseup", stopResize);
-            document.removeEventListener("touchmove", onResize);
-            document.removeEventListener("touchend", stopResize);
-          }
-        });
-      })();
-
       // 打开对话时检查是否需要显示悬浮按钮
       function checkFloatingBtn() {
         const charId = currentChatCharId;
@@ -16337,14 +16145,7 @@
       // 自定义设置
       window.todoSettings = {
         title: "我的小本本",
-        greetings: {
-          morning: { main: "早安！元气满满的一天 ☀️", sub: "吃早餐了吗？" },
-          forenoon: { main: "上午好！保持专注 💪", sub: "一步一步完成目标~" },
-          noon: { main: "午安！记得吃午饭 🍱", sub: "适当休息一下~" },
-          afternoon: { main: "下午好！继续加油 ✨", sub: "你做得很棒！" },
-          evening: { main: "晚上好！辛苦啦 🌆", sub: "今天完成了多少呢？" },
-          night: { main: "夜深了，早点休息哦 🌙", sub: "明天会更好的~" },
-        },
+        greeting: { main: "今天也要加油鸭！🦆", sub: "新的一天，新的开始~" },
       };
 
       async function initTodoSystem() {
@@ -16396,22 +16197,15 @@
         if (monthEl) monthEl.textContent = now.getMonth() + 1 + "月";
         if (weekdayEl) weekdayEl.textContent = weekdays[now.getDay()];
 
-        // 根据时间段显示问候语
-        const hour = now.getHours();
-        let period = "night";
-        if (hour >= 6 && hour < 9) period = "morning";
-        else if (hour >= 9 && hour < 12) period = "forenoon";
-        else if (hour >= 12 && hour < 14) period = "noon";
-        else if (hour >= 14 && hour < 18) period = "afternoon";
-        else if (hour >= 18 && hour < 21) period = "evening";
-
-        const greetings =
-          window.todoSettings.greetings[period] ||
-          window.todoSettings.greetings.morning;
+        // 显示统一问候语
+        const greeting = window.todoSettings.greeting || {
+          main: "今天也要加油鸭！🦆",
+          sub: "新的一天，新的开始~",
+        };
         const greetingEl = document.getElementById("todoGreeting");
         const subEl = document.getElementById("todoGreetingSub");
-        if (greetingEl) greetingEl.textContent = greetings.main;
-        if (subEl) subEl.textContent = greetings.sub;
+        if (greetingEl) greetingEl.textContent = greeting.main;
+        if (subEl) subEl.textContent = greeting.sub;
       }
 
       function updateTodoStats() {
@@ -16579,12 +16373,52 @@
       async function toggleTodoDone(id) {
         const todo = window.todoList.find((t) => t.id === id);
         if (todo) {
+          const wasDone = todo.done;
           todo.done = !todo.done;
           todo.doneAt = todo.done ? Date.now() : null;
           await localforage.setItem("todoList", window.todoList);
           renderTodoList();
           updateTodoStats();
-          if (todo.done) showToast("太棒了！完成一项 🎉");
+
+          if (todo.done && !wasDone) {
+            showToast("太棒了！完成一项 🎉");
+            // 通知所有绑定的AI角色用户完成了待办
+            notifyAiTodoCompleted(todo);
+          }
+        }
+      }
+
+      // 通知AI用户完成了待办事项
+      async function notifyAiTodoCompleted(todo) {
+        const bindingIds = Object.keys(window.todoAiBindings).filter(
+          (id) => window.todoAiBindings[id]
+        );
+        if (bindingIds.length === 0) return;
+
+        // 获取分类名称
+        const category = window.todoCategories.find(
+          (c) => c.id === todo.category
+        );
+        const categoryName = category ? category.name : "其他";
+
+        // 为每个绑定的AI注入系统消息
+        for (const charId of bindingIds) {
+          const char = characters.find((c) => String(c.id) === charId);
+          if (!char) continue;
+
+          // 向该角色的聊天记录注入系统提示
+          const historyKey = `chat_${charId}`;
+          let history = (await localforage.getItem(historyKey)) || [];
+
+          const systemMsg = {
+            role: "user",
+            content: `[系统提示: 用户刚刚完成了一项待办事项「${todo.text}」(分类:${categoryName})，请根据你的人设简短地夸奖或鼓励用户！]`,
+            isSystemHint: true,
+            timestamp: Date.now(),
+          };
+
+          history.push(systemMsg);
+          await localforage.setItem(historyKey, history);
         }
       }
 
@@ -16630,9 +16464,111 @@
           window.todoAiBindings[charId] = true;
           const char = characters.find((c) => String(c.id) === charId);
           showToast(`${char?.name || "TA"}会督促你完成待办哦~`);
+
+          // AI主动发起对话，表示看到了用户的待办列表
+          aiGreetForTodoBinding(charId);
         }
         await localforage.setItem("todoAiBindings", window.todoAiBindings);
         renderTodoAiCharList();
+      }
+
+      // AI被选为督促助手时主动发起对话
+      async function aiGreetForTodoBinding(charId) {
+        const char = characters.find((c) => String(c.id) === charId);
+        if (!char) return;
+
+        // 获取待办列表概况
+        const pending = window.todoList.filter((t) => !t.done);
+        const todoSummary =
+          pending.length > 0
+            ? pending
+                .slice(0, 5)
+                .map((t) => `「${t.text}」`)
+                .join("、") + (pending.length > 5 ? "等" : "")
+            : "暂无待办事项";
+
+        // 获取角色设定
+        const settings = chatSettings[charId] || {};
+        const persona =
+          settings.persona || `你是${char.name}，一个友善的AI助手。`;
+
+        // 构建prompt
+        const prompt = `${persona}
+
+[场景设定]
+用户刚刚在待办事项应用中选择你作为督促小助手。你现在可以看到用户的待办列表了。
+
+当前待办事项: ${todoSummary}
+待办总数: ${window.todoList.length}项，已完成: ${
+          window.todoList.filter((t) => t.done).length
+        }项
+
+请以你的人设身份，用简短的1-2句话回应用户，表示你看到了他们的待办列表，并根据你的性格特点展开一个简短的话题或给予鼓励。记住保持角色特色！`;
+
+        try {
+          // 调用API生成回复
+          const apiPreset =
+            apiPresets.find((p) => p.id === settings.apiPreset) ||
+            apiPresets[0];
+          if (!apiPreset || !apiPreset.key) {
+            console.log("未配置API，跳过AI问候");
+            return;
+          }
+
+          const response = await fetch(apiPreset.url, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${apiPreset.key}`,
+            },
+            body: JSON.stringify({
+              model: apiPreset.model,
+              messages: [{ role: "user", content: prompt }],
+              max_tokens: 150,
+              temperature: apiConfig.temperature || 0.8,
+            }),
+          });
+
+          if (!response.ok) {
+            console.error("API请求失败:", response.status);
+            return;
+          }
+
+          const data = await response.json();
+          const aiReply = data.choices?.[0]?.message?.content;
+
+          if (aiReply) {
+            // 保存到聊天记录
+            const historyKey = `chat_${charId}`;
+            let history = (await localforage.getItem(historyKey)) || [];
+
+            // 添加系统触发消息（不显示给用户看）
+            history.push({
+              role: "user",
+              content: "[用户将你设为待办督促助手]",
+              isSystemHint: true,
+              timestamp: Date.now(),
+            });
+
+            // 添加AI的回复
+            history.push({
+              role: "assistant",
+              content: aiReply,
+              timestamp: Date.now(),
+            });
+
+            await localforage.setItem(historyKey, history);
+
+            // 显示通知
+            showToast(
+              `${char.name}: ${aiReply.slice(0, 30)}${
+                aiReply.length > 30 ? "..." : ""
+              }`
+            );
+          }
+        } catch (e) {
+          console.error("AI问候失败:", e);
+        }
       }
 
       // ========== 设置弹窗 ==========
@@ -16702,11 +16638,7 @@
       }
 
       function loadGreetingForEdit() {
-        const period = document.getElementById("greetingTimeSelect").value;
-        const g = window.todoSettings.greetings[period] || {
-          main: "",
-          sub: "",
-        };
+        const g = window.todoSettings.greeting || { main: "", sub: "" };
         document.getElementById("greetingMainInput").value = g.main;
         document.getElementById("greetingSubInput").value = g.sub;
         document.getElementById("greetingPreviewMain").textContent =
@@ -16715,17 +16647,17 @@
       }
 
       async function saveGreeting() {
-        const period = document.getElementById("greetingTimeSelect").value;
         const main = document.getElementById("greetingMainInput").value.trim();
         const sub = document.getElementById("greetingSubInput").value.trim();
         if (!main) {
           showToast("请输入主问候语");
           return;
         }
-        window.todoSettings.greetings[period] = { main, sub };
+        window.todoSettings.greeting = { main, sub };
         await localforage.setItem("todoSettings", window.todoSettings);
         document.getElementById("greetingPreviewMain").textContent = main;
         document.getElementById("greetingPreviewSub").textContent = sub;
+        updateTodoDate(); // 立即更新显示
         showToast("问候语已保存！");
       }
 
@@ -17323,70 +17255,6 @@
         document.getElementById("imgOptionText").classList.remove("selected");
         window.selectedPostImage = null;
         checkPostValid();
-
-        // 渲染可见范围选项
-        renderVisibilityOptions();
-      }
-
-      // 渲染可见范围选项
-      function renderVisibilityOptions() {
-        const container = document.getElementById("igVisibilityOptions");
-        let html = `
-          <label class="ig-visibility-option" style="display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: white; border: 2px solid #f48fb1; border-radius: 20px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s;">
-            <input type="radio" name="postVisibility" value="public" checked style="display: none;" onchange="updateVisibilityUI()">
-            <span class="ig-vis-icon">🌍</span>
-            <span>公开</span>
-          </label>
-        `;
-
-        // 添加每个AI角色作为可选项
-        if (window.characters && window.characters.length > 0) {
-          window.characters.forEach((char) => {
-            html += `
-              <label class="ig-visibility-option" style="display: flex; align-items: center; gap: 6px; padding: 8px 12px; background: white; border: 2px solid #dbdbdb; border-radius: 20px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s;">
-                <input type="checkbox" name="postVisibleTo" value="${
-                  char.id
-                }" style="display: none;" onchange="updateVisibilityUI()">
-                <span class="ig-vis-icon">${char.avatar ? "👤" : "🤖"}</span>
-                <span>${char.note || char.name}</span>
-              </label>
-            `;
-          });
-        }
-
-        container.innerHTML = html;
-      }
-
-      // 更新可见范围UI
-      function updateVisibilityUI() {
-        const publicRadio = document.querySelector(
-          'input[name="postVisibility"][value="public"]'
-        );
-        const charCheckboxes = document.querySelectorAll(
-          'input[name="postVisibleTo"]'
-        );
-
-        // 检查是否有任何角色被选中
-        const anyCharSelected = Array.from(charCheckboxes).some(
-          (cb) => cb.checked
-        );
-
-        // 如果选中了角色，取消公开选项
-        if (anyCharSelected) {
-          publicRadio.checked = false;
-        }
-
-        // 更新UI样式
-        document.querySelectorAll(".ig-visibility-option").forEach((label) => {
-          const input = label.querySelector("input");
-          if (input.checked) {
-            label.style.borderColor = "#f48fb1";
-            label.style.background = "#fff0f5";
-          } else {
-            label.style.borderColor = "#dbdbdb";
-            label.style.background = "white";
-          }
-        });
       }
 
       // 关闭发布弹窗
@@ -17452,26 +17320,6 @@
         const text = document.getElementById("igPostText").value.trim();
         const textImg = document.getElementById("igTextImgInput").value.trim();
 
-        // 获取可见范围
-        const publicRadio = document.querySelector(
-          'input[name="postVisibility"][value="public"]'
-        );
-        const charCheckboxes = document.querySelectorAll(
-          'input[name="postVisibleTo"]:checked'
-        );
-
-        let visibleTo = [];
-        if (publicRadio && publicRadio.checked) {
-          visibleTo = ["public"]; // 公开
-        } else {
-          visibleTo = Array.from(charCheckboxes).map((cb) => cb.value);
-        }
-
-        // 如果没有选择任何选项，默认公开
-        if (visibleTo.length === 0) {
-          visibleTo = ["public"];
-        }
-
         const post = {
           id: Date.now(),
           content: text,
@@ -17482,7 +17330,6 @@
           authorId: "user",
           likes: [],
           comments: [],
-          visibleTo: visibleTo, // 可见范围
         };
 
         window.momentsData.posts.unshift(post);
@@ -17492,35 +17339,18 @@
         renderMomentsUI();
         showToast("✨ 动态发布成功！");
 
-        // AI角色可能会来互动（只有能看到的角色才会互动）
+        // AI角色可能会来互动
         setTimeout(() => {
           aiInteractWithPost(post);
-        }, 2000 + Math.random() * 3000);
+        }, 3000 + Math.random() * 5000);
       }
 
       // AI与用户动态互动 - 使用API生成符合人设的评论
       async function aiInteractWithPost(post) {
         if (!window.characters || window.characters.length === 0) return;
 
-        // 获取API配置
-        const apiConfig = apiPresets.find((p) => p.id === activePresetId);
-        if (!apiConfig) {
-          console.log("没有激活的API，跳过AI互动");
-          return;
-        }
-
-        // 根据可见范围筛选可以互动的角色
-        let eligibleChars = [...window.characters];
-        if (post.visibleTo && !post.visibleTo.includes("public")) {
-          eligibleChars = window.characters.filter((char) =>
-            post.visibleTo.includes(String(char.id))
-          );
-        }
-
-        if (eligibleChars.length === 0) return;
-
         // 随机选择1-2个AI来互动
-        const shuffled = eligibleChars.sort(() => 0.5 - Math.random());
+        const shuffled = [...window.characters].sort(() => 0.5 - Math.random());
         const interactors = shuffled.slice(
           0,
           Math.min(2, Math.ceil(Math.random() * 2))
@@ -17528,11 +17358,11 @@
 
         for (const char of interactors) {
           await new Promise((resolve) =>
-            setTimeout(resolve, 2000 + Math.random() * 3000)
+            setTimeout(resolve, 3000 + Math.random() * 5000)
           );
 
-          // 90% 概率点赞
-          if (Math.random() > 0.1) {
+          // 80% 概率点赞
+          if (Math.random() > 0.2) {
             const postIndex = window.momentsData.posts.findIndex(
               (p) => p.id === post.id
             );
@@ -17548,10 +17378,9 @@
             }
           }
 
-          // 80% 概率评论 - 使用API生成符合人设的评论
-          if (Math.random() > 0.2) {
+          // 60% 概率评论 - 使用API生成符合人设的评论
+          if (Math.random() > 0.4) {
             try {
-              console.log(`正在为角色 ${char.name} 生成评论...`);
               const comment = await generateAiCommentWithAPI(char, post);
               if (comment) {
                 const postIndex = window.momentsData.posts.findIndex(
@@ -17569,7 +17398,6 @@
                   });
                   await localforage.setItem("momentsData", window.momentsData);
                   renderMomentsUI();
-                  console.log(`角色 ${char.name} 评论成功: ${comment}`);
                 }
               }
             } catch (e) {
@@ -17604,20 +17432,11 @@
 
         const userName = window.momentsData.userProfile.name || "用户";
 
-        // 获取角色的完整人设信息
-        const charSettings = window.chatSettings
-          ? window.chatSettings[char.id]
-          : null;
-        let personaInfo = "";
-        if (charSettings && charSettings.persona) {
-          personaInfo = charSettings.persona;
-        }
-
         // 构建系统提示词
         const systemPrompt = `你是${
           char.note || char.name
         }，正在社交媒体上看到${userName}发布的一条动态。
-${personaInfo ? `你的人设:\n${personaInfo}` : ""}
+${char.description ? `你的人设: ${char.description}` : ""}
 
 请根据你的性格和人设，对这条动态写一条简短的评论回复。
 
@@ -17631,7 +17450,6 @@ ${personaInfo ? `你的人设:\n${personaInfo}` : ""}
         const userPrompt = `${userName}发布了一条动态:\n${postDescription}\n\n请写一条评论:`;
 
         try {
-          console.log(`调用API为角色 ${char.name} 生成评论...`);
           const response = await fetch(`${apiConfig.url}/chat/completions`, {
             method: "POST",
             headers: {
@@ -17644,19 +17462,17 @@ ${personaInfo ? `你的人设:\n${personaInfo}` : ""}
                 { role: "system", content: systemPrompt },
                 { role: "user", content: userPrompt },
               ],
-              max_tokens: 150,
-              temperature: apiConfig.temperature || 0.8,
+              max_tokens: 100,
+              temperature: 0.8,
             }),
           });
 
           if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`API请求失败: ${response.status} - ${errorText}`);
+            throw new Error(`API请求失败: ${response.status}`);
           }
 
           const data = await response.json();
           const comment = data.choices?.[0]?.message?.content?.trim();
-          console.log(`API返回评论: ${comment}`);
           return comment || null;
         } catch (e) {
           console.error("API调用失败:", e);
@@ -18935,10 +18751,12 @@ ${userName}在你的动态下留言了，你需要回复。
         closeTodoModal,
         saveTodoItem,
         toggleTodoDone,
+        notifyAiTodoCompleted,
         deleteTodoItem,
         filterTodos,
         selectTodoTag,
         toggleTodoAiBinding,
+        aiGreetForTodoBinding,
         renderTodoAiCharList,
         renderTodoTagSelect,
         // 待办设置
@@ -18986,8 +18804,6 @@ ${userName}在你的动态下留言了，你需要回复。
         saveProfile,
         showCharacterPosts,
         generateMomentsPromptForAi,
-        renderVisibilityOptions,
-        updateVisibilityUI,
         // 外观设置
         previewWallpaper,
         resetWallpaper,
