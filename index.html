@@ -7707,9 +7707,6 @@
 
     <div class="phone-container">
       <div class="main-content">
-        <!-- Top decorative bar -->
-        <div class="top-bar"></div>
-
         <!-- Profile Widget -->
         <div class="profile-widget">
           <div
@@ -11766,14 +11763,26 @@
           return;
         }
 
-        const history = chatHistories[currentChatCharId] || [];
+        // 【修复】保存当前聊天角色ID，防止用户在API请求期间返回导致currentChatCharId变为null
+        const savedCharId = currentChatCharId;
+        if (!savedCharId) {
+          showToast("请先打开一个对话");
+          return;
+        }
+
+        // 确保chatHistories中有该角色的记录
+        if (!chatHistories[savedCharId]) {
+          chatHistories[savedCharId] = [];
+        }
+
+        const history = chatHistories[savedCharId] || [];
         if (history.length === 0) {
           showToast("请先发送一条消息");
           return;
         }
 
-        const settings = chatSettings[currentChatCharId] || {};
-        const char = characters.find((c) => c.id === currentChatCharId);
+        const settings = chatSettings[savedCharId] || {};
+        const char = characters.find((c) => c.id === savedCharId);
 
         // UI 状态
         const btn = document.getElementById("replyBtn");
@@ -11931,12 +11940,12 @@
               ? matches.map((s) => s.slice(1, -1)).join("，")
               : aiReply;
 
-            chatHistories[currentChatCharId].push(msgObj);
-            saveAndRender();
+            chatHistories[savedCharId].push(msgObj);
+            saveAndRenderForChar(savedCharId);
             // 【新增】更新列表预览
-            updateCharacterLastMessage(currentChatCharId, aiReply);
+            updateCharacterLastMessage(savedCharId, aiReply);
             // === 触发语音 ===
-            triggerVoice(msgObj, textToRead, settings);
+            triggerVoiceForChar(savedCharId, msgObj, textToRead, settings);
           } else {
             // 先用 ||| 分割
             let replyParts = aiReply
@@ -11989,20 +11998,20 @@
                 audioUrl: null,
               };
 
-              chatHistories[currentChatCharId].push(msgObj);
-              saveAndRender();
+              chatHistories[savedCharId].push(msgObj);
+              saveAndRenderForChar(savedCharId);
               // 【新增】更新列表预览 (每次循环都更新，这样可以看到对方正在一句句发)
-              updateCharacterLastMessage(currentChatCharId, partContent);
+              updateCharacterLastMessage(savedCharId, partContent);
               // 如果是语音消息，自动生成音频
               if (isVoiceMsg && settings.voiceId) {
                 const voiceText = partContent.match(/^\[语音[:：](.+)\]$/)[1];
-                const msgIndex = chatHistories[currentChatCharId].length - 1;
+                const msgIndex = chatHistories[savedCharId].length - 1;
 
                 // 异步生成语音，不阻塞后续消息
-                generateVoiceForMessage(msgIndex, voiceText, settings);
+                generateVoiceForMessageForChar(savedCharId, msgIndex, voiceText, settings);
               } else if (i === replyParts.length - 1 && !isVoiceMsg) {
                 // 如果最后一条不是语音消息，且开启了自动朗读，触发TTS
-                triggerVoice(msgObj, textToRead, settings);
+                triggerVoiceForChar(savedCharId, msgObj, textToRead, settings);
               }
             }
           }
@@ -12029,6 +12038,15 @@
         renderConversation();
       }
 
+      // 【新增】支持指定charId的保存和渲染函数
+      function saveAndRenderForChar(charId) {
+        localforage.setItem("chatHistories", chatHistories);
+        // 只有当前打开的对话才需要渲染
+        if (currentChatCharId === charId) {
+          renderConversation();
+        }
+      }
+
       // 辅助函数：触发语音生成
       async function triggerVoice(msgObj, text, settings) {
         // 如果用户配置了音色
@@ -12043,6 +12061,22 @@
           if (audioUrl) {
             history[msgIndex].audioUrl = audioUrl;
             saveAndRender(); // 重新渲染以显示播放条
+          }
+        }
+      }
+
+      // 【新增】支持指定charId的语音触发函数
+      async function triggerVoiceForChar(charId, msgObj, text, settings) {
+        if (settings.voiceId) {
+          const history = chatHistories[charId];
+          if (!history) return;
+          const msgIndex = history.length - 1;
+
+          const audioUrl = await generateSpeech(text, charId);
+
+          if (audioUrl && history[msgIndex]) {
+            history[msgIndex].audioUrl = audioUrl;
+            saveAndRenderForChar(charId);
           }
         }
       }
@@ -12063,6 +12097,27 @@
             history[msgIndex].audioDuration =
               Math.ceil(voiceText.length / 5) + '"';
             saveAndRender();
+          }
+        } catch (e) {
+          console.error("Auto voice generation error:", e);
+        }
+      }
+
+      // 【新增】支持指定charId的语音消息生成函数
+      async function generateVoiceForMessageForChar(charId, msgIndex, voiceText, settings) {
+        if (!settings.voiceId) return;
+
+        const history = chatHistories[charId];
+        if (!history || !history[msgIndex]) return;
+
+        try {
+          const audioUrl = await generateSpeech(voiceText, charId);
+
+          if (audioUrl && history[msgIndex]) {
+            history[msgIndex].audioUrl = audioUrl;
+            history[msgIndex].audioDuration =
+              Math.ceil(voiceText.length / 5) + '"';
+            saveAndRenderForChar(charId);
           }
         } catch (e) {
           console.error("Auto voice generation error:", e);
@@ -17049,12 +17104,15 @@
             }
 
             // 更新角色的lastMessage用于消息列表显示
-            const charIndex = characters.findIndex((c) => c.id === charId);
+            // 【修复】使用String比较确保类型一致
+            const charIndex = characters.findIndex((c) => String(c.id) === String(charId));
             if (charIndex !== -1) {
               characters[charIndex].lastMessage =
                 aiReply.slice(0, 30) + (aiReply.length > 30 ? "..." : "");
               characters[charIndex].lastTime = "刚刚";
               await localforage.setItem("characters", characters);
+              // 【修复】刷新消息列表界面
+              renderCharacters();
             }
 
             // 显示通知弹窗
@@ -19348,6 +19406,10 @@ ${userName}在你的动态下留言了，你需要回复。
         originalOpenPage(pageId);
         if (pageId === "appearancePage") {
           initAppearancePage();
+        }
+        // 【修复】打开字体设置页面时渲染字体预设列表
+        if (pageId === "fontPage") {
+          renderFontPresets();
         }
       };
 
