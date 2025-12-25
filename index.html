@@ -123,6 +123,9 @@
         flex-direction: column;
         z-index: 1;
         background: var(--bg-pink);
+        /* 确保没有顶部边框或阴影 */
+        border: none;
+        box-shadow: none;
       }
 
       /* Main scrollable content */
@@ -133,15 +136,23 @@
         padding-bottom: calc(90px + env(safe-area-inset-bottom));
         overflow-y: auto;
         overflow-x: hidden;
+        /* 确保没有顶部边框或阴影 */
+        border: none;
+        box-shadow: none;
       }
 
-      /* Top decorative bar - 已隐藏 */
+      /* Top decorative bar - 完全移除 */
       .top-bar {
-        display: none;
+        display: none !important;
+        height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
       }
 
       .top-bar::after {
-        display: none;
+        display: none !important;
       }
 
       /* Profile Card Widget - 创意透明名片 */
@@ -151,7 +162,7 @@
         -webkit-backdrop-filter: blur(20px) saturate(180%);
         border-radius: 24px;
         padding: 16px;
-        margin-top: 20px;
+        margin-top: 0;
         position: relative;
         border: 1px solid rgba(255, 255, 255, 0.4);
         display: flex;
@@ -326,7 +337,7 @@
       }
 
       .app-name {
-        font-size: 0.6rem;
+        font-size: 0.7rem;
         font-weight: 500;
         color: var(--text-primary);
         text-align: center;
@@ -11944,6 +11955,18 @@
             saveAndRenderForChar(savedCharId);
             // 【新增】更新列表预览
             updateCharacterLastMessage(savedCharId, aiReply);
+
+            // 【修复】如果用户已经离开对话页面，显示通知弹窗和红点
+            if (currentChatCharId !== savedCharId) {
+              showMessageNotification(
+                savedCharId,
+                char.name,
+                char.avatar,
+                aiReply
+              );
+              addUnreadMessage(savedCharId);
+            }
+
             // === 触发语音 ===
             triggerVoiceForChar(savedCharId, msgObj, textToRead, settings);
           } else {
@@ -12002,13 +12025,33 @@
               saveAndRenderForChar(savedCharId);
               // 【新增】更新列表预览 (每次循环都更新，这样可以看到对方正在一句句发)
               updateCharacterLastMessage(savedCharId, partContent);
+
+              // 【修复】如果用户已经离开对话页面，显示通知弹窗和红点（只在最后一条消息时）
+              if (
+                i === replyParts.length - 1 &&
+                currentChatCharId !== savedCharId
+              ) {
+                showMessageNotification(
+                  savedCharId,
+                  char.name,
+                  char.avatar,
+                  partContent
+                );
+                addUnreadMessage(savedCharId);
+              }
+
               // 如果是语音消息，自动生成音频
               if (isVoiceMsg && settings.voiceId) {
                 const voiceText = partContent.match(/^\[语音[:：](.+)\]$/)[1];
                 const msgIndex = chatHistories[savedCharId].length - 1;
 
                 // 异步生成语音，不阻塞后续消息
-                generateVoiceForMessageForChar(savedCharId, msgIndex, voiceText, settings);
+                generateVoiceForMessageForChar(
+                  savedCharId,
+                  msgIndex,
+                  voiceText,
+                  settings
+                );
               } else if (i === replyParts.length - 1 && !isVoiceMsg) {
                 // 如果最后一条不是语音消息，且开启了自动朗读，触发TTS
                 triggerVoiceForChar(savedCharId, msgObj, textToRead, settings);
@@ -12104,7 +12147,12 @@
       }
 
       // 【新增】支持指定charId的语音消息生成函数
-      async function generateVoiceForMessageForChar(charId, msgIndex, voiceText, settings) {
+      async function generateVoiceForMessageForChar(
+        charId,
+        msgIndex,
+        voiceText,
+        settings
+      ) {
         if (!settings.voiceId) return;
 
         const history = chatHistories[charId];
@@ -17105,7 +17153,9 @@
 
             // 更新角色的lastMessage用于消息列表显示
             // 【修复】使用String比较确保类型一致
-            const charIndex = characters.findIndex((c) => String(c.id) === String(charId));
+            const charIndex = characters.findIndex(
+              (c) => String(c.id) === String(charId)
+            );
             if (charIndex !== -1) {
               characters[charIndex].lastMessage =
                 aiReply.slice(0, 30) + (aiReply.length > 30 ? "..." : "");
