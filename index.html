@@ -3714,7 +3714,7 @@
         position: fixed;
         top: max(16px, env(safe-area-inset-top));
         left: 50%;
-        transform: translateX(-50%) translateY(-150%);
+        transform: translateX(-50%) translateY(-200%);
         width: calc(100% - 32px);
         max-width: 340px;
         background: linear-gradient(135deg, #fff 0%, #fff5f8 100%);
@@ -3732,10 +3732,15 @@
         z-index: 9999;
         transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         cursor: pointer;
+        /* 确保在PWA模式下也完全隐藏 */
+        opacity: 0;
+        visibility: hidden;
       }
 
       .message-notification.show {
         transform: translateX(-50%) translateY(0);
+        opacity: 1;
+        visibility: visible;
       }
 
       .notification-avatar {
@@ -11892,7 +11897,7 @@
 
           // 添加用户动态提示词（让AI知道用户最近分享了什么）
           if (typeof generateMomentsPromptForAi === "function") {
-            const momentsPrompt = generateMomentsPromptForAi();
+            const momentsPrompt = generateMomentsPromptForAi(savedCharId);
             if (momentsPrompt) {
               systemContent += momentsPrompt;
             }
@@ -11968,21 +11973,15 @@
             saveAndRenderForChar(savedCharId);
             // 【新增】更新列表预览
             updateCharacterLastMessage(savedCharId, aiReply);
-
+            
             // 【修复】检查聊天对话页面是否打开，如果没打开则显示通知弹窗和红点
             const convPage = document.getElementById("chatConversationPage");
-            const isConvPageActive =
-              convPage && convPage.classList.contains("active");
+            const isConvPageActive = convPage && convPage.classList.contains("active");
             if (!isConvPageActive || currentChatCharId !== savedCharId) {
-              showMessageNotification(
-                savedCharId,
-                char.name,
-                char.avatar,
-                aiReply
-              );
+              showMessageNotification(savedCharId, char.name, char.avatar, aiReply);
               addUnreadMessage(savedCharId);
             }
-
+            
             // === 触发语音 ===
             triggerVoiceForChar(savedCharId, msgObj, textToRead, settings);
           } else {
@@ -12041,37 +12040,24 @@
               saveAndRenderForChar(savedCharId);
               // 【新增】更新列表预览 (每次循环都更新，这样可以看到对方正在一句句发)
               updateCharacterLastMessage(savedCharId, partContent);
-
+              
               // 【修复】检查聊天对话页面是否打开，如果没打开则显示通知弹窗和红点（只在最后一条消息时）
               if (i === replyParts.length - 1) {
-                const convPage = document.getElementById(
-                  "chatConversationPage"
-                );
-                const isConvPageActive =
-                  convPage && convPage.classList.contains("active");
+                const convPage = document.getElementById("chatConversationPage");
+                const isConvPageActive = convPage && convPage.classList.contains("active");
                 if (!isConvPageActive || currentChatCharId !== savedCharId) {
-                  showMessageNotification(
-                    savedCharId,
-                    char.name,
-                    char.avatar,
-                    partContent
-                  );
+                  showMessageNotification(savedCharId, char.name, char.avatar, partContent);
                   addUnreadMessage(savedCharId);
                 }
               }
-
+              
               // 如果是语音消息，自动生成音频
               if (isVoiceMsg && settings.voiceId) {
                 const voiceText = partContent.match(/^\[语音[:：](.+)\]$/)[1];
                 const msgIndex = chatHistories[savedCharId].length - 1;
 
                 // 异步生成语音，不阻塞后续消息
-                generateVoiceForMessageForChar(
-                  savedCharId,
-                  msgIndex,
-                  voiceText,
-                  settings
-                );
+                generateVoiceForMessageForChar(savedCharId, msgIndex, voiceText, settings);
               } else if (i === replyParts.length - 1 && !isVoiceMsg) {
                 // 如果最后一条不是语音消息，且开启了自动朗读，触发TTS
                 triggerVoiceForChar(savedCharId, msgObj, textToRead, settings);
@@ -12167,12 +12153,7 @@
       }
 
       // 【新增】支持指定charId的语音消息生成函数
-      async function generateVoiceForMessageForChar(
-        charId,
-        msgIndex,
-        voiceText,
-        settings
-      ) {
+      async function generateVoiceForMessageForChar(charId, msgIndex, voiceText, settings) {
         if (!settings.voiceId) return;
 
         const history = chatHistories[charId];
@@ -17173,9 +17154,7 @@
 
             // 更新角色的lastMessage用于消息列表显示
             // 【修复】使用String比较确保类型一致
-            const charIndex = characters.findIndex(
-              (c) => String(c.id) === String(charId)
-            );
+            const charIndex = characters.findIndex((c) => String(c.id) === String(charId));
             if (charIndex !== -1) {
               characters[charIndex].lastMessage =
                 aiReply.slice(0, 30) + (aiReply.length > 30 ? "..." : "");
@@ -19028,12 +19007,37 @@ ${userName}在你的动态下留言了，你需要回复。
       }
 
       // 生成动态相关的AI提示词
-      function generateMomentsPromptForAi() {
-        const posts = window.momentsData.posts.filter((p) => p.isUser);
-        if (posts.length === 0) return "";
+      function generateMomentsPromptForAi(charId) {
+        // 如果没有传入charId，使用当前聊天的角色ID
+        const targetCharId = charId || currentChatCharId;
+        if (!targetCharId) return "";
+        
+        // 获取当前AI角色的分组信息
+        const charSettings = chatSettings[targetCharId] || {};
+        const charGroup = charSettings.group;
+        
+        // 筛选当前AI角色可以看到的用户动态
+        const visiblePosts = window.momentsData.posts.filter((p) => {
+          if (!p.isUser) return false;
+          
+          // 如果是公开动态（visibility === "all" 或 undefined）
+          if (!p.visibility || p.visibility === "all") {
+            return true;
+          }
+          
+          // 如果是分组可见的动态
+          if (p.visibility === "groups" && p.visibleGroups && p.visibleGroups.length > 0) {
+            // 只有当前AI的分组在可见分组列表中才能看到
+            return charGroup && p.visibleGroups.includes(charGroup);
+          }
+          
+          return false;
+        });
+        
+        if (visiblePosts.length === 0) return "";
 
-        // 获取最近的3条用户动态
-        const recentPosts = posts.slice(0, 3);
+        // 获取最近的3条可见动态
+        const recentPosts = visiblePosts.slice(0, 3);
         let prompt =
           "\n\n【用户最近的动态】以下是用户在社交动态中分享的内容，你可以在对话中自然地提及或询问相关话题：\n";
 
