@@ -18156,8 +18156,8 @@
           const char = characters.find((c) => String(c.id) === charId);
           if (!char) continue;
 
-          const historyKey = `chat_${charId}`;
-          let history = (await localforage.getItem(historyKey)) || [];
+          // 【修复】从chatHistories获取现有聊天记录
+          let history = chatHistories[charId] || [];
 
           history.push({
             role: "user",
@@ -18166,7 +18166,9 @@
             timestamp: Date.now(),
           });
 
-          await localforage.setItem(historyKey, history);
+          // 【修复】更新内存和正确保存
+          chatHistories[charId] = history;
+          await localforage.setItem("chatHistories", chatHistories);
         }
       }
 
@@ -18349,15 +18351,16 @@
                 `${char.name}已成为督促助手（推理模型暂不支持自动回复）`
               );
 
-              // 仍然保存绑定状态
-              const historyKey = `chat_${charId}`;
-              let history = (await localforage.getItem(historyKey)) || [];
+              // 【修复】从chatHistories获取现有聊天记录
+              let history = chatHistories[charId] || [];
               history.push({
                 role: "assistant",
                 content: `[我现在是你的待办督促助手啦！有什么需要帮忙的随时找我~]`,
                 timestamp: Date.now(),
               });
-              await localforage.setItem(historyKey, history);
+              // 【修复】更新内存和正确保存
+              chatHistories[charId] = history;
+              await localforage.setItem("chatHistories", chatHistories);
               return;
             }
           }
@@ -18390,8 +18393,8 @@
           }
 
           if (aiReply) {
-            const historyKey = `chat_${charId}`;
-            let history = (await localforage.getItem(historyKey)) || [];
+            // 【修复】从chatHistories获取现有聊天记录，而不是从错误的key读取
+            let history = chatHistories[charId] || [];
 
             // 使用系统卡片形式而不是普通消息
             history.push({
@@ -18410,12 +18413,11 @@
               timestamp: Date.now(),
             });
 
-            await localforage.setItem(historyKey, history);
-
             // 更新内存中的聊天记录
-            if (chatHistories) {
-              chatHistories[charId] = history;
-            }
+            chatHistories[charId] = history;
+
+            // 【修复】正确保存到chatHistories对象
+            await localforage.setItem("chatHistories", chatHistories);
 
             // 更新角色的lastMessage用于消息列表显示
             // 【修复】使用String比较确保类型一致
