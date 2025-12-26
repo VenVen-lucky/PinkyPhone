@@ -21,7 +21,7 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Satisfy&display=swap"
       rel="stylesheet"
     />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js?v=1.1"></script>
     <style>
       * {
         margin: 0;
@@ -10128,21 +10128,21 @@
       </div>
 
       <!-- 预设编辑弹窗 -->
-      <div class="preset-modal" id="presetModal">
+      <div class="preset-modal" id="stylePresetModal">
         <div class="preset-modal-content">
           <div class="preset-modal-header">
-            <span class="preset-modal-title" id="presetModalTitle">创建预设</span>
+            <span class="preset-modal-title" id="stylePresetModalTitle">创建预设</span>
             <button class="preset-modal-close" onclick="closePresetModal()">✕</button>
           </div>
           <div class="preset-modal-body">
             <div class="preset-form-group">
               <label class="preset-form-label">预设名称</label>
-              <input type="text" class="preset-form-input" id="presetNameInput" placeholder="给预设起个名字...">
+              <input type="text" class="preset-form-input" id="stylePresetName" placeholder="给预设起个名字...">
             </div>
             
             <div class="preset-form-group">
               <label class="preset-form-label">分类</label>
-              <select class="preset-form-input" id="presetCategorySelect">
+              <select class="preset-form-input" id="stylePresetCategory">
                 <option value="character">🎭 角色预设</option>
                 <option value="style">✍️ 文风预设</option>
                 <option value="scene">🎬 场景预设</option>
@@ -10151,19 +10151,19 @@
             
             <div class="preset-form-group">
               <label class="preset-form-label">图标</label>
-              <input type="text" class="preset-form-input" id="presetIconInput" placeholder="输入一个emoji，如 🐱">
+              <input type="text" class="preset-form-input" id="stylePresetIcon" placeholder="输入一个emoji，如 🐱">
             </div>
             
             <div class="preset-form-group">
               <label class="preset-form-label">描述 <span class="preset-form-hint">(简短说明预设用途)</span></label>
-              <input type="text" class="preset-form-input" id="presetDescInput" placeholder="例如：温柔大姐姐文风">
+              <input type="text" class="preset-form-input" id="stylePresetDesc" placeholder="例如：温柔大姐姐文风">
             </div>
             
             <div class="preset-form-group">
               <label class="preset-form-label">
                 预设内容 <span class="preset-form-hint">(AI会按此指令生成回复)</span>
               </label>
-              <textarea class="preset-form-input preset-form-textarea" id="presetContentInput" placeholder="在这里输入预设指令...&#10;&#10;例如：&#10;你是一个温柔的大姐姐，说话时会带"呢～"、"哦～"等语气词..."></textarea>
+              <textarea class="preset-form-input preset-form-textarea" id="stylePresetContent" placeholder="在这里输入预设指令...&#10;&#10;例如：&#10;你是一个温柔的大姐姐，说话时会带"呢～"、"哦～"等语气词..."></textarea>
             </div>
           </div>
           <div class="preset-modal-footer">
@@ -12672,26 +12672,26 @@
       // 打开预设编辑弹窗
       function openPresetModal(presetId = null) {
         window.editingPresetId = presetId;
-        const modal = document.getElementById('presetModal');
-        const title = document.getElementById('presetModalTitle');
+        const modal = document.getElementById('stylePresetModal');
+        const title = document.getElementById('stylePresetModalTitle');
         
         if (presetId) {
           title.textContent = '编辑预设';
           const preset = window.presets.find(p => p.id === presetId);
           if (preset) {
-            document.getElementById('presetNameInput').value = preset.name || '';
-            document.getElementById('presetCategorySelect').value = preset.category || 'character';
-            document.getElementById('presetIconInput').value = preset.icon || '';
-            document.getElementById('presetDescInput').value = preset.description || '';
-            document.getElementById('presetContentInput').value = preset.content || '';
+            document.getElementById('stylePresetName').value = preset.name || '';
+            document.getElementById('stylePresetCategory').value = preset.category || 'character';
+            document.getElementById('stylePresetIcon').value = preset.icon || '';
+            document.getElementById('stylePresetDesc').value = preset.description || '';
+            document.getElementById('stylePresetContent').value = preset.content || '';
           }
         } else {
           title.textContent = '创建预设';
-          document.getElementById('presetNameInput').value = '';
-          document.getElementById('presetCategorySelect').value = 'character';
-          document.getElementById('presetIconInput').value = '';
-          document.getElementById('presetDescInput').value = '';
-          document.getElementById('presetContentInput').value = '';
+          document.getElementById('stylePresetName').value = '';
+          document.getElementById('stylePresetCategory').value = 'character';
+          document.getElementById('stylePresetIcon').value = '';
+          document.getElementById('stylePresetDesc').value = '';
+          document.getElementById('stylePresetContent').value = '';
         }
         
         modal.classList.add('active');
@@ -12699,17 +12699,17 @@
 
       // 关闭预设编辑弹窗
       function closePresetModal() {
-        document.getElementById('presetModal').classList.remove('active');
+        document.getElementById('stylePresetModal').classList.remove('active');
         window.editingPresetId = null;
       }
 
       // 保存预设
       async function savePreset() {
-        const name = document.getElementById('presetNameInput').value.trim();
-        const category = document.getElementById('presetCategorySelect').value;
-        const icon = document.getElementById('presetIconInput').value.trim() || '📝';
-        const description = document.getElementById('presetDescInput').value.trim();
-        const content = document.getElementById('presetContentInput').value.trim();
+        const name = document.getElementById('stylePresetName').value.trim();
+        const category = document.getElementById('stylePresetCategory').value;
+        const icon = document.getElementById('stylePresetIcon').value.trim() || '📝';
+        const description = document.getElementById('stylePresetDesc').value.trim();
+        const content = document.getElementById('stylePresetContent').value.trim();
 
         if (!name) {
           showToast('请输入预设名称');
