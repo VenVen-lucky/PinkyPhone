@@ -21,7 +21,7 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Satisfy&display=swap"
       rel="stylesheet"
     />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js?v=1.2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
     <style>
       * {
         margin: 0;
@@ -4470,18 +4470,28 @@
       .conv-menu-btn {
         width: 36px;
         height: 36px;
-        border: 1.5px solid rgba(0, 0, 0, 0.15);
+        border: 1.5px solid rgba(0, 0, 0, 0.1);
         background: rgba(255, 255, 255, 0.6);
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
         border-radius: 50%;
-        font-size: 14px;
-        letter-spacing: 2px;
-        color: var(--text-primary);
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
+        gap: 3px;
+        padding: 0;
+      }
+
+      .conv-menu-btn::before,
+      .conv-menu-btn::after,
+      .conv-menu-btn span {
+        content: '';
+        width: 4px;
+        height: 4px;
+        background: #666;
+        border-radius: 50%;
+        display: block;
       }
 
       .conv-menu {
@@ -11352,7 +11362,7 @@
           <div class="conv-avatar" id="convAvatar">🤖</div>
           <span class="conv-name" id="convName">角色名称</span>
         </div>
-        <button class="conv-menu-btn" onclick="openChatSettings()">•••</button>
+        <button class="conv-menu-btn" onclick="openChatSettings()"><span></span></button>
       </div>
 
       <div class="conv-menu" id="convMenu">
