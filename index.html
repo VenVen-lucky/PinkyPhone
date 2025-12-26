@@ -21,7 +21,7 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Satisfy&display=swap"
       rel="stylesheet"
     />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js?v=1.1"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js?v=1.3"></script>
     <style>
       * {
         margin: 0;
@@ -12896,22 +12896,48 @@
       // 导入预设数据
       async function importPresetData(data) {
         // 兼容Silly Tavern格式
-        const content = data.content || data.prompt || data.system_prompt || '';
+        let content = '';
+        let presetName = data.name || '导入的预设';
+        
+        // Silly Tavern格式：内容在prompts数组里
+        if (data.prompts && Array.isArray(data.prompts)) {
+          // 提取所有prompt的content，合并成一个完整的预设
+          const promptContents = data.prompts
+            .filter(p => p.content && typeof p.content === 'string')
+            .map(p => {
+              // 如果有名字，加上标题
+              if (p.name) {
+                return `【${p.name}】\n${p.content}`;
+              }
+              return p.content;
+            });
+          
+          if (promptContents.length > 0) {
+            content = promptContents.join('\n\n');
+            // 使用第一个prompt的名字或者文件名
+            if (data.prompts[0]?.name) {
+              presetName = data.prompts[0].name;
+            }
+          }
+        }
+        
+        // 如果prompts里没有找到，尝试其他字段
+        if (!content) {
+          content = data.content || data.prompt || data.system_prompt || '';
+        }
         
         if (!content) {
-          showToast('预设内容为空');
+          showToast('预设内容为空，无法导入');
           return;
         }
 
         const preset = {
           id: 'preset_' + Date.now(),
-          name: data.name || '导入的预设',
-          category: data.category || 'character',
+          name: presetName,
+          category: data.category || 'style',
           icon: data.icon || '📥',
-          description: data.description || '从外部导入的预设',
+          description: data.description || '从Silly Tavern导入的预设',
           content: content,
-          minWords: data.minWords || data.min_tokens || 100,
-          maxWords: data.maxWords || data.max_tokens || 500,
           createdAt: Date.now(),
           updatedAt: Date.now()
         };
@@ -16227,13 +16253,6 @@
       function handleFontFileUpload(input) {
         const file = input.files[0];
         if (!file) return;
-
-        // 限制大小 (例如 3MB)，防止 localStorage 爆炸
-        if (file.size > 3 * 1024 * 1024) {
-          alert("字体文件过大，请使用 URL 方式或上传小于 3MB 的文件。");
-          input.value = "";
-          return;
-        }
 
         document.getElementById("fontFileName").textContent = file.name;
 
