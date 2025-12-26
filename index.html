@@ -21,7 +21,7 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Satisfy&display=swap"
       rel="stylesheet"
     />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js?v=1.3"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js?v=1.5"></script>
     <style>
       * {
         margin: 0;
@@ -8662,7 +8662,7 @@
         padding: 0 !important;
         overflow: hidden;
       }
-      
+
       .preset-page.active {
         display: flex;
       }
@@ -9011,6 +9011,172 @@
         min-height: 120px;
         resize: vertical;
         line-height: 1.6;
+      }
+
+      /* 预设条目列表样式 */
+      .preset-entries-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-height: 400px;
+        overflow-y: auto;
+        background: transparent;
+        min-height: 100px;
+      }
+
+      .preset-entry-card {
+        background: #faf8f5 !important;
+        border: 1.5px solid rgba(255,182,193,0.3);
+        border-radius: 12px;
+        overflow: visible;
+        position: relative;
+        z-index: 1;
+      }
+
+      .preset-entry-header {
+        display: flex !important;
+        align-items: center;
+        padding: 12px;
+        gap: 10px;
+        background: rgba(255,255,255,0.5);
+        border-bottom: 1px solid rgba(255,182,193,0.2);
+        min-height: 48px;
+      }
+
+      .preset-entry-toggle {
+        position: relative;
+        width: 44px;
+        height: 24px;
+        min-width: 44px;
+        min-height: 24px;
+        background: #ddd;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s;
+        flex-shrink: 0;
+      }
+
+      .preset-entry-toggle.active {
+        background: linear-gradient(135deg, #f48fb1, #f06292);
+      }
+
+      .preset-entry-toggle::after {
+        content: '';
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 20px;
+        height: 20px;
+        background: white;
+        border-radius: 50%;
+        transition: all 0.3s;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      }
+
+      .preset-entry-toggle.active::after {
+        left: 22px;
+      }
+
+      .preset-entry-delete {
+        width: 28px;
+        height: 28px;
+        min-width: 28px;
+        min-height: 28px;
+        border: none;
+        background: rgba(255,100,100,0.1);
+        color: #e57373;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .preset-entry-body {
+        padding: 12px;
+        display: flex !important;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .preset-entry-row {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .preset-entry-label {
+        font-size: 0.8rem;
+        color: #8a6a7f;
+      }
+
+      .preset-entry-input {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1.5px solid #e5ddd3;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        outline: none;
+        background: white;
+        box-sizing: border-box;
+      }
+
+      .preset-entry-input:focus {
+        border-color: #f48fb1;
+      }
+
+      .preset-entry-textarea {
+        min-height: 80px;
+        resize: vertical;
+        line-height: 1.5;
+        font-family: inherit;
+      }
+
+      .preset-entry-content-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .preset-entry-expand-btn {
+        padding: 8px 12px;
+        border: none;
+        background: rgba(244,143,177,0.15);
+        color: #c2185b;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+
+      .preset-entry-content-wrapper {
+        display: none;
+        padding: 0 12px 12px 12px;
+      }
+
+      .preset-entry-content-wrapper.active {
+        display: block;
+      }
+
+      .preset-add-entry-btn {
+        width: 100%;
+        padding: 14px;
+        border: 2px dashed rgba(244,143,177,0.4);
+        background: rgba(255,255,255,0.5);
+        color: #c2185b;
+        border-radius: 12px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-top: 8px;
+      }
+
+      .preset-add-entry-btn:hover {
+        background: rgba(244,143,177,0.1);
+        border-color: #f48fb1;
       }
 
       .preset-form-row {
@@ -10099,20 +10265,38 @@
       <!-- 预设App页面 -->
       <div id="presetPage" class="page preset-page">
         <div class="preset-header">
-          <button class="preset-back-btn" onclick="closePage('presetPage')">←</button>
+          <button class="preset-back-btn" onclick="closePage('presetPage')">
+            ←
+          </button>
           <span class="preset-title">📝 预设管理</span>
-          <div style="display: flex; gap: 8px;">
-            <button class="preset-header-btn" onclick="openPresetImportModal()" style="background: linear-gradient(135deg, #81d4fa, #4fc3f7);">📥</button>
-            <button class="preset-header-btn" onclick="openPresetModal()">➕</button>
+          <div style="display: flex; gap: 8px">
+            <button
+              class="preset-header-btn"
+              onclick="openPresetImportModal()"
+              style="background: linear-gradient(135deg, #81d4fa, #4fc3f7)"
+            >
+              📥
+            </button>
+            <button class="preset-header-btn" onclick="openPresetModal()">
+              ➕
+            </button>
           </div>
         </div>
-        
+
         <div class="preset-content">
           <div class="preset-tabs">
-            <button class="preset-tab active" onclick="switchPresetTab('all')">全部</button>
-            <button class="preset-tab" onclick="switchPresetTab('character')">角色</button>
-            <button class="preset-tab" onclick="switchPresetTab('style')">文风</button>
-            <button class="preset-tab" onclick="switchPresetTab('scene')">场景</button>
+            <button class="preset-tab active" onclick="switchPresetTab('all')">
+              全部
+            </button>
+            <button class="preset-tab" onclick="switchPresetTab('character')">
+              角色
+            </button>
+            <button class="preset-tab" onclick="switchPresetTab('style')">
+              文风
+            </button>
+            <button class="preset-tab" onclick="switchPresetTab('scene')">
+              场景
+            </button>
           </div>
 
           <div class="preset-list" id="presetList">
@@ -10122,8 +10306,15 @@
 
         <!-- 批量操作浮动栏 -->
         <div class="preset-batch-bar" id="presetBatchBar">
-          <button class="preset-batch-btn cancel" onclick="cancelPresetBatch()">取消</button>
-          <button class="preset-batch-btn delete" onclick="deleteSelectedPresets()">🗑️ 删除所选</button>
+          <button class="preset-batch-btn cancel" onclick="cancelPresetBatch()">
+            取消
+          </button>
+          <button
+            class="preset-batch-btn delete"
+            onclick="deleteSelectedPresets()"
+          >
+            🗑️ 删除所选
+          </button>
         </div>
       </div>
 
@@ -10131,15 +10322,24 @@
       <div class="preset-modal" id="stylePresetModal">
         <div class="preset-modal-content">
           <div class="preset-modal-header">
-            <span class="preset-modal-title" id="stylePresetModalTitle">创建预设</span>
-            <button class="preset-modal-close" onclick="closePresetModal()">✕</button>
+            <span class="preset-modal-title" id="stylePresetModalTitle"
+              >创建预设</span
+            >
+            <button class="preset-modal-close" onclick="closePresetModal()">
+              ✕
+            </button>
           </div>
           <div class="preset-modal-body">
             <div class="preset-form-group">
               <label class="preset-form-label">预设名称</label>
-              <input type="text" class="preset-form-input" id="stylePresetName" placeholder="给预设起个名字...">
+              <input
+                type="text"
+                class="preset-form-input"
+                id="stylePresetName"
+                placeholder="给预设起个名字..."
+              />
             </div>
-            
+
             <div class="preset-form-group">
               <label class="preset-form-label">分类</label>
               <select class="preset-form-input" id="stylePresetCategory">
@@ -10148,27 +10348,53 @@
                 <option value="scene">🎬 场景预设</option>
               </select>
             </div>
-            
+
             <div class="preset-form-group">
               <label class="preset-form-label">图标</label>
-              <input type="text" class="preset-form-input" id="stylePresetIcon" placeholder="输入一个emoji，如 🐱">
+              <input
+                type="text"
+                class="preset-form-input"
+                id="stylePresetIcon"
+                placeholder="输入一个emoji，如 🐱"
+              />
             </div>
-            
+
             <div class="preset-form-group">
-              <label class="preset-form-label">描述 <span class="preset-form-hint">(简短说明预设用途)</span></label>
-              <input type="text" class="preset-form-input" id="stylePresetDesc" placeholder="例如：温柔大姐姐文风">
+              <label class="preset-form-label"
+                >描述
+                <span class="preset-form-hint">(简短说明预设用途)</span></label
+              >
+              <input
+                type="text"
+                class="preset-form-input"
+                id="stylePresetDesc"
+                placeholder="例如：温柔大姐姐文风"
+              />
             </div>
-            
+
             <div class="preset-form-group">
               <label class="preset-form-label">
-                预设内容 <span class="preset-form-hint">(AI会按此指令生成回复)</span>
+                预设条目
+                <span class="preset-form-hint">(可添加多个条目，分别开关)</span>
               </label>
-              <textarea class="preset-form-input preset-form-textarea" id="stylePresetContent" placeholder="在这里输入预设指令...&#10;&#10;例如：&#10;你是一个温柔的大姐姐，说话时会带"呢～"、"哦～"等语气词..."></textarea>
+              <div class="preset-entries-list" id="presetEntriesList">
+                <!-- 条目会在这里动态生成 -->
+              </div>
+              <button class="preset-add-entry-btn" onclick="addPresetEntry()">
+                + 添加条目
+              </button>
             </div>
           </div>
           <div class="preset-modal-footer">
-            <button class="preset-modal-btn cancel" onclick="closePresetModal()">取消</button>
-            <button class="preset-modal-btn save" onclick="savePreset()">保存</button>
+            <button
+              class="preset-modal-btn cancel"
+              onclick="closePresetModal()"
+            >
+              取消
+            </button>
+            <button class="preset-modal-btn save" onclick="savePreset()">
+              保存
+            </button>
           </div>
         </div>
       </div>
@@ -10182,21 +10408,39 @@
               <div class="preset-import-option-icon">📁</div>
               <div class="preset-import-option-text">
                 <div class="preset-import-option-title">从文件导入</div>
-                <div class="preset-import-option-desc">支持JSON格式的预设文件</div>
+                <div class="preset-import-option-desc">
+                  支持JSON格式的预设文件
+                </div>
               </div>
             </div>
-            <div class="preset-import-option" onclick="importPresetFromClipboard()">
+            <div
+              class="preset-import-option"
+              onclick="importPresetFromClipboard()"
+            >
               <div class="preset-import-option-icon">📋</div>
               <div class="preset-import-option-text">
                 <div class="preset-import-option-title">从剪贴板导入</div>
-                <div class="preset-import-option-desc">粘贴Silly Tavern预设JSON</div>
+                <div class="preset-import-option-desc">
+                  粘贴Silly Tavern预设JSON
+                </div>
               </div>
             </div>
           </div>
-          <button class="preset-import-cancel" onclick="closePresetImportModal()">取消</button>
+          <button
+            class="preset-import-cancel"
+            onclick="closePresetImportModal()"
+          >
+            取消
+          </button>
         </div>
       </div>
-      <input type="file" id="presetFileInput" accept=".json" style="display:none" onchange="handlePresetFileImport(event)">
+      <input
+        type="file"
+        id="presetFileInput"
+        accept=".json"
+        style="display: none"
+        onchange="handlePresetFileImport(event)"
+      />
 
       <div id="worldbookPage" class="page worldbook-page">
         <!-- 世界书头部 -->
@@ -11362,7 +11606,9 @@
           <div class="conv-avatar" id="convAvatar">🤖</div>
           <span class="conv-name" id="convName">角色名称</span>
         </div>
-        <button class="conv-menu-btn" onclick="openChatSettings()"><span></span></button>
+        <button class="conv-menu-btn" onclick="openChatSettings()">
+          <span></span>
+        </button>
       </div>
 
       <div class="conv-menu" id="convMenu">
@@ -12035,31 +12281,61 @@
                 <div class="toggle-sublabel">模拟真实约会场景</div>
               </div>
               <label class="toggle-switch">
-                <input type="checkbox" id="settingsOnlineDating" onchange="toggleOfflineSettings()" />
+                <input
+                  type="checkbox"
+                  id="settingsOnlineDating"
+                  onchange="toggleOfflineSettings()"
+                />
                 <span class="toggle-slider"></span>
               </label>
             </div>
-            
+
             <!-- 线下模式高级设置 -->
             <div class="offline-word-settings" id="offlineWordSettings">
-              <div class="offline-word-title">
-                ✨ 线下模式设置
-              </div>
+              <div class="offline-word-title">✨ 线下模式设置</div>
               <div class="offline-word-row">
-                <span style="font-size: 0.82rem; color: #8d6e63; min-width: 60px;">回复字数</span>
-                <input type="number" class="offline-word-input" id="offlineMinWords" value="100" min="10" max="5000">
+                <span
+                  style="font-size: 0.82rem; color: #8d6e63; min-width: 60px"
+                  >回复字数</span
+                >
+                <input
+                  type="number"
+                  class="offline-word-input"
+                  id="offlineMinWords"
+                  value="100"
+                  min="10"
+                  max="5000"
+                />
                 <span class="offline-word-sep">～</span>
-                <input type="number" class="offline-word-input" id="offlineMaxWords" value="500" min="10" max="5000">
+                <input
+                  type="number"
+                  class="offline-word-input"
+                  id="offlineMaxWords"
+                  value="500"
+                  min="10"
+                  max="5000"
+                />
                 <span class="offline-word-unit">字</span>
               </div>
               <div class="offline-preset-select">
-                <label style="font-size: 0.82rem; color: #8d6e63; display: block; margin-bottom: 8px;">应用预设</label>
-                <select class="offline-preset-dropdown" id="offlinePresetSelect">
+                <label
+                  style="
+                    font-size: 0.82rem;
+                    color: #8d6e63;
+                    display: block;
+                    margin-bottom: 8px;
+                  "
+                  >应用预设</label
+                >
+                <select
+                  class="offline-preset-dropdown"
+                  id="offlinePresetSelect"
+                >
                   <option value="">-- 不使用预设 --</option>
                 </select>
               </div>
             </div>
-            
+
             <div class="toggle-row">
               <div>
                 <div class="toggle-label">长期记忆总结</div>
@@ -12588,28 +12864,35 @@
       window.presetBatchMode = false;
       window.selectedPresetIds = [];
       window.editingPresetId = null;
-      window.currentPresetFilter = 'all';
+      window.currentPresetFilter = "all";
+      window.currentPresetEntries = [];
 
       // 初始化预设系统
       async function initPresetSystem() {
         try {
-          const savedPresets = await localforage.getItem('userPresets');
+          const savedPresets = await localforage.getItem("userPresets");
           window.presets = savedPresets || [];
-          console.log('✅ 预设系统初始化完成，共', window.presets.length, '个预设');
+          console.log(
+            "✅ 预设系统初始化完成，共",
+            window.presets.length,
+            "个预设"
+          );
         } catch (e) {
-          console.error('预设加载失败:', e);
+          console.error("预设加载失败:", e);
           window.presets = [];
         }
       }
 
       // 渲染预设列表
       function renderPresets() {
-        const list = document.getElementById('presetList');
+        const list = document.getElementById("presetList");
         if (!list) return;
 
         let filteredPresets = window.presets;
-        if (window.currentPresetFilter !== 'all') {
-          filteredPresets = window.presets.filter(p => p.category === window.currentPresetFilter);
+        if (window.currentPresetFilter !== "all") {
+          filteredPresets = window.presets.filter(
+            (p) => p.category === window.currentPresetFilter
+          );
         }
 
         if (filteredPresets.length === 0) {
@@ -12623,118 +12906,388 @@
           return;
         }
 
-        list.innerHTML = filteredPresets.map(preset => {
-          const isSelected = window.selectedPresetIds.includes(preset.id);
-          const batchClass = window.presetBatchMode ? 'batch-mode' : '';
-          const checkedClass = isSelected ? 'checked' : '';
-          
-          const categoryLabels = {
-            character: '🎭 角色',
-            style: '✍️ 文风',
-            scene: '🎬 场景'
-          };
-          
-          return `
-            <div class="preset-item ${batchClass}" onclick="handlePresetClick('${preset.id}')" oncontextmenu="startPresetBatchMode(event, '${preset.id}')">
+        list.innerHTML = filteredPresets
+          .map((preset) => {
+            const isSelected = window.selectedPresetIds.includes(preset.id);
+            const batchClass = window.presetBatchMode ? "batch-mode" : "";
+            const checkedClass = isSelected ? "checked" : "";
+
+            const categoryLabels = {
+              character: "🎭 角色",
+              style: "✍️ 文风",
+              scene: "🎬 场景",
+            };
+
+            const entryCount = preset.entries ? preset.entries.length : 0;
+            const enabledCount = preset.entries
+              ? preset.entries.filter((e) => e.enabled).length
+              : 0;
+
+            return `
+            <div class="preset-item ${batchClass}" onclick="handlePresetClick('${
+              preset.id
+            }')" oncontextmenu="startPresetBatchMode(event, '${preset.id}')">
               <div class="preset-item-header">
-                <div class="preset-item-icon">${preset.icon || '📝'}</div>
+                <div class="preset-item-icon">${preset.icon || "📝"}</div>
                 <div class="preset-item-info">
                   <div class="preset-item-name">${preset.name}</div>
-                  <div class="preset-item-desc">${preset.description || '暂无描述'}</div>
+                  <div class="preset-item-desc">${
+                    preset.description || "暂无描述"
+                  }</div>
                 </div>
-                <div class="preset-item-checkbox ${checkedClass}" onclick="event.stopPropagation(); togglePresetSelect('${preset.id}')">
-                  ${isSelected ? '✓' : ''}
+                <div class="preset-item-checkbox ${checkedClass}" onclick="event.stopPropagation(); togglePresetSelect('${
+              preset.id
+            }')">
+                  ${isSelected ? "✓" : ""}
                 </div>
               </div>
               <div class="preset-item-tags">
-                <span class="preset-item-tag">${categoryLabels[preset.category] || '📝 其他'}</span>
+                <span class="preset-item-tag">${
+                  categoryLabels[preset.category] || "📝 其他"
+                }</span>
+                <span class="preset-item-tag">📋 ${enabledCount}/${entryCount} 条目</span>
               </div>
-              ${!window.presetBatchMode ? `
+              ${
+                !window.presetBatchMode
+                  ? `
               <div class="preset-item-actions">
                 <button class="preset-action-btn edit" onclick="event.stopPropagation(); editPreset('${preset.id}')">✏️ 编辑</button>
                 <button class="preset-action-btn export" onclick="event.stopPropagation(); exportPreset('${preset.id}')">📤 导出</button>
                 <button class="preset-action-btn delete" onclick="event.stopPropagation(); deleteSinglePreset('${preset.id}')">🗑️ 删除</button>
               </div>
-              ` : ''}
+              `
+                  : ""
+              }
             </div>
           `;
-        }).join('');
+          })
+          .join("");
       }
 
       // 切换预设标签页
       function switchPresetTab(tab) {
         window.currentPresetFilter = tab;
-        document.querySelectorAll('.preset-tab').forEach(t => t.classList.remove('active'));
-        event.target.classList.add('active');
+        document
+          .querySelectorAll(".preset-tab")
+          .forEach((t) => t.classList.remove("active"));
+        event.target.classList.add("active");
         renderPresets();
       }
+
+      // 当前编辑中的预设条目
+      window.currentPresetEntries = [];
 
       // 打开预设编辑弹窗
       function openPresetModal(presetId = null) {
         window.editingPresetId = presetId;
-        const modal = document.getElementById('stylePresetModal');
-        const title = document.getElementById('stylePresetModalTitle');
-        
+        const modal = document.getElementById("stylePresetModal");
+        const title = document.getElementById("stylePresetModalTitle");
+
         if (presetId) {
-          title.textContent = '编辑预设';
-          const preset = window.presets.find(p => p.id === presetId);
+          title.textContent = "编辑预设";
+          const preset = window.presets.find((p) => p.id === presetId);
+          console.log("编辑预设:", preset);
+          console.log("预设entries:", preset?.entries);
+
           if (preset) {
-            document.getElementById('stylePresetName').value = preset.name || '';
-            document.getElementById('stylePresetCategory').value = preset.category || 'character';
-            document.getElementById('stylePresetIcon').value = preset.icon || '';
-            document.getElementById('stylePresetDesc').value = preset.description || '';
-            document.getElementById('stylePresetContent').value = preset.content || '';
+            document.getElementById("stylePresetName").value =
+              preset.name || "";
+            document.getElementById("stylePresetCategory").value =
+              preset.category || "character";
+            document.getElementById("stylePresetIcon").value =
+              preset.icon || "";
+            document.getElementById("stylePresetDesc").value =
+              preset.description || "";
+            // 加载条目 - 兼容旧格式
+            if (
+              preset.entries &&
+              Array.isArray(preset.entries) &&
+              preset.entries.length > 0
+            ) {
+              window.currentPresetEntries = JSON.parse(
+                JSON.stringify(preset.entries)
+              );
+              console.log(
+                "加载了entries:",
+                window.currentPresetEntries.length,
+                "个"
+              );
+            } else if (preset.content) {
+              // 旧格式：把content转换为单个条目
+              window.currentPresetEntries = [
+                {
+                  id: "entry_" + Date.now(),
+                  name: "主要内容",
+                  keywords: "",
+                  content: preset.content,
+                  enabled: true,
+                },
+              ];
+              console.log("从content转换为条目");
+            } else {
+              window.currentPresetEntries = [];
+              console.log("没有找到entries或content");
+            }
           }
         } else {
-          title.textContent = '创建预设';
-          document.getElementById('stylePresetName').value = '';
-          document.getElementById('stylePresetCategory').value = 'character';
-          document.getElementById('stylePresetIcon').value = '';
-          document.getElementById('stylePresetDesc').value = '';
-          document.getElementById('stylePresetContent').value = '';
+          title.textContent = "创建预设";
+          document.getElementById("stylePresetName").value = "";
+          document.getElementById("stylePresetCategory").value = "character";
+          document.getElementById("stylePresetIcon").value = "";
+          document.getElementById("stylePresetDesc").value = "";
+          window.currentPresetEntries = [];
         }
-        
-        modal.classList.add('active');
+
+        console.log(
+          "准备渲染，currentPresetEntries:",
+          window.currentPresetEntries
+        );
+        window.presetEntryDisplayLimit = 20; // 重置显示限制
+        renderPresetEntries();
+        modal.classList.add("active");
+      }
+
+      // 当前显示的条目数量限制
+      window.presetEntryDisplayLimit = 20;
+
+      // 渲染预设条目列表
+      function renderPresetEntries() {
+        const list = document.getElementById("presetEntriesList");
+        if (!list) {
+          console.error("找不到presetEntriesList元素");
+          return;
+        }
+
+        console.log(
+          "渲染条目，数量:",
+          window.currentPresetEntries ? window.currentPresetEntries.length : 0
+        );
+
+        if (
+          !window.currentPresetEntries ||
+          window.currentPresetEntries.length === 0
+        ) {
+          list.innerHTML =
+            '<div style="text-align:center;color:#999;padding:30px;background:rgba(255,255,255,0.8);border-radius:12px;">暂无条目，点击下方按钮添加</div>';
+          return;
+        }
+
+        // 限制显示数量
+        const displayEntries = window.currentPresetEntries.slice(
+          0,
+          window.presetEntryDisplayLimit
+        );
+        const hasMore =
+          window.currentPresetEntries.length > window.presetEntryDisplayLimit;
+
+        try {
+          let html = displayEntries
+            .map((entry, index) => {
+              const escapedName = presetEscapeHtml(entry.name || "");
+              const escapedKeywords = presetEscapeHtml(entry.keywords || "");
+              const escapedContent = presetEscapeHtml(entry.content || "");
+
+              return `
+            <div data-index="${index}" style="background:#faf8f5 !important;border:1.5px solid rgba(255,182,193,0.5) !important;border-radius:12px !important;margin-bottom:12px !important;overflow:visible !important;display:block !important;visibility:visible !important;opacity:1 !important;height:auto !important;">
+              <div style="display:flex !important;align-items:center !important;padding:12px !important;gap:10px !important;background:rgba(255,255,255,0.7) !important;border-bottom:1px solid rgba(255,182,193,0.3) !important;visibility:visible !important;opacity:1 !important;height:auto !important;">
+                <div onclick="togglePresetEntry(${index})" style="width:44px !important;height:24px !important;min-width:44px !important;min-height:24px !important;background:${
+                entry.enabled
+                  ? "linear-gradient(135deg,#f48fb1,#f06292)"
+                  : "#ddd"
+              } !important;border-radius:12px !important;position:relative !important;cursor:pointer !important;flex-shrink:0 !important;display:block !important;">
+                  <div style="position:absolute !important;top:2px !important;${
+                    entry.enabled ? "left:22px" : "left:2px"
+                  } !important;width:20px !important;height:20px !important;background:white !important;border-radius:50% !important;box-shadow:0 1px 3px rgba(0,0,0,0.2) !important;"></div>
+                </div>
+                <input type="text" value="${escapedName}" placeholder="备注 (可选)" onchange="updatePresetEntry(${index}, 'name', this.value)"
+                  style="flex:1 !important;padding:10px 12px !important;border:1.5px solid #e5ddd3 !important;border-radius:8px !important;font-size:0.95rem !important;outline:none !important;background:white !important;display:block !important;visibility:visible !important;height:auto !important;">
+                <button onclick="deletePresetEntry(${index})" style="width:32px !important;height:32px !important;min-width:32px !important;min-height:32px !important;border:none !important;background:rgba(255,100,100,0.15) !important;color:#e57373 !important;border-radius:8px !important;cursor:pointer !important;font-size:18px !important;display:flex !important;align-items:center !important;justify-content:center !important;flex-shrink:0 !important;">✕</button>
+              </div>
+              <div style="padding:12px !important;background:#faf8f5 !important;display:block !important;visibility:visible !important;opacity:1 !important;height:auto !important;">
+                <div style="margin-bottom:10px !important;display:block !important;visibility:visible !important;">
+                  <div style="font-size:0.8rem !important;color:#8a6a7f !important;margin-bottom:4px !important;display:block !important;">关键词 (用英文逗号,分隔)</div>
+                  <input type="text" value="${escapedKeywords}" placeholder="例如: key1, key2" onchange="updatePresetEntry(${index}, 'keywords', this.value)"
+                    style="width:100% !important;padding:10px 12px !important;border:1.5px solid #e5ddd3 !important;border-radius:8px !important;font-size:0.9rem !important;outline:none !important;background:white !important;box-sizing:border-box !important;display:block !important;">
+                </div>
+                <div style="display:flex !important;align-items:center !important;justify-content:space-between !important;visibility:visible !important;">
+                  <span style="font-size:0.8rem !important;color:#8a6a7f !important;display:inline !important;">内容 (点击右侧展开)</span>
+                  <button onclick="toggleEntryContent(${index})" style="padding:6px 12px !important;border:none !important;background:rgba(244,143,177,0.2) !important;color:#c2185b !important;border-radius:6px !important;font-size:0.85rem !important;cursor:pointer !important;display:inline-block !important;">展开</button>
+                </div>
+              </div>
+              <div id="entryContent_${index}" style="display:none;padding:0 12px 12px 12px !important;background:#faf8f5 !important;">
+                <textarea placeholder="输入预设内容..." onchange="updatePresetEntry(${index}, 'content', this.value)"
+                  style="width:100% !important;min-height:100px !important;padding:10px 12px !important;border:1.5px solid #e5ddd3 !important;border-radius:8px !important;font-size:0.9rem !important;outline:none !important;background:white !important;box-sizing:border-box !important;resize:vertical !important;font-family:inherit !important;line-height:1.5 !important;">${escapedContent}</textarea>
+              </div>
+            </div>
+          `;
+            })
+            .join("");
+
+          // 如果还有更多条目，显示加载更多按钮
+          if (hasMore) {
+            const remaining =
+              window.currentPresetEntries.length -
+              window.presetEntryDisplayLimit;
+            html += `
+              <div style="text-align:center;padding:15px;">
+                <button onclick="loadMorePresetEntries()" style="padding:10px 20px;background:linear-gradient(135deg,#f48fb1,#f06292);color:white;border:none;border-radius:20px;font-size:0.9rem;cursor:pointer;">
+                  加载更多 (还有 ${remaining} 个条目)
+                </button>
+              </div>
+            `;
+          }
+
+          // 显示条目统计
+          const enabledCount = window.currentPresetEntries.filter(
+            (e) => e.enabled
+          ).length;
+          html =
+            `<div style="text-align:center;padding:8px;color:#8a6a7f;font-size:0.85rem;background:rgba(255,255,255,0.6);border-radius:8px;margin-bottom:10px;">
+            共 ${window.currentPresetEntries.length} 个条目，已启用 ${enabledCount} 个
+          </div>` + html;
+
+          console.log("生成的HTML长度:", html.length);
+          list.innerHTML = html;
+          console.log("渲染完成，list子元素数量:", list.children.length);
+        } catch (err) {
+          console.error("渲染条目出错:", err);
+          list.innerHTML =
+            '<div style="color:red;padding:20px;">渲染出错: ' +
+            err.message +
+            "</div>";
+        }
+      }
+
+      // 加载更多条目
+      function loadMorePresetEntries() {
+        window.presetEntryDisplayLimit += 20;
+        renderPresetEntries();
+      }
+
+      // HTML转义函数
+      function presetEscapeHtml(text) {
+        if (!text) return "";
+        const div = document.createElement("div");
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      // 添加新条目
+      function addPresetEntry() {
+        console.log(
+          "添加新条目，当前数量:",
+          window.currentPresetEntries.length
+        );
+        window.currentPresetEntries.push({
+          id: "entry_" + Date.now(),
+          name: "",
+          keywords: "",
+          content: "",
+          enabled: true,
+        });
+        // 增加显示限制以确保新条目可见
+        window.presetEntryDisplayLimit = Math.max(
+          window.presetEntryDisplayLimit,
+          window.currentPresetEntries.length
+        );
+        renderPresetEntries();
+        // 滚动到底部显示新条目
+        setTimeout(() => {
+          const list = document.getElementById("presetEntriesList");
+          if (list) {
+            list.scrollTop = list.scrollHeight;
+          }
+        }, 100);
+        console.log("添加后数量:", window.currentPresetEntries.length);
+      }
+
+      // 切换条目开关
+      function togglePresetEntry(index) {
+        if (window.currentPresetEntries[index]) {
+          window.currentPresetEntries[index].enabled =
+            !window.currentPresetEntries[index].enabled;
+          renderPresetEntries();
+        }
+      }
+
+      // 更新条目字段
+      function updatePresetEntry(index, field, value) {
+        if (window.currentPresetEntries[index]) {
+          window.currentPresetEntries[index][field] = value;
+        }
+      }
+
+      // 删除条目
+      function deletePresetEntry(index) {
+        window.currentPresetEntries.splice(index, 1);
+        renderPresetEntries();
+      }
+
+      // 展开/收起条目内容
+      function toggleEntryContent(index) {
+        const wrapper = document.getElementById(`entryContent_${index}`);
+        if (wrapper) {
+          const isHidden =
+            wrapper.style.display === "none" || wrapper.style.display === "";
+          wrapper.style.display = isHidden ? "block" : "none";
+
+          // 找到对应的按钮并更新文字
+          const card = wrapper.parentElement;
+          if (card) {
+            const btn = card.querySelector(
+              'button[onclick*="toggleEntryContent"]'
+            );
+            if (btn) {
+              btn.textContent = isHidden ? "收起" : "展开";
+            }
+          }
+        }
       }
 
       // 关闭预设编辑弹窗
       function closePresetModal() {
-        document.getElementById('stylePresetModal').classList.remove('active');
+        document.getElementById("stylePresetModal").classList.remove("active");
         window.editingPresetId = null;
+        window.currentPresetEntries = [];
       }
 
       // 保存预设
       async function savePreset() {
-        const name = document.getElementById('stylePresetName').value.trim();
-        const category = document.getElementById('stylePresetCategory').value;
-        const icon = document.getElementById('stylePresetIcon').value.trim() || '📝';
-        const description = document.getElementById('stylePresetDesc').value.trim();
-        const content = document.getElementById('stylePresetContent').value.trim();
+        const name = document.getElementById("stylePresetName").value.trim();
+        const category = document.getElementById("stylePresetCategory").value;
+        const icon =
+          document.getElementById("stylePresetIcon").value.trim() || "📝";
+        const description = document
+          .getElementById("stylePresetDesc")
+          .value.trim();
 
         if (!name) {
-          showToast('请输入预设名称');
+          showToast("请输入预设名称");
           return;
         }
-        if (!content) {
-          showToast('请输入预设内容');
+        if (window.currentPresetEntries.length === 0) {
+          showToast("请至少添加一个条目");
           return;
         }
 
         const preset = {
-          id: window.editingPresetId || 'preset_' + Date.now(),
+          id: window.editingPresetId || "preset_" + Date.now(),
           name,
           category,
           icon,
           description,
-          content,
-          createdAt: window.editingPresetId ? 
-            (window.presets.find(p => p.id === window.editingPresetId)?.createdAt || Date.now()) : 
-            Date.now(),
-          updatedAt: Date.now()
+          entries: window.currentPresetEntries,
+          createdAt: window.editingPresetId
+            ? window.presets.find((p) => p.id === window.editingPresetId)
+                ?.createdAt || Date.now()
+            : Date.now(),
+          updatedAt: Date.now(),
         };
 
         if (window.editingPresetId) {
-          const index = window.presets.findIndex(p => p.id === window.editingPresetId);
+          const index = window.presets.findIndex(
+            (p) => p.id === window.editingPresetId
+          );
           if (index !== -1) {
             window.presets[index] = preset;
           }
@@ -12742,11 +13295,11 @@
           window.presets.push(preset);
         }
 
-        await localforage.setItem('userPresets', window.presets);
+        await localforage.setItem("userPresets", window.presets);
         closePresetModal();
         renderPresets();
         updateOfflinePresetDropdown();
-        showToast(window.editingPresetId ? '预设已更新' : '预设已创建');
+        showToast(window.editingPresetId ? "预设已更新" : "预设已创建");
       }
 
       // 编辑预设
@@ -12756,18 +13309,18 @@
 
       // 删除单个预设
       async function deleteSinglePreset(presetId) {
-        if (!confirm('确定要删除这个预设吗？')) return;
-        
-        window.presets = window.presets.filter(p => p.id !== presetId);
-        await localforage.setItem('userPresets', window.presets);
+        if (!confirm("确定要删除这个预设吗？")) return;
+
+        window.presets = window.presets.filter((p) => p.id !== presetId);
+        await localforage.setItem("userPresets", window.presets);
         renderPresets();
         updateOfflinePresetDropdown();
-        showToast('预设已删除');
+        showToast("预设已删除");
       }
 
       // 导出预设
       function exportPreset(presetId) {
-        const preset = window.presets.find(p => p.id === presetId);
+        const preset = window.presets.find((p) => p.id === presetId);
         if (!preset) return;
 
         // 转换为Silly Tavern兼容格式
@@ -12781,17 +13334,19 @@
           maxWords: preset.maxWords,
           // 兼容Silly Tavern的字段
           prompt: preset.content,
-          system_prompt: preset.content
+          system_prompt: preset.content,
         };
 
-        const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+        const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+          type: "application/json",
+        });
         const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
+        const a = document.createElement("a");
         a.href = url;
         a.download = `preset_${preset.name}.json`;
         a.click();
         URL.revokeObjectURL(url);
-        showToast('预设已导出');
+        showToast("预设已导出");
       }
 
       // 处理预设点击
@@ -12808,7 +13363,7 @@
         e.preventDefault();
         window.presetBatchMode = true;
         window.selectedPresetIds = [presetId];
-        document.getElementById('presetBatchBar').classList.add('active');
+        document.getElementById("presetBatchBar").classList.add("active");
         renderPresets();
       }
 
@@ -12827,40 +13382,47 @@
       function cancelPresetBatch() {
         window.presetBatchMode = false;
         window.selectedPresetIds = [];
-        document.getElementById('presetBatchBar').classList.remove('active');
+        document.getElementById("presetBatchBar").classList.remove("active");
         renderPresets();
       }
 
       // 删除选中的预设
       async function deleteSelectedPresets() {
         if (window.selectedPresetIds.length === 0) {
-          showToast('请先选择要删除的预设');
+          showToast("请先选择要删除的预设");
           return;
         }
-        
-        if (!confirm(`确定要删除选中的 ${window.selectedPresetIds.length} 个预设吗？`)) return;
-        
-        window.presets = window.presets.filter(p => !window.selectedPresetIds.includes(p.id));
-        await localforage.setItem('userPresets', window.presets);
+
+        if (
+          !confirm(
+            `确定要删除选中的 ${window.selectedPresetIds.length} 个预设吗？`
+          )
+        )
+          return;
+
+        window.presets = window.presets.filter(
+          (p) => !window.selectedPresetIds.includes(p.id)
+        );
+        await localforage.setItem("userPresets", window.presets);
         cancelPresetBatch();
         updateOfflinePresetDropdown();
-        showToast('已删除选中的预设');
+        showToast("已删除选中的预设");
       }
 
       // 打开导入弹窗
       function openPresetImportModal() {
-        document.getElementById('presetImportModal').classList.add('active');
+        document.getElementById("presetImportModal").classList.add("active");
       }
 
       // 关闭导入弹窗
       function closePresetImportModal() {
-        document.getElementById('presetImportModal').classList.remove('active');
+        document.getElementById("presetImportModal").classList.remove("active");
       }
 
       // 从文件导入
       function importPresetFromFile() {
         closePresetImportModal();
-        document.getElementById('presetFileInput').click();
+        document.getElementById("presetFileInput").click();
       }
 
       // 处理文件导入
@@ -12873,11 +13435,11 @@
           const data = JSON.parse(text);
           await importPresetData(data);
         } catch (e) {
-          console.error('导入失败:', e);
-          showToast('导入失败，请检查文件格式');
+          console.error("导入失败:", e);
+          showToast("导入失败，请检查文件格式");
         }
-        
-        event.target.value = '';
+
+        event.target.value = "";
       }
 
       // 从剪贴板导入
@@ -12888,114 +13450,160 @@
           await importPresetData(data);
           closePresetImportModal();
         } catch (e) {
-          console.error('导入失败:', e);
-          showToast('导入失败，请检查剪贴板内容');
+          console.error("导入失败:", e);
+          showToast("导入失败，请检查剪贴板内容");
         }
       }
 
       // 导入预设数据
       async function importPresetData(data) {
-        // 兼容Silly Tavern格式
-        let content = '';
-        let presetName = data.name || '导入的预设';
-        
+        console.log("开始导入预设数据:", data);
+        let entries = [];
+        let presetName = data.name || "导入的预设";
+
         // Silly Tavern格式：内容在prompts数组里
         if (data.prompts && Array.isArray(data.prompts)) {
-          // 提取所有prompt的content，合并成一个完整的预设
-          const promptContents = data.prompts
-            .filter(p => p.content && typeof p.content === 'string')
-            .map(p => {
-              // 如果有名字，加上标题
-              if (p.name) {
-                return `【${p.name}】\n${p.content}`;
+          console.log("检测到prompts数组，共", data.prompts.length, "个");
+
+          // 获取prompt_order来确定enabled状态（如果存在）
+          let enabledMap = {};
+          if (data.prompt_order && Array.isArray(data.prompt_order)) {
+            data.prompt_order.forEach((orderItem) => {
+              if (Array.isArray(orderItem)) {
+                orderItem.forEach((item) => {
+                  if (item && item.identifier) {
+                    enabledMap[item.identifier] = item.enabled !== false;
+                  }
+                });
+              } else if (orderItem && orderItem.identifier) {
+                enabledMap[orderItem.identifier] = orderItem.enabled !== false;
               }
-              return p.content;
             });
-          
-          if (promptContents.length > 0) {
-            content = promptContents.join('\n\n');
-            // 使用第一个prompt的名字或者文件名
-            if (data.prompts[0]?.name) {
-              presetName = data.prompts[0].name;
-            }
+          }
+
+          // 提取所有prompt并转换为条目（排除marker）
+          const baseTime = Date.now();
+          entries = data.prompts
+            .filter(
+              (p) => p.content && typeof p.content === "string" && !p.marker
+            )
+            .map((p, index) => {
+              let isEnabled = true;
+              if (p.identifier && enabledMap.hasOwnProperty(p.identifier)) {
+                isEnabled = enabledMap[p.identifier];
+              } else if (p.hasOwnProperty("enabled")) {
+                isEnabled = p.enabled !== false;
+              }
+
+              return {
+                id: "entry_" + baseTime + "_" + index,
+                name: p.name || "",
+                keywords: "",
+                content: p.content,
+                enabled: isEnabled,
+              };
+            });
+
+          console.log("过滤后得到", entries.length, "个条目");
+
+          const firstWithContent = data.prompts.find(
+            (p) => p.content && p.name
+          );
+          if (firstWithContent) {
+            presetName = firstWithContent.name;
           }
         }
-        
-        // 如果prompts里没有找到，尝试其他字段
-        if (!content) {
-          content = data.content || data.prompt || data.system_prompt || '';
+
+        // 如果prompts里没有找到，尝试其他字段作为单个条目
+        if (entries.length === 0) {
+          const content =
+            data.content || data.prompt || data.system_prompt || "";
+          if (content) {
+            entries.push({
+              id: "entry_" + Date.now(),
+              name: data.name || "主要内容",
+              keywords: "",
+              content: content,
+              enabled: true,
+            });
+          }
         }
-        
-        if (!content) {
-          showToast('预设内容为空，无法导入');
+
+        if (entries.length === 0) {
+          showToast("预设内容为空，无法导入");
           return;
         }
 
         const preset = {
-          id: 'preset_' + Date.now(),
+          id: "preset_" + Date.now(),
           name: presetName,
-          category: data.category || 'style',
-          icon: data.icon || '📥',
-          description: data.description || '从Silly Tavern导入的预设',
-          content: content,
+          category: data.category || "style",
+          icon: data.icon || "📥",
+          description: data.description || "从Silly Tavern导入的预设",
+          entries: entries,
           createdAt: Date.now(),
-          updatedAt: Date.now()
+          updatedAt: Date.now(),
         };
 
+        console.log("创建预设对象:", preset);
+        console.log("预设的entries:", preset.entries);
+
         window.presets.push(preset);
-        await localforage.setItem('userPresets', window.presets);
+        await localforage.setItem("userPresets", window.presets);
         renderPresets();
         updateOfflinePresetDropdown();
-        showToast('预设导入成功！');
+        showToast(`预设导入成功！共 ${entries.length} 个条目`);
       }
 
       // ==================== 线下模式设置 ====================
-      
+
       // 切换线下模式设置面板显示
       function toggleOfflineSettings() {
-        const checkbox = document.getElementById('settingsOnlineDating');
-        const settingsPanel = document.getElementById('offlineWordSettings');
-        
+        const checkbox = document.getElementById("settingsOnlineDating");
+        const settingsPanel = document.getElementById("offlineWordSettings");
+
         if (checkbox.checked) {
-          settingsPanel.classList.add('active');
+          settingsPanel.classList.add("active");
           updateOfflinePresetDropdown();
         } else {
-          settingsPanel.classList.remove('active');
+          settingsPanel.classList.remove("active");
         }
       }
 
       // 更新线下模式预设下拉列表
       function updateOfflinePresetDropdown() {
-        const select = document.getElementById('offlinePresetSelect');
+        const select = document.getElementById("offlinePresetSelect");
         if (!select) return;
 
         const currentValue = select.value;
-        
+
         select.innerHTML = '<option value="">-- 不使用预设 --</option>';
-        
-        window.presets.forEach(preset => {
-          const option = document.createElement('option');
+
+        window.presets.forEach((preset) => {
+          const option = document.createElement("option");
           option.value = preset.id;
-          option.textContent = `${preset.icon || '📝'} ${preset.name}`;
+          option.textContent = `${preset.icon || "📝"} ${preset.name}`;
           select.appendChild(option);
         });
 
         // 恢复之前的选择
-        if (currentValue && window.presets.find(p => p.id === currentValue)) {
+        if (currentValue && window.presets.find((p) => p.id === currentValue)) {
           select.value = currentValue;
         }
       }
 
       // 预设选择变化时更新字数范围
       function onOfflinePresetChange() {
-        const select = document.getElementById('offlinePresetSelect');
+        const select = document.getElementById("offlinePresetSelect");
         const presetId = select.value;
-        
+
         if (presetId) {
-          const preset = window.presets.find(p => p.id === presetId);
+          const preset = window.presets.find((p) => p.id === presetId);
           if (preset) {
-            document.getElementById('offlineMinWords').value = preset.minWords || 100;
-            document.getElementById('offlineMaxWords').value = preset.maxWords || 500;
+            document.getElementById("offlineMinWords").value =
+              preset.minWords || 100;
+            document.getElementById("offlineMaxWords").value =
+              preset.maxWords || 500;
           }
         }
       }
@@ -13004,10 +13612,10 @@
       function openPage(pageId) {
         const page = document.getElementById(pageId);
         if (page) {
-          page.classList.add('active');
-          
+          page.classList.add("active");
+
           // 预设页面特殊处理
-          if (pageId === 'presetPage') {
+          if (pageId === "presetPage") {
             renderPresets();
           }
         }
@@ -13016,10 +13624,10 @@
       function closePage(pageId) {
         const page = document.getElementById(pageId);
         if (page) {
-          page.classList.remove('active');
-          
+          page.classList.remove("active");
+
           // 预设页面关闭时取消批量模式
-          if (pageId === 'presetPage') {
+          if (pageId === "presetPage") {
             cancelPresetBatch();
           }
         }
@@ -14324,17 +14932,47 @@
           if (settings.onlineDating) {
             // 线下模式基础提示词
             systemContent += `\n【模式：沉浸式角色扮演】\n1. 以小说笔触回复。\n2. **必须严格遵守以下格式规范**：\n   - **环境/动作/神态描写**：直接书写，不加任何符号。\n   - **心理活动/内心独白**：必须用一对星号包裹，例如 *她看起来真可爱*。\n   - **语言对话**：必须用直角引号包裹，例如 「早安，亲爱的。」\n3. **禁止**拆分消息，请输出一段完整流畅的文本。\n4. **禁止**发送表情包（[sticker:xxx]格式）。\n5. **禁止**发送语音消息（[语音:xxx]格式）。\n`;
-            
+
             // 添加字数要求
             const minWords = settings.offlineMinWords || 100;
             const maxWords = settings.offlineMaxWords || 500;
             systemContent += `6. **字数要求**：回复字数必须在 ${minWords} 到 ${maxWords} 字之间。请务必遵守此限制。\n`;
-            
+
             // 如果选择了预设，添加预设内容
             if (settings.offlinePresetId && window.presets) {
-              const selectedPreset = window.presets.find(p => p.id === settings.offlinePresetId);
-              if (selectedPreset && selectedPreset.content) {
-                systemContent += `\n【预设风格指令】\n${selectedPreset.content}\n`;
+              const selectedPreset = window.presets.find(
+                (p) => p.id === settings.offlinePresetId
+              );
+              if (selectedPreset) {
+                let presetContent = "";
+
+                // 新格式：从entries数组获取启用的条目
+                if (
+                  selectedPreset.entries &&
+                  Array.isArray(selectedPreset.entries)
+                ) {
+                  const enabledEntries = selectedPreset.entries.filter(
+                    (e) => e.enabled
+                  );
+                  if (enabledEntries.length > 0) {
+                    presetContent = enabledEntries
+                      .map((e) => {
+                        if (e.name) {
+                          return `【${e.name}】\n${e.content}`;
+                        }
+                        return e.content;
+                      })
+                      .join("\n\n");
+                  }
+                }
+                // 兼容旧格式：直接使用content字段
+                else if (selectedPreset.content) {
+                  presetContent = selectedPreset.content;
+                }
+
+                if (presetContent) {
+                  systemContent += `\n【预设风格指令】\n${presetContent}\n`;
+                }
               }
             }
           } else {
@@ -14881,29 +15519,34 @@
         // ✅ 加在这里 (loadSettingsToForm 函数内部的末尾)：
         document.getElementById("settingsVoiceId").value =
           settings.voiceId || "";
-          
+
         // 线下模式设置初始化
-        const offlineWordSettings = document.getElementById('offlineWordSettings');
+        const offlineWordSettings = document.getElementById(
+          "offlineWordSettings"
+        );
         if (offlineWordSettings) {
           if (settings.onlineDating) {
-            offlineWordSettings.classList.add('active');
+            offlineWordSettings.classList.add("active");
           } else {
-            offlineWordSettings.classList.remove('active');
+            offlineWordSettings.classList.remove("active");
           }
         }
-        
+
         // 设置字数范围
-        if (document.getElementById('offlineMinWords')) {
-          document.getElementById('offlineMinWords').value = settings.offlineMinWords || 100;
+        if (document.getElementById("offlineMinWords")) {
+          document.getElementById("offlineMinWords").value =
+            settings.offlineMinWords || 100;
         }
-        if (document.getElementById('offlineMaxWords')) {
-          document.getElementById('offlineMaxWords').value = settings.offlineMaxWords || 500;
+        if (document.getElementById("offlineMaxWords")) {
+          document.getElementById("offlineMaxWords").value =
+            settings.offlineMaxWords || 500;
         }
-        
+
         // 更新并设置预设下拉框
         updateOfflinePresetDropdown();
-        if (document.getElementById('offlinePresetSelect')) {
-          document.getElementById('offlinePresetSelect').value = settings.offlinePresetId || '';
+        if (document.getElementById("offlinePresetSelect")) {
+          document.getElementById("offlinePresetSelect").value =
+            settings.offlinePresetId || "";
         }
       }
 
@@ -15142,9 +15785,12 @@
           voiceId: document.getElementById("settingsVoiceId").value.trim(),
 
           // 线下模式设置
-          offlineMinWords: parseInt(document.getElementById("offlineMinWords")?.value) || 100,
-          offlineMaxWords: parseInt(document.getElementById("offlineMaxWords")?.value) || 500,
-          offlinePresetId: document.getElementById("offlinePresetSelect")?.value || "",
+          offlineMinWords:
+            parseInt(document.getElementById("offlineMinWords")?.value) || 100,
+          offlineMaxWords:
+            parseInt(document.getElementById("offlineMaxWords")?.value) || 500,
+          offlinePresetId:
+            document.getElementById("offlinePresetSelect")?.value || "",
 
           // 火花字段更新
           flame: isFlameActive,
@@ -23024,6 +23670,15 @@ ${userName}在你的动态下留言了，你需要回复。
         toggleOfflineSettings,
         updateOfflinePresetDropdown,
         onOfflinePresetChange,
+        // 预设条目相关
+        renderPresetEntries,
+        addPresetEntry,
+        togglePresetEntry,
+        updatePresetEntry,
+        deletePresetEntry,
+        toggleEntryContent,
+        presetEscapeHtml,
+        loadMorePresetEntries,
       });
       console.log("✅ 所有函数已挂载到window");
       // 🆕 智能解析文本：自动识别 "关键词：URL" 格式
