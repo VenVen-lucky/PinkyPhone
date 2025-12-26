@@ -6540,10 +6540,548 @@
         background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
         color: #4caf50;
       }
+      .bg-transfer {
+        background: linear-gradient(135deg, #fff0f5, #ffe4ec);
+        color: #e91e63;
+      }
+      .bg-reroll {
+        background: linear-gradient(135deg, #e8eaf6, #c5cae9);
+        color: #5c6bc0;
+      }
 
       .panel-label {
         font-size: 0.75rem;
         color: #666;
+      }
+
+      /* ==================== 转账卡片样式 ==================== */
+      .transfer-card {
+        background: linear-gradient(135deg, #fff5f8 0%, #ffe8f0 100%);
+        border-radius: 16px;
+        padding: 16px;
+        min-width: 240px;
+        max-width: 280px;
+        box-shadow: 0 4px 15px rgba(244, 143, 177, 0.2);
+        border: 1px solid rgba(244, 143, 177, 0.3);
+      }
+      .transfer-card-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+      .transfer-card-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #f48fb1, #f06292);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        box-shadow: 0 4px 12px rgba(244, 143, 177, 0.4);
+      }
+      .transfer-card-info {
+        flex: 1;
+      }
+      .transfer-card-title {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #c2185b;
+      }
+      .transfer-card-from {
+        font-size: 0.75rem;
+        color: #e57373;
+        margin-top: 2px;
+      }
+      .transfer-card-amount {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #c2185b;
+        text-align: center;
+        padding: 16px 0;
+        border-top: 1px dashed rgba(244, 143, 177, 0.4);
+        border-bottom: 1px dashed rgba(244, 143, 177, 0.4);
+        margin: 8px 0;
+      }
+      .transfer-card-amount::before {
+        content: '¥';
+        font-size: 1rem;
+        margin-right: 4px;
+      }
+      .transfer-card-note {
+        font-size: 0.8rem;
+        color: #999;
+        text-align: center;
+        margin-bottom: 12px;
+      }
+      .transfer-card-actions {
+        display: flex;
+        gap: 10px;
+      }
+      .transfer-card-btn {
+        flex: 1;
+        padding: 10px;
+        border: none;
+        border-radius: 10px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .transfer-card-btn.accept {
+        background: linear-gradient(135deg, #f48fb1, #f06292);
+        color: white;
+        box-shadow: 0 4px 12px rgba(244, 143, 177, 0.4);
+      }
+      .transfer-card-btn.reject {
+        background: #f5f5f5;
+        color: #999;
+      }
+      .transfer-card-btn:active {
+        transform: scale(0.98);
+      }
+      .transfer-card-status {
+        text-align: center;
+        padding: 10px;
+        font-size: 0.85rem;
+        color: #999;
+        font-weight: 500;
+      }
+      .transfer-card-status.accepted {
+        color: #4caf50;
+      }
+      .transfer-card-status.rejected {
+        color: #f44336;
+      }
+
+      /* ==================== 位置卡片样式 ==================== */
+      .location-card {
+        background: linear-gradient(135deg, #fff5f8 0%, #ffe8f0 100%);
+        border-radius: 16px;
+        overflow: hidden;
+        min-width: 220px;
+        max-width: 260px;
+        box-shadow: 0 4px 15px rgba(244, 143, 177, 0.2);
+        border: 1px solid rgba(244, 143, 177, 0.3);
+      }
+      .location-card-map {
+        height: 100px;
+        background: linear-gradient(135deg, #fce4ec, #f8bbd9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+      }
+      .location-card-map-icon {
+        font-size: 40px;
+        animation: locationBounce 1s ease-in-out infinite;
+      }
+      @keyframes locationBounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-8px); }
+      }
+      .location-card-map-bg {
+        position: absolute;
+        inset: 0;
+        background-image: 
+          radial-gradient(circle at 20% 30%, rgba(255,255,255,0.3) 0%, transparent 40%),
+          radial-gradient(circle at 80% 70%, rgba(255,255,255,0.3) 0%, transparent 40%);
+      }
+      .location-card-info {
+        padding: 12px 14px;
+        background: white;
+      }
+      .location-card-name {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #c2185b;
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .location-card-name::before {
+        content: '📍';
+        font-size: 0.85rem;
+      }
+      .location-card-address {
+        font-size: 0.75rem;
+        color: #999;
+        line-height: 1.4;
+      }
+      .location-card-action {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+        background: linear-gradient(135deg, #fff0f5, #ffe4ec);
+        font-size: 0.8rem;
+        color: #e91e63;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .location-card-action:active {
+        background: #ffe4ec;
+      }
+
+      /* ==================== 钱包卡片样式 ==================== */
+      .wallet-card {
+        background: linear-gradient(135deg, #fff0f5 0%, #ffe4ec 100%);
+        border-radius: 20px;
+        padding: 20px;
+        margin: 16px;
+        box-shadow: 0 8px 25px rgba(244, 143, 177, 0.25);
+        border: 1px solid rgba(244, 143, 177, 0.3);
+        position: relative;
+        overflow: hidden;
+      }
+      .wallet-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -30%;
+        width: 150px;
+        height: 150px;
+        background: radial-gradient(circle, rgba(244,143,177,0.2) 0%, transparent 70%);
+        border-radius: 50%;
+      }
+      .wallet-card-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+        position: relative;
+        z-index: 1;
+      }
+      .wallet-card-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #f48fb1, #f06292);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        box-shadow: 0 4px 12px rgba(244, 143, 177, 0.4);
+      }
+      .wallet-card-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #c2185b;
+      }
+      .wallet-card-subtitle {
+        font-size: 0.75rem;
+        color: #e57373;
+        margin-top: 2px;
+      }
+      .wallet-card-balance {
+        text-align: center;
+        padding: 20px 0;
+        position: relative;
+        z-index: 1;
+      }
+      .wallet-card-balance-label {
+        font-size: 0.8rem;
+        color: #999;
+        margin-bottom: 8px;
+      }
+      .wallet-card-balance-amount {
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: #c2185b;
+      }
+      .wallet-card-balance-amount::before {
+        content: '¥';
+        font-size: 1.2rem;
+        margin-right: 4px;
+      }
+      .wallet-card-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 16px;
+        position: relative;
+        z-index: 1;
+      }
+      .wallet-card-btn {
+        flex: 1;
+        padding: 12px;
+        border: none;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+      }
+      .wallet-card-btn.primary {
+        background: linear-gradient(135deg, #f48fb1, #f06292);
+        color: white;
+        box-shadow: 0 4px 12px rgba(244, 143, 177, 0.4);
+      }
+      .wallet-card-btn.secondary {
+        background: white;
+        color: #c2185b;
+        border: 2px solid rgba(244, 143, 177, 0.4);
+      }
+      .wallet-card-btn:active {
+        transform: scale(0.98);
+      }
+
+      /* 钱包明细列表 */
+      .wallet-history {
+        margin: 0 16px 16px;
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      }
+      .wallet-history-header {
+        padding: 14px 16px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #c2185b;
+        border-bottom: 1px solid #f5f5f5;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .wallet-history-item {
+        display: flex;
+        align-items: center;
+        padding: 14px 16px;
+        border-bottom: 1px solid #f8f8f8;
+      }
+      .wallet-history-item:last-child {
+        border-bottom: none;
+      }
+      .wallet-history-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        margin-right: 12px;
+      }
+      .wallet-history-icon.income {
+        background: #e8f5e9;
+      }
+      .wallet-history-icon.expense {
+        background: #ffebee;
+      }
+      .wallet-history-info {
+        flex: 1;
+      }
+      .wallet-history-title {
+        font-size: 0.9rem;
+        color: #333;
+        font-weight: 500;
+      }
+      .wallet-history-time {
+        font-size: 0.75rem;
+        color: #999;
+        margin-top: 2px;
+      }
+      .wallet-history-amount {
+        font-size: 1rem;
+        font-weight: 600;
+      }
+      .wallet-history-amount.income {
+        color: #4caf50;
+      }
+      .wallet-history-amount.expense {
+        color: #f44336;
+      }
+      .wallet-history-empty {
+        padding: 30px;
+        text-align: center;
+        color: #ccc;
+        font-size: 0.85rem;
+      }
+
+      /* 充值弹窗 */
+      .recharge-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 1000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      .recharge-modal.active {
+        display: flex;
+      }
+      .recharge-modal-content {
+        background: linear-gradient(180deg, #fff 0%, #fff5f8 100%);
+        border-radius: 24px;
+        width: 100%;
+        max-width: 320px;
+        padding: 24px;
+        animation: scaleIn 0.2s ease;
+      }
+      .recharge-modal-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #c2185b;
+        text-align: center;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+      .recharge-amount-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-bottom: 16px;
+      }
+      .recharge-amount-btn {
+        padding: 14px 8px;
+        border: 2px solid rgba(244, 143, 177, 0.3);
+        border-radius: 12px;
+        background: white;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #c2185b;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .recharge-amount-btn.selected {
+        border-color: #f48fb1;
+        background: linear-gradient(135deg, #fff0f5, #ffe4ec);
+        box-shadow: 0 4px 12px rgba(244, 143, 177, 0.2);
+      }
+      .recharge-amount-btn:active {
+        transform: scale(0.98);
+      }
+      .recharge-custom-input {
+        width: 100%;
+        padding: 14px 16px;
+        border: 2px solid rgba(244, 143, 177, 0.3);
+        border-radius: 12px;
+        font-size: 1rem;
+        text-align: center;
+        outline: none;
+        margin-bottom: 20px;
+        color: #c2185b;
+        font-weight: 600;
+      }
+      .recharge-custom-input:focus {
+        border-color: #f48fb1;
+      }
+      .recharge-custom-input::placeholder {
+        color: #ddd;
+        font-weight: 400;
+      }
+      .recharge-modal-btns {
+        display: flex;
+        gap: 12px;
+      }
+      .recharge-modal-btn {
+        flex: 1;
+        padding: 14px;
+        border: none;
+        border-radius: 12px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .recharge-modal-btn.cancel {
+        background: #f5f5f5;
+        color: #999;
+      }
+      .recharge-modal-btn.confirm {
+        background: linear-gradient(135deg, #f48fb1, #f06292);
+        color: white;
+        box-shadow: 0 4px 12px rgba(244, 143, 177, 0.4);
+      }
+      .recharge-modal-btn:active {
+        transform: scale(0.98);
+      }
+
+      /* 转账弹窗 */
+      .send-transfer-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 600;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      .send-transfer-modal.active {
+        display: flex;
+      }
+      .send-transfer-modal-content {
+        background: linear-gradient(180deg, #fff 0%, #fff5f8 100%);
+        border-radius: 24px;
+        width: 100%;
+        max-width: 320px;
+        padding: 24px;
+        animation: scaleIn 0.2s ease;
+      }
+      .send-transfer-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #c2185b;
+        text-align: center;
+        margin-bottom: 8px;
+      }
+      .send-transfer-to {
+        font-size: 0.85rem;
+        color: #999;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      .send-transfer-input {
+        width: 100%;
+        padding: 16px;
+        border: 2px solid rgba(244, 143, 177, 0.3);
+        border-radius: 14px;
+        font-size: 1.5rem;
+        text-align: center;
+        font-weight: 700;
+        color: #c2185b;
+        outline: none;
+        margin-bottom: 12px;
+      }
+      .send-transfer-input:focus {
+        border-color: #f48fb1;
+      }
+      .send-transfer-balance {
+        font-size: 0.8rem;
+        color: #999;
+        text-align: center;
+        margin-bottom: 16px;
+      }
+      .send-transfer-note-input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid rgba(244, 143, 177, 0.2);
+        border-radius: 12px;
+        font-size: 0.9rem;
+        outline: none;
+        margin-bottom: 20px;
+      }
+      .send-transfer-note-input::placeholder {
+        color: #ccc;
       }
 
       /* ==================== 一起读书页面 ==================== */
@@ -10201,6 +10739,39 @@
               </div>
             </div>
 
+            <!-- 我的钱包 -->
+            <div class="wallet-card" id="userWalletCard">
+              <div class="wallet-card-header">
+                <div class="wallet-card-icon">💰</div>
+                <div>
+                  <div class="wallet-card-title">我的钱包</div>
+                  <div class="wallet-card-subtitle">与TA们的转账记录~</div>
+                </div>
+              </div>
+              <div class="wallet-card-balance">
+                <div class="wallet-card-balance-label">账户余额</div>
+                <div class="wallet-card-balance-amount" id="walletBalance">0.00</div>
+              </div>
+              <div class="wallet-card-actions">
+                <button class="wallet-card-btn secondary" onclick="openRechargeModal()">
+                  <span>💳</span> 充值
+                </button>
+                <button class="wallet-card-btn primary" onclick="viewWalletHistory()">
+                  <span>📜</span> 明细
+                </button>
+              </div>
+            </div>
+
+            <!-- 钱包明细 -->
+            <div class="wallet-history" id="walletHistorySection" style="display:none;">
+              <div class="wallet-history-header">
+                <span>📜</span> 交易明细
+              </div>
+              <div id="walletHistoryList">
+                <div class="wallet-history-empty">暂无交易记录</div>
+              </div>
+            </div>
+
             <!-- Profile Menu -->
             <div class="profile-menu">
               <div class="menu-item">
@@ -10216,19 +10787,6 @@
               <div class="menu-item">
                 <span class="menu-icon">🎴</span>
                 <span class="menu-text">我的卡片</span>
-                <span class="menu-arrow">›</span>
-              </div>
-              <div class="menu-item">
-                <span class="menu-icon">😊</span>
-                <span class="menu-text">我的表情</span>
-                <span class="menu-arrow">›</span>
-              </div>
-            </div>
-
-            <div class="profile-menu">
-              <div class="menu-item">
-                <span class="menu-icon">⚙️</span>
-                <span class="menu-text">设置</span>
                 <span class="menu-arrow">›</span>
               </div>
             </div>
@@ -11692,6 +12250,14 @@
             <div class="panel-item" onclick="sendFakeLocation()">
               <div class="panel-icon-box bg-location">📍</div>
               <span class="panel-label">位置</span>
+            </div>
+            <div class="panel-item" onclick="openTransferModal()">
+              <div class="panel-icon-box bg-transfer">💸</div>
+              <span class="panel-label">转账</span>
+            </div>
+            <div class="panel-item" onclick="rerollAIReply()">
+              <div class="panel-icon-box bg-reroll">🔄</div>
+              <span class="panel-label">重roll</span>
             </div>
             <div class="panel-item" onclick="sendNudge()">
               <div class="panel-icon-box bg-nudge">👋</div>
@@ -19291,17 +19857,415 @@
         closeChatPanel();
       }
       function sendFakeLocation() {
-        sendMediaMessage(
-          `
-        <div style="width:200px; height:100px; background:#e0e0e0; border-radius:8px; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;">
-            <div style="position:absolute; bottom:0; left:0; right:0; background:rgba(0,0,0,0.6); color:white; padding:4px 8px; font-size:0.75rem;">上海市 · 陆家嘴</div>
-            <div style="font-size:30px;">🗺️</div>
-        </div>
-    `,
-          "location"
-        );
+        // 打开位置选择弹窗
+        document.getElementById('locationModal').classList.add('active');
+        document.getElementById('locationNameInput').value = '';
+        document.getElementById('locationAddressInput').value = '';
         closeChatPanel();
       }
+
+      function closeLocationModal() {
+        document.getElementById('locationModal').classList.remove('active');
+      }
+
+      function confirmSendLocation() {
+        const name = document.getElementById('locationNameInput').value.trim() || '我的位置';
+        const address = document.getElementById('locationAddressInput').value.trim() || '点击查看详情';
+        
+        const locationHtml = `
+          <div class="location-card" onclick="alert('正在打开地图...')">
+            <div class="location-card-map">
+              <div class="location-card-map-bg"></div>
+              <div class="location-card-map-icon">📍</div>
+            </div>
+            <div class="location-card-info">
+              <div class="location-card-name">${name}</div>
+              <div class="location-card-address">${address}</div>
+            </div>
+            <div class="location-card-action">🗺️ 查看位置</div>
+          </div>
+        `;
+        
+        sendMediaMessage(locationHtml, "location");
+        closeLocationModal();
+      }
+
+      // AI发送位置卡片
+      function aiSendLocation(name, address) {
+        const locationHtml = `
+          <div class="location-card" onclick="alert('正在打开地图...')">
+            <div class="location-card-map">
+              <div class="location-card-map-bg"></div>
+              <div class="location-card-map-icon">📍</div>
+            </div>
+            <div class="location-card-info">
+              <div class="location-card-name">${name || 'TA的位置'}</div>
+              <div class="location-card-address">${address || '点击查看详情'}</div>
+            </div>
+            <div class="location-card-action">🗺️ 查看位置</div>
+          </div>
+        `;
+        return locationHtml;
+      }
+
+      /* ==================== 钱包系统 ==================== */
+      window.walletData = {
+        balance: 0,
+        history: []
+      };
+
+      // 初始化钱包数据
+      async function initWalletData() {
+        try {
+          const saved = await localforage.getItem('walletData');
+          if (saved) {
+            window.walletData = saved;
+          }
+          updateWalletDisplay();
+        } catch (e) {
+          console.error('钱包数据加载失败', e);
+        }
+      }
+
+      // 保存钱包数据
+      async function saveWalletData() {
+        try {
+          await localforage.setItem('walletData', window.walletData);
+        } catch (e) {
+          console.error('钱包数据保存失败', e);
+        }
+      }
+
+      // 更新钱包显示
+      function updateWalletDisplay() {
+        const balanceEl = document.getElementById('walletBalance');
+        if (balanceEl) {
+          balanceEl.textContent = window.walletData.balance.toFixed(2);
+        }
+      }
+
+      // 打开充值弹窗
+      function openRechargeModal() {
+        document.getElementById('rechargeModal').classList.add('active');
+        document.getElementById('rechargeCustomAmount').value = '';
+        // 清除选中状态
+        document.querySelectorAll('.recharge-amount-btn').forEach(btn => {
+          btn.classList.remove('selected');
+        });
+      }
+
+      function closeRechargeModal() {
+        document.getElementById('rechargeModal').classList.remove('active');
+      }
+
+      function selectRechargeAmount(amount) {
+        document.getElementById('rechargeCustomAmount').value = amount;
+        document.querySelectorAll('.recharge-amount-btn').forEach(btn => {
+          btn.classList.remove('selected');
+          if (btn.textContent.includes(amount)) {
+            btn.classList.add('selected');
+          }
+        });
+      }
+
+      function clearRechargeSelection() {
+        document.querySelectorAll('.recharge-amount-btn').forEach(btn => {
+          btn.classList.remove('selected');
+        });
+      }
+
+      function confirmRecharge() {
+        const amount = parseFloat(document.getElementById('rechargeCustomAmount').value);
+        if (!amount || amount <= 0) {
+          showToast('请输入有效金额');
+          return;
+        }
+        
+        window.walletData.balance += amount;
+        window.walletData.history.unshift({
+          id: Date.now(),
+          type: 'recharge',
+          amount: amount,
+          desc: '钱包充值',
+          time: new Date().toLocaleString('zh-CN', {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'})
+        });
+        
+        saveWalletData();
+        updateWalletDisplay();
+        closeRechargeModal();
+        showToast(`充值成功！余额 ¥${window.walletData.balance.toFixed(2)}`);
+      }
+
+      // 查看钱包明细
+      function viewWalletHistory() {
+        const section = document.getElementById('walletHistorySection');
+        const list = document.getElementById('walletHistoryList');
+        
+        if (section.style.display === 'none') {
+          section.style.display = 'block';
+          renderWalletHistory();
+        } else {
+          section.style.display = 'none';
+        }
+      }
+
+      function renderWalletHistory() {
+        const list = document.getElementById('walletHistoryList');
+        const history = window.walletData.history || [];
+        
+        if (history.length === 0) {
+          list.innerHTML = '<div class="wallet-history-empty">暂无交易记录</div>';
+          return;
+        }
+        
+        let html = '';
+        history.slice(0, 20).forEach(item => {
+          const isIncome = item.type === 'recharge' || item.type === 'receive';
+          html += `
+            <div class="wallet-history-item">
+              <div class="wallet-history-icon ${isIncome ? 'income' : 'expense'}">
+                ${item.type === 'recharge' ? '💳' : item.type === 'receive' ? '📥' : '📤'}
+              </div>
+              <div class="wallet-history-info">
+                <div class="wallet-history-title">${item.desc}</div>
+                <div class="wallet-history-time">${item.time}</div>
+              </div>
+              <div class="wallet-history-amount ${isIncome ? 'income' : 'expense'}">
+                ${isIncome ? '+' : '-'}¥${item.amount.toFixed(2)}
+              </div>
+            </div>
+          `;
+        });
+        
+        list.innerHTML = html;
+      }
+
+      /* ==================== 转账功能 ==================== */
+      function openTransferModal() {
+        if (!currentChatCharId) {
+          showToast('请先打开一个对话');
+          return;
+        }
+        
+        const char = characters.find(c => c.id === currentChatCharId);
+        if (!char) return;
+        
+        document.getElementById('sendTransferModal').classList.add('active');
+        document.getElementById('transferToName').textContent = `转给：${char.name}`;
+        document.getElementById('transferAmountInput').value = '';
+        document.getElementById('transferNoteInput').value = '';
+        document.getElementById('transferBalanceHint').textContent = `可用余额：¥${window.walletData.balance.toFixed(2)}`;
+        closeChatPanel();
+      }
+
+      function closeTransferModal() {
+        document.getElementById('sendTransferModal').classList.remove('active');
+      }
+
+      function confirmTransfer() {
+        const amount = parseFloat(document.getElementById('transferAmountInput').value);
+        const note = document.getElementById('transferNoteInput').value.trim() || '转账';
+        
+        if (!amount || amount <= 0) {
+          showToast('请输入有效金额');
+          return;
+        }
+        
+        if (amount > window.walletData.balance) {
+          showToast('余额不足');
+          return;
+        }
+        
+        const char = characters.find(c => c.id === currentChatCharId);
+        if (!char) return;
+        
+        // 扣款
+        window.walletData.balance -= amount;
+        window.walletData.history.unshift({
+          id: Date.now(),
+          type: 'send',
+          amount: amount,
+          desc: `转账给 ${char.name}`,
+          time: new Date().toLocaleString('zh-CN', {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'})
+        });
+        saveWalletData();
+        updateWalletDisplay();
+        
+        // 发送转账卡片消息
+        const transferId = Date.now();
+        const transferHtml = `
+          <div class="transfer-card" id="transfer_${transferId}">
+            <div class="transfer-card-header">
+              <div class="transfer-card-icon">💸</div>
+              <div class="transfer-card-info">
+                <div class="transfer-card-title">转账给TA</div>
+                <div class="transfer-card-from">来自：我</div>
+              </div>
+            </div>
+            <div class="transfer-card-amount">${amount.toFixed(2)}</div>
+            <div class="transfer-card-note">${note}</div>
+            <div class="transfer-card-status">等待对方确认...</div>
+          </div>
+        `;
+        
+        sendMediaMessage(transferHtml, 'transfer');
+        closeTransferModal();
+        
+        // 模拟AI决定是否接受转账（随机或基于金额）
+        setTimeout(() => {
+          const shouldAccept = Math.random() > 0.2; // 80%概率接受
+          handleAITransferResponse(transferId, amount, shouldAccept, char.name);
+        }, 2000 + Math.random() * 3000);
+      }
+
+      function handleAITransferResponse(transferId, amount, accepted, charName) {
+        // 更新转账卡片状态
+        const card = document.getElementById(`transfer_${transferId}`);
+        if (card) {
+          const statusEl = card.querySelector('.transfer-card-status');
+          if (statusEl) {
+            if (accepted) {
+              statusEl.className = 'transfer-card-status accepted';
+              statusEl.textContent = '✓ 对方已收款';
+            } else {
+              statusEl.className = 'transfer-card-status rejected';
+              statusEl.textContent = '✗ 对方已退回';
+              // 退款
+              window.walletData.balance += amount;
+              window.walletData.history.unshift({
+                id: Date.now(),
+                type: 'receive',
+                amount: amount,
+                desc: `${charName} 退回转账`,
+                time: new Date().toLocaleString('zh-CN', {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'})
+              });
+              saveWalletData();
+              updateWalletDisplay();
+            }
+          }
+        }
+        
+        // AI发送回复消息
+        if (!chatHistories[currentChatCharId]) chatHistories[currentChatCharId] = [];
+        const aiMsg = {
+          role: 'assistant',
+          content: accepted ? 
+            `收到啦～谢谢你的${amount.toFixed(2)}元！💕` : 
+            `这个...我不能收你的钱呢，给你退回去啦～`,
+          time: new Date().toLocaleTimeString('zh-CN', {hour: '2-digit', minute: '2-digit'})
+        };
+        chatHistories[currentChatCharId].push(aiMsg);
+        localforage.setItem('chatHistories', chatHistories);
+        renderConversation();
+      }
+
+      // AI向用户转账
+      function aiSendTransfer(amount, note) {
+        const transferId = Date.now();
+        const transferHtml = `
+          <div class="transfer-card" id="transfer_${transferId}" data-amount="${amount}">
+            <div class="transfer-card-header">
+              <div class="transfer-card-icon">💸</div>
+              <div class="transfer-card-info">
+                <div class="transfer-card-title">TA给你转账</div>
+                <div class="transfer-card-from">来自：TA</div>
+              </div>
+            </div>
+            <div class="transfer-card-amount">${amount.toFixed(2)}</div>
+            <div class="transfer-card-note">${note || '转账'}</div>
+            <div class="transfer-card-actions">
+              <button class="transfer-card-btn reject" onclick="rejectAITransfer('${transferId}', ${amount})">退回</button>
+              <button class="transfer-card-btn accept" onclick="acceptAITransfer('${transferId}', ${amount})">收款</button>
+            </div>
+          </div>
+        `;
+        return transferHtml;
+      }
+
+      function acceptAITransfer(transferId, amount) {
+        // 收款
+        window.walletData.balance += amount;
+        window.walletData.history.unshift({
+          id: Date.now(),
+          type: 'receive',
+          amount: amount,
+          desc: '收到TA的转账',
+          time: new Date().toLocaleString('zh-CN', {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'})
+        });
+        saveWalletData();
+        updateWalletDisplay();
+        
+        // 更新卡片
+        const card = document.getElementById(`transfer_${transferId}`);
+        if (card) {
+          const actionsEl = card.querySelector('.transfer-card-actions');
+          if (actionsEl) {
+            actionsEl.innerHTML = '<div class="transfer-card-status accepted">✓ 已收款</div>';
+          }
+        }
+        
+        showToast(`收款成功！+¥${amount.toFixed(2)}`);
+      }
+
+      function rejectAITransfer(transferId, amount) {
+        // 更新卡片
+        const card = document.getElementById(`transfer_${transferId}`);
+        if (card) {
+          const actionsEl = card.querySelector('.transfer-card-actions');
+          if (actionsEl) {
+            actionsEl.innerHTML = '<div class="transfer-card-status rejected">✗ 已退回</div>';
+          }
+        }
+        
+        showToast('已退回转账');
+      }
+
+      /* ==================== 重Roll功能 ==================== */
+      async function rerollAIReply() {
+        if (!currentChatCharId) {
+          showToast('请先打开一个对话');
+          return;
+        }
+        
+        const history = chatHistories[currentChatCharId] || [];
+        if (history.length === 0) {
+          showToast('没有可以重新生成的消息');
+          return;
+        }
+        
+        // 找到最后一条AI消息
+        let lastAiIndex = -1;
+        for (let i = history.length - 1; i >= 0; i--) {
+          if (history[i].role === 'assistant') {
+            lastAiIndex = i;
+            break;
+          }
+        }
+        
+        if (lastAiIndex === -1) {
+          showToast('没有找到AI消息');
+          return;
+        }
+        
+        // 删除最后一条AI消息
+        history.splice(lastAiIndex, 1);
+        chatHistories[currentChatCharId] = history;
+        await localforage.setItem('chatHistories', chatHistories);
+        
+        // 重新渲染
+        renderConversation();
+        
+        // 关闭面板
+        closeChatPanel();
+        
+        // 重新请求AI回复
+        showToast('正在重新生成...');
+        requestAIReply();
+      }
+
+      // 页面加载时初始化钱包
+      setTimeout(initWalletData, 500);
+
       /* ==================== 修复：一键刷新消息列表预览 ==================== */
       function fixAllLastMessages() {
         console.log("开始修复列表预览...");
@@ -23627,6 +24591,31 @@ ${userName}在你的动态下留言了，你需要回复。
         startFakeCall,
         sendFakeLocation,
         showFullImage,
+        // 位置功能
+        closeLocationModal,
+        confirmSendLocation,
+        aiSendLocation,
+        // 钱包功能
+        initWalletData,
+        saveWalletData,
+        updateWalletDisplay,
+        openRechargeModal,
+        closeRechargeModal,
+        selectRechargeAmount,
+        clearRechargeSelection,
+        confirmRecharge,
+        viewWalletHistory,
+        renderWalletHistory,
+        // 转账功能
+        openTransferModal,
+        closeTransferModal,
+        confirmTransfer,
+        handleAITransferResponse,
+        aiSendTransfer,
+        acceptAITransfer,
+        rejectAITransfer,
+        // 重Roll功能
+        rerollAIReply,
         // 触摸处理
         handleTouchStart,
         handleTouchMove,
@@ -23871,6 +24860,56 @@ ${userName}在你的动态下留言了，你需要回复。
         <div class="notification-text" id="notificationText">消息内容</div>
       </div>
       <div class="notification-time" id="notificationTime">刚刚</div>
+    </div>
+
+    <!-- 充值弹窗 -->
+    <div class="recharge-modal" id="rechargeModal" onclick="if(event.target===this)closeRechargeModal()">
+      <div class="recharge-modal-content">
+        <div class="recharge-modal-title">💰 钱包充值</div>
+        <div class="recharge-amount-grid">
+          <button class="recharge-amount-btn" onclick="selectRechargeAmount(10)">¥10</button>
+          <button class="recharge-amount-btn" onclick="selectRechargeAmount(50)">¥50</button>
+          <button class="recharge-amount-btn" onclick="selectRechargeAmount(100)">¥100</button>
+          <button class="recharge-amount-btn" onclick="selectRechargeAmount(200)">¥200</button>
+          <button class="recharge-amount-btn" onclick="selectRechargeAmount(500)">¥500</button>
+          <button class="recharge-amount-btn" onclick="selectRechargeAmount(1000)">¥1000</button>
+        </div>
+        <input type="number" class="recharge-custom-input" id="rechargeCustomAmount" placeholder="自定义金额" oninput="clearRechargeSelection()">
+        <div class="recharge-modal-btns">
+          <button class="recharge-modal-btn cancel" onclick="closeRechargeModal()">取消</button>
+          <button class="recharge-modal-btn confirm" onclick="confirmRecharge()">确认充值</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 转账弹窗 -->
+    <div class="send-transfer-modal" id="sendTransferModal" onclick="if(event.target===this)closeTransferModal()">
+      <div class="send-transfer-modal-content">
+        <div class="send-transfer-title">💸 转账给TA</div>
+        <div class="send-transfer-to" id="transferToName">转给：角色名</div>
+        <input type="number" class="send-transfer-input" id="transferAmountInput" placeholder="0.00">
+        <div class="send-transfer-balance" id="transferBalanceHint">可用余额：¥0.00</div>
+        <input type="text" class="send-transfer-note-input" id="transferNoteInput" placeholder="添加转账说明（可选）">
+        <div class="recharge-modal-btns">
+          <button class="recharge-modal-btn cancel" onclick="closeTransferModal()">取消</button>
+          <button class="recharge-modal-btn confirm" onclick="confirmTransfer()">确认转账</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 位置选择弹窗 -->
+    <div class="send-transfer-modal" id="locationModal" onclick="if(event.target===this)closeLocationModal()">
+      <div class="send-transfer-modal-content">
+        <div class="send-transfer-title">📍 发送位置</div>
+        <div style="margin-bottom:16px;">
+          <input type="text" class="send-transfer-note-input" id="locationNameInput" placeholder="位置名称，如：星巴克咖啡" style="margin-bottom:8px;">
+          <input type="text" class="send-transfer-note-input" id="locationAddressInput" placeholder="详细地址（可选）">
+        </div>
+        <div class="recharge-modal-btns">
+          <button class="recharge-modal-btn cancel" onclick="closeLocationModal()">取消</button>
+          <button class="recharge-modal-btn confirm" onclick="confirmSendLocation()">发送位置</button>
+        </div>
+      </div>
     </div>
   </body>
 </html>
