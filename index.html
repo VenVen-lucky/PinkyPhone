@@ -3953,6 +3953,7 @@
       /* ==================== API SETTINGS STYLES ==================== */
       .api-settings-page {
         background: #f5f5f5 !important;
+        padding: 0 !important;
       }
 
       .api-settings-page::before {
@@ -3979,6 +3980,7 @@
 
       .api-settings-content {
         padding: 16px;
+        padding-bottom: calc(40px + env(safe-area-inset-bottom));
       }
 
       .api-section {
@@ -7728,6 +7730,7 @@
       /* ==================== 世界书页面样式 ==================== */
       .worldbook-page {
         background: linear-gradient(180deg, #fff5f8 0%, #ffeef5 100%) !important;
+        padding: 0 !important;
       }
 
       .worldbook-page::before {
@@ -8433,10 +8436,12 @@
       .worldbook-group-add-row {
         display: flex;
         gap: 8px;
+        align-items: center;
       }
 
       .worldbook-group-add-input {
         flex: 1;
+        min-width: 0;
         padding: 10px 14px;
         border: 2px solid #f0f0f0;
         border-radius: 10px;
@@ -8456,6 +8461,8 @@
         border-radius: 10px;
         font-weight: 600;
         cursor: pointer;
+        white-space: nowrap;
+        flex-shrink: 0;
       }
 
       .worldbook-group-close {
@@ -13094,15 +13101,17 @@
           }
 
           if (settings.onlineDating) {
-            systemContent += `\n【模式：沉浸式角色扮演】\n1. 以小说笔触回复。\n2. **必须严格遵守以下格式规范**：\n   - **环境/动作/神态描写**：直接书写，不加任何符号。\n   - **心理活动/内心独白**：必须用一对星号包裹，例如 *她看起来真可爱*。\n   - **语言对话**：必须用直角引号包裹，例如 「早安，亲爱的。」\n3. **禁止**拆分消息，请输出一段完整流畅的文本。\n`;
+            systemContent += `\n【模式：沉浸式角色扮演】\n1. 以小说笔触回复。\n2. **必须严格遵守以下格式规范**：\n   - **环境/动作/神态描写**：直接书写，不加任何符号。\n   - **心理活动/内心独白**：必须用一对星号包裹，例如 *她看起来真可爱*。\n   - **语言对话**：必须用直角引号包裹，例如 「早安，亲爱的。」\n3. **禁止**拆分消息，请输出一段完整流畅的文本。\n4. **禁止**发送表情包（[sticker:xxx]格式）。\n5. **禁止**发送语音消息（[语音:xxx]格式）。\n`;
           } else {
             systemContent += `\n【模式：即时通讯】\n1. 像真人一样口语化聊天。\n2. **必须**拆分为多条短消息，使用 ||| 分隔。\n3. **语音消息功能**：你可以发送语音消息！格式为 [语音:要说的内容]。\n   - 语音消息适合表达亲密、撒娇、安慰等情感场景\n   - 不要每条都发语音，自然地穿插在文字消息中（大约20-30%概率）\n   - 语音内容应该口语化、自然，可以带语气词如"嗯~"、"啊"、"呢"\n   - 示例：宝贝 ||| [语音:想你了呢，今天有没有乖乖吃饭呀~] ||| 记得早点休息哦\n`;
           }
 
-          // 添加AI表情包功能提示
-          const aiStickerPrompt = generateAiStickerPrompt();
-          if (aiStickerPrompt) {
-            systemContent += aiStickerPrompt;
+          // 添加AI表情包功能提示（仅在非线下模式时启用）
+          if (!settings.onlineDating) {
+            const aiStickerPrompt = generateAiStickerPrompt();
+            if (aiStickerPrompt) {
+              systemContent += aiStickerPrompt;
+            }
           }
 
           // 添加待办监督提示词（仅对绑定了待办的角色生效）
