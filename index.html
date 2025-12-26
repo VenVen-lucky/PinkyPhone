@@ -21,7 +21,7 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Satisfy&display=swap"
       rel="stylesheet"
     />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js?v=1.5"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
     <style>
       * {
         margin: 0;
@@ -12109,6 +12109,33 @@
                 </label>
               </div>
             </div>
+
+            <!-- 头像大小调节 -->
+            <div class="form-group" style="margin-top: 16px">
+              <label class="form-label">头像大小</label>
+              <div style="display: flex; align-items: center; gap: 12px">
+                <input
+                  type="range"
+                  id="avatarSizeSlider"
+                  min="28"
+                  max="56"
+                  value="40"
+                  style="flex: 1; accent-color: #f48fb1"
+                  oninput="updateAvatarSizePreview(this.value)"
+                  onchange="saveAvatarSize(this.value)"
+                />
+                <span
+                  id="avatarSizeValue"
+                  style="
+                    min-width: 45px;
+                    text-align: center;
+                    font-size: 0.9rem;
+                    color: #666;
+                  "
+                  >40px</span
+                >
+              </div>
+            </div>
           </div>
         </div>
 
@@ -13465,21 +13492,38 @@
         if (data.prompts && Array.isArray(data.prompts)) {
           console.log("检测到prompts数组，共", data.prompts.length, "个");
 
-          // 获取prompt_order来确定enabled状态（如果存在）
+          // 获取prompt_order来确定enabled状态
+          // Silly Tavern格式: prompt_order是数组，每项有character_id和order
+          // order才是包含{identifier, enabled}的数组
           let enabledMap = {};
           if (data.prompt_order && Array.isArray(data.prompt_order)) {
             data.prompt_order.forEach((orderItem) => {
-              if (Array.isArray(orderItem)) {
+              // Silly Tavern格式：{character_id: xxx, order: [...]}
+              if (
+                orderItem &&
+                orderItem.order &&
+                Array.isArray(orderItem.order)
+              ) {
+                orderItem.order.forEach((item) => {
+                  if (item && item.identifier) {
+                    enabledMap[item.identifier] = item.enabled === true;
+                  }
+                });
+              }
+              // 兼容其他格式
+              else if (Array.isArray(orderItem)) {
                 orderItem.forEach((item) => {
                   if (item && item.identifier) {
-                    enabledMap[item.identifier] = item.enabled !== false;
+                    enabledMap[item.identifier] = item.enabled === true;
                   }
                 });
               } else if (orderItem && orderItem.identifier) {
-                enabledMap[orderItem.identifier] = orderItem.enabled !== false;
+                enabledMap[orderItem.identifier] = orderItem.enabled === true;
               }
             });
           }
+
+          console.log("解析到的enabledMap:", enabledMap);
 
           // 提取所有prompt并转换为条目（排除marker）
           const baseTime = Date.now();
@@ -13488,11 +13532,22 @@
               (p) => p.content && typeof p.content === "string" && !p.marker
             )
             .map((p, index) => {
-              let isEnabled = true;
+              // 优先使用prompt_order中的enabled状态
+              let isEnabled = false; // 默认关闭
               if (p.identifier && enabledMap.hasOwnProperty(p.identifier)) {
                 isEnabled = enabledMap[p.identifier];
+                console.log(
+                  `条目 ${
+                    p.name || p.identifier
+                  }: enabled=${isEnabled} (from prompt_order)`
+                );
               } else if (p.hasOwnProperty("enabled")) {
-                isEnabled = p.enabled !== false;
+                isEnabled = p.enabled === true;
+                console.log(
+                  `条目 ${
+                    p.name || p.identifier
+                  }: enabled=${isEnabled} (from prompt.enabled)`
+                );
               }
 
               return {
@@ -13504,7 +13559,10 @@
               };
             });
 
-          console.log("过滤后得到", entries.length, "个条目");
+          const enabledCount = entries.filter((e) => e.enabled).length;
+          console.log(
+            `过滤后得到 ${entries.length} 个条目，其中 ${enabledCount} 个已启用`
+          );
 
           const firstWithContent = data.prompts.find(
             (p) => p.content && p.name
@@ -13546,13 +13604,15 @@
         };
 
         console.log("创建预设对象:", preset);
-        console.log("预设的entries:", preset.entries);
+        const enabledCount = entries.filter((e) => e.enabled).length;
 
         window.presets.push(preset);
         await localforage.setItem("userPresets", window.presets);
         renderPresets();
         updateOfflinePresetDropdown();
-        showToast(`预设导入成功！共 ${entries.length} 个条目`);
+        showToast(
+          `预设导入成功！共 ${entries.length} 个条目，${enabledCount} 个已启用`
+        );
       }
 
       // ==================== 线下模式设置 ====================
@@ -14611,6 +14671,10 @@
           settings.showUserAvatar !== false
         );
 
+        // 应用头像大小设置
+        const avatarSize = char.avatarSize || 40;
+        applyAvatarSize(avatarSize);
+
         // 生成火花 HTML
         let sparkHtml = "";
         // 注意：这里读取的是 chatSettings 里的 flameData，或者 characters 里的
@@ -15424,6 +15488,13 @@
         document.getElementById("showUserAvatar").checked =
           settings.showUserAvatar !== false;
 
+        // 头像大小
+        const avatarSize = char.avatarSize || 40;
+        document.getElementById("avatarSizeSlider").value = avatarSize;
+        document.getElementById("avatarSizeValue").textContent =
+          avatarSize + "px";
+        applyAvatarSize(avatarSize);
+
         // 置顶设置
         document.getElementById("settingsPinned").checked =
           settings.pinned || false;
@@ -15692,6 +15763,45 @@
 
         // 应用到当前聊天界面
         applyAvatarVisibility(showAi, showUser);
+      }
+
+      // 更新头像大小预览
+      function updateAvatarSizePreview(size) {
+        document.getElementById("avatarSizeValue").textContent = size + "px";
+        applyAvatarSize(size);
+      }
+
+      // 保存头像大小设置
+      async function saveAvatarSize(size) {
+        if (!currentChatCharId) return;
+
+        const char = window.characters.find((c) => c.id === currentChatCharId);
+        if (char) {
+          char.avatarSize = parseInt(size);
+          await localforage.setItem("characters", window.characters);
+        }
+      }
+
+      // 应用头像大小
+      function applyAvatarSize(size) {
+        const style =
+          document.getElementById("avatarSizeStyle") ||
+          document.createElement("style");
+        style.id = "avatarSizeStyle";
+
+        const sizeNum = parseInt(size);
+        style.textContent = `
+          .chat-avatar-small {
+            width: ${sizeNum}px !important;
+            height: ${sizeNum}px !important;
+            min-width: ${sizeNum}px !important;
+            min-height: ${sizeNum}px !important;
+          }
+        `;
+
+        if (!document.getElementById("avatarSizeStyle")) {
+          document.head.appendChild(style);
+        }
       }
 
       // 应用头像可见性
@@ -23431,6 +23541,9 @@ ${userName}在你的动态下留言了，你需要回复。
         closeChatSettings,
         saveChatSettings,
         toggleAvatarDisplay,
+        updateAvatarSizePreview,
+        saveAvatarSize,
+        applyAvatarSize,
         applyAvatarVisibility,
         // 分组管理
         openGroupManager,
