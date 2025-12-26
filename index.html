@@ -12,6 +12,8 @@
       content="black-translucent"
     />
     <meta name="mobile-web-app-capable" content="yes" />
+    <!-- 设置主题颜色，让状态栏区域与背景一致 -->
+    <meta name="theme-color" content="#fce4ec" />
     <title>SillyTavern</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -46,6 +48,7 @@
       html {
         height: 100%;
         -webkit-text-size-adjust: 100%;
+        background: #fce4ec;
       }
 
       body {
@@ -337,7 +340,7 @@
       }
 
       .app-name {
-        font-size: 0.7rem;
+        font-size: 0.75rem;
         font-weight: 500;
         color: var(--text-primary);
         text-align: center;
@@ -413,7 +416,7 @@
       }
 
       .dock-label {
-        font-size: 0.6rem;
+        font-size: 0.65rem;
         font-weight: 500;
         color: var(--text-primary);
         text-align: center;
@@ -442,6 +445,9 @@
         padding-top: max(16px, env(safe-area-inset-top));
         padding-bottom: calc(20px + env(safe-area-inset-bottom));
         overflow-y: auto;
+        /* 确保没有顶部边框或阴影 */
+        border: none;
+        box-shadow: none;
       }
 
       .page::before {
@@ -459,6 +465,9 @@
         opacity: 0.5;
         pointer-events: none;
         z-index: -1;
+        /* 确保伪元素不会在顶部创建任何视觉边界 */
+        border: none;
+        box-shadow: none;
       }
 
       .page.active {
@@ -628,6 +637,9 @@
         background: #fdf5f7 !important;
         background-image: radial-gradient(circle, rgba(244,143,177,0.15) 2px, transparent 2px) !important;
         background-size: 20px 20px !important;
+        /* 确保顶部没有白色边框或阴影 */
+        border: none !important;
+        box-shadow: none !important;
       }
 
       .chat-app.active {
@@ -635,7 +647,8 @@
       }
 
       .chat-app::before {
-        display: none;
+        display: none !important;
+        content: none !important;
       }
 
       .chat-header {
@@ -11956,8 +11969,11 @@
             // 【新增】更新列表预览
             updateCharacterLastMessage(savedCharId, aiReply);
 
-            // 【修复】如果用户已经离开对话页面，显示通知弹窗和红点
-            if (currentChatCharId !== savedCharId) {
+            // 【修复】检查聊天对话页面是否打开，如果没打开则显示通知弹窗和红点
+            const convPage = document.getElementById("chatConversationPage");
+            const isConvPageActive =
+              convPage && convPage.classList.contains("active");
+            if (!isConvPageActive || currentChatCharId !== savedCharId) {
               showMessageNotification(
                 savedCharId,
                 char.name,
@@ -12026,18 +12042,22 @@
               // 【新增】更新列表预览 (每次循环都更新，这样可以看到对方正在一句句发)
               updateCharacterLastMessage(savedCharId, partContent);
 
-              // 【修复】如果用户已经离开对话页面，显示通知弹窗和红点（只在最后一条消息时）
-              if (
-                i === replyParts.length - 1 &&
-                currentChatCharId !== savedCharId
-              ) {
-                showMessageNotification(
-                  savedCharId,
-                  char.name,
-                  char.avatar,
-                  partContent
+              // 【修复】检查聊天对话页面是否打开，如果没打开则显示通知弹窗和红点（只在最后一条消息时）
+              if (i === replyParts.length - 1) {
+                const convPage = document.getElementById(
+                  "chatConversationPage"
                 );
-                addUnreadMessage(savedCharId);
+                const isConvPageActive =
+                  convPage && convPage.classList.contains("active");
+                if (!isConvPageActive || currentChatCharId !== savedCharId) {
+                  showMessageNotification(
+                    savedCharId,
+                    char.name,
+                    char.avatar,
+                    partContent
+                  );
+                  addUnreadMessage(savedCharId);
+                }
               }
 
               // 如果是语音消息，自动生成音频
