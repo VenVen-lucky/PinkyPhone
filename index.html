@@ -21,7 +21,7 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Satisfy&display=swap"
       rel="stylesheet"
     />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js?v=1.3"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js?v=1.1"></script>
     <style>
       * {
         margin: 0;
@@ -7115,21 +7115,18 @@
         gap: 12px;
         background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
       }
+      /* 隐藏视频通话占位头像 */
       .video-main-placeholder .avatar-large {
-        width: 100px;
-        height: 100px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #f48fb1, #ec407a);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 50px;
-        overflow: hidden;
+        display: none;
       }
       .video-main-placeholder .avatar-large img {
         width: 100%;
         height: 100%;
         object-fit: cover;
+      }
+      /* 视频占位文字样式 */
+      .video-main-placeholder span {
+        display: none;
       }
 
       /* 视频通话 - 我的画面（小窗口） */
@@ -7230,7 +7227,7 @@
         right: 0;
         top: 50%;
         transform: translateY(-50%);
-        max-height: 45vh;
+        max-height: 40vh;
         overflow-y: auto;
         padding: 16px 20px;
         display: none;
@@ -7245,9 +7242,9 @@
       /* 视频通话时对话区 */
       .call-overlay.video-call .call-conversation {
         top: auto;
-        bottom: 160px;
+        bottom: 190px;
         transform: none;
-        max-height: 40vh;
+        max-height: 35vh;
       }
       .call-overlay.video-call.in-call .call-conversation {
         display: flex;
@@ -7347,13 +7344,13 @@
         30% { transform: translateY(-6px); }
       }
 
-      /* 通话输入区域 - 移到按钮上方 */
+      /* 通话输入区域 - 移到按钮上方，增加间距 */
       .call-input-area {
         display: none;
         position: absolute;
         left: 0;
         right: 0;
-        bottom: 110px;
+        bottom: 130px;
         padding: 12px 20px;
         z-index: 7;
         background: transparent;
@@ -7363,7 +7360,7 @@
       }
       /* 视频通话时输入区 */
       .call-overlay.video-call .call-input-area {
-        bottom: 110px;
+        bottom: 130px;
       }
       .call-input-row {
         display: flex;
@@ -7401,7 +7398,7 @@
         flex-shrink: 0;
       }
 
-      /* 通话按钮区域 - 透明底栏，按钮分散 */
+      /* 通话按钮区域 - 透明底栏，按钮分散，增加间距 */
       .call-buttons-area {
         position: absolute;
         bottom: 0;
@@ -7409,8 +7406,8 @@
         right: 0;
         display: flex;
         justify-content: center;
-        padding: 20px 30px;
-        padding-bottom: calc(30px + env(safe-area-inset-bottom));
+        padding: 25px 30px;
+        padding-bottom: calc(35px + env(safe-area-inset-bottom));
         z-index: 7;
         background: linear-gradient(0deg, rgba(0,0,0,0.4) 0%, transparent 100%);
       }
@@ -22026,6 +22023,9 @@
           const overlay = document.getElementById("callOverlay");
           overlay.classList.add("in-call");
 
+          // 更新顶部栏状态
+          document.getElementById("callTopTimer").textContent = "00:00";
+
           if (callState.type === "video") {
             document.getElementById("videoCallTimer").textContent = "00:00";
           } else {
@@ -22045,6 +22045,7 @@
         } else {
           // AI拒绝接听
           document.getElementById("callStatus").textContent = "对方已拒绝";
+          document.getElementById("callTopTimer").textContent = "对方已拒绝";
           if (callState.type === "video") {
             document.getElementById("videoMainName").textContent = "对方已拒绝";
           }
@@ -22509,6 +22510,33 @@
         showCallTypingIndicator(true);
 
         try {
+          // 获取之前的聊天记录摘要
+          const chatHistory = chatHistories[callState.charId] || [];
+          let recentChatSummary = "";
+
+          if (chatHistory.length > 0) {
+            // 获取最近的聊天记录（最多20条非隐藏消息）
+            const recentMessages = chatHistory
+              .filter((msg) => !msg.isHidden && msg.role !== "system")
+              .slice(-20);
+
+            if (recentMessages.length > 0) {
+              recentChatSummary = "\n【通话前的聊天记录摘要】\n";
+              recentChatSummary +=
+                "以下是你们最近的聊天内容，请记住这些对话，在通话中保持连贯性：\n";
+              recentMessages.forEach((msg) => {
+                const sender = msg.role === "user" ? userNickname : charName;
+                // 简化消息内容，去掉过长的部分
+                let content = msg.content || "";
+                if (content.length > 100) {
+                  content = content.substring(0, 100) + "...";
+                }
+                recentChatSummary += `${sender}: ${content}\n`;
+              });
+              recentChatSummary += "---\n";
+            }
+          }
+
           // 构建系统提示词
           let inCallPrompt = "";
 
@@ -22517,12 +22545,18 @@
             inCallPrompt = persona.trim() + "\n\n";
           }
 
+          // 添加聊天记录摘要
+          if (recentChatSummary) {
+            inCallPrompt += recentChatSummary + "\n";
+          }
+
           // 通话场景说明
           inCallPrompt += `---\n【当前场景】\n`;
           inCallPrompt += `你正在和${userNickname}进行${
             callState.type === "video" ? "视频" : "语音"
           }通话。\n`;
-          inCallPrompt += `请完全按照上面的人设来说话，保持角色的性格、语气和说话习惯。\n\n`;
+          inCallPrompt += `请完全按照上面的人设来说话，保持角色的性格、语气和说话习惯。\n`;
+          inCallPrompt += `重要：你要记住之前聊天的内容，不要表现得像失忆了一样！\n\n`;
 
           if (callState.type === "video") {
             inCallPrompt += `【视频通话格式】\n`;
