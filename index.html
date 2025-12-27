@@ -7021,7 +7021,7 @@
         padding-top: calc(16px + env(safe-area-inset-top, 20px));
         display: flex;
         align-items: flex-start;
-        z-index: 10;
+        z-index: 15;
         background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, transparent 100%);
       }
       .call-minimize-btn {
@@ -7132,7 +7132,7 @@
       /* 视频通话 - 我的画面（小窗口） */
       .video-self {
         position: absolute;
-        top: calc(60px + env(safe-area-inset-top, 20px));
+        top: calc(130px + env(safe-area-inset-top, 20px));
         right: 16px;
         width: 100px;
         height: 140px;
@@ -7141,7 +7141,7 @@
         overflow: hidden;
         border: 2px solid rgba(255,255,255,0.3);
         display: none;
-        z-index: 10;
+        z-index: 9;
         cursor: pointer;
         transition: all 0.3s ease;
       }
@@ -7167,7 +7167,7 @@
       /* 视频画面互换状态 */
       .call-overlay.video-call.swapped .video-main {
         position: absolute;
-        top: calc(60px + env(safe-area-inset-top, 20px));
+        top: calc(130px + env(safe-area-inset-top, 20px));
         right: 16px;
         left: auto;
         bottom: auto;
@@ -7175,7 +7175,7 @@
         height: 140px;
         border-radius: 12px;
         border: 2px solid rgba(255,255,255,0.3);
-        z-index: 10;
+        z-index: 9;
       }
       .call-overlay.video-call.swapped .video-self {
         position: absolute;
@@ -28452,6 +28452,10 @@ ${userName}在你的动态下留言了，你需要回复。
         <div class="call-status" id="callStatus">正在呼叫...</div>
         <div class="call-timer" id="callTimer" style="display: none">00:00</div>
       </div>
+
+      <!-- 隐藏的兼容元素 -->
+      <span id="videoCallTimer" style="display: none">00:00</span>
+      <span id="videoCallName" style="display: none"></span>
 
       <!-- 对话区域 -->
       <div class="call-conversation" id="callConversation">
