@@ -21,7 +21,7 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Satisfy&display=swap"
       rel="stylesheet"
     />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js?v=1.1"></script>
     <style>
       * {
         margin: 0;
@@ -6342,7 +6342,7 @@
         border-radius: 6px;
         border: 2px solid rgba(0,0,0,0.1);
       }
-      
+
       /* ==================== 引用预览样式 ==================== */
       .quote-preview {
         display: flex;
@@ -6391,7 +6391,7 @@
       .quote-preview-close:active {
         background: rgba(0,0,0,0.2);
       }
-      
+
       /* 消息中的引用显示样式 */
       .msg-quote {
         padding: 6px 10px;
@@ -6415,7 +6415,7 @@
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
       }
-      
+
       /* ==================== 底部栏新布局 ==================== */
       .conv-input-area {
         padding: 0 !important;
@@ -6619,6 +6619,10 @@
         background: #fff3e0;
         color: #ff9800;
       }
+      .bg-video {
+        background: #e8f5e9;
+        color: #4caf50;
+      }
       .bg-location {
         background: #e3f2fd;
         color: #2196f3;
@@ -6766,7 +6770,7 @@
       .location-card-map-bg {
         position: absolute;
         inset: 0;
-        background-image: 
+        background-image:
           radial-gradient(circle at 20% 30%, rgba(255,255,255,0.3) 0%, transparent 40%),
           radial-gradient(circle at 80% 70%, rgba(255,255,255,0.3) 0%, transparent 40%);
       }
@@ -6948,6 +6952,606 @@
       }
       .wallet-history-amount.expense {
         color: #e91e63;
+      }
+
+      /* ==================== 通话界面样式 ==================== */
+      .call-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 10001;
+        display: none;
+        flex-direction: column;
+      }
+      .call-overlay.active {
+        display: flex;
+      }
+      .call-overlay.voice-call {
+        background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      }
+      .call-overlay.video-call {
+        background: #000;
+        /* 视频通话不用flex布局，用绝对定位 */
+        display: block;
+      }
+      .call-overlay.video-call.active {
+        display: block;
+      }
+
+      /* 语音通话头像区域 */
+      .call-avatar-section {
+        text-align: center;
+        padding-top: 80px;
+        padding-bottom: 20px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      /* 视频通话时完全隐藏头像区域 */
+      .call-overlay.video-call .call-avatar-section {
+        display: none !important;
+      }
+      .call-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #f48fb1, #ec407a);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 60px;
+        margin: 0 auto 20px;
+        box-shadow: 0 8px 32px rgba(244, 143, 177, 0.4);
+        overflow: hidden;
+      }
+      .call-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .call-name {
+        color: white;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+      .call-status {
+        color: rgba(255,255,255,0.7);
+        font-size: 0.95rem;
+      }
+      .call-timer {
+        color: rgba(255,255,255,0.9);
+        font-size: 1.1rem;
+        font-weight: 500;
+        margin-top: 10px;
+      }
+
+      /* 视频通话 - 对方画面（全屏背景） */
+      .video-main {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: #1a1a2e;
+        display: none;
+        overflow: hidden;
+        z-index: 1;
+      }
+      .call-overlay.video-call .video-main {
+        display: block;
+      }
+      .video-main img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .video-main-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: rgba(255,255,255,0.5);
+        font-size: 1rem;
+        gap: 12px;
+        background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+      }
+      .video-main-placeholder .avatar-large {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #f48fb1, #ec407a);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 50px;
+        overflow: hidden;
+      }
+      .video-main-placeholder .avatar-large img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      /* 视频通话 - 我的画面（小窗口） */
+      .video-self {
+        position: absolute;
+        top: calc(60px + env(safe-area-inset-top, 20px));
+        right: 16px;
+        width: 100px;
+        height: 140px;
+        border-radius: 12px;
+        background: #2a2a3e;
+        overflow: hidden;
+        border: 2px solid rgba(255,255,255,0.3);
+        display: none;
+        z-index: 10;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      .video-self img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .video-self-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: rgba(255,255,255,0.6);
+        font-size: 0.75rem;
+        background: linear-gradient(135deg, #2d2d4a, #1f1f35);
+      }
+      .call-overlay.video-call.in-call .video-self {
+        display: block;
+      }
+
+      /* 视频画面互换状态 */
+      .call-overlay.video-call.swapped .video-main {
+        position: absolute;
+        top: calc(60px + env(safe-area-inset-top, 20px));
+        right: 16px;
+        left: auto;
+        bottom: auto;
+        width: 100px;
+        height: 140px;
+        border-radius: 12px;
+        border: 2px solid rgba(255,255,255,0.3);
+        z-index: 10;
+      }
+      .call-overlay.video-call.swapped .video-self {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 0;
+        border: none;
+        z-index: 5;
+      }
+
+      /* 视频通话顶部信息栏 */
+      .video-call-header {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        padding: 16px;
+        padding-top: calc(16px + env(safe-area-inset-top, 20px));
+        background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, transparent 100%);
+        display: none;
+        z-index: 8;
+      }
+      .call-overlay.video-call .video-call-header {
+        display: block;
+      }
+      .video-call-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .video-call-name {
+        color: white;
+        font-size: 1.1rem;
+        font-weight: 600;
+      }
+      .video-call-timer {
+        color: rgba(255,255,255,0.8);
+        font-size: 0.9rem;
+      }
+
+      /* 通话中的对话区域 */
+      .call-conversation {
+        flex: 1;
+        width: 100%;
+        overflow-y: auto;
+        padding: 16px;
+        padding-bottom: 8px;
+        display: none;
+        position: relative;
+        z-index: 6;
+        -webkit-overflow-scrolling: touch;
+      }
+      .call-overlay.in-call .call-conversation {
+        display: block;
+      }
+      /* 视频通话时对话区绝对定位在底部 */
+      .call-overlay.video-call .call-conversation {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 180px;
+        top: auto;
+        max-height: 45vh;
+        background: transparent;
+        padding-bottom: 16px;
+      }
+      .call-overlay.video-call.in-call .call-conversation {
+        display: block;
+      }
+      .call-message {
+        background: rgba(60, 60, 70, 0.95);
+        border-radius: 12px;
+        padding: 14px 16px;
+        margin-bottom: 12px;
+        color: white;
+        font-size: 0.95rem;
+        line-height: 1.7;
+        animation: fadeInUp 0.3s ease;
+        word-wrap: break-word;
+        word-break: break-word;
+        overflow-wrap: break-word;
+      }
+      .call-message.user {
+        background: rgba(244, 143, 177, 0.85);
+      }
+      .call-message.ai {
+        background: rgba(60, 60, 70, 0.95);
+      }
+      .call-message .action-text {
+        color: rgba(255,255,255,0.7);
+      }
+      .call-message.system {
+        background: transparent;
+        color: rgba(255,255,255,0.6);
+        text-align: center;
+        font-size: 0.8rem;
+      }
+
+      /* 通话输入区域 */
+      .call-input-area {
+        display: none;
+        padding: 12px 16px;
+        padding-bottom: calc(12px + env(safe-area-inset-bottom, 10px));
+        background: rgba(0,0,0,0.5);
+        backdrop-filter: blur(20px);
+        position: relative;
+        z-index: 7;
+      }
+      .call-overlay.in-call .call-input-area {
+        display: block;
+      }
+      /* 视频通话时输入区绝对定位 */
+      .call-overlay.video-call .call-input-area {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 100px;
+        background: transparent;
+        backdrop-filter: none;
+      }
+      .call-input-row {
+        display: flex;
+        gap: 10px;
+        align-items: flex-end;
+      }
+      .call-input {
+        flex: 1;
+        background: rgba(255,255,255,0.15);
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 20px;
+        padding: 10px 16px;
+        color: white;
+        font-size: 0.95rem;
+        outline: none;
+        resize: none;
+        max-height: 80px;
+        min-height: 40px;
+      }
+      .call-input::placeholder {
+        color: rgba(255,255,255,0.5);
+      }
+      .call-send-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: none;
+        background: linear-gradient(135deg, #f48fb1, #ec407a);
+        color: white;
+        font-size: 18px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      /* 通话按钮区域 */
+      .call-buttons-area {
+        display: flex;
+        justify-content: center;
+        padding: 20px;
+        padding-bottom: calc(30px + env(safe-area-inset-bottom));
+        position: relative;
+        z-index: 7;
+        flex-shrink: 0;
+      }
+      .call-overlay.in-call .call-buttons-area {
+        background: rgba(0,0,0,0.5);
+        backdrop-filter: blur(20px);
+        padding-top: 16px;
+        padding-bottom: calc(20px + env(safe-area-inset-bottom));
+      }
+      .call-overlay.video-call .call-buttons-area {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(0deg, rgba(0,0,0,0.8) 0%, transparent 100%);
+        backdrop-filter: none;
+        padding-top: 40px;
+      }
+      .call-buttons {
+        display: flex;
+        gap: 24px;
+      }
+      .call-btn {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+      .call-btn:active {
+        transform: scale(0.95);
+      }
+      .call-btn.end-call {
+        background: linear-gradient(135deg, #ff5252, #d32f2f);
+        box-shadow: 0 4px 15px rgba(255, 82, 82, 0.4);
+      }
+      .call-btn.accept-call {
+        background: linear-gradient(135deg, #4caf50, #388e3c);
+        box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+      }
+      .call-btn.mute-btn, .call-btn.speaker-btn {
+        background: rgba(255,255,255,0.2);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        backdrop-filter: blur(10px);
+      }
+      .call-btn.mute-btn.active {
+        background: rgba(255, 82, 82, 0.6);
+      }
+      .call-btn.speaker-btn.active {
+        background: rgba(76, 175, 80, 0.6);
+      }
+
+      /* 来电界面 */
+      .call-incoming-buttons {
+        display: flex;
+        gap: 50px;
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* 来电全屏界面 */
+      .incoming-call-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(180deg, #1a1a2e 0%, #0d0d1a 100%);
+        z-index: 10002;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        padding: 60px 30px;
+        padding-top: calc(80px + env(safe-area-inset-top, 20px));
+        padding-bottom: calc(60px + env(safe-area-inset-bottom, 20px));
+      }
+      .incoming-call-overlay.active {
+        display: flex;
+      }
+      .incoming-call-overlay::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 50% 30%, rgba(244, 143, 177, 0.15) 0%, transparent 50%);
+        pointer-events: none;
+      }
+
+      .incoming-call-top {
+        text-align: center;
+        position: relative;
+        z-index: 1;
+      }
+      .incoming-call-label {
+        color: rgba(255,255,255,0.6);
+        font-size: 0.9rem;
+        margin-bottom: 8px;
+        letter-spacing: 1px;
+      }
+      .incoming-call-avatar-wrap {
+        position: relative;
+        margin: 20px auto 24px;
+      }
+      .incoming-call-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #f48fb1, #ec407a);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 60px;
+        overflow: hidden;
+        box-shadow: 0 8px 40px rgba(244, 143, 177, 0.4);
+        animation: avatarPulse 2s ease-in-out infinite;
+      }
+      .incoming-call-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      @keyframes avatarPulse {
+        0%, 100% { box-shadow: 0 8px 40px rgba(244, 143, 177, 0.4); }
+        50% { box-shadow: 0 8px 60px rgba(244, 143, 177, 0.6); }
+      }
+      .incoming-call-ring {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 140px;
+        height: 140px;
+        border: 2px solid rgba(244, 143, 177, 0.3);
+        border-radius: 50%;
+        animation: ringPulse 1.5s ease-out infinite;
+      }
+      .incoming-call-ring:nth-child(2) {
+        animation-delay: 0.5s;
+      }
+      .incoming-call-ring:nth-child(3) {
+        animation-delay: 1s;
+      }
+      @keyframes ringPulse {
+        0% {
+          width: 120px;
+          height: 120px;
+          opacity: 1;
+        }
+        100% {
+          width: 200px;
+          height: 200px;
+          opacity: 0;
+        }
+      }
+      .incoming-call-name {
+        color: white;
+        font-size: 1.6rem;
+        font-weight: 600;
+        margin-bottom: 6px;
+      }
+      .incoming-call-type {
+        color: rgba(255,255,255,0.7);
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+      }
+      .incoming-call-type-icon {
+        font-size: 1.1rem;
+      }
+
+      .incoming-call-actions {
+        display: flex;
+        gap: 60px;
+        position: relative;
+        z-index: 1;
+      }
+      .incoming-call-btn-wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+      }
+      .incoming-call-btn {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+      .incoming-call-btn:active {
+        transform: scale(0.95);
+      }
+      .incoming-call-btn.decline {
+        background: linear-gradient(135deg, #ff5252, #d32f2f);
+        box-shadow: 0 6px 25px rgba(255, 82, 82, 0.5);
+      }
+      .incoming-call-btn.accept {
+        background: linear-gradient(135deg, #4caf50, #388e3c);
+        box-shadow: 0 6px 25px rgba(76, 175, 80, 0.5);
+      }
+      .incoming-call-btn-label {
+        color: rgba(255,255,255,0.7);
+        font-size: 0.85rem;
+      }
+
+      /* 来电小提示条（备用） */
+      .incoming-call-toast {
+        position: fixed;
+        top: 50px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(135deg, #1a1a2e, #16213e);
+        border-radius: 16px;
+        padding: 16px 20px;
+        display: none;
+        align-items: center;
+        gap: 16px;
+        z-index: 10000;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        animation: slideDown 0.3s ease;
+        max-width: 90%;
+      }
+      .incoming-call-toast.active {
+        display: flex;
+      }
+
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translate(-50%, -20px);
+        }
+        to {
+          opacity: 1;
+          transform: translate(-50%, 0);
+        }
       }
 
       /* ==================== 钱包卡片样式（保留用于转账卡片等） ==================== */
@@ -12383,14 +12987,14 @@
 
       <div class="conv-input-area" id="inputArea">
         <!-- 引用预览区域 -->
-        <div class="quote-preview" id="quotePreview" style="display: none;">
+        <div class="quote-preview" id="quotePreview" style="display: none">
           <div class="quote-preview-content">
             <div class="quote-preview-sender" id="quotePreviewSender"></div>
             <div class="quote-preview-text" id="quotePreviewText"></div>
           </div>
           <button class="quote-preview-close" onclick="cancelQuote()">✕</button>
         </div>
-        
+
         <div class="conv-input-bar">
           <button class="tool-btn icon-btn" onclick="toggleChatPanel('plus')">
             +
@@ -12444,9 +13048,13 @@
               <div class="panel-icon-box bg-camera">📷</div>
               <span class="panel-label">拍摄</span>
             </div>
-            <div class="panel-item" onclick="startFakeCall()">
+            <div class="panel-item" onclick="startVoiceCall()">
               <div class="panel-icon-box bg-call">📞</div>
-              <span class="panel-label">通话</span>
+              <span class="panel-label">语音通话</span>
+            </div>
+            <div class="panel-item" onclick="startVideoCall()">
+              <div class="panel-icon-box bg-video">📹</div>
+              <span class="panel-label">视频通话</span>
             </div>
             <div class="panel-item" onclick="sendFakeLocation()">
               <div class="panel-icon-box bg-location">📍</div>
@@ -13020,6 +13628,197 @@
                 </button>
               </div>
               <div class="form-hint">请填写 MiniMax 的音色 ID</div>
+            </div>
+
+            <!-- 通话设置 -->
+            <div
+              class="form-group"
+              style="
+                margin-top: 18px;
+                padding-top: 18px;
+                border-top: 1px dashed #eee;
+              "
+            >
+              <label class="form-label">📞 通话设置</label>
+              <div class="avatar-toggle-group" style="margin-top: 10px">
+                <label class="toggle-item">
+                  <input
+                    type="checkbox"
+                    id="settingsCallVoiceEnabled"
+                    onchange="saveCallSettings()"
+                  />
+                  <span class="toggle-label"
+                    >通话接入语音 (使用上方Voice ID)</span
+                  >
+                </label>
+              </div>
+              <div class="avatar-toggle-group" style="margin-top: 8px">
+                <label class="toggle-item">
+                  <input
+                    type="checkbox"
+                    id="settingsAiCallEnabled"
+                    onchange="saveCallSettings()"
+                  />
+                  <span class="toggle-label">允许TA主动打电话给我</span>
+                </label>
+              </div>
+              <div class="form-hint" style="margin-top: 8px">
+                开启语音后，通话中AI的回复将自动朗读
+              </div>
+
+              <!-- 视频通话画面设置 -->
+              <div
+                style="
+                  margin-top: 16px;
+                  padding-top: 16px;
+                  border-top: 1px dashed #f0f0f0;
+                "
+              >
+                <label class="form-label" style="font-size: 0.85rem"
+                  >📹 视频通话画面</label
+                >
+                <div class="form-hint" style="margin-bottom: 10px">
+                  设置视频通话时对方和自己的画面
+                </div>
+
+                <div style="display: flex; gap: 16px; margin-top: 12px">
+                  <!-- 对方画面 -->
+                  <div style="flex: 1; text-align: center">
+                    <div
+                      style="font-size: 0.8rem; color: #666; margin-bottom: 6px"
+                    >
+                      TA的画面
+                    </div>
+                    <div
+                      id="videoCallPartnerPreview"
+                      style="
+                        width: 80px;
+                        height: 110px;
+                        border-radius: 8px;
+                        background: #f5f5f5;
+                        margin: 0 auto;
+                        overflow: hidden;
+                        cursor: pointer;
+                        border: 2px dashed #ddd;
+                      "
+                      onclick="document.getElementById('videoCallPartnerInput').click()"
+                    >
+                      <img
+                        id="videoCallPartnerImg"
+                        src=""
+                        style="
+                          width: 100%;
+                          height: 100%;
+                          object-fit: cover;
+                          display: none;
+                        "
+                      />
+                      <div
+                        id="videoCallPartnerPlaceholder"
+                        style="
+                          height: 100%;
+                          display: flex;
+                          align-items: center;
+                          justify-content: center;
+                          color: #999;
+                          font-size: 0.7rem;
+                        "
+                      >
+                        点击设置
+                      </div>
+                    </div>
+                    <input
+                      type="file"
+                      id="videoCallPartnerInput"
+                      hidden
+                      accept="image/*,video/*"
+                      onchange="handleVideoCallImageUpload(this, 'partner')"
+                    />
+                    <button
+                      onclick="clearVideoCallImage('partner')"
+                      style="
+                        margin-top: 6px;
+                        font-size: 0.7rem;
+                        padding: 2px 8px;
+                        background: #f5f5f5;
+                        border: none;
+                        border-radius: 4px;
+                        color: #999;
+                      "
+                    >
+                      清除
+                    </button>
+                  </div>
+
+                  <!-- 自己画面 -->
+                  <div style="flex: 1; text-align: center">
+                    <div
+                      style="font-size: 0.8rem; color: #666; margin-bottom: 6px"
+                    >
+                      我的画面
+                    </div>
+                    <div
+                      id="videoCallSelfPreview"
+                      style="
+                        width: 80px;
+                        height: 110px;
+                        border-radius: 8px;
+                        background: #f5f5f5;
+                        margin: 0 auto;
+                        overflow: hidden;
+                        cursor: pointer;
+                        border: 2px dashed #ddd;
+                      "
+                      onclick="document.getElementById('videoCallSelfInput').click()"
+                    >
+                      <img
+                        id="videoCallSelfImg"
+                        src=""
+                        style="
+                          width: 100%;
+                          height: 100%;
+                          object-fit: cover;
+                          display: none;
+                        "
+                      />
+                      <div
+                        id="videoCallSelfPlaceholder"
+                        style="
+                          height: 100%;
+                          display: flex;
+                          align-items: center;
+                          justify-content: center;
+                          color: #999;
+                          font-size: 0.7rem;
+                        "
+                      >
+                        点击设置
+                      </div>
+                    </div>
+                    <input
+                      type="file"
+                      id="videoCallSelfInput"
+                      hidden
+                      accept="image/*,video/*"
+                      onchange="handleVideoCallImageUpload(this, 'self')"
+                    />
+                    <button
+                      onclick="clearVideoCallImage('self')"
+                      style="
+                        margin-top: 6px;
+                        font-size: 0.7rem;
+                        padding: 2px 8px;
+                        background: #f5f5f5;
+                        border: none;
+                        border-radius: 4px;
+                        color: #999;
+                      "
+                    >
+                      清除
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -15435,7 +16234,7 @@
       var currentChatCharId = null;
 
       // Open conversation
-      function openConversation(charId) {
+      async function openConversation(charId) {
         // 设置标题栏 (带火花)
         const settings = chatSettings[charId] || {};
         currentChatCharId = charId;
@@ -15454,6 +16253,12 @@
           avatarEl.innerHTML = `<img src="${char.avatar}" alt="${char.name}">`;
         } else {
           avatarEl.innerHTML = "🤖";
+        }
+
+        // 确保chatHistories是最新的
+        const savedHistories = await localforage.getItem("chatHistories");
+        if (savedHistories) {
+          chatHistories = savedHistories;
         }
 
         // Load chat history
@@ -15597,12 +16402,15 @@
               // 如果是转账卡片HTML，需要根据状态更新显示
               if (rawContent.includes("transfer-card") && m.transferStatus) {
                 const status = m.transferStatus;
-                if (status === 'accepted' || status === 'rejected') {
-                  const statusText = status === 'accepted' ? '已收款' : '已退回';
+                if (status === "accepted" || status === "rejected") {
+                  const statusText =
+                    status === "accepted" ? "已收款" : "已退回";
                   // 替换状态显示
                   contentHtml = rawContent
-                    .replace(/class="transfer-card-status[^"]*">[^<]*</g, 
-                             `class="transfer-card-status ${status}">${statusText}<`)
+                    .replace(
+                      /class="transfer-card-status[^"]*">[^<]*</g,
+                      `class="transfer-card-status ${status}">${statusText}<`
+                    )
                     .replace(/data-status="[^"]*"/g, `data-status="${status}"`);
                 } else {
                   contentHtml = rawContent;
@@ -15618,22 +16426,24 @@
               const hasTransfer = /\[转账[:：]/.test(rawContent);
               const hasRedpacket = /\[红包[:：]/.test(rawContent);
               const hasLocation = /\[位置[:：]/.test(rawContent);
-              
+
               if (hasTransfer || hasRedpacket || hasLocation) {
                 // 处理特殊标签，生成卡片
                 let processed = rawContent;
                 const msgIdx = m.originalIndex; // 使用消息索引作为唯一标识
-                
+
                 // 检查消息是否已被处理过（有状态）
-                const msgStatus = m.transferStatus || 'pending';
-                const isProcessed = msgStatus !== 'pending';
-                
+                const msgStatus = m.transferStatus || "pending";
+                const isProcessed = msgStatus !== "pending";
+
                 // 处理转账标签
                 processed = processed.replace(
                   /\[转账[:：](\d+(?:\.\d+)?)(?:[:：]([^\]]*))?\]/g,
                   (match, amount, note) => {
-                    const footerContent = isProcessed 
-                      ? `<span class="transfer-card-status ${msgStatus}">${msgStatus === 'accepted' ? '已收款' : '已退回'}</span>`
+                    const footerContent = isProcessed
+                      ? `<span class="transfer-card-status ${msgStatus}">${
+                          msgStatus === "accepted" ? "已收款" : "已退回"
+                        }</span>`
                       : `<div class="transfer-card-btns">
                           <button class="transfer-card-btn reject" onclick="event.stopPropagation();rejectAITransfer(${msgIdx},this)">退回</button>
                           <button class="transfer-card-btn accept" onclick="event.stopPropagation();acceptAITransfer(${msgIdx},${amount},this)">收款</button>
@@ -15642,8 +16452,12 @@
                       <div class="transfer-card-header">
                         <div class="transfer-card-icon">💰</div>
                         <div class="transfer-card-info">
-                          <div class="transfer-card-title">${note || '转账给你'}</div>
-                          <div class="transfer-card-amount">${parseFloat(amount).toFixed(2)}</div>
+                          <div class="transfer-card-title">${
+                            note || "转账给你"
+                          }</div>
+                          <div class="transfer-card-amount">${parseFloat(
+                            amount
+                          ).toFixed(2)}</div>
                         </div>
                       </div>
                       <div class="transfer-card-footer">
@@ -15653,13 +16467,15 @@
                     </div>`;
                   }
                 );
-                
+
                 // 处理红包标签
                 processed = processed.replace(
                   /\[红包[:：](\d+(?:\.\d+)?)(?:[:：]([^\]]*))?\]/g,
                   (match, amount, note) => {
-                    const footerContent = isProcessed 
-                      ? `<span class="transfer-card-status ${msgStatus}">${msgStatus === 'accepted' ? '已领取' : '已退回'}</span>`
+                    const footerContent = isProcessed
+                      ? `<span class="transfer-card-status ${msgStatus}">${
+                          msgStatus === "accepted" ? "已领取" : "已退回"
+                        }</span>`
                       : `<div class="transfer-card-btns">
                           <button class="transfer-card-btn reject" onclick="event.stopPropagation();rejectAITransfer(${msgIdx},this)">退回</button>
                           <button class="transfer-card-btn accept" onclick="event.stopPropagation();acceptAITransfer(${msgIdx},${amount},this)">领取</button>
@@ -15668,8 +16484,12 @@
                       <div class="transfer-card-header">
                         <div class="transfer-card-icon">🧧</div>
                         <div class="transfer-card-info">
-                          <div class="transfer-card-title">${note || '恭喜发财'}</div>
-                          <div class="transfer-card-amount">${parseFloat(amount).toFixed(2)}</div>
+                          <div class="transfer-card-title">${
+                            note || "恭喜发财"
+                          }</div>
+                          <div class="transfer-card-amount">${parseFloat(
+                            amount
+                          ).toFixed(2)}</div>
                         </div>
                       </div>
                       <div class="transfer-card-footer">
@@ -15679,7 +16499,7 @@
                     </div>`;
                   }
                 );
-                
+
                 // 处理位置标签
                 processed = processed.replace(
                   /\[位置[:：]([^\]:：]+)(?:[:：]([^\]]*))?\]/g,
@@ -15691,41 +16511,60 @@
                       </div>
                       <div class="location-card-info">
                         <div class="location-card-name">${name}</div>
-                        <div class="location-card-address">${address || '点击查看详情'}</div>
+                        <div class="location-card-address">${
+                          address || "点击查看详情"
+                        }</div>
                       </div>
                     </div>`;
                   }
                 );
-                
+
                 contentHtml = processed;
               } else {
                 // 普通消息
                 let processed = rawContent;
-                
+
                 // 处理嵌入的语音标签 [语音:xxx] - 转换为可点击的语音提示
                 processed = processed.replace(
                   /\[语音[:：]([^\]]+)\]/g,
-                  (match, text) => `<span class="inline-voice-tag" onclick="playInlineVoice(this, '${escapeHtml(text).replace(/'/g, "\\'")}')">🎤 ${text.length > 20 ? text.substring(0, 20) + '...' : text}</span>`
+                  (match, text) =>
+                    `<span class="inline-voice-tag" onclick="playInlineVoice(this, '${escapeHtml(
+                      text
+                    ).replace(/'/g, "\\'")}')">🎤 ${
+                      text.length > 20 ? text.substring(0, 20) + "..." : text
+                    }</span>`
                 );
-                
+
                 // 先处理AI表情包标签 [sticker:xxx]
                 contentHtml = processAiStickerTags(processed);
                 // 再处理其他格式化
-                if (!contentHtml.includes('class="sticker-img"') && !contentHtml.includes('inline-voice-tag')) {
+                if (
+                  !contentHtml.includes('class="sticker-img"') &&
+                  !contentHtml.includes("inline-voice-tag")
+                ) {
                   contentHtml = formatNovelMessage(contentHtml);
                 }
               }
             }
-            
+
             // 检测是否为特殊卡片消息，决定气泡样式
-            const isSpecialCard = contentHtml.includes('transfer-card') || contentHtml.includes('location-card');
-            const specialBubbleStyle = isSpecialCard ? 'style="background:transparent!important;box-shadow:none!important;padding:0!important;"' : '';
+            const isSpecialCard =
+              contentHtml.includes("transfer-card") ||
+              contentHtml.includes("location-card");
+            const specialBubbleStyle = isSpecialCard
+              ? 'style="background:transparent!important;box-shadow:none!important;padding:0!important;"'
+              : "";
 
             // 生成引用显示HTML
-            let quoteHtml = '';
+            let quoteHtml = "";
             if (m.quote) {
-              const quoteSender = m.quote.sender || (m.quote.senderRole === 'user' ? '我' : 'TA');
-              const quoteText = m.quote.displayContent || (m.quote.content || '').replace(/<[^>]+>/g, '').substring(0, 50);
+              const quoteSender =
+                m.quote.sender || (m.quote.senderRole === "user" ? "我" : "TA");
+              const quoteText =
+                m.quote.displayContent ||
+                (m.quote.content || "")
+                  .replace(/<[^>]+>/g, "")
+                  .substring(0, 50);
               quoteHtml = `
                 <div class="msg-quote">
                   <div class="msg-quote-sender">${quoteSender}</div>
@@ -15762,10 +16601,13 @@
 
         // 8. 组合最终 HTML
         // 在多选模式下，整行可点击
-        const isSelecting = typeof isSelectionMode !== "undefined" && isSelectionMode;
+        const isSelecting =
+          typeof isSelectionMode !== "undefined" && isSelectionMode;
         const wrapperFirstMsgIdx = messages[0]?.originalIndex;
-        const wrapperClickHandler = isSelecting ? `onclick="handleWrapperClick(event, ${wrapperFirstMsgIdx})"` : '';
-        
+        const wrapperClickHandler = isSelecting
+          ? `onclick="handleWrapperClick(event, ${wrapperFirstMsgIdx})"`
+          : "";
+
         return `
     <div class="msg-wrapper ${isUser ? "user" : "ai"}" ${wrapperClickHandler}>
         <div class="chat-avatar-small">
@@ -15811,19 +16653,19 @@
             minute: "2-digit",
           }),
         };
-        
+
         // 如果有引用，添加引用信息
         if (currentQuote) {
           msgObj.quote = {
             sender: currentQuote.sender,
             senderRole: currentQuote.senderRole,
             content: currentQuote.content,
-            displayContent: currentQuote.displayContent
+            displayContent: currentQuote.displayContent,
           };
           // 清除引用
           cancelQuote();
         }
-        
+
         chatHistories[currentChatCharId].push(msgObj);
 
         // Save and render
@@ -15985,7 +16827,7 @@
               }
             }
           } else {
-            systemContent += `\n【模式：即时通讯】\n1. 像真人一样口语化聊天，**禁止使用括号()包裹任何内容**，直接说话即可。\n2. **必须**拆分为多条短消息，使用 ||| 分隔。\n3. **语音消息功能**：你可以发送语音消息！格式为 [语音:要说的内容]。\n   - 语音消息适合表达亲密、撒娇、安慰等情感场景\n   - 不要每条都发语音，自然地穿插在文字消息中（大约20-30%概率）\n   - 语音内容应该口语化、自然，可以带语气词如"嗯~"、"啊"、"呢"\n   - 示例：宝贝 ||| [语音:想你了呢，今天有没有乖乖吃饭呀~] ||| 记得早点休息哦\n4. **发送转账**：你可以给用户发转账！格式为 [转账:金额:说明]\n   - 适合在节日祝福、表达感谢、安慰心情等场景使用\n   - 金额一般在1-200之间，不要太频繁使用\n   - 示例：生日快乐！ ||| [转账:88.88:生日红包~] ||| 希望你喜欢\n5. **接收/退回用户转账**：当用户给你发转账时，你可以选择接收或退回\n   - 接收转账格式：[收款]  退回转账格式：[退款]\n   - 收到转账后自然地感谢或拒绝，不要每次都收，偶尔也要客气地退回\n   - 示例（接收）：哇谢谢宝贝！ ||| [收款] ||| 我会好好用的～\n   - 示例（退回）：这个我不能收啦！ ||| [退款] ||| 你自己留着花吧～\n6. **位置功能**：你可以发送位置卡片！格式为 [位置:地点名称:详细地址]\n   - 适合在约会、见面、分享当前位置等场景使用\n   - 示例：我到啦！ ||| [位置:星巴克咖啡:南京路步行街店] ||| 你快来～\n7. **撤回功能**：你可以撤回刚发的消息！格式为 [撤回]\n   - 适合在说错话、发错消息、后悔、害羞等场景使用\n   - 撤回后用户仍能看到你撤回了什么\n   - 示例：我喜欢你... ||| [撤回] ||| 没什么！\n8. **引用回复功能**：你可以引用用户之前说的某句话来针对性回复！格式为 [引用:要引用的原文内容]回复内容\n   - 适合在回应用户之前说的某句具体的话、澄清误解、表达对某句话的感受时使用\n   - 引用的内容会显示在你消息的上方，让用户知道你在回复哪句话\n   - 示例：[引用:我今天好累啊]心疼你... ||| 早点休息好不好？\n`;
+            systemContent += `\n【模式：即时通讯】\n1. 像真人一样口语化聊天，**禁止使用括号()包裹任何内容**，直接说话即可。\n2. **必须**拆分为多条短消息，使用 ||| 分隔。\n3. **语音消息功能**：你可以发送语音消息！格式为 [语音:要说的内容]。\n   - 语音消息适合表达亲密、撒娇、安慰等情感场景\n   - 不要每条都发语音，自然地穿插在文字消息中（大约20-30%概率）\n   - 语音内容应该口语化、自然，可以带语气词如"嗯~"、"啊"、"呢"\n   - 示例：宝贝 ||| [语音:想你了呢，今天有没有乖乖吃饭呀~] ||| 记得早点休息哦\n4. **发送转账**：你可以给用户发转账！格式为 [转账:金额:说明]\n   - 适合在节日祝福、表达感谢、安慰心情等场景使用\n   - 金额一般在1-200之间，不要太频繁使用\n   - 示例：生日快乐！ ||| [转账:88.88:生日红包~] ||| 希望你喜欢\n5. **接收/退回用户转账**：当用户给你发转账时，你可以选择接收或退回\n   - 接收转账格式：[收款]  退回转账格式：[退款]\n   - 收到转账后自然地感谢或拒绝，不要每次都收，偶尔也要客气地退回\n   - 示例（接收）：哇谢谢宝贝！ ||| [收款] ||| 我会好好用的～\n   - 示例（退回）：这个我不能收啦！ ||| [退款] ||| 你自己留着花吧～\n6. **位置功能**：你可以发送位置卡片！格式为 [位置:地点名称:详细地址]\n   - 适合在约会、见面、分享当前位置等场景使用\n   - 示例：我到啦！ ||| [位置:星巴克咖啡:南京路步行街店] ||| 你快来～\n7. **撤回功能**：你可以撤回刚发的消息！格式为 [撤回]\n   - 适合在说错话、发错消息、后悔、害羞等场景使用\n   - 撤回后用户仍能看到你撤回了什么\n   - 示例：我喜欢你... ||| [撤回] ||| 没什么！\n8. **引用回复功能**：你可以引用用户之前说的某句话来针对性回复！格式为 [引用:要引用的原文内容]回复内容\n   - 适合在回应用户之前说的某句具体的话、澄清误解、表达对某句话的感受时使用\n   - 引用的内容会显示在你消息的上方，让用户知道你在回复哪句话\n   - 示例：[引用:我今天好累啊]心疼你... ||| 早点休息好不好？\n9. **发起通话功能**：你可以主动给用户打电话！格式为 [打电话:语音] 或 [打电话:视频]\n   - 适合在想念用户、有重要事情要说、想听用户声音等场景使用\n   - 不要太频繁使用，在对话自然发展到想通话的时候再用\n   - 示例：好想你啊... ||| [打电话:语音] ||| 我想听听你的声音\n`;
           }
 
           // 添加AI表情包功能提示（仅在非线下模式时启用）
@@ -16022,10 +16864,19 @@
 
           const messages = [
             { role: "system", content: systemContent },
-            ...shortTermMemory.map((m) => ({
-              role: m.role === "user" ? "user" : "assistant",
-              content: m.content,
-            })),
+            ...shortTermMemory
+              .map((m) => {
+                // 处理隐藏的系统消息（如通话记录）
+                if (m.role === "system" && m.isHidden) {
+                  return { role: "system", content: m.content };
+                }
+                // 普通消息
+                return {
+                  role: m.role === "user" ? "user" : "assistant",
+                  content: m.content,
+                };
+              })
+              .filter((m) => m.content), // 过滤空消息
           ];
 
           const reqTemperature =
@@ -16121,21 +16972,41 @@
 
             // 进一步分割：把特殊标签分离成单独的消息
             replyParts = replyParts.flatMap((part) => {
-              // 匹配所有特殊标签：表情包、转账、红包、位置、语音、撤回、收款、退款
-              const specialTagRegex = /(\[(sticker|表情|表情包|转账|红包|位置|语音)[：:][^\]]+\]|\[撤回\]|\[收款\]|\[退款\])/gi;
+              // 匹配所有特殊标签：表情包、转账、红包、位置、语音、撤回、收款、退款、打电话
+              const specialTagRegex =
+                /(\[(sticker|表情|表情包|转账|红包|位置|语音|打电话)[：:][^\]]+\]|\[撤回\]|\[收款\]|\[退款\])/gi;
               // 用标签分割，同时保留标签本身
               const segments = part
                 .split(specialTagRegex)
                 .filter(
                   (s) =>
-                    s && s.trim() && !["sticker", "表情", "表情包", "转账", "红包", "位置", "语音", "撤回", "收款", "退款"].includes(s)
+                    s &&
+                    s.trim() &&
+                    ![
+                      "sticker",
+                      "表情",
+                      "表情包",
+                      "转账",
+                      "红包",
+                      "位置",
+                      "语音",
+                      "撤回",
+                      "收款",
+                      "退款",
+                      "打电话",
+                    ].includes(s)
                 );
               return segments.map((s) => s.trim()).filter((s) => s);
             });
 
             // 只朗读文字消息
             textToRead = replyParts
-              .filter((p) => !p.match(/^\[(sticker|表情|表情包|转账|红包|位置|语音|撤回|收款|退款)[：:]?/i))
+              .filter(
+                (p) =>
+                  !p.match(
+                    /^\[(sticker|表情|表情包|转账|红包|位置|语音|撤回|收款|退款|打电话)[：:]?/i
+                  )
+              )
               .join("，");
 
             for (let i = 0; i < replyParts.length; i++) {
@@ -16144,7 +17015,19 @@
               );
 
               const partContent = replyParts[i];
-              
+
+              // 检查是否是打电话标签
+              const callMatch =
+                partContent.match(/^\[打电话[:：](语音|视频)\]$/i);
+              if (callMatch) {
+                const callType = callMatch[1] === "视频" ? "video" : "voice";
+                // 延迟一下再发起来电
+                setTimeout(() => {
+                  aiInitiateCall(savedCharId, callType);
+                }, 1000);
+                continue; // 不保存打电话标签本身
+              }
+
               // 检查是否是撤回标签
               const isRecallTag = /^\[撤回\]$/i.test(partContent.trim());
               if (isRecallTag) {
@@ -16153,7 +17036,10 @@
                 if (history && history.length > 0) {
                   // 找到最后一条AI消息并标记为撤回
                   for (let j = history.length - 1; j >= 0; j--) {
-                    if (history[j].role === 'assistant' && !history[j].isRecalled) {
+                    if (
+                      history[j].role === "assistant" &&
+                      !history[j].isRecalled
+                    ) {
                       history[j].isRecalled = true;
                       break;
                     }
@@ -16162,7 +17048,7 @@
                 }
                 continue; // 不保存撤回标签本身
               }
-              
+
               // 检查是否是收款标签
               const isAcceptTag = /^\[收款\]$/i.test(partContent.trim());
               if (isAcceptTag) {
@@ -16170,7 +17056,11 @@
                 const history = chatHistories[savedCharId];
                 if (history) {
                   for (let j = history.length - 1; j >= 0; j--) {
-                    if (history[j].role === 'user' && history[j].transferId && history[j].transferStatus === 'pending') {
+                    if (
+                      history[j].role === "user" &&
+                      history[j].transferId &&
+                      history[j].transferStatus === "pending"
+                    ) {
                       updateUserTransferStatus(history[j].transferId, true);
                       break;
                     }
@@ -16178,7 +17068,7 @@
                 }
                 continue; // 不保存收款标签本身
               }
-              
+
               // 检查是否是退款标签
               const isRejectTag = /^\[退款\]$/i.test(partContent.trim());
               if (isRejectTag) {
@@ -16186,7 +17076,11 @@
                 const history = chatHistories[savedCharId];
                 if (history) {
                   for (let j = history.length - 1; j >= 0; j--) {
-                    if (history[j].role === 'user' && history[j].transferId && history[j].transferStatus === 'pending') {
+                    if (
+                      history[j].role === "user" &&
+                      history[j].transferId &&
+                      history[j].transferStatus === "pending"
+                    ) {
                       updateUserTransferStatus(history[j].transferId, false);
                       break;
                     }
@@ -16194,22 +17088,27 @@
                 }
                 continue; // 不保存退款标签本身
               }
-              
+
               const isVoiceMsg = /^\[语音[:：](.+)\]$/.test(partContent);
               const isStickerMsg = /^\[(sticker|表情|表情包)[：:]/i.test(
                 partContent
               );
-              
+
               // 检查是否包含引用标签 [引用:xxx]内容
               let quoteInfo = null;
               let actualContent = partContent;
-              const quoteMatch = partContent.match(/^\[引用[:：]([^\]]+)\](.*)$/s);
+              const quoteMatch = partContent.match(
+                /^\[引用[:：]([^\]]+)\](.*)$/s
+              );
               if (quoteMatch) {
                 quoteInfo = {
-                  sender: '我', // AI引用的是用户说的话
-                  senderRole: 'user',
+                  sender: "我", // AI引用的是用户说的话
+                  senderRole: "user",
                   content: quoteMatch[1],
-                  displayContent: quoteMatch[1].length > 50 ? quoteMatch[1].substring(0, 50) + '...' : quoteMatch[1]
+                  displayContent:
+                    quoteMatch[1].length > 50
+                      ? quoteMatch[1].substring(0, 50) + "..."
+                      : quoteMatch[1],
                 };
                 actualContent = quoteMatch[2].trim() || partContent; // 如果没有回复内容，保留原始
               }
@@ -16223,7 +17122,7 @@
                 }),
                 audioUrl: null,
               };
-              
+
               // 添加引用信息
               if (quoteInfo) {
                 msgObj.quote = quoteInfo;
@@ -16613,6 +17512,46 @@
         document.getElementById("settingsVoiceId").value =
           settings.voiceId || "";
 
+        // 通话设置加载
+        const callVoiceCheckbox = document.getElementById(
+          "settingsCallVoiceEnabled"
+        );
+        const aiCallCheckbox = document.getElementById("settingsAiCallEnabled");
+        if (callVoiceCheckbox) {
+          callVoiceCheckbox.checked = settings.callVoiceEnabled || false;
+        }
+        if (aiCallCheckbox) {
+          aiCallCheckbox.checked = settings.aiCallEnabled || false;
+        }
+
+        // 视频通话画面加载
+        const partnerImg = document.getElementById("videoCallPartnerImg");
+        const partnerPlaceholder = document.getElementById(
+          "videoCallPartnerPlaceholder"
+        );
+        const selfImg = document.getElementById("videoCallSelfImg");
+        const selfPlaceholder = document.getElementById(
+          "videoCallSelfPlaceholder"
+        );
+
+        if (settings.videoCallPartnerImage && partnerImg) {
+          partnerImg.src = settings.videoCallPartnerImage;
+          partnerImg.style.display = "block";
+          if (partnerPlaceholder) partnerPlaceholder.style.display = "none";
+        } else if (partnerImg) {
+          partnerImg.style.display = "none";
+          if (partnerPlaceholder) partnerPlaceholder.style.display = "flex";
+        }
+
+        if (settings.videoCallSelfImage && selfImg) {
+          selfImg.src = settings.videoCallSelfImage;
+          selfImg.style.display = "block";
+          if (selfPlaceholder) selfPlaceholder.style.display = "none";
+        } else if (selfImg) {
+          selfImg.style.display = "none";
+          if (selfPlaceholder) selfPlaceholder.style.display = "flex";
+        }
+
         // 线下模式设置初始化
         const offlineWordSettings = document.getElementById(
           "offlineWordSettings"
@@ -16954,6 +17893,13 @@
             .value.trim(),
           // 在 saveChatSettings 构建 settings 对象时添加：
           voiceId: document.getElementById("settingsVoiceId").value.trim(),
+
+          // 通话设置
+          callVoiceEnabled:
+            document.getElementById("settingsCallVoiceEnabled")?.checked ||
+            false,
+          aiCallEnabled:
+            document.getElementById("settingsAiCallEnabled")?.checked || false,
 
           // 线下模式设置
           offlineMinWords:
@@ -18320,6 +19266,11 @@
 
         // 遍历生成 HTML (逻辑保持不变)
         history.forEach((msg, index) => {
+          // 跳过隐藏的系统消息（如通话记录）
+          if (msg.isHidden) {
+            return;
+          }
+
           const isRecalled = msg.isRecalled === true;
 
           if (isRecalled) {
@@ -18332,13 +19283,16 @@
               );
               currentGroup = [];
             }
-            
+
             // 区分用户撤回和AI撤回
             if (msg.role === "user") {
               html += `<div class="msg-system-tip">你撤回了一条消息</div>`;
             } else {
               // AI撤回，用户可以点击查看原内容
-              const recalledContent = (msg.content || '').replace(/</g, '&lt;').replace(/>/g, '&gt;').substring(0, 50);
+              const recalledContent = (msg.content || "")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .substring(0, 50);
               html += `<div class="msg-system-tip msg-recalled-ai" onclick="showRecalledContent(${index})">
                 对方撤回了一条消息 <span style="color:#f48fb1;font-size:0.75rem;">[点击查看]</span>
               </div>`;
@@ -18510,7 +19464,7 @@
           renderConversation();
         }
       }
-      
+
       // 整行点击处理（多选模式下）
       function handleWrapperClick(event, index) {
         if (isSelectionMode && index !== undefined) {
@@ -18538,45 +19492,46 @@
         });
         hideContextMenu();
       }
-      
+
       // 引用消息
       function handleQuoteMsg() {
         const msg = chatHistories[currentChatCharId][activeMsgIndex];
-        const char = characters.find(c => c.id === currentChatCharId);
-        
+        const char = characters.find((c) => c.id === currentChatCharId);
+
         // 获取发送者名称
-        const senderName = msg.role === 'user' ? '我' : (char?.note || char?.name || 'TA');
-        
+        const senderName =
+          msg.role === "user" ? "我" : char?.note || char?.name || "TA";
+
         // 清理消息内容用于显示（去掉HTML标签）
-        let content = msg.content || '';
-        content = content.replace(/<[^>]+>/g, '').trim();
-        if (content.length > 50) content = content.substring(0, 50) + '...';
-        
+        let content = msg.content || "";
+        content = content.replace(/<[^>]+>/g, "").trim();
+        if (content.length > 50) content = content.substring(0, 50) + "...";
+
         // 保存引用信息
         currentQuote = {
           msgIndex: activeMsgIndex,
           sender: senderName,
           senderRole: msg.role,
           content: msg.content,
-          displayContent: content
+          displayContent: content,
         };
-        
+
         // 显示引用预览
-        document.getElementById('quotePreview').style.display = 'flex';
-        document.getElementById('quotePreviewSender').textContent = senderName;
-        document.getElementById('quotePreviewText').textContent = content;
-        
+        document.getElementById("quotePreview").style.display = "flex";
+        document.getElementById("quotePreviewSender").textContent = senderName;
+        document.getElementById("quotePreviewText").textContent = content;
+
         // 聚焦输入框
-        document.getElementById('convInput').focus();
-        
+        document.getElementById("convInput").focus();
+
         hideContextMenu();
-        showToast('已引用消息');
+        showToast("已引用消息");
       }
-      
+
       // 取消引用
       function cancelQuote() {
         currentQuote = null;
-        document.getElementById('quotePreview').style.display = 'none';
+        document.getElementById("quotePreview").style.display = "none";
       }
 
       // 撤回 (核心功能：AI可见，用户不可见)
@@ -18591,17 +19546,17 @@
         showToast("消息已撤回");
         hideContextMenu();
       }
-      
+
       // 查看AI撤回的消息内容
       function showRecalledContent(msgIndex) {
         const msg = chatHistories[currentChatCharId][msgIndex];
         if (!msg) return;
-        
-        let content = msg.content || '';
+
+        let content = msg.content || "";
         // 清理HTML标签用于显示
-        content = content.replace(/<[^>]+>/g, '').substring(0, 200);
-        if (content.length >= 200) content += '...';
-        
+        content = content.replace(/<[^>]+>/g, "").substring(0, 200);
+        if (content.length >= 200) content += "...";
+
         alert(`对方撤回的内容：\n\n${content}`);
       }
 
@@ -18902,8 +19857,8 @@
 
       // ==================== 语音功能 (MiniMax TTS 完整最终版) ====================
 
-      // 1. 全局变量：只定义一次！
-      let voiceConfig = JSON.parse(localStorage.getItem("voiceConfig") || "{}");
+      // 1. 全局变量voiceConfig已在初始化时从localforage加载到window.voiceConfig
+      // 这里不需要重新定义
 
       // 2. 切换线路 UI
       function switchVoiceUrl(type) {
@@ -18922,25 +19877,41 @@
         }
       }
 
-      // 3. 初始化加载配置
+      // 3. 初始化加载配置到界面
       function loadVoiceSettings() {
-        if (voiceConfig.groupId)
-          document.getElementById("voiceGroupId").value = voiceConfig.groupId;
-        if (voiceConfig.apiKey)
-          document.getElementById("voiceApiKey").value = voiceConfig.apiKey;
-        if (voiceConfig.model)
-          document.getElementById("voiceModelSelect").value = voiceConfig.model;
+        // voiceConfig已经在初始化时加载到window.voiceConfig
+        const config = window.voiceConfig || {};
+
+        if (config.groupId) {
+          const groupIdEl = document.getElementById("voiceGroupId");
+          if (groupIdEl) groupIdEl.value = config.groupId;
+        }
+        if (config.apiKey) {
+          const apiKeyEl = document.getElementById("voiceApiKey");
+          if (apiKeyEl) apiKeyEl.value = config.apiKey;
+        }
+        if (config.model) {
+          const modelEl = document.getElementById("voiceModelSelect");
+          if (modelEl) modelEl.value = config.model;
+        }
 
         // 加载线路选择 (默认国内)
-        const baseUrl = voiceConfig.baseUrl || "https://api.minimax.chat";
+        const baseUrl = config.baseUrl || "https://api.minimax.chat";
         if (baseUrl.includes("minimaxi.chat")) {
           switchVoiceUrl("intl");
         } else {
           switchVoiceUrl("cn");
         }
+
+        console.log("语音配置已加载:", {
+          groupId: config.groupId ? "已设置" : "未设置",
+          model: config.model,
+        });
       }
-      // 监听加载
-      document.addEventListener("DOMContentLoaded", loadVoiceSettings);
+      // 监听加载 - 延迟执行确保数据已从localforage加载
+      document.addEventListener("DOMContentLoaded", () => {
+        setTimeout(loadVoiceSettings, 500);
+      });
 
       // 4. 保存配置
       function saveVoiceConfig() {
@@ -18960,53 +19931,59 @@
           return;
         }
 
-        voiceConfig = { groupId, apiKey, model, baseUrl };
-        localforage.setItem("voiceConfig", voiceConfig);
+        window.voiceConfig = { groupId, apiKey, model, baseUrl };
+        localforage.setItem("voiceConfig", window.voiceConfig);
         showToast("语音配置已保存 🎙️");
       }
-      
+
       // 播放嵌入式语音标签
       async function playInlineVoice(el, text) {
         if (!text) return;
-        
+
         // 检查是否有语音配置
         const settings = chatSettings[currentChatCharId] || {};
         if (!settings.voiceId) {
-          showToast('此角色未配置语音');
+          showToast("此角色未配置语音");
           return;
         }
-        
-        el.innerHTML = '🔊 播放中...';
-        el.style.pointerEvents = 'none';
-        
+
+        el.innerHTML = "🔊 播放中...";
+        el.style.pointerEvents = "none";
+
         try {
           const audioUrl = await generateSpeech(text, currentChatCharId);
           if (audioUrl) {
             const audio = new Audio(audioUrl);
             audio.play();
             audio.onended = () => {
-              el.innerHTML = `🎤 ${text.length > 20 ? text.substring(0, 20) + '...' : text}`;
-              el.style.pointerEvents = 'auto';
+              el.innerHTML = `🎤 ${
+                text.length > 20 ? text.substring(0, 20) + "..." : text
+              }`;
+              el.style.pointerEvents = "auto";
             };
           } else {
-            el.innerHTML = `🎤 ${text.length > 20 ? text.substring(0, 20) + '...' : text}`;
-            el.style.pointerEvents = 'auto';
+            el.innerHTML = `🎤 ${
+              text.length > 20 ? text.substring(0, 20) + "..." : text
+            }`;
+            el.style.pointerEvents = "auto";
           }
         } catch (e) {
-          console.error('语音播放失败', e);
-          el.innerHTML = `🎤 ${text.length > 20 ? text.substring(0, 20) + '...' : text}`;
-          el.style.pointerEvents = 'auto';
+          console.error("语音播放失败", e);
+          el.innerHTML = `🎤 ${
+            text.length > 20 ? text.substring(0, 20) + "..." : text
+          }`;
+          el.style.pointerEvents = "auto";
         }
       }
-      
+
       // ==================== 优化版：generateSpeech (更自然的断句) ====================
       async function generateSpeech(text, charId) {
         // 1. 获取 ID 和 Key
         let currentGroupId =
-          (voiceConfig && voiceConfig.groupId) ||
+          (window.voiceConfig && window.voiceConfig.groupId) ||
           document.getElementById("voiceGroupId")?.value;
         let currentApiKey =
-          (voiceConfig && voiceConfig.apiKey) ||
+          (window.voiceConfig && window.voiceConfig.apiKey) ||
           document.getElementById("voiceApiKey")?.value;
 
         if (!currentGroupId || !currentApiKey) {
@@ -19076,7 +20053,7 @@
             },
             body: JSON.stringify({
               // 【建议】如果你觉得 Turbo 模型太卡，可以在 API 设置里选 speech-02-hd
-              model: voiceConfig.model || "speech-01-turbo",
+              model: window.voiceConfig.model || "speech-01-turbo",
               text: cleanText,
               stream: false,
               voice_setting: {
@@ -20403,10 +21380,10 @@
       // 查看大图 (简单的全屏预览)
       function showFullImage(src) {
         // 多选模式下不放大图片
-        if (typeof isSelectionMode !== 'undefined' && isSelectionMode) {
+        if (typeof isSelectionMode !== "undefined" && isSelectionMode) {
           return;
         }
-        
+
         const overlay = document.createElement("div");
         overlay.style.cssText = `
         position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -20453,41 +21430,1051 @@
         // setTimeout(() => { ... }, 1000);
       }
 
-      // 7. 模拟功能：拍照/通话/位置 (仅提示)
+      // 7. 模拟功能：拍照/位置
       function handleCameraAction() {
         alert("相机功能开发中... (可使用相册发图)");
       }
-      function startFakeCall() {
-        sendMediaMessage(
-          `
-        <div style="background:white; padding:10px 14px; border-radius:10px; display:flex; align-items:center; gap:10px; box-shadow:0 1px 3px rgba(0,0,0,0.1);">
-            <div style="background:#f5f5f5; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#ff9800;">📞</div>
-            <div>
-                <div style="font-size:0.9rem;">语音通话</div>
-                <div style="font-size:0.7rem; color:#999;">通话时长 00:00</div>
-            </div>
-        </div>
-    `,
-          "call"
-        );
-        closeChatPanel();
+
+      /* ==================== 语音/视频通话功能 ==================== */
+      var callState = {
+        active: false,
+        type: "voice", // 'voice' or 'video'
+        status: "idle", // 'idle', 'calling', 'incoming', 'connected'
+        charId: null,
+        startTime: null,
+        timerInterval: null,
+        isMuted: false,
+        isSpeaker: true,
+        currentAudio: null,
+        conversationHistory: [],
+        isAiSpeaking: false,
+        videoSelfExpanded: false,
+      };
+
+      // 保存通话设置
+      function saveCallSettings() {
+        if (!currentChatCharId) return;
+        const settings = chatSettings[currentChatCharId] || {};
+        settings.callVoiceEnabled =
+          document.getElementById("settingsCallVoiceEnabled")?.checked || false;
+        settings.aiCallEnabled =
+          document.getElementById("settingsAiCallEnabled")?.checked || false;
+        chatSettings[currentChatCharId] = settings;
+        localforage.setItem("chatSettings", chatSettings);
       }
+
+      // 处理视频通话画面上传
+      function handleVideoCallImageUpload(input, type) {
+        const file = input.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const dataUrl = e.target.result;
+
+          if (type === "partner") {
+            document.getElementById("videoCallPartnerImg").src = dataUrl;
+            document.getElementById("videoCallPartnerImg").style.display =
+              "block";
+            document.getElementById(
+              "videoCallPartnerPlaceholder"
+            ).style.display = "none";
+          } else {
+            document.getElementById("videoCallSelfImg").src = dataUrl;
+            document.getElementById("videoCallSelfImg").style.display = "block";
+            document.getElementById("videoCallSelfPlaceholder").style.display =
+              "none";
+          }
+
+          // 保存到设置
+          if (!currentChatCharId) return;
+          const settings = chatSettings[currentChatCharId] || {};
+          if (type === "partner") {
+            settings.videoCallPartnerImage = dataUrl;
+          } else {
+            settings.videoCallSelfImage = dataUrl;
+          }
+          chatSettings[currentChatCharId] = settings;
+          localforage.setItem("chatSettings", chatSettings);
+        };
+        reader.readAsDataURL(file);
+      }
+
+      // 清除视频画面
+      function clearVideoCallImage(type) {
+        if (type === "partner") {
+          document.getElementById("videoCallPartnerImg").src = "";
+          document.getElementById("videoCallPartnerImg").style.display = "none";
+          document.getElementById("videoCallPartnerPlaceholder").style.display =
+            "flex";
+        } else {
+          document.getElementById("videoCallSelfImg").src = "";
+          document.getElementById("videoCallSelfImg").style.display = "none";
+          document.getElementById("videoCallSelfPlaceholder").style.display =
+            "flex";
+        }
+
+        if (!currentChatCharId) return;
+        const settings = chatSettings[currentChatCharId] || {};
+        if (type === "partner") {
+          delete settings.videoCallPartnerImage;
+        } else {
+          delete settings.videoCallSelfImage;
+        }
+        chatSettings[currentChatCharId] = settings;
+        localforage.setItem("chatSettings", chatSettings);
+      }
+
+      // 发起语音通话
+      function startVoiceCall() {
+        closeChatPanel();
+        initiateCall("voice");
+      }
+
+      // 发起视频通话
+      function startVideoCall() {
+        closeChatPanel();
+        initiateCall("video");
+      }
+
+      // 发起通话
+      function initiateCall(type) {
+        if (!currentChatCharId) {
+          showToast("请先打开一个对话");
+          return;
+        }
+
+        const char = characters.find((c) => c.id === currentChatCharId);
+        if (!char) return;
+
+        const settings = chatSettings[currentChatCharId] || {};
+
+        callState.active = true;
+        callState.type = type;
+        callState.status = "calling";
+        callState.charId = currentChatCharId;
+        callState.conversationHistory = [];
+        callState.videoSelfExpanded = false;
+
+        // 设置界面
+        const overlay = document.getElementById("callOverlay");
+        overlay.className = `call-overlay ${type}-call active`;
+        overlay.classList.remove("in-call");
+
+        const charName = settings.charNote || char.note || char.name;
+
+        // 语音通话头像设置
+        const avatarImg = document.getElementById("callAvatarImg");
+        const avatarPlaceholder = document.getElementById(
+          "callAvatarPlaceholder"
+        );
+        if (char.avatar) {
+          avatarImg.src = char.avatar;
+          avatarImg.style.display = "block";
+          avatarPlaceholder.style.display = "none";
+        } else {
+          avatarImg.style.display = "none";
+          avatarPlaceholder.style.display = "block";
+        }
+
+        document.getElementById("callName").textContent = charName;
+        document.getElementById("callStatus").textContent = "正在呼叫...";
+        document.getElementById("callTimer").style.display = "none";
+        document.getElementById("callConversation").innerHTML = "";
+
+        // 视频通话设置
+        if (type === "video") {
+          document.getElementById("videoCallName").textContent = charName;
+          document.getElementById("videoCallTimer").textContent = "连接中...";
+
+          // 设置对方画面
+          const videoMainImg = document.getElementById("videoMainImg");
+          const videoMainPlaceholder = document.getElementById(
+            "videoMainPlaceholder"
+          );
+          if (settings.videoCallPartnerImage) {
+            videoMainImg.src = settings.videoCallPartnerImage;
+            videoMainImg.style.display = "block";
+            videoMainPlaceholder.style.display = "none";
+          } else {
+            videoMainImg.style.display = "none";
+            videoMainPlaceholder.style.display = "flex";
+            // 设置占位头像
+            const mainAvatarImg = document.getElementById("videoMainAvatarImg");
+            const mainAvatarPlaceholder = document.getElementById(
+              "videoMainAvatarPlaceholder"
+            );
+            if (char.avatar) {
+              mainAvatarImg.src = char.avatar;
+              mainAvatarImg.style.display = "block";
+              mainAvatarPlaceholder.style.display = "none";
+            } else {
+              mainAvatarImg.style.display = "none";
+              mainAvatarPlaceholder.style.display = "block";
+            }
+            document.getElementById("videoMainName").textContent = charName;
+          }
+
+          // 设置自己画面
+          const videoSelfImg = document.getElementById("videoSelfImg");
+          const videoSelfPlaceholder = document.getElementById(
+            "videoSelfPlaceholder"
+          );
+          if (settings.videoCallSelfImage) {
+            videoSelfImg.src = settings.videoCallSelfImage;
+            videoSelfImg.style.display = "block";
+            videoSelfPlaceholder.style.display = "none";
+          } else {
+            videoSelfImg.style.display = "none";
+            videoSelfPlaceholder.style.display = "flex";
+          }
+          document.getElementById("videoSelf").classList.remove("expanded");
+        }
+
+        // 显示呼叫按钮
+        document.getElementById("callCallingBtns").style.display = "flex";
+        document.getElementById("callIncomingBtns").style.display = "none";
+        document.getElementById("callInCallBtns").style.display = "none";
+
+        // 模拟AI接听（2-4秒后）
+        setTimeout(() => {
+          if (callState.status === "calling") {
+            aiAnswerCall();
+          }
+        }, 2000 + Math.random() * 2000);
+      }
+
+      // 切换视频画面位置（互换大小窗口）
+      function toggleVideoSelf() {
+        const overlay = document.getElementById("callOverlay");
+        callState.videoSelfExpanded = !callState.videoSelfExpanded;
+        overlay.classList.toggle("swapped", callState.videoSelfExpanded);
+      }
+
+      // AI接听通话
+      async function aiAnswerCall() {
+        const settings = chatSettings[callState.charId] || {};
+        const char = characters.find((c) => c.id === callState.charId);
+
+        // 简单模拟：大部分情况接听，小概率拒绝
+        const willAnswer = Math.random() > 0.15;
+
+        if (willAnswer) {
+          callState.status = "connected";
+          callState.startTime = Date.now();
+
+          const overlay = document.getElementById("callOverlay");
+          overlay.classList.add("in-call");
+
+          if (callState.type === "video") {
+            document.getElementById("videoCallTimer").textContent = "00:00";
+          } else {
+            document.getElementById("callStatus").textContent = "语音通话中";
+            document.getElementById("callTimer").style.display = "block";
+          }
+
+          // 显示通话中按钮
+          document.getElementById("callCallingBtns").style.display = "none";
+          document.getElementById("callInCallBtns").style.display = "flex";
+
+          // 开始计时
+          startCallTimer();
+
+          // AI开场白
+          await generateCallResponse("通话刚接通，请自然地打招呼");
+        } else {
+          // AI拒绝接听
+          document.getElementById("callStatus").textContent = "对方已拒绝";
+          if (callState.type === "video") {
+            document.getElementById("videoMainName").textContent = "对方已拒绝";
+          }
+          setTimeout(() => {
+            endCall();
+            addCallRecord("refused");
+          }, 1500);
+        }
+      }
+
+      // 用户接听来电
+      function acceptCall() {
+        if (callState.status !== "incoming") return;
+
+        callState.status = "connected";
+        callState.startTime = Date.now();
+
+        const overlay = document.getElementById("callOverlay");
+        overlay.classList.add("in-call");
+
+        if (callState.type === "video") {
+          document.getElementById("videoCallTimer").textContent = "00:00";
+        } else {
+          document.getElementById("callStatus").textContent = "语音通话中";
+          document.getElementById("callTimer").style.display = "block";
+        }
+
+        // 显示通话中按钮
+        document.getElementById("callIncomingBtns").style.display = "none";
+        document.getElementById("callInCallBtns").style.display = "flex";
+
+        // 开始计时
+        startCallTimer();
+      }
+
+      // 用户拒绝来电
+      function declineCall() {
+        document.getElementById("callStatus").textContent = "已拒绝";
+        setTimeout(() => {
+          endCall();
+          addCallRecord("declined");
+        }, 500);
+      }
+
+      // 结束通话
+      function endCall() {
+        if (callState.timerInterval) {
+          clearInterval(callState.timerInterval);
+          callState.timerInterval = null;
+        }
+
+        // 停止当前播放的音频
+        if (callState.currentAudio) {
+          callState.currentAudio.pause();
+          callState.currentAudio = null;
+        }
+
+        // 如果是正常通话结束，添加通话记录
+        if (callState.status === "connected" && callState.startTime) {
+          addCallRecord("completed");
+        }
+
+        // 重置状态
+        callState.active = false;
+        callState.status = "idle";
+        callState.startTime = null;
+        callState.conversationHistory = [];
+        callState.videoSelfExpanded = false;
+
+        // 隐藏界面 - 移除所有相关类并强制隐藏
+        const overlay = document.getElementById("callOverlay");
+        overlay.classList.remove(
+          "active",
+          "in-call",
+          "video-call",
+          "voice-call",
+          "swapped"
+        );
+        overlay.style.display = "none";
+
+        // 恢复默认类
+        setTimeout(() => {
+          overlay.style.display = "";
+          overlay.className = "call-overlay voice-call";
+        }, 100);
+      }
+
+      // 开始通话计时
+      function startCallTimer() {
+        const voiceTimer = document.getElementById("callTimer");
+        const videoTimer = document.getElementById("videoCallTimer");
+
+        callState.timerInterval = setInterval(() => {
+          if (!callState.startTime) return;
+          const elapsed = Math.floor((Date.now() - callState.startTime) / 1000);
+          const mins = Math.floor(elapsed / 60)
+            .toString()
+            .padStart(2, "0");
+          const secs = (elapsed % 60).toString().padStart(2, "0");
+          const timeStr = `${mins}:${secs}`;
+
+          if (callState.type === "video") {
+            videoTimer.textContent = timeStr;
+          } else {
+            voiceTimer.textContent = timeStr;
+          }
+        }, 1000);
+      }
+
+      // 添加通话记录到聊天
+      function addCallRecord(result) {
+        if (!callState.charId) return;
+
+        const duration = callState.startTime
+          ? Math.floor((Date.now() - callState.startTime) / 1000)
+          : 0;
+        const mins = Math.floor(duration / 60)
+          .toString()
+          .padStart(2, "0");
+        const secs = (duration % 60).toString().padStart(2, "0");
+
+        let statusText = "";
+        let icon = callState.type === "video" ? "📹" : "📞";
+
+        switch (result) {
+          case "completed":
+            statusText = `通话时长 ${mins}:${secs}`;
+            break;
+          case "refused":
+            statusText = "对方已拒绝";
+            break;
+          case "declined":
+            statusText = "已拒绝";
+            break;
+          case "missed":
+            statusText = "未接来电";
+            break;
+          default:
+            statusText = "通话结束";
+        }
+
+        const callHtml = `
+          <div style="background:white; padding:10px 14px; border-radius:10px; display:flex; align-items:center; gap:10px; box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+            <div style="background:#f5f5f5; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:${
+              callState.type === "video" ? "#4caf50" : "#ff9800"
+            };">${icon}</div>
+            <div>
+              <div style="font-size:0.9rem;">${
+                callState.type === "video" ? "视频通话" : "语音通话"
+              }</div>
+              <div style="font-size:0.7rem; color:#999;">${statusText}</div>
+            </div>
+          </div>
+        `;
+
+        if (!chatHistories[callState.charId]) {
+          chatHistories[callState.charId] = [];
+        }
+
+        // 添加可见的通话卡片
+        chatHistories[callState.charId].push({
+          role: "user",
+          content: callHtml,
+          isHtml: true,
+          time: new Date().toLocaleTimeString("zh-CN", {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+        });
+
+        // 如果有通话内容，添加隐藏的通话记录供AI参考
+        if (
+          result === "completed" &&
+          callState.conversationHistory.length > 0
+        ) {
+          const settings = chatSettings[callState.charId] || {};
+          const userNickname = settings.userNickname || "用户";
+          const charName = settings.charName || "对方";
+
+          // 格式化通话记录
+          const callTranscript = callState.conversationHistory
+            .map((msg) => {
+              const speaker = msg.role === "user" ? userNickname : charName;
+              // 移除【】中的动作描写，只保留对话内容用于记录
+              const content = msg.content.replace(/【[^】]*】/g, "").trim();
+              return `${speaker}: ${content}`;
+            })
+            .join("\n");
+
+          // 添加隐藏的系统消息，AI能看到但用户看不到
+          chatHistories[callState.charId].push({
+            role: "system",
+            content: `[通话记录 - ${
+              callState.type === "video" ? "视频" : "语音"
+            }通话，时长${mins}:${secs}]\n${callTranscript}\n[通话结束]`,
+            isHidden: true,
+            time: new Date().toLocaleTimeString("zh-CN", {
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+          });
+        }
+
+        localforage.setItem("chatHistories", chatHistories);
+
+        // 更新聊天列表预览
+        const previewText =
+          callState.type === "video" ? "[视频通话]" : "[语音通话]";
+        if (typeof updateCharacterLastMessage === "function") {
+          updateCharacterLastMessage(callState.charId, previewText);
+        }
+
+        // 强制刷新聊天界面
+        const savedCharId = callState.charId;
+        setTimeout(() => {
+          if (currentChatCharId === savedCharId) {
+            renderConversation();
+          }
+          // 同时刷新聊天列表
+          if (typeof renderCharacterList === "function") {
+            renderCharacterList();
+          }
+        }, 150);
+      }
+
+      // 切换静音
+      function toggleMute() {
+        callState.isMuted = !callState.isMuted;
+        const btn = document.getElementById("muteBtn");
+        btn.classList.toggle("active", callState.isMuted);
+        btn.textContent = callState.isMuted ? "🔇" : "🎤";
+      }
+
+      // 切换扬声器
+      function toggleSpeaker() {
+        callState.isSpeaker = !callState.isSpeaker;
+        const btn = document.getElementById("speakerBtn");
+        btn.classList.toggle("active", callState.isSpeaker);
+        btn.textContent = callState.isSpeaker ? "🔊" : "🔈";
+      }
+
+      // 用户发送通话消息
+      function sendCallMessage() {
+        const input = document.getElementById("callInput");
+        const text = input.value.trim();
+        if (!text || callState.status !== "connected") return;
+
+        input.value = "";
+
+        // 显示用户消息
+        addCallMessage(text, "user");
+
+        // 保存到通话历史
+        callState.conversationHistory.push({ role: "user", content: text });
+
+        // AI回复
+        generateCallResponse(text);
+      }
+
+      // 处理输入框回车
+      function handleCallInputKeydown(event) {
+        if (event.key === "Enter" && !event.shiftKey) {
+          event.preventDefault();
+          sendCallMessage();
+        }
+      }
+
+      // 生成通话中的AI回复
+      async function generateCallResponse(context) {
+        if (!callState.active || callState.status !== "connected") return;
+
+        const apiConfig = getActiveApiConfig();
+        if (!apiConfig || !apiConfig.url || !apiConfig.key) {
+          console.error("通话: API配置缺失");
+          addCallMessage("(API未配置，请在设置中配置API)", "system");
+          return;
+        }
+
+        const settings = chatSettings[callState.charId] || {};
+        const char = characters.find((c) => c.id === callState.charId);
+        if (!char) return;
+
+        const charName = settings.charName || char.name || "对方";
+        const persona = settings.persona || "";
+        const userNickname = settings.userNickname || "用户";
+
+        console.log("通话人设:", { charName, personaLength: persona.length });
+
+        try {
+          // 构建系统提示词
+          let inCallPrompt = "";
+
+          // 人设放在最前面
+          if (persona && persona.trim()) {
+            inCallPrompt = persona.trim() + "\n\n";
+          }
+
+          // 通话场景说明
+          inCallPrompt += `---\n【当前场景】\n`;
+          inCallPrompt += `你正在和${userNickname}进行${
+            callState.type === "video" ? "视频" : "语音"
+          }通话。\n`;
+          inCallPrompt += `请完全按照上面的人设来说话，保持角色的性格、语气和说话习惯。\n\n`;
+
+          if (callState.type === "video") {
+            inCallPrompt += `【视频通话格式】\n`;
+            inCallPrompt += `用【】描述动作、表情、神态，穿插在对话中。\n`;
+            inCallPrompt += `示例：【看着屏幕笑了笑】你好呀～【歪头看着你】怎么突然想起给我打视频了？\n`;
+          } else {
+            inCallPrompt += `【语音通话格式】\n`;
+            inCallPrompt += `这是语音通话，只能听到声音。\n`;
+            inCallPrompt += `直接用对话回复，不要描写动作，不要用【】或括号。\n`;
+            inCallPrompt += `像真人打电话一样自然地说话。\n`;
+          }
+
+          const messages = [{ role: "system", content: inCallPrompt }];
+
+          // 添加通话历史
+          if (callState.conversationHistory.length > 0) {
+            callState.conversationHistory.forEach((msg) => {
+              messages.push({ role: msg.role, content: msg.content });
+            });
+          }
+
+          // 添加当前触发
+          if (callState.conversationHistory.length === 0) {
+            messages.push({ role: "user", content: "(电话接通了)" });
+          } else if (
+            context &&
+            !callState.conversationHistory.find((m) => m.content === context)
+          ) {
+            messages.push({ role: "user", content: context });
+          }
+
+          console.log("通话API请求:", {
+            url: apiConfig.url,
+            model: apiConfig.model,
+            messagesCount: messages.length,
+            systemPrompt: inCallPrompt.substring(0, 200),
+          });
+
+          const reqTemperature =
+            apiConfig.temperature !== undefined
+              ? Number(apiConfig.temperature)
+              : 0.8;
+
+          const response = await fetch(`${apiConfig.url}/chat/completions`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${apiConfig.key}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              model: apiConfig.model,
+              messages: messages,
+              temperature: reqTemperature,
+            }),
+          });
+
+          if (!response.ok) {
+            const errText = await response.text();
+            console.error("通话API错误:", response.status, errText);
+            addCallMessage("(连接失败，请重试)", "system");
+            return;
+          }
+
+          const data = await response.json();
+
+          // 详细调试输出
+          console.log("通话API完整响应:", data);
+          console.log("choices[0]:", data.choices?.[0]);
+          console.log("message:", data.choices?.[0]?.message);
+          console.log("content:", data.choices?.[0]?.message?.content);
+          console.log("finish_reason:", data.choices?.[0]?.finish_reason);
+
+          let aiReply = "";
+
+          // 尝试多种方式提取回复
+          if (data.choices && data.choices[0]) {
+            const choice = data.choices[0];
+            if (choice.message && choice.message.content) {
+              aiReply = choice.message.content;
+            } else if (choice.text) {
+              aiReply = choice.text;
+            }
+            // 检查是否被过滤
+            if (choice.finish_reason === "content_filter") {
+              console.warn("通话: 内容被过滤");
+            }
+          }
+
+          // 检查是否为空
+          if (!aiReply || !aiReply.trim() || aiReply.trim().length < 2) {
+            console.error("通话: AI回复为空", {
+              aiReply,
+              choicesLength: data.choices?.length,
+              firstChoice: data.choices?.[0],
+            });
+
+            // 使用备用回复
+            if (callState.conversationHistory.length === 0) {
+              aiReply =
+                callState.type === "video"
+                  ? `【看到屏幕亮起，脸上浮现出一丝笑意】接通了。怎么突然想起给我打视频？【微微歪头】是想我了？`
+                  : `喂？是你呀。怎么这个时候打电话过来？`;
+            } else {
+              aiReply =
+                callState.type === "video"
+                  ? `【眨了眨眼看着你】嗯？你说什么？`
+                  : `嗯？你说什么？`;
+            }
+          }
+
+          // 保存到通话历史
+          callState.conversationHistory.push({
+            role: "assistant",
+            content: aiReply,
+          });
+
+          // 显示在通话界面（视频通话保留动作描写）
+          addCallMessage(aiReply, "ai", callState.type === "video");
+
+          // 如果开启了语音，朗读回复（只读对话部分，不读动作）
+          if (
+            settings.callVoiceEnabled &&
+            settings.voiceId &&
+            !callState.isMuted
+          ) {
+            const textToSpeak = aiReply.replace(/【[^】]*】/g, "").trim();
+            if (textToSpeak) {
+              await speakInCall(textToSpeak, settings.voiceId);
+            }
+          }
+        } catch (error) {
+          console.error("通话AI回复失败:", error);
+          addCallMessage("(出错了，请重试)", "system");
+        }
+      }
+
+      // 添加通话消息到界面
+      function addCallMessage(text, sender, preserveActions = false) {
+        const container = document.getElementById("callConversation");
+        const msgDiv = document.createElement("div");
+        msgDiv.className = `call-message ${sender}`;
+
+        if (sender === "ai" && preserveActions) {
+          // 视频通话：【】动作描写用不同样式
+          const html = text.replace(
+            /【([^】]*)】/g,
+            '<span class="action-text">【$1】</span>'
+          );
+          msgDiv.innerHTML = html;
+        } else {
+          msgDiv.textContent = text;
+        }
+
+        container.appendChild(msgDiv);
+        container.scrollTop = container.scrollHeight;
+      }
+
+      // 在通话中朗读文字
+      async function speakInCall(text, voiceId) {
+        if (callState.isAiSpeaking) return;
+        callState.isAiSpeaking = true;
+
+        // 使用和试听一样的配置来源
+        const currentGroupId =
+          (window.voiceConfig && window.voiceConfig.groupId) ||
+          document.getElementById("voiceGroupId")?.value;
+        const currentApiKey =
+          (window.voiceConfig && window.voiceConfig.apiKey) ||
+          document.getElementById("voiceApiKey")?.value;
+
+        if (!currentGroupId || !currentApiKey) {
+          console.error("通话语音: MiniMax配置缺失");
+          callState.isAiSpeaking = false;
+          return;
+        }
+
+        if (!voiceId) {
+          console.error("通话语音: Voice ID缺失");
+          callState.isAiSpeaking = false;
+          return;
+        }
+
+        // 清洗文本 - 移除动作描写
+        let cleanText = text;
+        cleanText = cleanText
+          .replace(/[\(（][^\)）]*[\)）]/g, "")
+          .replace(/\*[^\*]+\*/g, "")
+          .replace(/【[^】]*】/g, "");
+        cleanText = cleanText.replace(/\n/g, "，");
+        cleanText = cleanText
+          .replace(/……/g, "，")
+          .replace(/…/g, "，")
+          .replace(/—/g, "，")
+          .replace(/~/g, "")
+          .replace(/["]/g, "");
+        cleanText = cleanText.replace(
+          /[^\u4e00-\u9fa5a-zA-Z0-9，。！？,.?! ]/g,
+          ""
+        );
+
+        if (cleanText.trim().length < 1) {
+          callState.isAiSpeaking = false;
+          return;
+        }
+
+        console.log("通话语音合成:", {
+          voiceId,
+          textLength: cleanText.length,
+          text: cleanText.substring(0, 50),
+        });
+
+        try {
+          // 检查是否使用国际线路
+          const activeIntlBtn = document.getElementById("voiceUrlIntl");
+          const isIntlSelected =
+            activeIntlBtn && activeIntlBtn.classList.contains("active");
+          const apiUrl = isIntlSelected
+            ? "https://api.minimaxi.chat"
+            : "https://api.minimax.chat";
+
+          const response = await fetch(
+            `${apiUrl}/v1/t2a_v2?GroupId=${currentGroupId}`,
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${currentApiKey}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                model:
+                  (window.voiceConfig && window.voiceConfig.model) ||
+                  "speech-01-turbo",
+                text: cleanText,
+                stream: false,
+                voice_setting: {
+                  voice_id: voiceId,
+                  speed: 1.0,
+                  vol: 1.0,
+                  pitch: 0,
+                },
+                audio_setting: {
+                  sample_rate: 32000,
+                  bitrate: 128000,
+                  format: "mp3",
+                  channel: 1,
+                },
+              }),
+            }
+          );
+
+          if (!response.ok) {
+            console.error("通话语音API错误:", response.status);
+            throw new Error(`HTTP ${response.status}`);
+          }
+
+          const result = await response.json();
+          console.log("通话语音API响应:", result.base_resp);
+
+          if (result.base_resp && result.base_resp.status_code !== 0) {
+            throw new Error(result.base_resp.status_msg);
+          }
+
+          // 处理音频数据 - hex转bytes（和generateSpeech一样）
+          const audioHex = result.data?.audio || result.audio;
+          if (audioHex) {
+            const bytes = new Uint8Array(audioHex.length / 2);
+            for (let i = 0; i < audioHex.length; i += 2) {
+              bytes[i / 2] = parseInt(audioHex.substr(i, 2), 16);
+            }
+            const blob = new Blob([bytes.buffer], { type: "audio/mp3" });
+            const audioUrl = URL.createObjectURL(blob);
+
+            const audio = new Audio(audioUrl);
+            callState.currentAudio = audio;
+
+            audio.onended = () => {
+              callState.isAiSpeaking = false;
+              callState.currentAudio = null;
+              URL.revokeObjectURL(audioUrl);
+            };
+
+            audio.onerror = (e) => {
+              console.error("通话语音播放错误:", e);
+              callState.isAiSpeaking = false;
+              callState.currentAudio = null;
+              URL.revokeObjectURL(audioUrl);
+            };
+
+            await audio.play();
+            return;
+          }
+
+          // 备用：URL处理
+          const audioUrl = result.data?.audio_url || result.audio_url;
+          if (audioUrl) {
+            const audio = new Audio(audioUrl);
+            callState.currentAudio = audio;
+
+            audio.onended = () => {
+              callState.isAiSpeaking = false;
+              callState.currentAudio = null;
+            };
+
+            audio.onerror = (e) => {
+              console.error("通话语音播放错误:", e);
+              callState.isAiSpeaking = false;
+              callState.currentAudio = null;
+            };
+
+            await audio.play();
+            return;
+          }
+
+          console.error("通话语音: 无音频数据");
+          callState.isAiSpeaking = false;
+        } catch (error) {
+          console.error("通话语音合成失败:", error);
+          callState.isAiSpeaking = false;
+        }
+      }
+
+      // AI主动来电
+      function aiInitiateCall(charId, type = "voice") {
+        const settings = chatSettings[charId] || {};
+        if (!settings.aiCallEnabled) return;
+
+        const char = characters.find((c) => c.id === charId);
+        if (!char) return;
+
+        // 显示来电通知
+        callState.charId = charId;
+        callState.type = type;
+        callState.status = "incoming";
+
+        const overlay = document.getElementById("incomingCallOverlay");
+        const avatarImg = document.getElementById("incomingCallAvatarImg");
+        const avatarPlaceholder = document.getElementById(
+          "incomingCallAvatarPlaceholder"
+        );
+
+        if (char.avatar) {
+          avatarImg.src = char.avatar;
+          avatarImg.style.display = "block";
+          avatarPlaceholder.style.display = "none";
+        } else {
+          avatarImg.style.display = "none";
+          avatarPlaceholder.style.display = "block";
+        }
+
+        document.getElementById("incomingCallName").textContent =
+          settings.charNote || char.note || char.name;
+        document.getElementById("incomingCallTypeIcon").textContent =
+          type === "video" ? "📹" : "📞";
+        document.getElementById("incomingCallTypeText").textContent =
+          type === "video" ? "视频通话" : "语音通话";
+
+        overlay.classList.add("active");
+
+        // 30秒后自动取消
+        setTimeout(() => {
+          if (callState.status === "incoming") {
+            declineIncomingCall();
+            addCallRecord("missed");
+          }
+        }, 30000);
+      }
+
+      // 接听来电通知
+      function acceptIncomingCall() {
+        document
+          .getElementById("incomingCallOverlay")
+          .classList.remove("active");
+
+        // 打开通话界面
+        const char = characters.find((c) => c.id === callState.charId);
+        if (!char) return;
+
+        const settings = chatSettings[callState.charId] || {};
+
+        callState.active = true;
+        callState.conversationHistory = [];
+        callState.videoSelfExpanded = false;
+
+        const overlay = document.getElementById("callOverlay");
+        overlay.className = `call-overlay ${callState.type}-call active`;
+
+        const charName = settings.charNote || char.note || char.name;
+
+        const avatarImg = document.getElementById("callAvatarImg");
+        const avatarPlaceholder = document.getElementById(
+          "callAvatarPlaceholder"
+        );
+        if (char.avatar) {
+          avatarImg.src = char.avatar;
+          avatarImg.style.display = "block";
+          avatarPlaceholder.style.display = "none";
+        } else {
+          avatarImg.style.display = "none";
+          avatarPlaceholder.style.display = "block";
+        }
+
+        document.getElementById("callName").textContent = charName;
+        document.getElementById("callConversation").innerHTML = "";
+
+        // 视频通话设置
+        if (callState.type === "video") {
+          document.getElementById("videoCallName").textContent = charName;
+
+          const videoMainImg = document.getElementById("videoMainImg");
+          const videoMainPlaceholder = document.getElementById(
+            "videoMainPlaceholder"
+          );
+          if (settings.videoCallPartnerImage) {
+            videoMainImg.src = settings.videoCallPartnerImage;
+            videoMainImg.style.display = "block";
+            videoMainPlaceholder.style.display = "none";
+          } else {
+            videoMainImg.style.display = "none";
+            videoMainPlaceholder.style.display = "flex";
+            const mainAvatarImg = document.getElementById("videoMainAvatarImg");
+            const mainAvatarPlaceholder = document.getElementById(
+              "videoMainAvatarPlaceholder"
+            );
+            if (char.avatar) {
+              mainAvatarImg.src = char.avatar;
+              mainAvatarImg.style.display = "block";
+              mainAvatarPlaceholder.style.display = "none";
+            }
+            document.getElementById("videoMainName").textContent = charName;
+          }
+
+          const videoSelfImg = document.getElementById("videoSelfImg");
+          const videoSelfPlaceholder = document.getElementById(
+            "videoSelfPlaceholder"
+          );
+          if (settings.videoCallSelfImage) {
+            videoSelfImg.src = settings.videoCallSelfImage;
+            videoSelfImg.style.display = "block";
+            videoSelfPlaceholder.style.display = "none";
+          } else {
+            videoSelfImg.style.display = "none";
+            videoSelfPlaceholder.style.display = "flex";
+          }
+          document.getElementById("videoSelf").classList.remove("expanded");
+        }
+
+        // 显示来电按钮
+        document.getElementById("callCallingBtns").style.display = "none";
+        document.getElementById("callIncomingBtns").style.display = "flex";
+        document.getElementById("callInCallBtns").style.display = "none";
+
+        // 直接进入通话
+        acceptCall();
+
+        // AI说话
+        generateCallResponse("用户接听了你的来电，自然地开始对话");
+      }
+
+      // 拒绝来电通知
+      function declineIncomingCall() {
+        document
+          .getElementById("incomingCallOverlay")
+          .classList.remove("active");
+        callState.status = "idle";
+        callState.charId = null;
+      }
+
       function sendFakeLocation() {
         // 打开位置选择弹窗
-        document.getElementById('locationModal').classList.add('active');
-        document.getElementById('locationNameInput').value = '';
-        document.getElementById('locationAddressInput').value = '';
+        document.getElementById("locationModal").classList.add("active");
+        document.getElementById("locationNameInput").value = "";
+        document.getElementById("locationAddressInput").value = "";
         closeChatPanel();
       }
 
       function closeLocationModal() {
-        document.getElementById('locationModal').classList.remove('active');
+        document.getElementById("locationModal").classList.remove("active");
       }
 
       function confirmSendLocation() {
-        const name = document.getElementById('locationNameInput').value.trim() || '我的位置';
-        const address = document.getElementById('locationAddressInput').value.trim() || '点击查看详情';
-        
+        const name =
+          document.getElementById("locationNameInput").value.trim() ||
+          "我的位置";
+        const address =
+          document.getElementById("locationAddressInput").value.trim() ||
+          "点击查看详情";
+
         const locationHtml = `
           <div class="location-card">
             <div class="location-card-map">
@@ -20500,7 +22487,7 @@
             </div>
           </div>
         `;
-        
+
         sendMediaMessage(locationHtml, "location");
         closeLocationModal();
       }
@@ -20514,8 +22501,10 @@
               <div class="location-card-map-icon">📍</div>
             </div>
             <div class="location-card-info">
-              <div class="location-card-name">${name || 'TA的位置'}</div>
-              <div class="location-card-address">${address || '点击查看详情'}</div>
+              <div class="location-card-name">${name || "TA的位置"}</div>
+              <div class="location-card-address">${
+                address || "点击查看详情"
+              }</div>
             </div>
           </div>
         `;
@@ -20524,130 +22513,148 @@
       /* ==================== 钱包系统 ==================== */
       window.walletData = {
         balance: 0,
-        history: []
+        history: [],
       };
 
       // 初始化钱包数据
       async function initWalletData() {
         try {
-          const saved = await localforage.getItem('walletData');
+          const saved = await localforage.getItem("walletData");
           if (saved) {
             window.walletData = saved;
           }
           updateWalletDisplay();
         } catch (e) {
-          console.error('钱包数据加载失败', e);
+          console.error("钱包数据加载失败", e);
         }
       }
 
       // 保存钱包数据
       async function saveWalletData() {
         try {
-          await localforage.setItem('walletData', window.walletData);
+          await localforage.setItem("walletData", window.walletData);
         } catch (e) {
-          console.error('钱包数据保存失败', e);
+          console.error("钱包数据保存失败", e);
         }
       }
 
       // 更新钱包显示
       function updateWalletDisplay() {
         // 更新钱包页面的余额
-        const balanceEl = document.getElementById('walletBalanceDisplay');
+        const balanceEl = document.getElementById("walletBalanceDisplay");
         if (balanceEl) {
           balanceEl.textContent = window.walletData.balance.toFixed(2);
         }
       }
-      
+
       // 打开钱包页面
       function openWalletPage() {
-        document.getElementById('walletPage').classList.add('active');
+        document.getElementById("walletPage").classList.add("active");
         updateWalletDisplay();
         renderWalletHistoryPage();
       }
-      
+
       // 关闭钱包页面
       function closeWalletPage() {
-        document.getElementById('walletPage').classList.remove('active');
+        document.getElementById("walletPage").classList.remove("active");
       }
-      
+
       // 渲染钱包历史记录
       function renderWalletHistoryPage() {
-        const list = document.getElementById('walletHistoryListPage');
+        const list = document.getElementById("walletHistoryListPage");
         const history = window.walletData.history || [];
-        
+
         if (history.length === 0) {
-          list.innerHTML = '<div class="wallet-history-empty">暂无交易记录</div>';
+          list.innerHTML =
+            '<div class="wallet-history-empty">暂无交易记录</div>';
           return;
         }
-        
-        let html = '';
-        history.slice(0, 50).forEach(item => {
-          const isIncome = item.type === 'recharge' || item.type === 'receive';
+
+        let html = "";
+        history.slice(0, 50).forEach((item) => {
+          const isIncome = item.type === "recharge" || item.type === "receive";
           html += `
             <div class="wallet-history-item">
-              <div class="wallet-history-icon ${isIncome ? 'income' : 'expense'}">
-                ${item.type === 'recharge' ? '💳' : item.type === 'receive' ? '📥' : '📤'}
+              <div class="wallet-history-icon ${
+                isIncome ? "income" : "expense"
+              }">
+                ${
+                  item.type === "recharge"
+                    ? "💳"
+                    : item.type === "receive"
+                    ? "📥"
+                    : "📤"
+                }
               </div>
               <div class="wallet-history-info">
                 <div class="wallet-history-desc">${item.desc}</div>
                 <div class="wallet-history-time">${item.time}</div>
               </div>
-              <div class="wallet-history-amount ${isIncome ? 'income' : 'expense'}">
-                ${isIncome ? '+' : '-'}¥${item.amount.toFixed(2)}
+              <div class="wallet-history-amount ${
+                isIncome ? "income" : "expense"
+              }">
+                ${isIncome ? "+" : "-"}¥${item.amount.toFixed(2)}
               </div>
             </div>
           `;
         });
-        
+
         list.innerHTML = html;
       }
 
       // 打开充值弹窗
       function openRechargeModal() {
-        document.getElementById('rechargeModal').classList.add('active');
-        document.getElementById('rechargeCustomAmount').value = '';
+        document.getElementById("rechargeModal").classList.add("active");
+        document.getElementById("rechargeCustomAmount").value = "";
         // 清除选中状态
-        document.querySelectorAll('.recharge-amount-btn').forEach(btn => {
-          btn.classList.remove('selected');
+        document.querySelectorAll(".recharge-amount-btn").forEach((btn) => {
+          btn.classList.remove("selected");
         });
       }
 
       function closeRechargeModal() {
-        document.getElementById('rechargeModal').classList.remove('active');
+        document.getElementById("rechargeModal").classList.remove("active");
       }
 
       function selectRechargeAmount(amount) {
-        document.getElementById('rechargeCustomAmount').value = amount;
-        document.querySelectorAll('.recharge-amount-btn').forEach(btn => {
-          btn.classList.remove('selected');
+        document.getElementById("rechargeCustomAmount").value = amount;
+        document.querySelectorAll(".recharge-amount-btn").forEach((btn) => {
+          btn.classList.remove("selected");
           if (btn.textContent.includes(amount)) {
-            btn.classList.add('selected');
+            btn.classList.add("selected");
           }
         });
       }
 
       function clearRechargeSelection() {
-        document.querySelectorAll('.recharge-amount-btn').forEach(btn => {
-          btn.classList.remove('selected');
+        document.querySelectorAll(".recharge-amount-btn").forEach((btn) => {
+          btn.classList.remove("selected");
         });
       }
 
       function confirmRecharge() {
-        const amount = parseFloat(document.getElementById('rechargeCustomAmount').value);
+        const amount = parseFloat(
+          document.getElementById("rechargeCustomAmount").value
+        );
         if (!amount || amount <= 0) {
-          showToast('请输入有效金额');
+          showToast("请输入有效金额");
           return;
         }
-        
+
         window.walletData.balance += amount;
         window.walletData.history.unshift({
           id: Date.now(),
-          type: 'recharge',
+          type: "recharge",
           amount: amount,
-          desc: '钱包充值',
-          time: new Date().toLocaleString('zh-CN', {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'})
+          desc: "钱包充值",
+          time: new Date().toLocaleString("zh-CN", {
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
         });
-        
+
         saveWalletData();
         updateWalletDisplay();
         renderWalletHistoryPage(); // 刷新历史列表
@@ -20658,61 +22665,74 @@
       /* ==================== 转账功能 ==================== */
       function openTransferModal() {
         if (!currentChatCharId) {
-          showToast('请先打开一个对话');
+          showToast("请先打开一个对话");
           return;
         }
-        
-        const char = characters.find(c => c.id === currentChatCharId);
+
+        const char = characters.find((c) => c.id === currentChatCharId);
         if (!char) return;
-        
-        document.getElementById('sendTransferModal').classList.add('active');
-        document.getElementById('transferToName').textContent = `转给：${char.name}`;
-        document.getElementById('transferAmountInput').value = '';
-        document.getElementById('transferNoteInput').value = '';
-        document.getElementById('transferBalanceHint').textContent = `可用余额：¥${window.walletData.balance.toFixed(2)}`;
+
+        document.getElementById("sendTransferModal").classList.add("active");
+        document.getElementById(
+          "transferToName"
+        ).textContent = `转给：${char.name}`;
+        document.getElementById("transferAmountInput").value = "";
+        document.getElementById("transferNoteInput").value = "";
+        document.getElementById(
+          "transferBalanceHint"
+        ).textContent = `可用余额：¥${window.walletData.balance.toFixed(2)}`;
         closeChatPanel();
       }
 
       function closeTransferModal() {
-        document.getElementById('sendTransferModal').classList.remove('active');
+        document.getElementById("sendTransferModal").classList.remove("active");
       }
 
       function confirmTransfer() {
-        const amount = parseFloat(document.getElementById('transferAmountInput').value);
-        const note = document.getElementById('transferNoteInput').value.trim() || '转账';
-        
+        const amount = parseFloat(
+          document.getElementById("transferAmountInput").value
+        );
+        const note =
+          document.getElementById("transferNoteInput").value.trim() || "转账";
+
         if (!amount || amount <= 0) {
-          showToast('请输入有效金额');
+          showToast("请输入有效金额");
           return;
         }
-        
+
         if (amount > window.walletData.balance) {
-          showToast('余额不足');
+          showToast("余额不足");
           return;
         }
-        
-        const char = characters.find(c => c.id === currentChatCharId);
+
+        const char = characters.find((c) => c.id === currentChatCharId);
         if (!char) return;
-        
+
         // 扣款
         window.walletData.balance -= amount;
         window.walletData.history.unshift({
           id: Date.now(),
-          type: 'send',
+          type: "send",
           amount: amount,
           desc: `转账给 ${char.name}`,
-          time: new Date().toLocaleString('zh-CN', {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'})
+          time: new Date().toLocaleString("zh-CN", {
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
         });
         saveWalletData();
         updateWalletDisplay();
-        
+
         // 发送转账卡片消息 - 使用特殊格式存储，渲染时会转换
-        const transferId = 'user_tf_' + Date.now();
-        
+        const transferId = "user_tf_" + Date.now();
+
         // 直接存储HTML到消息中
-        if (!chatHistories[currentChatCharId]) chatHistories[currentChatCharId] = [];
+        if (!chatHistories[currentChatCharId])
+          chatHistories[currentChatCharId] = [];
         chatHistories[currentChatCharId].push({
-          role: 'user',
+          role: "user",
           content: `<div class="transfer-card" data-transfer-id="${transferId}" data-status="pending">
             <div class="transfer-card-header">
               <div class="transfer-card-icon">💰</div>
@@ -20729,14 +22749,17 @@
           isHtml: true,
           transferId: transferId,
           transferAmount: amount,
-          transferStatus: 'pending',
-          time: new Date().toLocaleTimeString('zh-CN', {hour: '2-digit', minute: '2-digit'})
+          transferStatus: "pending",
+          time: new Date().toLocaleTimeString("zh-CN", {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
         });
-        
-        localforage.setItem('chatHistories', chatHistories);
+
+        localforage.setItem("chatHistories", chatHistories);
         renderConversation();
         closeTransferModal();
-        
+
         // 不再自动触发AI回复，让用户自己发消息
       }
 
@@ -20745,22 +22768,34 @@
         const history = chatHistories[currentChatCharId] || [];
         for (let i = 0; i < history.length; i++) {
           if (history[i].transferId === transferId) {
-            history[i].transferStatus = accepted ? 'accepted' : 'rejected';
+            history[i].transferStatus = accepted ? "accepted" : "rejected";
             // 更新HTML内容
             history[i].content = history[i].content
-              .replace('data-status="pending"', `data-status="${accepted ? 'accepted' : 'rejected'}"`)
-              .replace('class="transfer-card-status pending">待确认', 
-                       `class="transfer-card-status ${accepted ? 'accepted' : 'rejected'}">${accepted ? '已收款' : '已退回'}`);
-            
+              .replace(
+                'data-status="pending"',
+                `data-status="${accepted ? "accepted" : "rejected"}"`
+              )
+              .replace(
+                'class="transfer-card-status pending">待确认',
+                `class="transfer-card-status ${
+                  accepted ? "accepted" : "rejected"
+                }">${accepted ? "已收款" : "已退回"}`
+              );
+
             if (!accepted) {
               // 退款
               window.walletData.balance += history[i].transferAmount;
               window.walletData.history.unshift({
                 id: Date.now(),
-                type: 'receive',
+                type: "receive",
                 amount: history[i].transferAmount,
-                desc: '转账被退回',
-                time: new Date().toLocaleString('zh-CN', {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'})
+                desc: "转账被退回",
+                time: new Date().toLocaleString("zh-CN", {
+                  month: "2-digit",
+                  day: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                }),
               });
               saveWalletData();
               updateWalletDisplay();
@@ -20768,36 +22803,41 @@
             break;
           }
         }
-        localforage.setItem('chatHistories', chatHistories);
+        localforage.setItem("chatHistories", chatHistories);
         renderConversation();
       }
 
       // AI向用户转账 - 收款/退回
       function acceptAITransfer(msgIdx, amount, btnEl) {
         // 获取角色名字
-        const char = characters.find(c => c.id === currentChatCharId);
-        const charName = char ? char.name : 'TA';
-        
+        const char = characters.find((c) => c.id === currentChatCharId);
+        const charName = char ? char.name : "TA";
+
         // 收款
         window.walletData.balance += parseFloat(amount);
         window.walletData.history.unshift({
           id: Date.now(),
-          type: 'receive',
+          type: "receive",
           amount: parseFloat(amount),
           desc: `收到 ${charName} 的转账`,
-          time: new Date().toLocaleString('zh-CN', {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'})
+          time: new Date().toLocaleString("zh-CN", {
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
         });
         saveWalletData();
         updateWalletDisplay();
-        
+
         // 更新消息状态
         const history = chatHistories[currentChatCharId] || [];
         if (history[msgIdx]) {
-          history[msgIdx].transferStatus = 'accepted';
-          localforage.setItem('chatHistories', chatHistories);
+          history[msgIdx].transferStatus = "accepted";
+          localforage.setItem("chatHistories", chatHistories);
           renderConversation();
         }
-        
+
         showToast(`收款成功！+¥${parseFloat(amount).toFixed(2)}`);
       }
 
@@ -20805,47 +22845,50 @@
         // 更新消息状态
         const history = chatHistories[currentChatCharId] || [];
         if (history[msgIdx]) {
-          history[msgIdx].transferStatus = 'rejected';
-          localforage.setItem('chatHistories', chatHistories);
+          history[msgIdx].transferStatus = "rejected";
+          localforage.setItem("chatHistories", chatHistories);
           renderConversation();
         }
-        
-        showToast('已退回转账');
+
+        showToast("已退回转账");
       }
 
       /* ==================== 重Roll功能 ==================== */
       async function rerollAIReply() {
         if (!currentChatCharId) {
-          showToast('请先打开一个对话');
+          showToast("请先打开一个对话");
           return;
         }
-        
+
         const history = chatHistories[currentChatCharId] || [];
         if (history.length === 0) {
-          showToast('没有可以重新生成的消息');
+          showToast("没有可以重新生成的消息");
           return;
         }
-        
+
         // 从后往前删除所有连续的AI消息（因为即时模式下AI会发多条）
         let deletedCount = 0;
-        while (history.length > 0 && history[history.length - 1].role === 'assistant') {
+        while (
+          history.length > 0 &&
+          history[history.length - 1].role === "assistant"
+        ) {
           history.pop();
           deletedCount++;
         }
-        
+
         if (deletedCount === 0) {
-          showToast('最后一条不是AI消息，无法重roll');
+          showToast("最后一条不是AI消息，无法重roll");
           return;
         }
-        
+
         // 保存并重新渲染
         chatHistories[currentChatCharId] = history;
-        await localforage.setItem('chatHistories', chatHistories);
+        await localforage.setItem("chatHistories", chatHistories);
         renderConversation();
-        
+
         // 关闭面板
         closeChatPanel();
-        
+
         // 重新请求AI回复（不显示提示）
         requestAIReply();
       }
@@ -20854,46 +22897,52 @@
       // 处理AI回复中的特殊标签
       function processAISpecialTags(content) {
         let processed = content;
-        
+
         // 处理转账标签 [转账:金额:说明] 或 [转账:金额]
-        const transferMatch = processed.match(/\[转账[:：](\d+(?:\.\d+)?)(?:[:：]([^\]]*))?\]/);
+        const transferMatch = processed.match(
+          /\[转账[:：](\d+(?:\.\d+)?)(?:[:：]([^\]]*))?\]/
+        );
         if (transferMatch) {
           const amount = transferMatch[1];
-          const note = transferMatch[2] || '转账给你';
-          processed = processed.replace(transferMatch[0], '');
-          return { 
-            text: processed.trim(), 
+          const note = transferMatch[2] || "转账给你";
+          processed = processed.replace(transferMatch[0], "");
+          return {
+            text: processed.trim(),
             specialCard: generateAITransferCard(amount, note),
-            type: 'transfer'
+            type: "transfer",
           };
         }
-        
+
         // 处理位置标签 [位置:名称:地址] 或 [位置:名称]
-        const locationMatch = processed.match(/\[位置[:：]([^\]:：]+)(?:[:：]([^\]]*))?\]/);
+        const locationMatch = processed.match(
+          /\[位置[:：]([^\]:：]+)(?:[:：]([^\]]*))?\]/
+        );
         if (locationMatch) {
           const name = locationMatch[1];
-          const address = locationMatch[2] || '';
-          processed = processed.replace(locationMatch[0], '');
+          const address = locationMatch[2] || "";
+          processed = processed.replace(locationMatch[0], "");
           return {
             text: processed.trim(),
             specialCard: generateAILocationCard(name, address),
-            type: 'location'
+            type: "location",
           };
         }
-        
+
         // 处理红包标签 [红包:金额:说明]
-        const redpacketMatch = processed.match(/\[红包[:：](\d+(?:\.\d+)?)(?:[:：]([^\]]*))?\]/);
+        const redpacketMatch = processed.match(
+          /\[红包[:：](\d+(?:\.\d+)?)(?:[:：]([^\]]*))?\]/
+        );
         if (redpacketMatch) {
           const amount = redpacketMatch[1];
-          const note = redpacketMatch[2] || '恭喜发财';
-          processed = processed.replace(redpacketMatch[0], '');
+          const note = redpacketMatch[2] || "恭喜发财";
+          processed = processed.replace(redpacketMatch[0], "");
           return {
             text: processed.trim(),
             specialCard: generateAITransferCard(amount, note),
-            type: 'redpacket'
+            type: "redpacket",
           };
         }
-        
+
         return { text: processed, specialCard: null, type: null };
       }
 
@@ -25231,7 +27280,6 @@ ${userName}在你的动态下留言了，你需要回复。
         sendRedPacket,
         sendNudge,
         handleCameraAction,
-        startFakeCall,
         sendFakeLocation,
         showFullImage,
         // 位置功能
@@ -25259,6 +27307,23 @@ ${userName}在你的动态下留言了，你需要回复。
         rejectAITransfer,
         // 重Roll功能
         rerollAIReply,
+        // 通话功能
+        startVoiceCall,
+        startVideoCall,
+        endCall,
+        acceptCall,
+        declineCall,
+        toggleMute,
+        toggleSpeaker,
+        saveCallSettings,
+        aiInitiateCall,
+        acceptIncomingCall,
+        declineIncomingCall,
+        sendCallMessage,
+        handleCallInputKeydown,
+        toggleVideoSelf,
+        handleVideoCallImageUpload,
+        clearVideoCallImage,
         // 触摸处理
         handleTouchStart,
         handleTouchMove,
@@ -25510,7 +27575,7 @@ ${userName}在你的动态下留言了，你需要回复。
       <div class="wallet-page-header">
         <button class="wallet-page-back" onclick="closeWalletPage()">‹</button>
         <span>我的钱包</span>
-        <span style="width:30px;"></span>
+        <span style="width: 30px"></span>
       </div>
       <div class="wallet-page-content">
         <div class="wallet-balance-card">
@@ -25533,51 +27598,288 @@ ${userName}在你的动态下留言了，你需要回复。
     </div>
 
     <!-- 充值弹窗 -->
-    <div class="recharge-modal" id="rechargeModal" onclick="if(event.target===this)closeRechargeModal()">
+    <div
+      class="recharge-modal"
+      id="rechargeModal"
+      onclick="if(event.target===this)closeRechargeModal()"
+    >
       <div class="recharge-modal-content">
         <div class="recharge-modal-title">💰 钱包充值</div>
         <div class="recharge-amount-grid">
-          <button class="recharge-amount-btn" onclick="selectRechargeAmount(10)">¥10</button>
-          <button class="recharge-amount-btn" onclick="selectRechargeAmount(50)">¥50</button>
-          <button class="recharge-amount-btn" onclick="selectRechargeAmount(100)">¥100</button>
-          <button class="recharge-amount-btn" onclick="selectRechargeAmount(200)">¥200</button>
-          <button class="recharge-amount-btn" onclick="selectRechargeAmount(500)">¥500</button>
-          <button class="recharge-amount-btn" onclick="selectRechargeAmount(1000)">¥1000</button>
+          <button
+            class="recharge-amount-btn"
+            onclick="selectRechargeAmount(10)"
+          >
+            ¥10
+          </button>
+          <button
+            class="recharge-amount-btn"
+            onclick="selectRechargeAmount(50)"
+          >
+            ¥50
+          </button>
+          <button
+            class="recharge-amount-btn"
+            onclick="selectRechargeAmount(100)"
+          >
+            ¥100
+          </button>
+          <button
+            class="recharge-amount-btn"
+            onclick="selectRechargeAmount(200)"
+          >
+            ¥200
+          </button>
+          <button
+            class="recharge-amount-btn"
+            onclick="selectRechargeAmount(500)"
+          >
+            ¥500
+          </button>
+          <button
+            class="recharge-amount-btn"
+            onclick="selectRechargeAmount(1000)"
+          >
+            ¥1000
+          </button>
         </div>
-        <input type="number" class="recharge-custom-input" id="rechargeCustomAmount" placeholder="自定义金额" oninput="clearRechargeSelection()">
+        <input
+          type="number"
+          class="recharge-custom-input"
+          id="rechargeCustomAmount"
+          placeholder="自定义金额"
+          oninput="clearRechargeSelection()"
+        />
         <div class="recharge-modal-btns">
-          <button class="recharge-modal-btn cancel" onclick="closeRechargeModal()">取消</button>
-          <button class="recharge-modal-btn confirm" onclick="confirmRecharge()">确认充值</button>
+          <button
+            class="recharge-modal-btn cancel"
+            onclick="closeRechargeModal()"
+          >
+            取消
+          </button>
+          <button
+            class="recharge-modal-btn confirm"
+            onclick="confirmRecharge()"
+          >
+            确认充值
+          </button>
         </div>
       </div>
     </div>
 
     <!-- 转账弹窗 -->
-    <div class="send-transfer-modal" id="sendTransferModal" onclick="if(event.target===this)closeTransferModal()">
+    <div
+      class="send-transfer-modal"
+      id="sendTransferModal"
+      onclick="if(event.target===this)closeTransferModal()"
+    >
       <div class="send-transfer-modal-content">
         <div class="send-transfer-title">💸 转账给TA</div>
         <div class="send-transfer-to" id="transferToName">转给：角色名</div>
-        <input type="number" class="send-transfer-input" id="transferAmountInput" placeholder="0.00">
-        <div class="send-transfer-balance" id="transferBalanceHint">可用余额：¥0.00</div>
-        <input type="text" class="send-transfer-note-input" id="transferNoteInput" placeholder="添加转账说明（可选）">
+        <input
+          type="number"
+          class="send-transfer-input"
+          id="transferAmountInput"
+          placeholder="0.00"
+        />
+        <div class="send-transfer-balance" id="transferBalanceHint">
+          可用余额：¥0.00
+        </div>
+        <input
+          type="text"
+          class="send-transfer-note-input"
+          id="transferNoteInput"
+          placeholder="添加转账说明（可选）"
+        />
         <div class="recharge-modal-btns">
-          <button class="recharge-modal-btn cancel" onclick="closeTransferModal()">取消</button>
-          <button class="recharge-modal-btn confirm" onclick="confirmTransfer()">确认转账</button>
+          <button
+            class="recharge-modal-btn cancel"
+            onclick="closeTransferModal()"
+          >
+            取消
+          </button>
+          <button
+            class="recharge-modal-btn confirm"
+            onclick="confirmTransfer()"
+          >
+            确认转账
+          </button>
         </div>
       </div>
     </div>
 
     <!-- 位置选择弹窗 -->
-    <div class="send-transfer-modal" id="locationModal" onclick="if(event.target===this)closeLocationModal()">
+    <div
+      class="send-transfer-modal"
+      id="locationModal"
+      onclick="if(event.target===this)closeLocationModal()"
+    >
       <div class="send-transfer-modal-content">
         <div class="send-transfer-title">📍 发送位置</div>
-        <div style="margin-bottom:16px;">
-          <input type="text" class="send-transfer-note-input" id="locationNameInput" placeholder="位置名称，如：星巴克咖啡" style="margin-bottom:8px;">
-          <input type="text" class="send-transfer-note-input" id="locationAddressInput" placeholder="详细地址（可选）">
+        <div style="margin-bottom: 16px">
+          <input
+            type="text"
+            class="send-transfer-note-input"
+            id="locationNameInput"
+            placeholder="位置名称，如：星巴克咖啡"
+            style="margin-bottom: 8px"
+          />
+          <input
+            type="text"
+            class="send-transfer-note-input"
+            id="locationAddressInput"
+            placeholder="详细地址（可选）"
+          />
         </div>
         <div class="recharge-modal-btns">
-          <button class="recharge-modal-btn cancel" onclick="closeLocationModal()">取消</button>
-          <button class="recharge-modal-btn confirm" onclick="confirmSendLocation()">发送位置</button>
+          <button
+            class="recharge-modal-btn cancel"
+            onclick="closeLocationModal()"
+          >
+            取消
+          </button>
+          <button
+            class="recharge-modal-btn confirm"
+            onclick="confirmSendLocation()"
+          >
+            发送位置
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 通话界面 -->
+    <div class="call-overlay voice-call" id="callOverlay">
+      <!-- 视频通话 - 对方画面（全屏） -->
+      <div class="video-main" id="videoMain" onclick="toggleVideoSelf()">
+        <img id="videoMainImg" src="" style="display: none" />
+        <div class="video-main-placeholder" id="videoMainPlaceholder">
+          <div class="avatar-large">
+            <span id="videoMainAvatarPlaceholder">🤖</span>
+            <img id="videoMainAvatarImg" src="" style="display: none" />
+          </div>
+          <span id="videoMainName">等待接通...</span>
+        </div>
+      </div>
+
+      <!-- 视频通话顶部信息 -->
+      <div class="video-call-header">
+        <div class="video-call-info">
+          <span class="video-call-name" id="videoCallName">角色名</span>
+          <span class="video-call-timer" id="videoCallTimer">00:00</span>
+        </div>
+      </div>
+
+      <!-- 视频通话 - 我的画面（小窗口，可点击切换） -->
+      <div class="video-self" id="videoSelf" onclick="toggleVideoSelf()">
+        <img id="videoSelfImg" src="" style="display: none" />
+        <div class="video-self-placeholder" id="videoSelfPlaceholder">我</div>
+      </div>
+
+      <!-- 语音通话头像区域 -->
+      <div class="call-avatar-section" id="callAvatarSection">
+        <div class="call-avatar" id="callAvatar">
+          <span id="callAvatarPlaceholder">🤖</span>
+          <img id="callAvatarImg" src="" style="display: none" />
+        </div>
+        <div class="call-name" id="callName">角色名</div>
+        <div class="call-status" id="callStatus">正在呼叫...</div>
+        <div class="call-timer" id="callTimer" style="display: none">00:00</div>
+      </div>
+
+      <!-- 对话区域 -->
+      <div class="call-conversation" id="callConversation"></div>
+
+      <!-- 输入区域 -->
+      <div class="call-input-area" id="callInputArea">
+        <div class="call-input-row">
+          <textarea
+            class="call-input"
+            id="callInput"
+            placeholder="说点什么..."
+            rows="1"
+            onkeydown="handleCallInputKeydown(event)"
+          ></textarea>
+          <button class="call-send-btn" onclick="sendCallMessage()">➤</button>
+        </div>
+      </div>
+
+      <!-- 按钮区域 -->
+      <div class="call-buttons-area">
+        <!-- 呼叫中的按钮 -->
+        <div class="call-buttons" id="callCallingBtns">
+          <button class="call-btn end-call" onclick="endCall()">📞</button>
+        </div>
+
+        <!-- 来电的按钮 -->
+        <div
+          class="call-incoming-buttons"
+          id="callIncomingBtns"
+          style="display: none"
+        >
+          <button class="call-btn end-call" onclick="declineCall()">📞</button>
+          <button class="call-btn accept-call" onclick="acceptCall()">
+            📞
+          </button>
+        </div>
+
+        <!-- 通话中的按钮 -->
+        <div class="call-buttons" id="callInCallBtns" style="display: none">
+          <button class="call-btn mute-btn" id="muteBtn" onclick="toggleMute()">
+            🎤
+          </button>
+          <button class="call-btn end-call" onclick="endCall()">📞</button>
+          <button
+            class="call-btn speaker-btn"
+            id="speakerBtn"
+            onclick="toggleSpeaker()"
+          >
+            🔊
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 来电全屏界面 -->
+    <div class="incoming-call-overlay" id="incomingCallOverlay">
+      <div class="incoming-call-top">
+        <div class="incoming-call-label">来电</div>
+        <div class="incoming-call-avatar-wrap">
+          <div class="incoming-call-ring"></div>
+          <div class="incoming-call-ring"></div>
+          <div class="incoming-call-ring"></div>
+          <div class="incoming-call-avatar" id="incomingCallAvatar">
+            <span id="incomingCallAvatarPlaceholder">🤖</span>
+            <img id="incomingCallAvatarImg" src="" style="display: none" />
+          </div>
+        </div>
+        <div class="incoming-call-name" id="incomingCallName">角色名</div>
+        <div class="incoming-call-type" id="incomingCallType">
+          <span class="incoming-call-type-icon" id="incomingCallTypeIcon"
+            >📞</span
+          >
+          <span id="incomingCallTypeText">语音通话</span>
+        </div>
+      </div>
+
+      <div class="incoming-call-actions">
+        <div class="incoming-call-btn-wrap">
+          <button
+            class="incoming-call-btn decline"
+            onclick="declineIncomingCall()"
+          >
+            📞
+          </button>
+          <span class="incoming-call-btn-label">拒绝</span>
+        </div>
+        <div class="incoming-call-btn-wrap">
+          <button
+            class="incoming-call-btn accept"
+            onclick="acceptIncomingCall()"
+          >
+            📞
+          </button>
+          <span class="incoming-call-btn-label">接听</span>
         </div>
       </div>
     </div>
