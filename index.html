@@ -21,7 +21,7 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Satisfy&display=swap"
       rel="stylesheet"
     />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js?v=1.9"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js?v=1.7"></script>
     <style>
       * {
         margin: 0;
@@ -268,7 +268,7 @@
       }
 
       .profile-location::before {
-        content: "📍";
+        content: "○";
         font-size: 0.75rem;
       }
 
@@ -886,7 +886,15 @@
       .empty-icon {
         font-size: 48px;
         margin-bottom: 16px;
-        opacity: 0.8;
+        opacity: 0.6;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .empty-icon svg {
+        stroke: var(--text-secondary);
       }
 
       .empty-text {
@@ -1268,7 +1276,7 @@
         animation: floatBg 15s ease-in-out infinite;
       }
       .ig-post-text-img::after {
-        content: "✨";
+        content: "★";
         position: absolute;
         font-size: 3rem;
         opacity: 0.15;
@@ -1995,6 +2003,13 @@
       .ig-empty-icon {
         font-size: 4rem;
         margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #8e8e8e;
+      }
+      .ig-empty-icon svg {
+        stroke: #b0bec5;
       }
       .ig-empty-title {
         font-size: 1.2rem;
@@ -2337,10 +2352,10 @@
         gap: 8px;
       }
       .todo-cute-title-text::before {
-        content: "🎀";
+        content: "♡";
       }
       .todo-cute-title-text::after {
-        content: "🎀";
+        content: "♡";
       }
 
       /* 夹板容器 */
@@ -2715,13 +2730,13 @@
         overflow: hidden;
       }
       .todo-add-btn::before {
-        content: "✨";
+        content: "★";
         position: absolute;
         left: 20px;
         animation: sparkle 2s infinite;
       }
       .todo-add-btn::after {
-        content: "✨";
+        content: "★";
         position: absolute;
         right: 20px;
         animation: sparkle 2s infinite 0.5s;
@@ -3355,6 +3370,13 @@
         font-size: 2.5rem;
         margin-bottom: 10px;
         animation: float 3s ease-in-out infinite;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #c9879f;
+      }
+      .todo-empty-icon svg {
+        stroke: #c9879f;
       }
       @keyframes float {
         0%, 100% { transform: translateY(0); }
@@ -3603,6 +3625,15 @@
 
       .menu-icon {
         font-size: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        color: var(--accent-pink);
+      }
+
+      .menu-icon svg {
+        stroke: var(--accent-pink);
       }
 
       .menu-text {
@@ -3661,10 +3692,22 @@
         font-size: 20px;
         opacity: 0.5;
         transition: opacity 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-secondary);
+      }
+
+      .tab-icon svg {
+        stroke: var(--text-secondary);
       }
 
       .chat-tab.active .tab-icon {
         opacity: 1;
+      }
+
+      .chat-tab.active .tab-icon svg {
+        stroke: var(--accent-pink);
       }
 
       .tab-label {
@@ -3780,7 +3823,7 @@
       }
 
       .notification-name::after {
-        content: '💕';
+        content: '♡';
         font-size: 12px;
       }
 
@@ -4548,6 +4591,14 @@
       .conv-empty-icon {
         font-size: 48px;
         margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-secondary);
+      }
+
+      .conv-empty-icon svg {
+        stroke: var(--text-hint);
       }
 
       .conv-empty-text {
@@ -4822,7 +4873,7 @@
       }
 
       .settings-header-title::before {
-        content: "⚙️";
+        content: "○";
         font-size: 1.1rem;
       }
 
@@ -6593,55 +6644,62 @@
       }
 
       .panel-icon-box {
-        width: 56px;
-        height: 56px;
-        border-radius: 16px;
-        background: white;
+        width: 54px;
+        height: 54px;
+        border-radius: 50%;
+        background: #6b9ac4;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 24px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 2px 10px rgba(107, 154, 196, 0.25);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
       }
 
-      /* 图标背景色 */
+      .panel-item:active .panel-icon-box {
+        transform: scale(0.95);
+      }
+
+      /* 图标背景色 - 简约圆形风格 */
       .bg-photo {
-        background: #f5f5f5;
+        background: #78a5c8;
+        color: #fff;
       }
       .bg-camera {
-        background: #f5f5f5;
+        background: #7eb8d8;
+        color: #fff;
       }
       .bg-redpacket {
-        background: #ffebee;
-        color: #ff5252;
+        background: #e88a8a;
+        color: #fff;
       }
       .bg-call {
-        background: #fff3e0;
-        color: #ff9800;
+        background: #7ec4b8;
+        color: #fff;
       }
       .bg-video {
-        background: #e8f5e9;
-        color: #4caf50;
+        background: #9bc88e;
+        color: #fff;
       }
       .bg-location {
-        background: #e3f2fd;
-        color: #2196f3;
+        background: #6baed6;
+        color: #fff;
       }
       .bg-nudge {
-        background: #fce4ec;
-        color: #f48fb1;
+        background: #d4a5c9;
+        color: #fff;
       }
       .bg-book {
-        background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
-        color: #4caf50;
+        background: #8fc49b;
+        color: #fff;
       }
       .bg-transfer {
-        background: linear-gradient(135deg, #fff0f5, #ffe4ec);
-        color: #e91e63;
+        background: #e8a4b8;
+        color: #fff;
       }
       .bg-reroll {
-        background: linear-gradient(135deg, #e8eaf6, #c5cae9);
-        color: #5c6bc0;
+        background: #a8b4d4;
+        color: #fff;
       }
 
       .panel-label {
@@ -9557,6 +9615,14 @@
       .worldbook-empty-icon {
         font-size: 64px;
         margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #c2185b;
+      }
+
+      .worldbook-empty-icon svg {
+        stroke: #c2185b;
       }
 
       .worldbook-empty-title {
@@ -10371,6 +10437,14 @@
         font-size: 48px;
         margin-bottom: 16px;
         opacity: 0.5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--accent-pink);
+      }
+
+      .preset-empty-icon svg {
+        stroke: var(--accent-pink);
       }
 
       .preset-empty-text {
@@ -10934,7 +11008,20 @@
             onclick="document.getElementById('avatarInput').click()"
           >
             <div class="profile-avatar-inner">
-              <span id="avatarPlaceholder">🐰</span>
+              <span id="avatarPlaceholder"
+                ><svg
+                  width="28"
+                  height="28"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#f48fb1"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle></svg
+              ></span>
               <img id="avatarImg" src="" alt="" style="display: none" />
             </div>
           </div>
@@ -10966,7 +11053,7 @@
               id="profileBio"
               onclick="openEditModal('bio')"
             >
-              点击编辑你的个性签名 ✨
+              点击编辑你的个性签名 ★
             </div>
           </div>
         </div>
@@ -11005,7 +11092,7 @@
             id="chatHeaderBtn"
             onclick="handleHeaderBtn()"
           >
-            ➕
+            +
           </button>
         </div>
 
@@ -11015,7 +11102,20 @@
           <div class="chat-tab-content active" id="messagesTab">
             <!-- Search bar -->
             <div class="search-bar">
-              <span class="search-icon">🔍</span>
+              <span class="search-icon"
+                ><svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg
+              ></span>
               <input
                 type="text"
                 placeholder="搜索聊天记录"
@@ -11032,7 +11132,22 @@
             <div class="message-list" id="messageList">
               <!-- Empty state -->
               <div class="empty-state" id="emptyMessages">
-                <div class="empty-icon">💭</div>
+                <div class="empty-icon">
+                  <svg
+                    width="48"
+                    height="48"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path
+                      d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                    ></path>
+                  </svg>
+                </div>
                 <div class="empty-text">还没有消息哦</div>
                 <div class="empty-hint">添加AI角色开始聊天吧～</div>
               </div>
@@ -11048,7 +11163,22 @@
                 <div class="ig-story-item" onclick="openPostModal()">
                   <div class="ig-story-ring my-story">
                     <div class="ig-story-avatar" id="myStoryAvatar">
-                      <span class="ig-story-avatar-emoji">🐰</span>
+                      <span class="ig-story-avatar-emoji"
+                        ><svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="#f48fb1"
+                          stroke-width="1.8"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <path
+                            d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"
+                          ></path>
+                          <circle cx="12" cy="7" r="4"></circle></svg
+                      ></span>
                     </div>
                     <div class="ig-story-add">+</div>
                   </div>
@@ -11061,7 +11191,29 @@
             <!-- 动态列表 -->
             <div class="ig-feed" id="igFeed">
               <div class="ig-empty-state" id="igEmptyState">
-                <div class="ig-empty-icon">📷</div>
+                <div class="ig-empty-icon">
+                  <svg
+                    width="48"
+                    height="48"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <rect
+                      x="3"
+                      y="3"
+                      width="18"
+                      height="18"
+                      rx="2"
+                      ry="2"
+                    ></rect>
+                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                    <polyline points="21 15 16 10 5 21"></polyline>
+                  </svg>
+                </div>
                 <div class="ig-empty-title">分享你的精彩瞬间</div>
                 <div class="ig-empty-text">点击右下角按钮发布第一条动态吧~</div>
               </div>
@@ -11107,7 +11259,28 @@
                     onclick="selectImageOption('album')"
                     id="imgOptionAlbum"
                   >
-                    <span class="ig-image-option-icon">🖼️</span>
+                    <span class="ig-image-option-icon"
+                      ><svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <rect
+                          x="3"
+                          y="3"
+                          width="18"
+                          height="18"
+                          rx="2"
+                          ry="2"
+                        ></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline></svg
+                    ></span>
                     <span class="ig-image-option-text">从相册选择</span>
                   </div>
                   <div
@@ -11115,7 +11288,24 @@
                     onclick="selectImageOption('text')"
                     id="imgOptionText"
                   >
-                    <span class="ig-image-option-icon">🎨</span>
+                    <span class="ig-image-option-icon"
+                      ><svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M12 19l7-7 3 3-7 7-3-3z"></path>
+                        <path
+                          d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"
+                        ></path>
+                        <path d="M2 2l7.586 7.586"></path>
+                        <circle cx="11" cy="11" r="2"></circle></svg
+                    ></span>
                     <span class="ig-image-option-text">文字配图</span>
                   </div>
                 </div>
@@ -11136,13 +11326,43 @@
                 <div class="ig-image-preview" id="igImagePreview">
                   <img id="igPreviewImg" src="" alt="" />
                   <span class="ig-image-preview-remove" onclick="removeImage()"
-                    >❌ 移除图片</span
+                    ><svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                    移除图片</span
                   >
                 </div>
 
                 <!-- 可见范围选择 -->
                 <div class="ig-visibility-section">
-                  <div class="ig-visibility-label">👁️ 谁可以看</div>
+                  <div class="ig-visibility-label">
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path
+                        d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+                      ></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                    谁可以看
+                  </div>
                   <div class="ig-visibility-options" id="visibilityOptions">
                     <div
                       class="ig-visibility-option selected"
@@ -11177,7 +11397,7 @@
               <div class="ig-profile-modal-body">
                 <div class="ig-profile-avatar-edit">
                   <div class="ig-profile-avatar-preview" id="igAvatarPreview">
-                    🐰
+                    A
                   </div>
                   <div class="ig-profile-avatar-btns">
                     <button
@@ -11294,7 +11514,22 @@
           >
             <div class="ig-post-menu-content">
               <div class="ig-post-menu-item" onclick="deletePost()">
-                <span class="ig-post-menu-icon">🗑️</span>
+                <span class="ig-post-menu-icon"
+                  ><svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path
+                      d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                    ></path></svg
+                ></span>
                 <span>删除动态</span>
               </div>
               <div class="ig-post-menu-cancel" onclick="closePostMenu()">
@@ -11330,7 +11565,7 @@
                     </div>
                     <div class="todo-greeting-box">
                       <div class="todo-greeting-text" id="todoGreeting">
-                        今天也要加油鸭！🦆
+                        今天也要加油鸭！
                       </div>
                       <div class="todo-greeting-sub" id="todoGreetingSub">
                         新的一天，新的开始~
@@ -11366,13 +11601,44 @@
 
                   <!-- 添加按钮 -->
                   <button class="todo-add-btn" onclick="openTodoModal()">
-                    <span>✏️</span> 添加新待办
+                    <span
+                      ><svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M12 20h9"></path>
+                        <path
+                          d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"
+                        ></path></svg
+                    ></span>
+                    添加新待办
                   </button>
 
                   <!-- 监督区域 -->
                   <div class="todo-ai-section">
                     <div class="todo-ai-header">
-                      <div class="todo-ai-icon">💝</div>
+                      <div class="todo-ai-icon">
+                        <svg
+                          width="22"
+                          height="22"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="#e91e63"
+                          stroke-width="1.8"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <path
+                            d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                          ></path>
+                        </svg>
+                      </div>
                       <div>
                         <div class="todo-ai-title">督促小助手</div>
                         <div class="todo-ai-subtitle">选择谁来陪伴督促你~</div>
@@ -11390,11 +11656,23 @@
             <div class="period-tracker-section">
               <div class="period-card">
                 <div class="period-header">
-                  <div class="period-icon">🌸</div>
+                  <div class="period-icon">
+                    <svg
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#f48fb1"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <path d="M12 6v6l4 2"></path>
+                    </svg>
+                  </div>
                   <div class="period-title-area">
-                    <div class="period-title">
-                      生理期记录 <span style="font-size: 0.7rem">💕</span>
-                    </div>
+                    <div class="period-title">生理期记录</div>
                     <div class="period-subtitle">记录周期，TA们会更懂你~</div>
                   </div>
                 </div>
@@ -11443,7 +11721,23 @@
 
                 <!-- 小贴士 -->
                 <div class="period-tips">
-                  <div class="period-tips-title">💡 温馨提示</div>
+                  <div class="period-tips-title">
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      style="vertical-align: middle; margin-right: 4px"
+                    >
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="12" y1="16" x2="12" y2="12"></line>
+                      <line x1="12" y1="8" x2="12.01" y2="8"></line></svg
+                    >温馨提示
+                  </div>
                   <div class="period-tips-content" id="periodTipsContent">
                     设置经期信息后，TA们会在特殊时期给你更多关心和温暖哦~
                   </div>
@@ -11455,13 +11749,49 @@
                     class="period-action-btn secondary"
                     onclick="openPeriodModal()"
                   >
-                    ⚙️ 设置
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      style="vertical-align: middle; margin-right: 2px"
+                    >
+                      <circle cx="12" cy="12" r="3"></circle>
+                      <path
+                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
+                      ></path>
+                    </svg>
+                    设置
                   </button>
                   <button
                     class="period-action-btn primary"
                     onclick="recordPeriodStart()"
                   >
-                    🩸 记录来了
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      style="vertical-align: middle; margin-right: 2px"
+                    >
+                      <path d="M12 2v4"></path>
+                      <path d="M12 18v4"></path>
+                      <path d="M4.93 4.93l2.83 2.83"></path>
+                      <path d="M16.24 16.24l2.83 2.83"></path>
+                      <path d="M2 12h4"></path>
+                      <path d="M18 12h4"></path>
+                      <path d="M4.93 19.07l2.83-2.83"></path>
+                      <path d="M16.24 7.76l2.83-2.83"></path>
+                    </svg>
+                    记录来了
                   </button>
                 </div>
               </div>
@@ -11476,7 +11806,24 @@
           >
             <div class="todo-modal">
               <div class="todo-modal-header">
-                <div class="todo-modal-title">✏️ 添加待办</div>
+                <div class="todo-modal-title">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    style="vertical-align: middle; margin-right: 4px"
+                  >
+                    <path d="M12 20h9"></path>
+                    <path
+                      d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"
+                    ></path></svg
+                  >添加待办
+                </div>
                 <button class="todo-modal-close" onclick="closeTodoModal()">
                   ✕
                 </button>
@@ -11515,7 +11862,24 @@
           >
             <div class="todo-settings-modal">
               <div class="todo-modal-header">
-                <div class="todo-modal-title">⚙️ 待办设置</div>
+                <div class="todo-modal-title">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    style="vertical-align: middle; margin-right: 4px"
+                  >
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path
+                      d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
+                    ></path></svg
+                  >待办设置
+                </div>
                 <button
                   class="todo-modal-close"
                   onclick="closeTodoSettingsModal()"
@@ -11526,7 +11890,24 @@
               <div class="todo-modal-body">
                 <!-- 标题设置 -->
                 <div class="todo-input-group">
-                  <label class="todo-input-label">📝 页面标题</label>
+                  <label class="todo-input-label"
+                    ><svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      style="vertical-align: middle; margin-right: 4px"
+                    >
+                      <path d="M12 20h9"></path>
+                      <path
+                        d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"
+                      ></path></svg
+                    >页面标题</label
+                  >
                   <input
                     type="text"
                     class="todo-input"
@@ -11538,10 +11919,26 @@
 
                 <!-- 问候语设置 -->
                 <div class="todo-input-group">
-                  <label class="todo-input-label">💬 自定义问候语</label>
+                  <label class="todo-input-label"
+                    ><svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      style="vertical-align: middle; margin-right: 4px"
+                    >
+                      <path
+                        d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                      ></path></svg
+                    >自定义问候语</label
+                  >
                   <div class="greeting-preview">
                     <div class="greeting-preview-main" id="greetingPreviewMain">
-                      今天也要加油鸭！🦆
+                      今天也要加油鸭！
                     </div>
                     <div class="greeting-preview-sub" id="greetingPreviewSub">
                       新的一天，新的开始~
@@ -11575,7 +11972,24 @@
 
                 <!-- 分类管理 -->
                 <div class="todo-input-group">
-                  <label class="todo-input-label">🏷️ 管理分类</label>
+                  <label class="todo-input-label"
+                    ><svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      style="vertical-align: middle; margin-right: 4px"
+                    >
+                      <path
+                        d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"
+                      ></path>
+                      <line x1="7" y1="7" x2="7.01" y2="7"></line></svg
+                    >管理分类</label
+                  >
                   <div class="todo-category-list" id="todoCategoryList">
                     <!-- 动态渲染 -->
                   </div>
@@ -11620,19 +12034,76 @@
           >
             <div class="period-modal">
               <div class="period-modal-header">
-                <div class="period-modal-title">🌸 经期设置</div>
+                <div class="period-modal-title">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    style="vertical-align: middle; margin-right: 4px"
+                  >
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M12 6v6l4 2"></path></svg
+                  >经期设置
+                </div>
                 <button class="period-modal-close" onclick="closePeriodModal()">
                   ✕
                 </button>
               </div>
               <div class="period-modal-body">
                 <div class="period-input-group">
-                  <label class="period-input-label">📅 上次经期开始日期</label>
+                  <label class="period-input-label"
+                    ><svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      style="vertical-align: middle; margin-right: 4px"
+                    >
+                      <rect
+                        x="3"
+                        y="4"
+                        width="18"
+                        height="18"
+                        rx="2"
+                        ry="2"
+                      ></rect>
+                      <line x1="16" y1="2" x2="16" y2="6"></line>
+                      <line x1="8" y1="2" x2="8" y2="6"></line>
+                      <line x1="3" y1="10" x2="21" y2="10"></line></svg
+                    >上次经期开始日期</label
+                  >
                   <input type="date" class="period-input" id="periodLastDate" />
                   <div class="period-hint">选择你上次月经第一天的日期</div>
                 </div>
                 <div class="period-input-group">
-                  <label class="period-input-label">🔄 平均周期天数</label>
+                  <label class="period-input-label"
+                    ><svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      style="vertical-align: middle; margin-right: 4px"
+                    >
+                      <polyline points="23 4 23 10 17 10"></polyline>
+                      <polyline points="1 20 1 14 7 14"></polyline>
+                      <path
+                        d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"
+                      ></path></svg
+                    >平均周期天数</label
+                  >
                   <input
                     type="number"
                     class="period-input"
@@ -11644,7 +12115,22 @@
                   <div class="period-hint">一般为21-35天，平均28天</div>
                 </div>
                 <div class="period-input-group">
-                  <label class="period-input-label">⏱️ 平均经期天数</label>
+                  <label class="period-input-label"
+                    ><svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      style="vertical-align: middle; margin-right: 4px"
+                    >
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <polyline points="12 6 12 12 16 14"></polyline></svg
+                    >平均经期天数</label
+                  >
                   <input
                     type="number"
                     class="period-input"
@@ -11669,7 +12155,21 @@
             <!-- Profile Header -->
             <div class="profile-header-card">
               <div class="profile-main">
-                <div class="profile-avatar-large">🐰</div>
+                <div class="profile-avatar-large">
+                  <svg
+                    width="32"
+                    height="32"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#f48fb1"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                  </svg>
+                </div>
                 <div class="profile-info-main">
                   <div class="profile-name-large">我的昵称</div>
                   <div class="profile-id">SillyTavern ID: ST_12345</div>
@@ -11681,22 +12181,91 @@
             <!-- Profile Menu -->
             <div class="profile-menu">
               <div class="menu-item" onclick="openWalletPage()">
-                <span class="menu-icon">💰</span>
+                <span class="menu-icon"
+                  ><svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <rect
+                      x="1"
+                      y="4"
+                      width="22"
+                      height="16"
+                      rx="2"
+                      ry="2"
+                    ></rect>
+                    <line x1="1" y1="10" x2="23" y2="10"></line></svg
+                ></span>
                 <span class="menu-text">我的钱包</span>
                 <span class="menu-arrow">›</span>
               </div>
               <div class="menu-item">
-                <span class="menu-icon">⭐</span>
+                <span class="menu-icon"
+                  ><svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <polygon
+                      points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                    ></polygon></svg
+                ></span>
                 <span class="menu-text">我的收藏</span>
                 <span class="menu-arrow">›</span>
               </div>
               <div class="menu-item">
-                <span class="menu-icon">📷</span>
+                <span class="menu-icon"
+                  ><svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <rect
+                      x="3"
+                      y="3"
+                      width="18"
+                      height="18"
+                      rx="2"
+                      ry="2"
+                    ></rect>
+                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                    <polyline points="21 15 16 10 5 21"></polyline></svg
+                ></span>
                 <span class="menu-text">我的相册</span>
                 <span class="menu-arrow">›</span>
               </div>
               <div class="menu-item">
-                <span class="menu-icon">🎴</span>
+                <span class="menu-icon"
+                  ><svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                    <path d="M3 9h18"></path>
+                    <path d="M9 21V9"></path></svg
+                ></span>
                 <span class="menu-text">我的卡片</span>
                 <span class="menu-arrow">›</span>
               </div>
@@ -11707,25 +12276,82 @@
         <!-- Chat App Bottom Tab Bar -->
         <div class="chat-tab-bar">
           <div class="chat-tab active" onclick="switchChatTab('messages')">
-            <span class="tab-icon">💬</span>
+            <span class="tab-icon"
+              ><svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                ></path></svg
+            ></span>
             <span class="tab-badge" id="messagesBadge" style="display: none"
               >0</span
             >
             <span class="tab-label">Message</span>
           </div>
           <div class="chat-tab" onclick="switchChatTab('moments')">
-            <span class="tab-icon">🌟</span>
+            <span class="tab-icon"
+              ><svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                <line x1="15" y1="9" x2="15.01" y2="9"></line></svg
+            ></span>
             <span class="tab-badge" id="momentsBadge" style="display: none"
               >0</span
             >
             <span class="tab-label">Moment</span>
           </div>
           <div class="chat-tab" onclick="switchChatTab('todo')">
-            <span class="tab-icon">📋</span>
+            <span class="tab-icon"
+              ><svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M9 11l3 3L22 4"></path>
+                <path
+                  d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"
+                ></path></svg
+            ></span>
             <span class="tab-label">To Do</span>
           </div>
           <div class="chat-tab" onclick="switchChatTab('profile')">
-            <span class="tab-icon">👤</span>
+            <span class="tab-icon"
+              ><svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle></svg
+            ></span>
             <span class="tab-label">Me</span>
           </div>
         </div>
@@ -11737,17 +12363,59 @@
           <button class="preset-back-btn" onclick="closePage('presetPage')">
             ←
           </button>
-          <span class="preset-title">📝 预设管理</span>
+          <span class="preset-title"
+            ><svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              style="vertical-align: middle; margin-right: 4px"
+            >
+              <path d="M12 20h9"></path>
+              <path
+                d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"
+              ></path></svg
+            >预设管理</span
+          >
           <div style="display: flex; gap: 8px">
             <button
               class="preset-header-btn"
               onclick="openPresetImportModal()"
               style="background: linear-gradient(135deg, #81d4fa, #4fc3f7)"
             >
-              📥
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
             </button>
             <button class="preset-header-btn" onclick="openPresetModal()">
-              ➕
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
             </button>
           </div>
         </div>
@@ -11782,7 +12450,23 @@
             class="preset-batch-btn delete"
             onclick="deleteSelectedPresets()"
           >
-            🗑️ 删除所选
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              style="vertical-align: middle; margin-right: 2px"
+            >
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path
+                d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+              ></path>
+            </svg>
+            删除所选
           </button>
         </div>
       </div>
@@ -11812,9 +12496,9 @@
             <div class="preset-form-group">
               <label class="preset-form-label">分类</label>
               <select class="preset-form-input" id="stylePresetCategory">
-                <option value="character">🎭 角色预设</option>
-                <option value="style">✍️ 文风预设</option>
-                <option value="scene">🎬 场景预设</option>
+                <option value="character">角色预设</option>
+                <option value="style">文风预设</option>
+                <option value="scene">场景预设</option>
               </select>
             </div>
 
@@ -11824,7 +12508,7 @@
                 type="text"
                 class="preset-form-input"
                 id="stylePresetIcon"
-                placeholder="输入一个emoji，如 🐱"
+                placeholder="输入一个符号，如 ★"
               />
             </div>
 
@@ -11886,7 +12570,7 @@
               class="preset-import-option"
               onclick="importPresetFromClipboard()"
             >
-              <div class="preset-import-option-icon">📋</div>
+              <div class="preset-import-option-icon">≡</div>
               <div class="preset-import-option-text">
                 <div class="preset-import-option-title">从剪贴板导入</div>
                 <div class="preset-import-option-desc">
@@ -11918,7 +12602,7 @@
             <button class="back-btn" onclick="closePage('worldbookPage')">
               ←
             </button>
-            <div class="worldbook-title">📖 世界书</div>
+            <div class="worldbook-title">≡ 世界书</div>
           </div>
           <div class="worldbook-header-actions">
             <button
@@ -11940,7 +12624,7 @@
               onclick="openWorldbookModal()"
               title="新建世界书"
             >
-              ➕
+              +
             </button>
           </div>
         </div>
@@ -11979,7 +12663,7 @@
                 class="worldbook-batch-btn delete"
                 onclick="deleteSelectedWorldbooks()"
               >
-                🗑️ 删除
+                ✕ 删除
               </button>
             </div>
           </div>
@@ -11995,13 +12679,43 @@
             id="worldbookEmpty"
             style="display: none"
           >
-            <div class="worldbook-empty-icon">📚</div>
+            <div class="worldbook-empty-icon">
+              <svg
+                width="48"
+                height="48"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path
+                  d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"
+                ></path>
+              </svg>
+            </div>
             <div class="worldbook-empty-title">还没有世界书</div>
             <div class="worldbook-empty-text">
               创建世界书，让AI角色拥有更丰富的背景设定
             </div>
             <button class="worldbook-empty-btn" onclick="openWorldbookModal()">
-              ➕ 创建第一本世界书
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                style="vertical-align: middle; margin-right: 2px"
+              >
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              创建第一本世界书
             </button>
           </div>
         </div>
@@ -12065,7 +12779,7 @@
                 class="worldbook-add-entry-btn"
                 onclick="addWorldbookEntry()"
               >
-                ➕ 添加新条目
+                + 添加新条目
               </button>
             </div>
           </div>
@@ -12222,7 +12936,7 @@
           <button class="back-btn" onclick="closePage('apiPage')">←</button>
           <h1 class="page-title">API设置</h1>
           <button class="page-header-add" onclick="openApiPresetModal()">
-            ➕
+            +
           </button>
         </div>
 
@@ -12233,9 +12947,23 @@
             <div class="api-preset-list" id="apiPresetList">
               <!-- Presets will be rendered here -->
               <div class="empty-state" id="emptyPresets">
-                <div class="empty-icon">🔌</div>
+                <div class="empty-icon">
+                  <svg
+                    width="48"
+                    height="48"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path>
+                    <line x1="12" y1="2" x2="12" y2="12"></line>
+                  </svg>
+                </div>
                 <div class="empty-text">还没有API预设</div>
-                <div class="empty-hint">点击右上角 ➕ 创建预设</div>
+                <div class="empty-hint">点击右上角 + 创建预设</div>
               </div>
             </div>
           </div>
@@ -12246,7 +12974,21 @@
             id="activeConfigSection"
             style="display: none"
           >
-            <div class="api-section-title">✅ 当前使用</div>
+            <div class="api-section-title">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                style="vertical-align: middle; margin-right: 4px"
+              >
+                <polyline points="20 6 9 17 4 12"></polyline></svg
+              >当前使用
+            </div>
             <div class="active-config-card">
               <div class="active-config-row">
                 <span class="active-label">预设名称</span>
@@ -12346,7 +13088,7 @@
           </div>
           <!-- Tips -->
           <div class="api-tips">
-            <div class="api-tips-title">💡 提示</div>
+            <div class="api-tips-title">○ 提示</div>
             <div class="api-tips-content">
               支持 OpenAI 兼容格式的 API。填写反代地址时无需添加 /v1 后缀。
             </div>
@@ -12397,7 +13139,7 @@
                   class="key-toggle-btn"
                   onclick="togglePresetKeyVisibility()"
                 >
-                  👁️
+                  ○
                 </button>
               </div>
             </div>
@@ -12618,7 +13360,7 @@
 
               <div class="action-buttons-grid">
                 <button class="action-btn" onclick="previewCustomFont()">
-                  👁️ 预览
+                  ○ 预览
                 </button>
                 <button
                   class="action-btn"
@@ -12637,7 +13379,7 @@
 
           <div class="settings-section">
             <div class="section-header">
-              <div class="section-icon orange">📚</div>
+              <div class="section-icon orange">≡</div>
               <span class="section-title">我的字体库</span>
             </div>
             <div class="section-body">
@@ -12673,7 +13415,7 @@
         >
           <!-- 壁纸设置 -->
           <div class="appearance-section">
-            <h3>🖼️ 主屏幕壁纸</h3>
+            <h3>▣ 主屏幕壁纸</h3>
             <div
               class="wallpaper-preview"
               id="wallpaperPreview"
@@ -12695,7 +13437,7 @@
 
           <!-- 字体颜色设置 -->
           <div class="appearance-section">
-            <h3>🎨 字体颜色</h3>
+            <h3>◈ 字体颜色</h3>
             <div class="color-options">
               <div
                 class="color-option"
@@ -12750,7 +13492,7 @@
 
           <!-- APP图标和名称设置 -->
           <div class="appearance-section">
-            <h3>📱 APP自定义</h3>
+            <h3>□ APP自定义</h3>
             <div class="app-customize-list">
               <div class="app-customize-item">
                 <div
@@ -12921,7 +13663,7 @@
             class="appearance-save-btn"
             onclick="saveAppearanceSettings()"
           >
-            ✨ 保存设置
+            ★ 保存设置
           </button>
         </div>
       </div>
@@ -13010,8 +13752,20 @@
         >
           <div class="create-avatar">
             <span class="create-avatar-placeholder" id="charAvatarPlaceholder"
-              >📷</span
-            >
+              ><svg
+                width="32"
+                height="32"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline></svg
+            ></span>
             <img id="charAvatarPreview" src="" alt="" style="display: none" />
           </div>
           <span class="create-avatar-hint">点击上传头像</span>
@@ -13072,7 +13826,7 @@
       <div class="conv-header">
         <button class="conv-back-btn" onclick="closeConversation()">‹</button>
         <div class="conv-title-section">
-          <div class="conv-avatar" id="convAvatar">🤖</div>
+          <div class="conv-avatar" id="convAvatar">AI</div>
           <span class="conv-name" id="convName">角色名称</span>
         </div>
         <button class="conv-menu-btn" onclick="openChatSettings()">
@@ -13082,16 +13836,31 @@
 
       <div class="conv-menu" id="convMenu">
         <div class="conv-menu-item" onclick="clearChatHistory()">
-          🗑️ 清空聊天记录
+          ✕ 清空聊天记录
         </div>
         <div class="conv-menu-item" onclick="deleteCharacter()">
-          ❌ 删除此角色
+          ✕ 删除此角色
         </div>
       </div>
 
       <div class="conv-messages" id="convMessages" onclick="closeChatPanel()">
         <div class="conv-empty">
-          <div class="conv-empty-icon">💬</div>
+          <div class="conv-empty-icon">
+            <svg
+              width="48"
+              height="48"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+              ></path>
+            </svg>
+          </div>
           <div class="conv-empty-text">开始和TA聊天吧～</div>
         </div>
       </div>
@@ -13148,43 +13917,142 @@
 
         <div class="chat-panel" id="plusPanel">
           <div class="panel-grid">
-            <div
-              class="panel-item"
-              onclick="document.getElementById('chatImgInput').click()"
-            >
-              <div class="panel-icon-box bg-photo">🖼️</div>
-              <span class="panel-label">相册</span>
-            </div>
             <div class="panel-item" onclick="handleCameraAction()">
-              <div class="panel-icon-box bg-camera">📷</div>
+              <div class="panel-icon-box bg-camera">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"
+                  ></path>
+                  <circle cx="12" cy="13" r="4"></circle>
+                </svg>
+              </div>
               <span class="panel-label">拍摄</span>
             </div>
             <div class="panel-item" onclick="startVoiceCall()">
-              <div class="panel-icon-box bg-call">📞</div>
+              <div class="panel-icon-box bg-call">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
+                  ></path>
+                </svg>
+              </div>
               <span class="panel-label">语音通话</span>
             </div>
             <div class="panel-item" onclick="startVideoCall()">
-              <div class="panel-icon-box bg-video">📹</div>
+              <div class="panel-icon-box bg-video">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                  <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                </svg>
+              </div>
               <span class="panel-label">视频通话</span>
             </div>
             <div class="panel-item" onclick="sendFakeLocation()">
-              <div class="panel-icon-box bg-location">📍</div>
+              <div class="panel-icon-box bg-location">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"
+                  ></path>
+                  <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+              </div>
               <span class="panel-label">位置</span>
             </div>
             <div class="panel-item" onclick="openTransferModal()">
-              <div class="panel-icon-box bg-transfer">💸</div>
+              <div class="panel-icon-box bg-transfer">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <line x1="12" y1="1" x2="12" y2="23"></line>
+                  <path
+                    d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"
+                  ></path>
+                </svg>
+              </div>
               <span class="panel-label">转账</span>
             </div>
             <div class="panel-item" onclick="rerollAIReply()">
-              <div class="panel-icon-box bg-reroll">🔄</div>
+              <div class="panel-icon-box bg-reroll">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <polyline points="23 4 23 10 17 10"></polyline>
+                  <polyline points="1 20 1 14 7 14"></polyline>
+                  <path
+                    d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"
+                  ></path>
+                </svg>
+              </div>
               <span class="panel-label">重roll</span>
             </div>
-            <div class="panel-item" onclick="sendNudge()">
-              <div class="panel-icon-box bg-nudge">👋</div>
-              <span class="panel-label">拍一拍</span>
-            </div>
             <div class="panel-item" onclick="openReadTogether()">
-              <div class="panel-icon-box bg-book">📚</div>
+              <div class="panel-icon-box bg-book">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                  <path
+                    d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"
+                  ></path>
+                </svg>
+              </div>
               <span class="panel-label">一起读书</span>
             </div>
           </div>
@@ -13237,22 +14105,22 @@
         <button class="read-header-back" onclick="closeReadTogether()">
           ←
         </button>
-        <div class="read-header-title">📚 一起读书</div>
+        <div class="read-header-title">≡ 一起读书</div>
         <button class="read-header-action" onclick="startFloatingMode()">
-          📌
+          •
         </button>
       </div>
       <div class="read-content">
         <!-- 我的书架 -->
         <div class="bookshelf-section">
-          <div class="bookshelf-title">📚 我的书架</div>
+          <div class="bookshelf-title">≡ 我的书架</div>
           <div class="bookshelf-grid" id="bookshelfGrid">
             <!-- 书籍卡片会动态生成 -->
             <div
               class="book-card add-book-card"
               onclick="document.getElementById('bookFileInput').click()"
             >
-              <div style="font-size: 32px; margin-bottom: 8px">➕</div>
+              <div style="font-size: 32px; margin-bottom: 8px">+</div>
               <div>导入新书</div>
             </div>
           </div>
@@ -13267,10 +14135,10 @@
 
         <!-- 当前阅读 -->
         <div id="currentReadingSection" style="display: none">
-          <div class="bookshelf-title">📖 当前阅读</div>
+          <div class="bookshelf-title">≡ 当前阅读</div>
           <div class="read-book-info">
             <div class="read-book-title">
-              <span>📖</span>
+              <span>≡</span>
               <span id="readBookName">书名</span>
               <span class="read-status-badge" id="readStatusBadge">
                 <span>✓</span> 阅读中
@@ -13332,7 +14200,7 @@
                   style="flex: none; padding: 8px 16px"
                   onclick="startFloatingMode()"
                 >
-                  📌 悬浮阅读
+                  • 悬浮阅读
                 </button>
               </div>
             </div>
@@ -13351,7 +14219,7 @@
         <!-- 导入设置 -->
         <div class="read-settings" style="margin-top: 16px">
           <div class="bookshelf-title" style="margin-bottom: 12px">
-            ⚙️ 导入设置
+            ○ 导入设置
           </div>
           <div class="read-setting-row">
             <span class="read-setting-label">每页字数</span>
@@ -13379,11 +14247,11 @@
             class="read-setting-row"
             style="flex-direction: column; align-items: flex-start; gap: 8px"
           >
-            <span class="read-setting-label">💡 使用说明</span>
+            <span class="read-setting-label">○ 使用说明</span>
             <div style="font-size: 0.85rem; color: #666; line-height: 1.6">
               1. 设置每页字数，然后导入TXT书籍<br />
               2. 点击书籍卡片开始阅读<br />
-              3. 点击「📌 悬浮阅读」开启悬浮窗<br />
+              3. 点击「• 悬浮阅读」开启悬浮窗<br />
               4. 悬浮窗可以拖动、缩放，边看书边聊天<br />
               5. AI会根据当前阅读内容与你互动
             </div>
@@ -13398,7 +14266,7 @@
       id="readFloatingBtn"
       onclick="toggleFloatingPanel()"
     >
-      📖
+      ≡
     </button>
 
     <!-- 悬浮阅读面板 -->
@@ -13429,7 +14297,7 @@
           class="read-float-btn"
           onclick="openReadTogether();hideFloatingPanel();"
         >
-          📚 书架
+          ≡ 书架
         </button>
       </div>
       <div class="read-float-resize-hint">↘ 拖动右下角缩放</div>
@@ -13448,7 +14316,7 @@
         <!-- Section 1: Basic Info -->
         <div class="settings-section">
           <div class="section-header">
-            <div class="section-icon brown">📝</div>
+            <div class="section-icon brown">○</div>
             <span class="section-title">基础资料</span>
           </div>
           <div class="section-body">
@@ -13498,7 +14366,7 @@
                     id="settingsPinned"
                     onchange="togglePinContact()"
                   />
-                  <span class="toggle-label">📌 置顶此联系人</span>
+                  <span class="toggle-label">• 置顶此联系人</span>
                 </label>
               </div>
             </div>
@@ -13512,7 +14380,28 @@
                   id="settingsOtherAvatar"
                   onclick="document.getElementById('otherAvatarInput').click()"
                 >
-                  <span id="otherAvatarPlaceholder">📷</span>
+                  <span id="otherAvatarPlaceholder"
+                    ><svg
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <rect
+                        x="3"
+                        y="3"
+                        width="18"
+                        height="18"
+                        rx="2"
+                        ry="2"
+                      ></rect>
+                      <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                      <polyline points="21 15 16 10 5 21"></polyline></svg
+                  ></span>
                   <img id="otherAvatarImg" src="" style="display: none" />
                 </div>
                 <input
@@ -13544,7 +14433,28 @@
                   id="settingsMyAvatar"
                   onclick="document.getElementById('myAvatarInput').click()"
                 >
-                  <span id="myAvatarPlaceholder">📷</span>
+                  <span id="myAvatarPlaceholder"
+                    ><svg
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <rect
+                        x="3"
+                        y="3"
+                        width="18"
+                        height="18"
+                        rx="2"
+                        ry="2"
+                      ></rect>
+                      <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                      <polyline points="21 15 16 10 5 21"></polyline></svg
+                  ></span>
                   <img id="myAvatarImg" src="" style="display: none" />
                 </div>
                 <input
@@ -13655,8 +14565,8 @@
         <!-- Section 2: AI Brain & Persona -->
         <div class="settings-section">
           <div class="section-header">
-            <div class="section-icon purple">🧠</div>
-            <span class="section-title">AI大脑与设定</span>
+            <div class="section-icon purple">≡</div>
+            <span class="section-title">设定</span>
           </div>
           <div class="section-body">
             <div class="form-group">
@@ -13750,7 +14660,23 @@
                 border-top: 1px dashed #eee;
               "
             >
-              <label class="form-label">📞 通话设置</label>
+              <label class="form-label"
+                ><svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  style="vertical-align: middle; margin-right: 4px"
+                >
+                  <path
+                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
+                  ></path></svg
+                >通话设置</label
+              >
               <div class="avatar-toggle-group" style="margin-top: 10px">
                 <label class="toggle-item">
                   <input
@@ -13786,7 +14712,27 @@
                 "
               >
                 <label class="form-label" style="font-size: 0.85rem"
-                  >📹 视频通话画面</label
+                  ><svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    style="vertical-align: middle; margin-right: 4px"
+                  >
+                    <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                    <rect
+                      x="1"
+                      y="5"
+                      width="15"
+                      height="14"
+                      rx="2"
+                      ry="2"
+                    ></rect></svg
+                  >视频通话画面</label
                 >
                 <div class="form-hint" style="margin-bottom: 10px">
                   设置视频通话时对方和自己的画面
@@ -13940,7 +14886,7 @@
                 "
               >
                 <label class="form-label" style="font-size: 0.85rem"
-                  >🎨 通话气泡样式</label
+                  >◈ 通话气泡样式</label
                 >
                 <div class="form-hint" style="margin-bottom: 10px">
                   自定义通话时消息气泡的颜色和透明度
@@ -14095,7 +15041,7 @@
         <!-- Section 4: Play Mode -->
         <div class="settings-section">
           <div class="section-header">
-            <div class="section-icon orange">🎮</div>
+            <div class="section-icon orange">▷</div>
             <span class="section-title">玩法与模式</span>
           </div>
           <div class="section-body">
@@ -14116,7 +15062,7 @@
 
             <!-- 线下模式高级设置 -->
             <div class="offline-word-settings" id="offlineWordSettings">
-              <div class="offline-word-title">✨ 线下模式设置</div>
+              <div class="offline-word-title">★ 线下模式设置</div>
               <div class="offline-word-row">
                 <span
                   style="font-size: 0.82rem; color: #8d6e63; min-width: 60px"
@@ -14214,10 +15160,10 @@
             </div>
             <div class="action-buttons-grid" style="margin-top: 12px">
               <button class="action-btn" onclick="viewSummaries()">
-                📋 查看/管理总结
+                ≡ 查看/管理总结
               </button>
               <button class="action-btn" onclick="triggerManualSummary()">
-                ✍️ 立即手动总结
+                ✎ 立即手动总结
               </button>
             </div>
             <div class="toggle-row" style="margin-top: 12px">
@@ -14246,8 +15192,8 @@
         <!-- Section 5: Visual Customization -->
         <div class="settings-section">
           <div class="section-header">
-            <div class="section-icon blue">🎨</div>
-            <span class="section-title">视觉美化</span>
+            <div class="section-icon blue">◈</div>
+            <span class="section-title">美化</span>
           </div>
           <div class="section-body">
             <div class="form-group">
@@ -14261,7 +15207,7 @@
                   class="bg-upload-btn"
                   onclick="document.getElementById('bgUploadInput').click()"
                 >
-                  📤 点击上传背景图片
+                  ↑ 点击上传背景图片
                 </button>
                 <input
                   type="file"
@@ -14454,10 +15400,10 @@
             </div>
             <div class="action-buttons-grid">
               <button class="action-btn" onclick="exportBubbleStyle()">
-                📤 导出
+                ↑ 导出
               </button>
               <button class="action-btn" onclick="importBubbleStyle()">
-                📥 导入
+                ↓ 导入
               </button>
             </div>
             <div class="form-group" style="margin-top: 16px">
@@ -14482,7 +15428,7 @@
             <div class="chat-preview-container">
               <div class="preview-label">实时预览</div>
               <div class="preview-msg-row">
-                <div class="preview-avatar" id="previewOtherAvatar">🤖</div>
+                <div class="preview-avatar" id="previewOtherAvatar">AI</div>
                 <div>
                   <div class="preview-bubble" id="previewOtherBubble">
                     对方消息预览
@@ -14491,7 +15437,7 @@
                 </div>
               </div>
               <div class="preview-msg-row right">
-                <div class="preview-avatar" id="previewMyAvatar">😊</div>
+                <div class="preview-avatar" id="previewMyAvatar">我</div>
                 <div>
                   <div class="preview-bubble" id="previewMyBubble">
                     我的消息预览
@@ -14512,10 +15458,10 @@
           <div class="section-body">
             <div class="action-buttons-grid">
               <button class="action-btn" onclick="importChatHistory()">
-                📥 导入聊天记录
+                ↓ 导入聊天记录
               </button>
               <button class="action-btn" onclick="exportChatHistory()">
-                📤 导出聊天记录
+                ↑ 导出聊天记录
               </button>
             </div>
             <button
@@ -14523,7 +15469,7 @@
               style="width: 100%; margin-top: 12px"
               onclick="searchChatContent()"
             >
-              🔍 查找聊天内容
+              ○ 查找聊天内容
             </button>
             <div style="border-top: 1px dashed #e5ddd3; margin: 20px 0"></div>
             <div class="action-buttons-grid">
@@ -14544,7 +15490,7 @@
       <!-- Settings Footer -->
       <div class="settings-footer">
         <button class="footer-btn cancel" onclick="closeChatSettings()">
-          ❌ 取消
+          ✕ 取消
         </button>
         <button class="footer-btn save" onclick="saveChatSettings()">
           💾 保存
@@ -14619,12 +15565,12 @@
           // 世界书数据
           window.worldbooks = values[12] || [];
           window.worldbookGroups = values[13] || [];
-          // 【✅ 关键修复开始】
+          // 【✓ 关键修复开始】
           // 必须手动更新 activePresetId 变量，否则界面渲染时不知道刚才读到了什么
           if (window.savedActivePresetId) {
             activePresetId = window.savedActivePresetId;
           }
-          // 【✅ 关键修复结束】
+          // 【✓ 关键修复结束】
           // 加载头像
           if (avatarImg) {
             const img = document.getElementById("avatarImg");
@@ -14697,7 +15643,7 @@
           const savedPresets = await localforage.getItem("userPresets");
           window.presets = savedPresets || [];
           console.log(
-            "✅ 预设系统初始化完成，共",
+            "✓ 预设系统初始化完成，共",
             window.presets.length,
             "个预设"
           );
@@ -14722,7 +15668,7 @@
         if (filteredPresets.length === 0) {
           list.innerHTML = `
             <div class="preset-empty">
-              <div class="preset-empty-icon">📝</div>
+              <div class="preset-empty-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg></div>
               <div class="preset-empty-text">还没有预设哦~</div>
               <button class="preset-empty-btn" onclick="openPresetModal()">创建第一个预设</button>
             </div>
@@ -14737,9 +15683,9 @@
             const checkedClass = isSelected ? "checked" : "";
 
             const categoryLabels = {
-              character: "🎭 角色",
-              style: "✍️ 文风",
-              scene: "🎬 场景",
+              character: "角色",
+              style: "文风",
+              scene: "场景",
             };
 
             const entryCount = preset.entries ? preset.entries.length : 0;
@@ -14752,7 +15698,7 @@
               preset.id
             }')" oncontextmenu="startPresetBatchMode(event, '${preset.id}')">
               <div class="preset-item-header">
-                <div class="preset-item-icon">${preset.icon || "📝"}</div>
+                <div class="preset-item-icon">${preset.icon || "○"}</div>
                 <div class="preset-item-info">
                   <div class="preset-item-name">${preset.name}</div>
                   <div class="preset-item-desc">${
@@ -14767,17 +15713,17 @@
               </div>
               <div class="preset-item-tags">
                 <span class="preset-item-tag">${
-                  categoryLabels[preset.category] || "📝 其他"
+                  categoryLabels[preset.category] || "○ 其他"
                 }</span>
-                <span class="preset-item-tag">📋 ${enabledCount}/${entryCount} 条目</span>
+                <span class="preset-item-tag">≡ ${enabledCount}/${entryCount} 条目</span>
               </div>
               ${
                 !window.presetBatchMode
                   ? `
               <div class="preset-item-actions">
                 <button class="preset-action-btn edit" onclick="event.stopPropagation(); editPreset('${preset.id}')">✏️ 编辑</button>
-                <button class="preset-action-btn export" onclick="event.stopPropagation(); exportPreset('${preset.id}')">📤 导出</button>
-                <button class="preset-action-btn delete" onclick="event.stopPropagation(); deleteSinglePreset('${preset.id}')">🗑️ 删除</button>
+                <button class="preset-action-btn export" onclick="event.stopPropagation(); exportPreset('${preset.id}')">↑ 导出</button>
+                <button class="preset-action-btn delete" onclick="event.stopPropagation(); deleteSinglePreset('${preset.id}')">✕ 删除</button>
               </div>
               `
                   : ""
@@ -15080,7 +16026,7 @@
         const name = document.getElementById("stylePresetName").value.trim();
         const category = document.getElementById("stylePresetCategory").value;
         const icon =
-          document.getElementById("stylePresetIcon").value.trim() || "📝";
+          document.getElementById("stylePresetIcon").value.trim() || "○";
         const description = document
           .getElementById("stylePresetDesc")
           .value.trim();
@@ -15393,7 +16339,7 @@
           id: "preset_" + Date.now(),
           name: presetName,
           category: data.category || "style",
-          icon: data.icon || "📥",
+          icon: data.icon || "↓",
           description: data.description || "从Silly Tavern导入的预设",
           entries: entries,
           createdAt: Date.now(),
@@ -15439,7 +16385,7 @@
         window.presets.forEach((preset) => {
           const option = document.createElement("option");
           option.value = preset.id;
-          option.textContent = `${preset.icon || "📝"} ${preset.name}`;
+          option.textContent = `${preset.icon || "○"} ${preset.name}`;
           select.appendChild(option);
         });
 
@@ -15777,10 +16723,10 @@
 
         // Update header button (todo用设置按钮)
         const buttons = {
-          messages: "➕",
+          messages: "+",
           moments: "📷",
-          todo: "⚙️",
-          profile: "⚙️",
+          todo: "○",
+          profile: "○",
         };
         document.getElementById("chatHeaderBtn").textContent = buttons[tabName];
 
@@ -15925,7 +16871,7 @@
         if (characters.length === 0) {
           container.innerHTML = `
                                     <div class="empty-state" id="emptyMessages">
-                                        <div class="empty-icon">💭</div>
+                                        <div class="empty-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></div>
                                         <div class="empty-text">还没有消息哦</div>
                                         <div class="empty-hint">添加AI角色开始聊天吧～</div>
                                     </div>
@@ -15973,7 +16919,7 @@
                 ${
                   char.avatar
                     ? `<img src="${char.avatar}" alt="${char.name}">`
-                    : "🤖"
+                    : "AI"
                 }
               </div>
               <div class="message-info">
@@ -16069,9 +17015,9 @@
         if (apiPresets.length === 0) {
           container.innerHTML = `
                                             <div class="empty-state" id="emptyPresets">
-                                                <div class="empty-icon">🔌</div>
+                                                <div class="empty-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg></div>
                                                 <div class="empty-text">还没有API预设</div>
-                                                <div class="empty-hint">点击右上角 ➕ 创建预设</div>
+                                                <div class="empty-hint">点击右上角 + 创建预设</div>
                                             </div>
                                         `;
           return;
@@ -16112,7 +17058,7 @@
         renderApiPresets();
         updateActiveConfigDisplay();
 
-        // 【✅ 新增：给个提示，让你知道保存成功了】
+        // 【✓ 新增：给个提示，让你知道保存成功了】
         const preset = apiPresets.find((p) => p.id == presetId);
         if (preset) {
           showToast(`已切换并保存预设：${preset.name}`);
@@ -16151,10 +17097,10 @@
         const btn = document.querySelector(".key-toggle-btn");
         if (input.type === "password") {
           input.type = "text";
-          btn.textContent = "🙈";
+          btn.textContent = "○";
         } else {
           input.type = "password";
-          btn.textContent = "👁️";
+          btn.textContent = "○";
         }
       }
 
@@ -16654,7 +17600,7 @@
                         </div>`;
                     return `<div class="transfer-card" data-msg-idx="${msgIdx}" data-amount="${amount}">
                       <div class="transfer-card-header">
-                        <div class="transfer-card-icon">💰</div>
+                        <div class="transfer-card-icon">¥</div>
                         <div class="transfer-card-info">
                           <div class="transfer-card-title">${
                             note || "转账给你"
@@ -16734,7 +17680,7 @@
                   (match, text) =>
                     `<span class="inline-voice-tag" onclick="playInlineVoice(this, '${escapeHtml(
                       text
-                    ).replace(/'/g, "\\'")}')">🎤 ${
+                    ).replace(/'/g, "\\'")}')">♪ ${
                       text.length > 20 ? text.substring(0, 20) + "..." : text
                     }</span>`
                 );
@@ -16798,7 +17744,7 @@
         // 7. 头像与时间
         const time = messages[messages.length - 1].time || "";
         const avatarUrl = isUser ? userAvatarSrc : aiAvatarSrc;
-        const defaultEmoji = isUser ? "😊" : "🤖";
+        const defaultEmoji = isUser ? "我" : "AI";
         const avatarHtml = avatarUrl
           ? `<img src="${avatarUrl}" />`
           : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:20px;">${defaultEmoji}</div>`;
@@ -17386,7 +18332,7 @@
         } finally {
           btn.disabled = false;
           btn.classList.remove("loading");
-          btn.innerHTML = "<span>✨</span>";
+          btn.innerHTML = "<span>★</span>";
         }
       }
 
@@ -17697,9 +18643,9 @@
         // 稍微延迟一点点赋值，确保 DOM 已经生成
         setTimeout(() => {
           if (document.getElementById("settingsFlameIcon")) {
-            const fData = settings.flameData || { icon: "🔥", days: 1 };
+            const fData = settings.flameData || { icon: "♨", days: 1 };
             document.getElementById("settingsFlameIcon").value =
-              fData.icon || "🔥";
+              fData.icon || "♨";
             document.getElementById("settingsFlameDays").value =
               fData.days || 1;
 
@@ -17712,7 +18658,7 @@
                 : "none";
           }
         }, 0);
-        // ✅ 加在这里 (loadSettingsToForm 函数内部的末尾)：
+        // ✓ 加在这里 (loadSettingsToForm 函数内部的末尾)：
         document.getElementById("settingsVoiceId").value =
           settings.voiceId || "";
 
@@ -17867,7 +18813,7 @@
           document.getElementById("previewOtherAvatar").innerHTML = "🤖";
           document.getElementById("otherAvatarInput").value = "";
         } else {
-          document.getElementById("previewMyAvatar").innerHTML = "😊";
+          document.getElementById("previewMyAvatar").innerHTML = "我";
           document.getElementById("myAvatarInput").value = "";
         }
       }
@@ -17948,10 +18894,10 @@
 
         document.getElementById("previewOtherAvatar").innerHTML = otherAvatar
           ? `<img src="${otherAvatar}">`
-          : "🤖";
+          : "AI";
         document.getElementById("previewMyAvatar").innerHTML = myAvatar
           ? `<img src="${myAvatar}">`
-          : "😊";
+          : "我";
       }
 
       // 切换头像显示
@@ -18095,7 +19041,7 @@
         const isFlameActive = document.getElementById("settingsFlame").checked;
         const flameIcon = document.getElementById("settingsFlameIcon")
           ? document.getElementById("settingsFlameIcon").value
-          : "🔥";
+          : "♨";
         const flameDays = document.getElementById("settingsFlameDays")
           ? parseInt(document.getElementById("settingsFlameDays").value)
           : 1;
@@ -18166,7 +19112,7 @@
           flame: isFlameActive,
           flameData: {
             active: isFlameActive,
-            icon: flameIcon || "🔥",
+            icon: flameIcon || "♨",
             days: flameDays || 1,
           },
 
@@ -18250,7 +19196,7 @@
         closeChatSettings();
         // 判断一下：只有开启了火花，才提示“续火花”
         if (isFlameActive) {
-          showToast("设置已保存，火花已续上 🔥");
+          showToast("设置已保存，火花已续上 ♨");
         } else {
           showToast("设置已保存");
         }
@@ -18372,7 +19318,7 @@
         if (charAvatar) {
           avatarEl.innerHTML = `<img src="${charAvatar}" alt="">`;
         } else {
-          avatarEl.innerHTML = charName ? charName.charAt(0) : "🤖";
+          avatarEl.innerHTML = charName ? charName.charAt(0) : "AI";
         }
         nameEl.textContent = charName || "未知";
         textEl.textContent = messageText || "发来一条消息";
@@ -18690,7 +19636,7 @@
         userPersonaPresets.push(newPreset);
         localforage.setItem("userPersonaPresets", userPersonaPresets);
 
-        showToast("预设已保存 ✨");
+        showToast("预设已保存 ★");
         initUserPersonaPresets(); // 刷新下拉框
       }
 
@@ -18740,7 +19686,7 @@
             performSummary(settings, history, summarizedCount, totalMsg);
           } else {
             // 手动模式：提示用户
-            showToast(`🔔 新消息已达 ${newMsgCount} 条，建议进行总结`);
+            showToast(`○ 新消息已达 ${newMsgCount} 条，建议进行总结`);
             // 这里可以加一个小红点逻辑，或者弹窗，目前用Toast提示
           }
         }
@@ -18815,7 +19761,7 @@
             chatSettings[currentChatCharId] = settings;
             localforage.setItem("chatSettings", chatSettings);
 
-            showToast("✅ 长期记忆已更新");
+            showToast("✓ 长期记忆已更新");
           }
         } catch (e) {
           console.error(e);
@@ -18883,7 +19829,7 @@
 
                                                 <div style="position:absolute; top:8px; right:8px; display:flex; gap:4px;">
                                                     <button onclick="startEditSummary(${index})" style="border:none; background:white; width:28px; height:28px; border-radius:6px; box-shadow:0 1px 3px rgba(0,0,0,0.1); color:#5d4e37; cursor:pointer; display:flex; align-items:center; justify-content:center;">✏️</button>
-                                                    <button onclick="deleteSummary(${index})" style="border:none; background:white; width:28px; height:28px; border-radius:6px; box-shadow:0 1px 3px rgba(0,0,0,0.1); color:#ff6b6b; cursor:pointer; display:flex; align-items:center; justify-content:center;">🗑️</button>
+                                                    <button onclick="deleteSummary(${index})" style="border:none; background:white; width:28px; height:28px; border-radius:6px; box-shadow:0 1px 3px rgba(0,0,0,0.1); color:#ff6b6b; cursor:pointer; display:flex; align-items:center; justify-content:center;">✕</button>
                                                 </div>
                                             </div>
 
@@ -18962,7 +19908,7 @@
         chatSettings[currentChatCharId] = settings;
         localforage.setItem("chatSettings", chatSettings);
 
-        showToast("记忆已修正 ✨");
+        showToast("记忆已修正 ★");
 
         // 重新渲染列表（最简单的方法，确保UI同步）
         viewSummaries();
@@ -19074,14 +20020,14 @@
                                     <div style="display: flex; gap: 10px; margin-bottom: 10px;">
                                         <div style="flex: 1;">
                                             <label class="form-label" style="font-size: 0.75rem;">火花样式</label>
-                                            <input type="text" id="settingsFlameIcon" class="form-input" style="text-align:center;" placeholder="🔥" value="🔥">
+                                            <input type="text" id="settingsFlameIcon" class="form-input" style="text-align:center;" placeholder="♨" value="♨">
                                         </div>
                                         <div style="flex: 2;">
                                             <label class="form-label" style="font-size: 0.75rem;">已续天数</label>
                                             <input type="number" id="settingsFlameDays" class="form-input" value="1" min="1">
                                         </div>
                                     </div>
-                                    <div style="font-size: 0.7rem; color: #999;">✨ 每天聊天会自动 +1 哦</div>
+                                    <div style="font-size: 0.7rem; color: #999;">★ 每天聊天会自动 +1 哦</div>
                                 `;
 
           // 插入到开关行的后面
@@ -19380,7 +20326,7 @@
         document.getElementById("fontFileName").textContent = "未选择文件";
         window.tempFontData = null;
 
-        showToast("字体保存并应用成功 ✨");
+        showToast("字体保存并应用成功 ★");
       }
 
       // 渲染字体列表
@@ -19425,7 +20371,7 @@
                                             </div>
                                             <button class="preset-edit-btn" style="color:#ff6b6b;" onclick="event.stopPropagation(); deleteFontPreset(${
                                               preset.id
-                                            })">🗑️</button>
+                                            })">✕</button>
                                         </div>
                                       `;
         });
@@ -19504,7 +20450,7 @@
         if (history.length === 0) {
           container.innerHTML = `
             <div class="conv-empty">
-                <div class="conv-empty-icon">💬</div>
+                <div class="conv-empty-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></div>
                 <div class="conv-empty-text">开始和TA聊天吧～</div>
             </div>`;
           return;
@@ -19573,7 +20519,7 @@
             }
             html += `<div class="msg-system-card">
               <div class="system-card">
-                <div class="system-card-icon">${msg.cardIcon || "📌"}</div>
+                <div class="system-card-icon">${msg.cardIcon || "•"}</div>
                 <div class="system-card-title">${
                   msg.cardTitle || "系统消息"
                 }</div>
@@ -20206,7 +21152,7 @@
           return;
         }
 
-        el.innerHTML = "🔊 播放中...";
+        el.innerHTML = "▶ 播放中...";
         el.style.pointerEvents = "none";
 
         try {
@@ -20215,20 +21161,20 @@
             const audio = new Audio(audioUrl);
             audio.play();
             audio.onended = () => {
-              el.innerHTML = `🎤 ${
+              el.innerHTML = `♪ ${
                 text.length > 20 ? text.substring(0, 20) + "..." : text
               }`;
               el.style.pointerEvents = "auto";
             };
           } else {
-            el.innerHTML = `🎤 ${
+            el.innerHTML = `♪ ${
               text.length > 20 ? text.substring(0, 20) + "..." : text
             }`;
             el.style.pointerEvents = "auto";
           }
         } catch (e) {
           console.error("语音播放失败", e);
-          el.innerHTML = `🎤 ${
+          el.innerHTML = `♪ ${
             text.length > 20 ? text.substring(0, 20) + "..." : text
           }`;
           el.style.pointerEvents = "auto";
@@ -20779,7 +21725,7 @@
           html += `<button class="ai-bind-btn ${
             hasBindings ? "has-bindings" : ""
           }" onclick="openAiBindModal()">
-            🔗 ${hasBindings ? boundCategories.length : ""}
+            ⊕ ${hasBindings ? boundCategories.length : ""}
           </button>`;
         }
 
@@ -20837,7 +21783,7 @@
           html += `
           <div class="sticker-item" onclick="importStickersFromUrl()">
               <div class="sticker-add-btn">
-                  <div class="sticker-add-icon">🔗</div>
+                  <div class="sticker-add-icon">⊕</div>
                   <div class="sticker-add-text">链接</div>
               </div>
               <div class="sticker-desc">网络图片</div>
@@ -21103,7 +22049,7 @@
             <div class="ai-bind-modal">
               <div class="ai-bind-modal-header">
                 <div>
-                  <div class="ai-bind-modal-title">🔗 绑定表情包</div>
+                  <div class="ai-bind-modal-title">⊕ 绑定表情包</div>
                   <div class="ai-bind-modal-subtitle">${
                     charName
                       ? `为「${charName}」选择表情包`
@@ -21116,11 +22062,11 @@
         `;
 
         if (!charId) {
-          modalHtml += `<div class="ai-bind-empty-hint">💡 请先进入一个角色的对话，<br>然后再来绑定表情包</div>`;
+          modalHtml += `<div class="ai-bind-empty-hint">○ 请先进入一个角色的对话，<br>然后再来绑定表情包</div>`;
         } else if (window.stickerCategories.length === 0) {
           modalHtml += `<div class="ai-bind-empty-hint">暂无表情分类<br>请先添加一些表情包</div>`;
         } else {
-          modalHtml += `<div class="ai-bind-char-hint">💡 每个角色可以绑定不同的表情包分类</div>`;
+          modalHtml += `<div class="ai-bind-char-hint">○ 每个角色可以绑定不同的表情包分类</div>`;
 
           window.stickerCategories.forEach((cat) => {
             const count = window.customStickers.filter(
@@ -22256,7 +23202,7 @@
         } else {
           bubbleImg.style.display = "none";
           bubbleAvatar.style.display = "block";
-          bubbleAvatar.textContent = callState.type === "video" ? "📹" : "📞";
+          bubbleAvatar.textContent = callState.type === "video" ? "▶" : "☎";
         }
 
         // 显示悬浮球
@@ -22401,7 +23347,7 @@
         const secs = (duration % 60).toString().padStart(2, "0");
 
         let statusText = "";
-        let icon = callState.type === "video" ? "📹" : "📞";
+        let icon = callState.type === "video" ? "▶" : "☎";
 
         switch (result) {
           case "completed":
@@ -22511,7 +23457,7 @@
         callState.isMuted = !callState.isMuted;
         const btn = document.getElementById("muteBtn");
         btn.classList.toggle("active", callState.isMuted);
-        btn.textContent = callState.isMuted ? "🔇" : "🎤";
+        btn.textContent = callState.isMuted ? "○" : "♪";
       }
 
       // 切换扬声器
@@ -22519,7 +23465,7 @@
         callState.isSpeaker = !callState.isSpeaker;
         const btn = document.getElementById("speakerBtn");
         btn.classList.toggle("active", callState.isSpeaker);
-        btn.textContent = callState.isSpeaker ? "🔊" : "🔈";
+        btn.textContent = callState.isSpeaker ? "◉" : "○";
       }
 
       // 用户发送通话消息
@@ -23036,7 +23982,7 @@
         document.getElementById("incomingCallName").textContent =
           settings.charNote || char.note || char.name;
         document.getElementById("incomingCallTypeIcon").textContent =
-          type === "video" ? "📹" : "📞";
+          type === "video" ? "▶" : "☎";
         document.getElementById("incomingCallTypeText").textContent =
           type === "video" ? "视频通话" : "语音通话";
 
@@ -23280,8 +24226,8 @@
                   item.type === "recharge"
                     ? "💳"
                     : item.type === "receive"
-                    ? "📥"
-                    : "📤"
+                    ? "↓"
+                    : "↑"
                 }
               </div>
               <div class="wallet-history-info">
@@ -23433,7 +24379,7 @@
           role: "user",
           content: `<div class="transfer-card" data-transfer-id="${transferId}" data-status="pending">
             <div class="transfer-card-header">
-              <div class="transfer-card-icon">💰</div>
+              <div class="transfer-card-icon">¥</div>
               <div class="transfer-card-info">
                 <div class="transfer-card-title">${note}</div>
                 <div class="transfer-card-amount">${amount.toFixed(2)}</div>
@@ -23676,7 +24622,7 @@
         });
         localforage.setItem("characters", characters);
         renderCharacters(); // 刷新界面
-        console.log("列表预览修复完成 ✅");
+        console.log("列表预览修复完成 ✓");
       }
 
       // 页面加载后自动运行一次修复
@@ -23817,7 +24763,7 @@
             <div class="book-card ${
               isReading ? "reading" : ""
             }" onclick="selectBook('${book.id}')">
-              <div class="book-card-icon">📖</div>
+              <div class="book-card-icon">≡</div>
               <div class="book-card-name">${escapeHtml(book.bookName)}</div>
               <div class="book-card-info">${
                 book.chunks.length
@@ -23840,7 +24786,7 @@
         // 添加新书按钮
         html += `
           <div class="book-card add-book-card" onclick="document.getElementById('bookFileInput').click()">
-            <div style="font-size:32px;margin-bottom:8px;">➕</div>
+            <div style="font-size:32px;margin-bottom:8px;">+</div>
             <div>导入新书</div>
           </div>
         `;
@@ -23928,7 +24874,7 @@
             })
             .catch((err) => alert("保存失败: " + err));
           showToast(
-            "📚 《" +
+            "≡ 《" +
               newBook.bookName +
               "》已加入书架！共 " +
               chunks.length +
@@ -23992,7 +24938,7 @@
         localforage.setItem("readTogetherData", window.readTogetherData);
         renderBookshelf();
         renderCurrentReading();
-        showToast("📖 开始阅读《" + book.bookName + "》");
+        showToast("≡ 开始阅读《" + book.bookName + "》");
       }
 
       // 暂停阅读（回到书架）
@@ -24027,7 +24973,7 @@
         renderBookshelf();
         renderCurrentReading();
         hideFloatingBtn();
-        showToast("🗑️ 书籍已删除");
+        showToast("✕ 书籍已删除");
       }
 
       // 翻页功能
@@ -24082,7 +25028,7 @@
       function startFloatingMode() {
         closeReadTogether();
         showFloatingBtn();
-        showToast("📌 悬浮窗已开启，点击📖按钮可查看当前内容");
+        showToast("• 悬浮窗已开启，点击≡按钮可查看当前内容");
       }
 
       function showFloatingBtn() {
@@ -24245,17 +25191,17 @@
 
       // 默认分类
       window.todoCategories = [
-        { id: "self", emoji: "✨", name: "自我" },
-        { id: "health", emoji: "🏃", name: "健康" },
-        { id: "study", emoji: "📚", name: "学习" },
-        { id: "work", emoji: "💼", name: "工作" },
-        { id: "life", emoji: "🏠", name: "生活" },
+        { id: "self", emoji: "★", name: "自我" },
+        { id: "health", emoji: "○", name: "健康" },
+        { id: "study", emoji: "≡", name: "学习" },
+        { id: "work", emoji: "○", name: "工作" },
+        { id: "life", emoji: "○", name: "生活" },
       ];
 
       // 自定义设置
       window.todoSettings = {
         title: "我的小本本",
-        greeting: { main: "今天也要加油鸭！🦆", sub: "新的一天，新的开始~" },
+        greeting: { main: "今天也要加油鸭！", sub: "新的一天，新的开始~" },
       };
 
       async function initTodoSystem() {
@@ -24309,7 +25255,7 @@
 
         // 显示统一问候语
         const greeting = window.todoSettings.greeting || {
-          main: "今天也要加油鸭！🦆",
+          main: "今天也要加油鸭！",
           sub: "新的一天，新的开始~",
         };
         const greetingEl = document.getElementById("todoGreeting");
@@ -24336,7 +25282,7 @@
 
         let html = `<button class="todo-filter-btn ${
           window.currentTodoFilter === "all" ? "active" : ""
-        }" onclick="filterTodos('all')">💫 全部</button>`;
+        }" onclick="filterTodos('all')">◇ 全部</button>`;
         window.todoCategories.forEach((cat) => {
           html += `<button class="todo-filter-btn ${
             window.currentTodoFilter === cat.id ? "active" : ""
@@ -24363,7 +25309,7 @@
         }
 
         if (todos.length === 0) {
-          container.innerHTML = `<div class="todo-empty-state"><div class="todo-empty-icon">📝</div><div class="todo-empty-text">还没有待办事项</div><div class="todo-empty-hint">点击下方按钮添加一个吧~</div></div>`;
+          container.innerHTML = `<div class="todo-empty-state"><div class="todo-empty-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg></div><div class="todo-empty-text">还没有待办事项</div><div class="todo-empty-hint">点击下方按钮添加一个吧~</div></div>`;
           return;
         }
 
@@ -24376,7 +25322,7 @@
         todos.forEach((todo) => {
           const cat = window.todoCategories.find((c) => c.id === todo.tag) || {
             name: "其他",
-            emoji: "📌",
+            emoji: "•",
           };
           html += `
             <div class="todo-item ${todo.done ? "done" : ""}" data-id="${
@@ -24394,7 +25340,7 @@
               <div class="todo-tag tag-${todo.tag}">${cat.name}</div>
               <button class="todo-delete-btn" onclick="deleteTodoItem('${
                 todo.id
-              }')">🗑️</button>
+              }')">✕</button>
             </div>`;
         });
         container.innerHTML = html;
@@ -24491,7 +25437,7 @@
           updateTodoStats();
 
           if (todo.done && !wasDone) {
-            showToast("太棒了！完成一项 🎉");
+            showToast("太棒了！完成一项 ♪");
             // 通知所有绑定的AI角色
             notifyAiTodoCompleted(todo);
           }
@@ -24762,7 +25708,7 @@
               role: "system",
               type: "system-card",
               cardType: "todo-binding",
-              cardIcon: "📋",
+              cardIcon: "≡",
               cardTitle: "已设为待办督促助手",
               cardDesc: "Ta 将帮你督促完成待办事项",
               timestamp: Date.now(),
@@ -24838,14 +25784,14 @@
             cat.name
           }</div><button class="todo-category-delete" onclick="deleteTodoCategory(${i})" ${
             canDelete ? "" : "disabled"
-          }>🗑️</button></div>`;
+          }>✕</button></div>`;
         });
         container.innerHTML = html;
       }
 
       async function addTodoCategory() {
         const emoji =
-          document.getElementById("newCategoryEmoji").value.trim() || "📌";
+          document.getElementById("newCategoryEmoji").value.trim() || "•";
         const name = document.getElementById("newCategoryName").value.trim();
         if (!name) {
           showToast("请输入分类名称");
@@ -24986,21 +25932,21 @@
           tips = "";
 
         if (cycleDay <= data.duration) {
-          status = `经期第 ${cycleDay} 天 🩸`;
+          status = `经期第 ${cycleDay} 天 ●`;
           statusClass = "period";
-          tips = "💗 经期期间要多休息，注意保暖，多喝热水，保持心情愉快~";
+          tips = "♡ 经期期间要多休息，注意保暖，多喝热水，保持心情愉快~";
         } else if (cycleDay >= data.cycleLength - 3) {
           status = `经期前期 (还有${daysUntilNext}天)`;
           statusClass = "warning";
-          tips = "🌙 经期快来了，提前准备好，注意休息哦~";
+          tips = "○ 经期快来了，提前准备好，注意休息哦~";
         } else if (cycleDay >= 12 && cycleDay <= 16) {
-          status = `排卵期 💫`;
+          status = `排卵期 ◇`;
           statusClass = "safe";
-          tips = "🌟 排卵期身体状态较好，是运动和学习的好时机！";
+          tips = "☆ 排卵期身体状态较好，是运动和学习的好时机！";
         } else {
-          status = `安全期 ✨`;
+          status = `安全期 ★`;
           statusClass = "safe";
-          tips = "☀️ 身体状态不错，保持好心情，继续加油~";
+          tips = "○ 身体状态不错，保持好心情，继续加油~";
         }
 
         if (statusEl) {
@@ -25092,7 +26038,7 @@
         closePeriodModal();
         updatePeriodDisplay();
         renderPeriodCalendar();
-        showToast("设置已保存 💕");
+        showToast("设置已保存 ♡");
       }
 
       async function recordPeriodStart() {
@@ -25108,7 +26054,7 @@
 
         updatePeriodDisplay();
         renderPeriodCalendar();
-        showToast("已记录，要多注意休息哦 💗");
+        showToast("已记录，要多注意休息哦 ♡");
       }
 
       // 生成经期提示词（所有AI角色都能看到）
@@ -25145,7 +26091,7 @@
       window.momentsData = {
         posts: [], // 所有动态
         userProfile: {
-          avatar: "🐰",
+          avatar: "A",
           avatarImg: null,
           name: "我的昵称",
           handle: "@username",
@@ -25175,7 +26121,7 @@
             storyAvatar.innerHTML = `<img src="${profile.avatarImg}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
           } else {
             storyAvatar.innerHTML = `<span class="ig-story-avatar-emoji">${
-              profile.avatar || "🐰"
+              profile.avatar || "A"
             }</span>`;
           }
         }
@@ -25198,7 +26144,7 @@
                   profile.avatarImg
                     ? `<img src="${profile.avatarImg}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
                     : `<span class="ig-story-avatar-emoji">${
-                        profile.avatar || "🐰"
+                        profile.avatar || "A"
                       }</span>`
                 }
               </div>
@@ -25226,7 +26172,7 @@
                     ${
                       char.avatar
                         ? `<img src="${char.avatar}" alt="${char.name}">`
-                        : `<span class="ig-story-avatar-emoji">🤖</span>`
+                        : `<span class="ig-story-avatar-emoji">AI</span>`
                     }
                   </div>
                 </div>
@@ -25249,7 +26195,7 @@
         if (posts.length === 0) {
           container.innerHTML = `
             <div class="ig-empty-state" id="igEmptyState">
-              <div class="ig-empty-icon">📷</div>
+              <div class="ig-empty-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div>
               <div class="ig-empty-title">分享你的精彩瞬间</div>
               <div class="ig-empty-text">点击右下角按钮发布第一条动态吧~</div>
             </div>
@@ -25297,15 +26243,15 @@
           const bgStyles = [
             {
               bg: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-              emoji: "✨",
+              emoji: "★",
             },
             {
               bg: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
-              emoji: "🌸",
+              emoji: "○",
             },
             {
               bg: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
-              emoji: "💫",
+              emoji: "◇",
             },
             {
               bg: "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)",
@@ -25317,7 +26263,7 @@
             },
             {
               bg: "linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)",
-              emoji: "💜",
+              emoji: "♡",
             },
             {
               bg: "linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)",
@@ -25325,7 +26271,7 @@
             },
             {
               bg: "linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)",
-              emoji: "☀️",
+              emoji: "○",
             },
           ];
           const style = bgStyles[Math.floor(post.id) % bgStyles.length];
@@ -25357,7 +26303,7 @@
             if (char) {
               return {
                 name: char.note || char.name,
-                avatar: "🤖",
+                avatar: "AI",
                 avatarImg: char.avatar,
               };
             }
@@ -25432,7 +26378,7 @@
                   post.timestamp
                 )}</div>
               </div>
-              <button class="ig-post-delete" onclick="confirmDeletePost('${postIdStr}')" title="删除">🗑️</button>
+              <button class="ig-post-delete" onclick="confirmDeletePost('${postIdStr}')" title="删除">✕</button>
             </div>
             ${contentHtml}
             ${imageHtml}
@@ -25441,12 +26387,12 @@
                 <button class="ig-action-btn ${
                   liked ? "liked" : ""
                 }" onclick="toggleLike('${postIdStr}')">
-                  ${liked ? "❤️" : "🤍"}<span>${likeData.length || ""}</span>
+                  ${liked ? "♡" : "♡"}<span>${likeData.length || ""}</span>
                 </button>
                 <button class="ig-action-btn" onclick="openComments('${postIdStr}')">
-                  💬<span>${comments.length || ""}</span>
+                  ○<span>${comments.length || ""}</span>
                 </button>
-                <button class="ig-action-btn" onclick="sharePostToChat('${postIdStr}')" title="转发到聊天">📤</button>
+                <button class="ig-action-btn" onclick="sharePostToChat('${postIdStr}')" title="转发到聊天">↑</button>
                 <div class="ig-action-spacer"></div>
                 <button class="ig-action-btn ${
                   bookmarked ? "bookmarked" : ""
@@ -25661,7 +26607,7 @@
 
         closePostModal();
         renderMomentsUI();
-        showToast("✨ 动态发布成功！");
+        showToast("★ 动态发布成功！");
 
         // AI角色会来互动 - 根据可见范围筛选
         setTimeout(() => {
@@ -25739,7 +26685,7 @@
                   id: Date.now(),
                   authorId: String(char.id),
                   authorName: char.note || char.name,
-                  authorAvatar: char.avatar || "🤖",
+                  authorAvatar: char.avatar || "AI",
                   content: comment,
                   timestamp: Date.now(),
                   replyTo: null,
@@ -25988,7 +26934,7 @@ ${persona ? `你的人设: ${persona}` : ""}
               const avatar =
                 c.authorId === "user"
                   ? window.momentsData.userProfile.avatar
-                  : "🤖";
+                  : "AI";
 
               // 回复标记
               let replyHtml = "";
@@ -26102,7 +27048,7 @@ ${persona ? `你的人设: ${persona}` : ""}
                   id: Date.now(),
                   authorId: String(char.id),
                   authorName: char.note || char.name,
-                  authorAvatar: char.avatar || "🤖",
+                  authorAvatar: char.avatar || "AI",
                   content: reply,
                   timestamp: Date.now(),
                   replyTo: profile.name,
@@ -26132,7 +27078,7 @@ ${persona ? `你的人设: ${persona}` : ""}
                     id: Date.now(),
                     authorId: String(char.id),
                     authorName: char.note || char.name,
-                    authorAvatar: char.avatar || "🤖",
+                    authorAvatar: char.avatar || "AI",
                     content: reply,
                     timestamp: Date.now(),
                     replyTo: profile.name,
@@ -26297,7 +27243,7 @@ ${userName}在你的动态下留言了，你需要回复。
         await localforage.setItem("momentsData", window.momentsData);
 
         renderMomentsUI();
-        showToast("🗑️ 动态已删除");
+        showToast("✕ 动态已删除");
       };
 
       // 当前要转发的动态ID
@@ -26312,7 +27258,7 @@ ${userName}在你的动态下留言了，你需要回复。
           (p) => String(p.id) === String(postId)
         );
         if (!post) {
-          showToast("❌ 找不到这条动态");
+          showToast("✕ 找不到这条动态");
           return;
         }
 
@@ -26329,7 +27275,7 @@ ${userName}在你的动态下留言了，你需要回复。
               char.id
             }')">
               <div class="ig-share-avatar">
-                ${char.avatar ? `<img src="${char.avatar}" alt="">` : "🤖"}
+                ${char.avatar ? `<img src="${char.avatar}" alt="">` : "AI"}
               </div>
               <div class="ig-share-info">
                 <div class="ig-share-name">${char.note || char.name}</div>
@@ -26358,7 +27304,7 @@ ${userName}在你的动态下留言了，你需要回复。
           (p) => String(p.id) === String(currentSharePostId)
         );
         if (!post) {
-          showToast("❌ 找不到这条动态");
+          showToast("✕ 找不到这条动态");
           closeShareModal();
           return;
         }
@@ -26367,7 +27313,7 @@ ${userName}在你的动态下留言了，你需要回复。
           (c) => String(c.id) === String(charId)
         );
         if (!char) {
-          showToast("❌ 找不到这个角色");
+          showToast("✕ 找不到这个角色");
           closeShareModal();
           return;
         }
@@ -26376,7 +27322,7 @@ ${userName}在你的动态下留言了，你需要回复。
         let authorName, authorAvatar, authorAvatarImg;
         if (post.isUser) {
           authorName = window.momentsData.userProfile.name || "我";
-          authorAvatar = window.momentsData.userProfile.avatar || "🐰";
+          authorAvatar = window.momentsData.userProfile.avatar || "A";
           authorAvatarImg = window.momentsData.userProfile.avatarImg;
         } else {
           const postChar = window.characters?.find(
@@ -26401,9 +27347,9 @@ ${userName}在你的动态下留言了，你需要回复。
           imageHtml = `<img class="shared-post-image" src="${post.image}" alt="">`;
         } else if (post.textImage) {
           const bgStyles = [
-            { bg: "linear-gradient(135deg, #667eea, #764ba2)", emoji: "✨" },
-            { bg: "linear-gradient(135deg, #f093fb, #f5576c)", emoji: "🌸" },
-            { bg: "linear-gradient(135deg, #4facfe, #00f2fe)", emoji: "💫" },
+            { bg: "linear-gradient(135deg, #667eea, #764ba2)", emoji: "★" },
+            { bg: "linear-gradient(135deg, #f093fb, #f5576c)", emoji: "○" },
+            { bg: "linear-gradient(135deg, #4facfe, #00f2fe)", emoji: "◇" },
             { bg: "linear-gradient(135deg, #43e97b, #38f9d7)", emoji: "🌿" },
           ];
           const style = bgStyles[Math.floor(post.id) % bgStyles.length];
@@ -26437,7 +27383,7 @@ ${userName}在你的动态下留言了，你需要回复。
             </div>
             <div class="shared-post-footer">
               <span class="shared-post-footer-text">
-                <span class="shared-post-footer-icon">📤</span> 转发的动态
+                <span class="shared-post-footer-icon">↑</span> 转发的动态
               </span>
               <span class="shared-post-interact">点击查看 ›</span>
             </div>
@@ -26491,7 +27437,7 @@ ${userName}在你的动态下留言了，你需要回复。
             );
           }
 
-          showToast(`📤 已转发给 ${char.note || char.name}`);
+          showToast(`↑ 已转发给 ${char.note || char.name}`);
         }, 300);
       };
 
@@ -26530,7 +27476,7 @@ ${userName}在你的动态下留言了，你需要回复。
         if (profile.avatarImg) {
           preview.innerHTML = `<img src="${profile.avatarImg}" alt="">`;
         } else {
-          preview.innerHTML = profile.avatar || "🐰";
+          preview.innerHTML = profile.avatar || "A";
         }
 
         document.getElementById("igEditName").value = profile.name || "";
@@ -26564,26 +27510,26 @@ ${userName}在你的动态下留言了，你需要回复。
       // 打开表情选择器
       function openEmojiPicker() {
         const emojis = [
-          "😊",
+          "我",
           "😎",
           "🥰",
           "😇",
           "🤗",
           "😋",
-          "🐰",
-          "🐱",
-          "🐶",
-          "🦊",
-          "🐻",
-          "🐼",
-          "🌸",
+          "A",
+          "B",
+          "C",
+          "D",
+          "E",
+          "F",
+          "○",
           "🌺",
           "🌻",
-          "🌈",
-          "⭐",
-          "💫",
+          "○",
+          "☆",
+          "◇",
           "🎀",
-          "💕",
+          "♡",
         ];
         const emoji = prompt("选择一个表情作为头像：\n" + emojis.join(" "));
         if (emoji && emojis.includes(emoji)) {
@@ -26608,7 +27554,7 @@ ${userName}在你的动态下留言了，你需要回复。
         closeProfileModal();
         renderMomentsUI();
         renderStoriesBar();
-        showToast("个人资料已保存 ✨");
+        showToast("个人资料已保存 ★");
       }
 
       // 显示某个角色的动态
@@ -26866,7 +27812,7 @@ ${userName}在你的动态下留言了，你需要回复。
             window.appearanceSettings
           );
           applyAppearanceSettings();
-          showToast("外观设置已保存 ✨");
+          showToast("外观设置已保存 ★");
         } catch (e) {
           console.error("保存外观设置失败:", e);
           showToast("保存失败，请重试");
@@ -27189,9 +28135,9 @@ ${userName}在你的动态下留言了，你需要回复。
                     wb.description || "暂无描述"
                   )}</div>
                   <div class="worldbook-item-meta">
-                    <div class="worldbook-item-meta-item">📝 ${entryCount} 条目</div>
-                    <div class="worldbook-item-meta-item">✅ ${activeEntries} 启用</div>
-                    <div class="worldbook-item-meta-item">📅 ${
+                    <div class="worldbook-item-meta-item">○ ${entryCount} 条目</div>
+                    <div class="worldbook-item-meta-item">✓ ${activeEntries} 启用</div>
+                    <div class="worldbook-item-meta-item">□ ${
                       wb.updateTime || "刚刚"
                     }</div>
                   </div>
@@ -27202,7 +28148,7 @@ ${userName}在你的动态下留言了，你需要回复。
                   }', event)" title="编辑">✏️</button>
                   <button class="worldbook-item-btn delete" onclick="deleteWorldbook('${
                     wb.id
-                  }', event)" title="删除">🗑️</button>
+                  }', event)" title="删除">✕</button>
                   <div class="worldbook-item-toggle ${
                     wb.enabled !== false ? "active" : ""
                   }" onclick="toggleWorldbookEnabled('${
@@ -27543,12 +28489,12 @@ ${userName}在你的动态下留言了，你需要回复。
                 }" onclick="toggleEntryEnabled(${index})"></div>
                 <div class="worldbook-entry-actions">
                   <button class="worldbook-entry-btn" onclick="editWorldbookEntry(${index})">✏️</button>
-                  <button class="worldbook-entry-btn delete" onclick="deleteWorldbookEntry(${index})">🗑️</button>
+                  <button class="worldbook-entry-btn delete" onclick="deleteWorldbookEntry(${index})">✕</button>
                 </div>
               </div>
               ${
                 entry.comment
-                  ? `<div style="font-size: 0.8rem; color: #666; margin-bottom: 6px;">📝 ${escapeHtml(
+                  ? `<div style="font-size: 0.8rem; color: #666; margin-bottom: 6px;">○ ${escapeHtml(
                       entry.comment
                     )}</div>`
                   : ""
@@ -27689,7 +28635,7 @@ ${userName}在你的动态下留言了，你需要回复。
             )}</span>
             <button class="worldbook-group-item-delete" onclick="deleteWorldbookGroup('${
               group.id
-            }')">🗑️</button>
+            }')">✕</button>
           </div>
         `
           )
@@ -27781,7 +28727,7 @@ ${userName}在你的动态下留言了，你需要回复。
             }" onclick="toggleWorldbookInSettings('${wb.id}')">
               <div class="worldbook-select-checkbox"></div>
               <div class="worldbook-select-info">
-                <div class="worldbook-select-name">📖 ${escapeHtml(
+                <div class="worldbook-select-name">≡ ${escapeHtml(
                   wb.name
                 )}</div>
                 <div class="worldbook-select-desc">${entryCount} 条启用条目 · ${escapeHtml(
@@ -28194,7 +29140,7 @@ ${userName}在你的动态下留言了，你需要回复。
         presetEscapeHtml,
         loadMorePresetEntries,
       });
-      console.log("✅ 所有函数已挂载到window");
+      console.log("✓ 所有函数已挂载到window");
       // 🆕 智能解析文本：自动识别 "关键词：URL" 格式
       function parseStickersFromText(text) {
         const lines = text.split(/\r?\n/); // 按行分割
@@ -28256,7 +29202,7 @@ ${userName}在你的动态下留言了，你需要回复。
         id="multiDeleteBtn"
         onclick="deleteSelectedMessages()"
       >
-        🗑️ 删除
+        ✕ 删除
       </button>
     </div>
 
@@ -28266,7 +29212,7 @@ ${userName}在你的动态下留言了，你需要回复。
       id="messageNotification"
       onclick="handleNotificationClick()"
     >
-      <div class="notification-avatar" id="notificationAvatar">🤖</div>
+      <div class="notification-avatar" id="notificationAvatar">AI</div>
       <div class="notification-content">
         <div class="notification-name" id="notificationName">角色名</div>
         <div class="notification-text" id="notificationText">消息内容</div>
@@ -28308,7 +29254,7 @@ ${userName}在你的动态下留言了，你需要回复。
       onclick="if(event.target===this)closeRechargeModal()"
     >
       <div class="recharge-modal-content">
-        <div class="recharge-modal-title">💰 钱包充值</div>
+        <div class="recharge-modal-title">¥ 钱包充值</div>
         <div class="recharge-amount-grid">
           <button
             class="recharge-amount-btn"
@@ -28378,7 +29324,24 @@ ${userName}在你的动态下留言了，你需要回复。
       onclick="if(event.target===this)closeTransferModal()"
     >
       <div class="send-transfer-modal-content">
-        <div class="send-transfer-title">💸 转账给TA</div>
+        <div class="send-transfer-title">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            style="vertical-align: middle; margin-right: 6px"
+          >
+            <line x1="12" y1="1" x2="12" y2="23"></line>
+            <path
+              d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"
+            ></path></svg
+          >转账给TA
+        </div>
         <div class="send-transfer-to" id="transferToName">转给：角色名</div>
         <input
           type="number"
@@ -28419,7 +29382,22 @@ ${userName}在你的动态下留言了，你需要回复。
       onclick="if(event.target===this)closeLocationModal()"
     >
       <div class="send-transfer-modal-content">
-        <div class="send-transfer-title">📍 发送位置</div>
+        <div class="send-transfer-title">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            style="vertical-align: middle; margin-right: 6px"
+          >
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle></svg
+          >发送位置
+        </div>
         <div style="margin-bottom: 16px">
           <input
             type="text"
@@ -28458,7 +29436,21 @@ ${userName}在你的动态下留言了，你需要回复。
       id="callFloatingBubble"
       onclick="restoreCall()"
     >
-      <span id="floatingBubbleAvatar">📞</span>
+      <span id="floatingBubbleAvatar"
+        ><svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path
+            d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
+          ></path></svg
+      ></span>
       <img id="floatingBubbleImg" src="" style="display: none" />
     </div>
 
@@ -28469,7 +29461,7 @@ ${userName}在你的动态下留言了，你需要回复。
         <img id="videoMainImg" src="" style="display: none" />
         <div class="video-main-placeholder" id="videoMainPlaceholder">
           <div class="avatar-large">
-            <span id="videoMainAvatarPlaceholder">🤖</span>
+            <span id="videoMainAvatarPlaceholder">AI</span>
             <img id="videoMainAvatarImg" src="" style="display: none" />
           </div>
           <span id="videoMainName">等待接通...</span>
@@ -28489,11 +29481,25 @@ ${userName}在你的动态下留言了，你需要回复。
           onclick="minimizeCall()"
           title="最小化"
         >
-          ↙️
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="4 14 10 14 10 20"></polyline>
+            <polyline points="20 10 14 10 14 4"></polyline>
+            <line x1="14" y1="10" x2="21" y2="3"></line>
+            <line x1="3" y1="21" x2="10" y2="14"></line>
+          </svg>
         </button>
         <div class="call-top-info">
           <div class="call-top-avatar" id="callTopAvatar">
-            <span id="callTopAvatarPlaceholder">🤖</span>
+            <span id="callTopAvatarPlaceholder">AI</span>
             <img id="callTopAvatarImg" src="" style="display: none" />
           </div>
           <div class="call-top-name" id="callTopName">角色名</div>
@@ -28508,7 +29514,7 @@ ${userName}在你的动态下留言了，你需要回复。
         style="display: none"
       >
         <div class="call-avatar" id="callAvatar">
-          <span id="callAvatarPlaceholder">🤖</span>
+          <span id="callAvatarPlaceholder">AI</span>
           <img id="callAvatarImg" src="" style="display: none" />
         </div>
         <div class="call-name" id="callName">角色名</div>
@@ -28541,7 +29547,21 @@ ${userName}在你的动态下留言了，你需要回复。
             rows="1"
             onkeydown="handleCallInputKeydown(event)"
           ></textarea>
-          <button class="call-send-btn" onclick="sendCallMessage()">➤</button>
+          <button class="call-send-btn" onclick="sendCallMessage()">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
         </div>
       </div>
 
@@ -28549,7 +29569,22 @@ ${userName}在你的动态下留言了，你需要回复。
       <div class="call-buttons-area">
         <!-- 呼叫中的按钮 -->
         <div class="call-buttons" id="callCallingBtns">
-          <button class="call-btn end-call" onclick="endCall()">📞</button>
+          <button class="call-btn end-call" onclick="endCall()">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
+              ></path>
+            </svg>
+          </button>
         </div>
 
         <!-- 来电的按钮 -->
@@ -28558,9 +29593,37 @@ ${userName}在你的动态下留言了，你需要回复。
           id="callIncomingBtns"
           style="display: none"
         >
-          <button class="call-btn end-call" onclick="declineCall()">📞</button>
+          <button class="call-btn end-call" onclick="declineCall()">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
+              ></path>
+            </svg>
+          </button>
           <button class="call-btn accept-call" onclick="acceptCall()">
-            📞
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
+              ></path>
+            </svg>
           </button>
         </div>
 
@@ -28571,15 +29634,59 @@ ${userName}在你的动态下留言了，你需要回复。
             onclick="rerollCallResponse()"
             title="重新回复"
           >
-            🔄
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="23 4 23 10 17 10"></polyline>
+              <polyline points="1 20 1 14 7 14"></polyline>
+              <path
+                d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"
+              ></path>
+            </svg>
           </button>
-          <button class="call-btn end-call" onclick="endCall()">📞</button>
+          <button class="call-btn end-call" onclick="endCall()">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
+              ></path>
+            </svg>
+          </button>
           <button
             class="call-btn speaker-btn"
             id="speakerBtn"
             onclick="toggleSpeaker()"
           >
-            🔊
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <path
+                d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"
+              ></path>
+            </svg>
           </button>
         </div>
       </div>
@@ -28594,15 +29701,27 @@ ${userName}在你的动态下留言了，你需要回复。
           <div class="incoming-call-ring"></div>
           <div class="incoming-call-ring"></div>
           <div class="incoming-call-avatar" id="incomingCallAvatar">
-            <span id="incomingCallAvatarPlaceholder">🤖</span>
+            <span id="incomingCallAvatarPlaceholder">AI</span>
             <img id="incomingCallAvatarImg" src="" style="display: none" />
           </div>
         </div>
         <div class="incoming-call-name" id="incomingCallName">角色名</div>
         <div class="incoming-call-type" id="incomingCallType">
           <span class="incoming-call-type-icon" id="incomingCallTypeIcon"
-            >📞</span
-          >
+            ><svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
+              ></path></svg
+          ></span>
           <span id="incomingCallTypeText">语音通话</span>
         </div>
       </div>
@@ -28613,7 +29732,20 @@ ${userName}在你的动态下留言了，你需要回复。
             class="incoming-call-btn decline"
             onclick="declineIncomingCall()"
           >
-            📞
+            <svg
+              width="28"
+              height="28"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
+              ></path>
+            </svg>
           </button>
           <span class="incoming-call-btn-label">拒绝</span>
         </div>
@@ -28622,7 +29754,20 @@ ${userName}在你的动态下留言了，你需要回复。
             class="incoming-call-btn accept"
             onclick="acceptIncomingCall()"
           >
-            📞
+            <svg
+              width="28"
+              height="28"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
+              ></path>
+            </svg>
           </button>
           <span class="incoming-call-btn-label">接听</span>
         </div>
