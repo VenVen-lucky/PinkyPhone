@@ -21,7 +21,7 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Satisfy&display=swap"
       rel="stylesheet"
     />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js?v=1.1"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js?v=1.2"></script>
     <style>
       * {
         margin: 0;
@@ -21888,8 +21888,6 @@
           });
         }
 
-        localforage.setItem("chatHistories", chatHistories);
-
         // 更新聊天列表预览
         const previewText =
           callState.type === "video" ? "[视频通话]" : "[语音通话]";
@@ -21897,17 +21895,23 @@
           updateCharacterLastMessage(callState.charId, previewText);
         }
 
-        // 强制刷新聊天界面
+        // 保存聊天记录并强制刷新界面
         const savedCharId = callState.charId;
-        setTimeout(() => {
-          if (currentChatCharId === savedCharId) {
-            renderConversation();
-          }
-          // 同时刷新聊天列表
-          if (typeof renderCharacterList === "function") {
-            renderCharacterList();
-          }
-        }, 150);
+        localforage.setItem("chatHistories", chatHistories).then(() => {
+          // 等待 localforage 保存完成后再刷新界面
+          // 使用 requestAnimationFrame 确保在下一帧渲染
+          requestAnimationFrame(() => {
+            // 只要当前聊天角色ID存在且等于通话角色ID就刷新
+            // 使用 == 而非 === 以避免类型不匹配的问题
+            if (currentChatCharId && currentChatCharId == savedCharId) {
+              renderConversation();
+            }
+            // 同时刷新聊天列表
+            if (typeof renderCharacterList === "function") {
+              renderCharacterList();
+            }
+          });
+        });
       }
 
       // 切换静音
