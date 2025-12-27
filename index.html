@@ -21,7 +21,7 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Satisfy&display=swap"
       rel="stylesheet"
     />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js?v=1.8"></script>
     <style>
       * {
         margin: 0;
@@ -5853,6 +5853,23 @@
         background: transparent !important;
       }
 
+      /* 嵌入式语音标签样式 */
+      .inline-voice-tag {
+        display: inline-block;
+        background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        color: #2e7d32;
+        cursor: pointer;
+        margin: 2px 0;
+        transition: all 0.2s;
+      }
+      .inline-voice-tag:active {
+        transform: scale(0.96);
+        background: #c8e6c9;
+      }
+
       /* ==================== 语音播放器样式 ==================== */
       .audio-player-bubble {
         display: inline-flex;
@@ -6325,6 +6342,80 @@
         border-radius: 6px;
         border: 2px solid rgba(0,0,0,0.1);
       }
+
+      /* ==================== 引用预览样式 ==================== */
+      .quote-preview {
+        display: flex;
+        align-items: center;
+        padding: 8px 12px;
+        background: rgba(255, 255, 255, 0.95);
+        border-bottom: 1px solid rgba(244, 143, 177, 0.2);
+        gap: 8px;
+      }
+      .quote-preview-content {
+        flex: 1;
+        min-width: 0;
+        padding: 6px 10px;
+        background: rgba(244, 143, 177, 0.1);
+        border-left: 3px solid #f48fb1;
+        border-radius: 0 8px 8px 0;
+      }
+      .quote-preview-sender {
+        font-size: 0.75rem;
+        color: #f48fb1;
+        font-weight: 500;
+        margin-bottom: 2px;
+      }
+      .quote-preview-text {
+        font-size: 0.8rem;
+        color: #666;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 100%;
+      }
+      .quote-preview-close {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border: none;
+        background: rgba(0,0,0,0.1);
+        color: #666;
+        font-size: 12px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .quote-preview-close:active {
+        background: rgba(0,0,0,0.2);
+      }
+
+      /* 消息中的引用显示样式 */
+      .msg-quote {
+        padding: 6px 10px;
+        background: rgba(0, 0, 0, 0.05);
+        border-left: 3px solid rgba(244, 143, 177, 0.6);
+        border-radius: 0 8px 8px 0;
+        margin-bottom: 6px;
+        font-size: 0.8rem;
+      }
+      .msg-quote-sender {
+        font-size: 0.7rem;
+        color: #f48fb1;
+        font-weight: 500;
+        margin-bottom: 2px;
+      }
+      .msg-quote-text {
+        color: #888;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+      }
+
       /* ==================== 底部栏新布局 ==================== */
       .conv-input-area {
         padding: 0 !important;
@@ -6554,119 +6645,110 @@
         color: #666;
       }
 
-      /* ==================== 转账卡片样式 ==================== */
+      /* ==================== 转账卡片样式 - 微信风格 ==================== */
       .transfer-card {
-        background: linear-gradient(135deg, #fff5f8 0%, #ffe8f0 100%);
-        border-radius: 16px;
-        padding: 16px;
-        min-width: 240px;
-        max-width: 280px;
-        box-shadow: 0 4px 15px rgba(244, 143, 177, 0.2);
-        border: 1px solid rgba(244, 143, 177, 0.3);
+        background: linear-gradient(135deg, #fff0f5 0%, #ffe8f0 100%);
+        border-radius: 12px;
+        padding: 12px 14px;
+        min-width: 200px;
+        max-width: 220px;
+        box-shadow: 0 2px 8px rgba(244, 143, 177, 0.15);
+        border: 1px solid rgba(244, 143, 177, 0.2);
+        cursor: pointer;
       }
       .transfer-card-header {
         display: flex;
         align-items: center;
-        gap: 12px;
-        margin-bottom: 12px;
+        gap: 10px;
       }
       .transfer-card-icon {
-        width: 44px;
-        height: 44px;
-        border-radius: 12px;
-        background: linear-gradient(135deg, #f48fb1, #f06292);
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #f48fb1, #ec407a);
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 22px;
-        box-shadow: 0 4px 12px rgba(244, 143, 177, 0.4);
+        font-size: 20px;
+        flex-shrink: 0;
       }
       .transfer-card-info {
         flex: 1;
+        min-width: 0;
       }
       .transfer-card-title {
-        font-size: 0.95rem;
-        font-weight: 600;
-        color: #c2185b;
-      }
-      .transfer-card-from {
-        font-size: 0.75rem;
-        color: #e57373;
-        margin-top: 2px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #333;
+        margin-bottom: 2px;
       }
       .transfer-card-amount {
-        font-size: 1.8rem;
-        font-weight: 700;
+        font-size: 0.8rem;
         color: #c2185b;
-        text-align: center;
-        padding: 16px 0;
-        border-top: 1px dashed rgba(244, 143, 177, 0.4);
-        border-bottom: 1px dashed rgba(244, 143, 177, 0.4);
-        margin: 8px 0;
+        font-weight: 600;
       }
       .transfer-card-amount::before {
         content: '¥';
-        font-size: 1rem;
-        margin-right: 4px;
+        font-size: 0.7rem;
+        margin-right: 2px;
       }
-      .transfer-card-note {
-        font-size: 0.8rem;
+      .transfer-card-footer {
+        margin-top: 10px;
+        padding-top: 8px;
+        border-top: 1px solid rgba(244, 143, 177, 0.2);
+        font-size: 0.72rem;
         color: #999;
-        text-align: center;
-        margin-bottom: 12px;
-      }
-      .transfer-card-actions {
         display: flex;
-        gap: 10px;
-      }
-      .transfer-card-btn {
-        flex: 1;
-        padding: 10px;
-        border: none;
-        border-radius: 10px;
-        font-size: 0.85rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s;
-      }
-      .transfer-card-btn.accept {
-        background: linear-gradient(135deg, #f48fb1, #f06292);
-        color: white;
-        box-shadow: 0 4px 12px rgba(244, 143, 177, 0.4);
-      }
-      .transfer-card-btn.reject {
-        background: #f5f5f5;
-        color: #999;
-      }
-      .transfer-card-btn:active {
-        transform: scale(0.98);
+        align-items: center;
+        justify-content: space-between;
       }
       .transfer-card-status {
-        text-align: center;
-        padding: 10px;
-        font-size: 0.85rem;
+        font-size: 0.72rem;
         color: #999;
-        font-weight: 500;
+      }
+      .transfer-card-status.pending {
+        color: #ff9800;
       }
       .transfer-card-status.accepted {
         color: #4caf50;
       }
       .transfer-card-status.rejected {
-        color: #f44336;
+        color: #999;
+      }
+      .transfer-card-btn {
+        padding: 4px 10px;
+        border: none;
+        border-radius: 4px;
+        font-size: 0.72rem;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .transfer-card-btn.accept {
+        background: linear-gradient(135deg, #f48fb1, #ec407a);
+        color: white;
+      }
+      .transfer-card-btn.reject {
+        background: #f5f5f5;
+        color: #666;
+        margin-right: 6px;
+      }
+      .transfer-card-btn:active {
+        transform: scale(0.96);
       }
 
       /* ==================== 位置卡片样式 ==================== */
       .location-card {
-        background: linear-gradient(135deg, #fff5f8 0%, #ffe8f0 100%);
-        border-radius: 16px;
+        background: linear-gradient(135deg, #fff0f5 0%, #ffe8f0 100%);
+        border-radius: 12px;
         overflow: hidden;
-        min-width: 220px;
-        max-width: 260px;
-        box-shadow: 0 4px 15px rgba(244, 143, 177, 0.2);
-        border: 1px solid rgba(244, 143, 177, 0.3);
+        min-width: 180px;
+        max-width: 200px;
+        box-shadow: 0 2px 8px rgba(244, 143, 177, 0.15);
+        border: 1px solid rgba(244, 143, 177, 0.2);
+        cursor: pointer;
       }
       .location-card-map {
-        height: 100px;
+        height: 70px;
         background: linear-gradient(135deg, #fce4ec, #f8bbd9);
         display: flex;
         align-items: center;
@@ -6674,59 +6756,195 @@
         position: relative;
       }
       .location-card-map-icon {
-        font-size: 40px;
-        animation: locationBounce 1s ease-in-out infinite;
+        font-size: 28px;
+        animation: locationBounce 1.5s ease-in-out infinite;
       }
       @keyframes locationBounce {
         0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-8px); }
+        50% { transform: translateY(-5px); }
       }
       .location-card-map-bg {
         position: absolute;
         inset: 0;
-        background-image: 
+        background-image:
           radial-gradient(circle at 20% 30%, rgba(255,255,255,0.3) 0%, transparent 40%),
           radial-gradient(circle at 80% 70%, rgba(255,255,255,0.3) 0%, transparent 40%);
       }
       .location-card-info {
-        padding: 12px 14px;
+        padding: 10px 12px;
         background: white;
       }
       .location-card-name {
-        font-size: 0.9rem;
-        font-weight: 600;
-        color: #c2185b;
-        margin-bottom: 4px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #333;
+        margin-bottom: 2px;
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 4px;
       }
       .location-card-name::before {
         content: '📍';
-        font-size: 0.85rem;
+        font-size: 0.75rem;
       }
       .location-card-address {
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         color: #999;
-        line-height: 1.4;
+        line-height: 1.3;
       }
-      .location-card-action {
+
+      /* ==================== 钱包详情页样式 ==================== */
+      .wallet-page {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: #f5f5f5;
+        z-index: 9999;
+        display: none;
+        flex-direction: column;
+      }
+      .wallet-page.active {
+        display: flex;
+      }
+      .wallet-page-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px;
+        background: linear-gradient(135deg, #f48fb1, #ec407a);
+        color: white;
+        font-size: 1.1rem;
+        font-weight: 600;
+      }
+      .wallet-page-back {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.8rem;
+        cursor: pointer;
+        padding: 0;
+        width: 30px;
+      }
+      .wallet-page-content {
+        flex: 1;
+        overflow-y: auto;
+        padding-bottom: 20px;
+      }
+      .wallet-balance-card {
+        background: linear-gradient(135deg, #f48fb1, #ec407a);
+        margin: 16px;
+        border-radius: 16px;
+        padding: 24px;
+        text-align: center;
+        color: white;
+        box-shadow: 0 8px 24px rgba(236, 64, 122, 0.3);
+      }
+      .wallet-balance-label {
+        font-size: 0.85rem;
+        opacity: 0.9;
+        margin-bottom: 8px;
+      }
+      .wallet-balance-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+      }
+      .wallet-balance-value::before {
+        content: '¥';
+        font-size: 1.4rem;
+        margin-right: 4px;
+      }
+      .wallet-balance-actions {
+        margin-top: 20px;
+      }
+      .wallet-action-btn {
+        background: rgba(255,255,255,0.2);
+        border: 1px solid rgba(255,255,255,0.4);
+        border-radius: 20px;
+        padding: 10px 24px;
+        color: white;
+        font-size: 0.9rem;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .wallet-action-btn:active {
+        background: rgba(255,255,255,0.3);
+      }
+      .wallet-history-section {
+        background: white;
+        margin: 0 16px;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      }
+      .wallet-history-title {
+        padding: 14px 16px;
+        font-weight: 600;
+        color: #333;
+        border-bottom: 1px solid #f0f0f0;
+      }
+      .wallet-history-list {
+        max-height: 400px;
+        overflow-y: auto;
+      }
+      .wallet-history-empty {
+        padding: 40px;
+        text-align: center;
+        color: #999;
+        font-size: 0.9rem;
+      }
+      .wallet-history-item {
+        display: flex;
+        align-items: center;
+        padding: 14px 16px;
+        border-bottom: 1px solid #f5f5f5;
+      }
+      .wallet-history-item:last-child {
+        border-bottom: none;
+      }
+      .wallet-history-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 10px;
-        background: linear-gradient(135deg, #fff0f5, #ffe4ec);
-        font-size: 0.8rem;
-        color: #e91e63;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s;
+        font-size: 18px;
+        margin-right: 12px;
       }
-      .location-card-action:active {
-        background: #ffe4ec;
+      .wallet-history-icon.income {
+        background: #e8f5e9;
+      }
+      .wallet-history-icon.expense {
+        background: #fce4ec;
+      }
+      .wallet-history-info {
+        flex: 1;
+      }
+      .wallet-history-desc {
+        font-size: 0.9rem;
+        color: #333;
+      }
+      .wallet-history-time {
+        font-size: 0.75rem;
+        color: #999;
+        margin-top: 2px;
+      }
+      .wallet-history-amount {
+        font-size: 1rem;
+        font-weight: 600;
+      }
+      .wallet-history-amount.income {
+        color: #4caf50;
+      }
+      .wallet-history-amount.expense {
+        color: #e91e63;
       }
 
-      /* ==================== 钱包卡片样式 ==================== */
+      /* ==================== 钱包卡片样式（保留用于转账卡片等） ==================== */
       .wallet-card {
         background: linear-gradient(135deg, #fff0f5 0%, #ffe4ec 100%);
         border-radius: 20px;
@@ -6913,7 +7131,7 @@
         right: 0;
         bottom: 0;
         background: rgba(0,0,0,0.5);
-        z-index: 1000;
+        z-index: 10000;
         display: none;
         align-items: center;
         justify-content: center;
@@ -7020,7 +7238,7 @@
         right: 0;
         bottom: 0;
         background: rgba(0,0,0,0.5);
-        z-index: 600;
+        z-index: 10000;
         display: none;
         align-items: center;
         justify-content: center;
@@ -10739,41 +10957,13 @@
               </div>
             </div>
 
-            <!-- 我的钱包 -->
-            <div class="wallet-card" id="userWalletCard">
-              <div class="wallet-card-header">
-                <div class="wallet-card-icon">💰</div>
-                <div>
-                  <div class="wallet-card-title">我的钱包</div>
-                  <div class="wallet-card-subtitle">与TA们的转账记录~</div>
-                </div>
-              </div>
-              <div class="wallet-card-balance">
-                <div class="wallet-card-balance-label">账户余额</div>
-                <div class="wallet-card-balance-amount" id="walletBalance">0.00</div>
-              </div>
-              <div class="wallet-card-actions">
-                <button class="wallet-card-btn secondary" onclick="openRechargeModal()">
-                  <span>💳</span> 充值
-                </button>
-                <button class="wallet-card-btn primary" onclick="viewWalletHistory()">
-                  <span>📜</span> 明细
-                </button>
-              </div>
-            </div>
-
-            <!-- 钱包明细 -->
-            <div class="wallet-history" id="walletHistorySection" style="display:none;">
-              <div class="wallet-history-header">
-                <span>📜</span> 交易明细
-              </div>
-              <div id="walletHistoryList">
-                <div class="wallet-history-empty">暂无交易记录</div>
-              </div>
-            </div>
-
             <!-- Profile Menu -->
             <div class="profile-menu">
+              <div class="menu-item" onclick="openWalletPage()">
+                <span class="menu-icon">💰</span>
+                <span class="menu-text">我的钱包</span>
+                <span class="menu-arrow">›</span>
+              </div>
               <div class="menu-item">
                 <span class="menu-icon">⭐</span>
                 <span class="menu-text">我的收藏</span>
@@ -12186,6 +12376,15 @@
       </div>
 
       <div class="conv-input-area" id="inputArea">
+        <!-- 引用预览区域 -->
+        <div class="quote-preview" id="quotePreview" style="display: none">
+          <div class="quote-preview-content">
+            <div class="quote-preview-sender" id="quotePreviewSender"></div>
+            <div class="quote-preview-text" id="quotePreviewText"></div>
+          </div>
+          <button class="quote-preview-close" onclick="cancelQuote()">✕</button>
+        </div>
+
         <div class="conv-input-bar">
           <button class="tool-btn icon-btn" onclick="toggleChatPanel('plus')">
             +
@@ -12238,10 +12437,6 @@
             <div class="panel-item" onclick="handleCameraAction()">
               <div class="panel-icon-box bg-camera">📷</div>
               <span class="panel-label">拍摄</span>
-            </div>
-            <div class="panel-item" onclick="sendRedPacket()">
-              <div class="panel-icon-box bg-redpacket">🧧</div>
-              <span class="panel-label">红包</span>
             </div>
             <div class="panel-item" onclick="startFakeCall()">
               <div class="panel-icon-box bg-call">📞</div>
@@ -12699,6 +12894,33 @@
                     color: #666;
                   "
                   >40px</span
+                >
+              </div>
+            </div>
+
+            <!-- 气泡间距调节 -->
+            <div class="form-group" style="margin-top: 16px">
+              <label class="form-label">气泡间距</label>
+              <div style="display: flex; align-items: center; gap: 12px">
+                <input
+                  type="range"
+                  id="bubbleGapSlider"
+                  min="2"
+                  max="20"
+                  value="6"
+                  style="flex: 1; accent-color: #f48fb1"
+                  oninput="updateBubbleGapPreview(this.value)"
+                  onchange="saveBubbleGap(this.value)"
+                />
+                <span
+                  id="bubbleGapValue"
+                  style="
+                    min-width: 45px;
+                    text-align: center;
+                    font-size: 0.9rem;
+                    color: #666;
+                  "
+                  >6px</span
                 >
               </div>
             </div>
@@ -15364,22 +15586,187 @@
             if (
               m.isHtml ||
               rawContent.includes("<img") ||
-              rawContent.includes("style=")
+              rawContent.includes("location-card")
             ) {
+              // 如果是转账卡片HTML，需要根据状态更新显示
+              if (rawContent.includes("transfer-card") && m.transferStatus) {
+                const status = m.transferStatus;
+                if (status === "accepted" || status === "rejected") {
+                  const statusText =
+                    status === "accepted" ? "已收款" : "已退回";
+                  // 替换状态显示
+                  contentHtml = rawContent
+                    .replace(
+                      /class="transfer-card-status[^"]*">[^<]*</g,
+                      `class="transfer-card-status ${status}">${statusText}<`
+                    )
+                    .replace(/data-status="[^"]*"/g, `data-status="${status}"`);
+                } else {
+                  contentHtml = rawContent;
+                }
+              } else {
+                contentHtml = rawContent;
+              }
+            } else if (rawContent.includes("transfer-card")) {
+              // AI发的转账卡片（存储为HTML格式）
               contentHtml = rawContent;
             } else {
-              // 先处理AI表情包标签 [sticker:xxx]
-              contentHtml = processAiStickerTags(rawContent);
-              // 再处理其他格式化
-              if (!contentHtml.includes('class="sticker-img"')) {
-                contentHtml = formatNovelMessage(contentHtml);
+              // 检查是否包含特殊标签
+              const hasTransfer = /\[转账[:：]/.test(rawContent);
+              const hasRedpacket = /\[红包[:：]/.test(rawContent);
+              const hasLocation = /\[位置[:：]/.test(rawContent);
+
+              if (hasTransfer || hasRedpacket || hasLocation) {
+                // 处理特殊标签，生成卡片
+                let processed = rawContent;
+                const msgIdx = m.originalIndex; // 使用消息索引作为唯一标识
+
+                // 检查消息是否已被处理过（有状态）
+                const msgStatus = m.transferStatus || "pending";
+                const isProcessed = msgStatus !== "pending";
+
+                // 处理转账标签
+                processed = processed.replace(
+                  /\[转账[:：](\d+(?:\.\d+)?)(?:[:：]([^\]]*))?\]/g,
+                  (match, amount, note) => {
+                    const footerContent = isProcessed
+                      ? `<span class="transfer-card-status ${msgStatus}">${
+                          msgStatus === "accepted" ? "已收款" : "已退回"
+                        }</span>`
+                      : `<div class="transfer-card-btns">
+                          <button class="transfer-card-btn reject" onclick="event.stopPropagation();rejectAITransfer(${msgIdx},this)">退回</button>
+                          <button class="transfer-card-btn accept" onclick="event.stopPropagation();acceptAITransfer(${msgIdx},${amount},this)">收款</button>
+                        </div>`;
+                    return `<div class="transfer-card" data-msg-idx="${msgIdx}" data-amount="${amount}">
+                      <div class="transfer-card-header">
+                        <div class="transfer-card-icon">💰</div>
+                        <div class="transfer-card-info">
+                          <div class="transfer-card-title">${
+                            note || "转账给你"
+                          }</div>
+                          <div class="transfer-card-amount">${parseFloat(
+                            amount
+                          ).toFixed(2)}</div>
+                        </div>
+                      </div>
+                      <div class="transfer-card-footer">
+                        <span>微信转账</span>
+                        ${footerContent}
+                      </div>
+                    </div>`;
+                  }
+                );
+
+                // 处理红包标签
+                processed = processed.replace(
+                  /\[红包[:：](\d+(?:\.\d+)?)(?:[:：]([^\]]*))?\]/g,
+                  (match, amount, note) => {
+                    const footerContent = isProcessed
+                      ? `<span class="transfer-card-status ${msgStatus}">${
+                          msgStatus === "accepted" ? "已领取" : "已退回"
+                        }</span>`
+                      : `<div class="transfer-card-btns">
+                          <button class="transfer-card-btn reject" onclick="event.stopPropagation();rejectAITransfer(${msgIdx},this)">退回</button>
+                          <button class="transfer-card-btn accept" onclick="event.stopPropagation();acceptAITransfer(${msgIdx},${amount},this)">领取</button>
+                        </div>`;
+                    return `<div class="transfer-card" data-msg-idx="${msgIdx}" data-amount="${amount}">
+                      <div class="transfer-card-header">
+                        <div class="transfer-card-icon">🧧</div>
+                        <div class="transfer-card-info">
+                          <div class="transfer-card-title">${
+                            note || "恭喜发财"
+                          }</div>
+                          <div class="transfer-card-amount">${parseFloat(
+                            amount
+                          ).toFixed(2)}</div>
+                        </div>
+                      </div>
+                      <div class="transfer-card-footer">
+                        <span>微信红包</span>
+                        ${footerContent}
+                      </div>
+                    </div>`;
+                  }
+                );
+
+                // 处理位置标签
+                processed = processed.replace(
+                  /\[位置[:：]([^\]:：]+)(?:[:：]([^\]]*))?\]/g,
+                  (match, name, address) => {
+                    return `<div class="location-card">
+                      <div class="location-card-map">
+                        <div class="location-card-map-bg"></div>
+                        <div class="location-card-map-icon">📍</div>
+                      </div>
+                      <div class="location-card-info">
+                        <div class="location-card-name">${name}</div>
+                        <div class="location-card-address">${
+                          address || "点击查看详情"
+                        }</div>
+                      </div>
+                    </div>`;
+                  }
+                );
+
+                contentHtml = processed;
+              } else {
+                // 普通消息
+                let processed = rawContent;
+
+                // 处理嵌入的语音标签 [语音:xxx] - 转换为可点击的语音提示
+                processed = processed.replace(
+                  /\[语音[:：]([^\]]+)\]/g,
+                  (match, text) =>
+                    `<span class="inline-voice-tag" onclick="playInlineVoice(this, '${escapeHtml(
+                      text
+                    ).replace(/'/g, "\\'")}')">🎤 ${
+                      text.length > 20 ? text.substring(0, 20) + "..." : text
+                    }</span>`
+                );
+
+                // 先处理AI表情包标签 [sticker:xxx]
+                contentHtml = processAiStickerTags(processed);
+                // 再处理其他格式化
+                if (
+                  !contentHtml.includes('class="sticker-img"') &&
+                  !contentHtml.includes("inline-voice-tag")
+                ) {
+                  contentHtml = formatNovelMessage(contentHtml);
+                }
               }
+            }
+
+            // 检测是否为特殊卡片消息，决定气泡样式
+            const isSpecialCard =
+              contentHtml.includes("transfer-card") ||
+              contentHtml.includes("location-card");
+            const specialBubbleStyle = isSpecialCard
+              ? 'style="background:transparent!important;box-shadow:none!important;padding:0!important;"'
+              : "";
+
+            // 生成引用显示HTML
+            let quoteHtml = "";
+            if (m.quote) {
+              const quoteSender =
+                m.quote.sender || (m.quote.senderRole === "user" ? "我" : "TA");
+              const quoteText =
+                m.quote.displayContent ||
+                (m.quote.content || "")
+                  .replace(/<[^>]+>/g, "")
+                  .substring(0, 50);
+              quoteHtml = `
+                <div class="msg-quote">
+                  <div class="msg-quote-sender">${quoteSender}</div>
+                  <div class="msg-quote-text">${escapeHtml(quoteText)}</div>
+                </div>
+              `;
             }
 
             // 普通气泡 HTML
             return `
         <div class="${bubbleClass}"
                 data-index="${m.originalIndex}"
+                ${specialBubbleStyle}
                 oncontextmenu="return false;"
                 ontouchstart="handleTouchStart(event, ${m.originalIndex})"
                 ontouchend="handleTouchEnd()"
@@ -15388,7 +15775,7 @@
                 onmouseup="handleMouseUp()"
                 onclick="handleBubbleClick(event, ${m.originalIndex})"
         >
-            ${contentHtml}
+            ${quoteHtml}${contentHtml}
         </div>`;
           })
           .join("");
@@ -15402,8 +15789,16 @@
           : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:20px;">${defaultEmoji}</div>`;
 
         // 8. 组合最终 HTML
+        // 在多选模式下，整行可点击
+        const isSelecting =
+          typeof isSelectionMode !== "undefined" && isSelectionMode;
+        const wrapperFirstMsgIdx = messages[0]?.originalIndex;
+        const wrapperClickHandler = isSelecting
+          ? `onclick="handleWrapperClick(event, ${wrapperFirstMsgIdx})"`
+          : "";
+
         return `
-    <div class="msg-wrapper ${isUser ? "user" : "ai"}">
+    <div class="msg-wrapper ${isUser ? "user" : "ai"}" ${wrapperClickHandler}>
         <div class="chat-avatar-small">
             ${avatarHtml}
         </div>
@@ -15438,14 +15833,29 @@
           chatHistories[currentChatCharId] = [];
         }
 
-        chatHistories[currentChatCharId].push({
+        // 构建消息对象，包含引用信息
+        const msgObj = {
           role: "user",
           content: text,
           time: new Date().toLocaleTimeString("zh-CN", {
             hour: "2-digit",
             minute: "2-digit",
           }),
-        });
+        };
+
+        // 如果有引用，添加引用信息
+        if (currentQuote) {
+          msgObj.quote = {
+            sender: currentQuote.sender,
+            senderRole: currentQuote.senderRole,
+            content: currentQuote.content,
+            displayContent: currentQuote.displayContent,
+          };
+          // 清除引用
+          cancelQuote();
+        }
+
+        chatHistories[currentChatCharId].push(msgObj);
 
         // Save and render
         localforage.setItem("chatHistories", chatHistories);
@@ -15606,7 +16016,7 @@
               }
             }
           } else {
-            systemContent += `\n【模式：即时通讯】\n1. 像真人一样口语化聊天。\n2. **必须**拆分为多条短消息，使用 ||| 分隔。\n3. **语音消息功能**：你可以发送语音消息！格式为 [语音:要说的内容]。\n   - 语音消息适合表达亲密、撒娇、安慰等情感场景\n   - 不要每条都发语音，自然地穿插在文字消息中（大约20-30%概率）\n   - 语音内容应该口语化、自然，可以带语气词如"嗯~"、"啊"、"呢"\n   - 示例：宝贝 ||| [语音:想你了呢，今天有没有乖乖吃饭呀~] ||| 记得早点休息哦\n`;
+            systemContent += `\n【模式：即时通讯】\n1. 像真人一样口语化聊天，**禁止使用括号()包裹任何内容**，直接说话即可。\n2. **必须**拆分为多条短消息，使用 ||| 分隔。\n3. **语音消息功能**：你可以发送语音消息！格式为 [语音:要说的内容]。\n   - 语音消息适合表达亲密、撒娇、安慰等情感场景\n   - 不要每条都发语音，自然地穿插在文字消息中（大约20-30%概率）\n   - 语音内容应该口语化、自然，可以带语气词如"嗯~"、"啊"、"呢"\n   - 示例：宝贝 ||| [语音:想你了呢，今天有没有乖乖吃饭呀~] ||| 记得早点休息哦\n4. **发送转账**：你可以给用户发转账！格式为 [转账:金额:说明]\n   - 适合在节日祝福、表达感谢、安慰心情等场景使用\n   - 金额一般在1-200之间，不要太频繁使用\n   - 示例：生日快乐！ ||| [转账:88.88:生日红包~] ||| 希望你喜欢\n5. **接收/退回用户转账**：当用户给你发转账时，你可以选择接收或退回\n   - 接收转账格式：[收款]  退回转账格式：[退款]\n   - 收到转账后自然地感谢或拒绝，不要每次都收，偶尔也要客气地退回\n   - 示例（接收）：哇谢谢宝贝！ ||| [收款] ||| 我会好好用的～\n   - 示例（退回）：这个我不能收啦！ ||| [退款] ||| 你自己留着花吧～\n6. **位置功能**：你可以发送位置卡片！格式为 [位置:地点名称:详细地址]\n   - 适合在约会、见面、分享当前位置等场景使用\n   - 示例：我到啦！ ||| [位置:星巴克咖啡:南京路步行街店] ||| 你快来～\n7. **撤回功能**：你可以撤回刚发的消息！格式为 [撤回]\n   - 适合在说错话、发错消息、后悔、害羞等场景使用\n   - 撤回后用户仍能看到你撤回了什么\n   - 示例：我喜欢你... ||| [撤回] ||| 没什么！\n8. **引用回复功能**：你可以引用用户之前说的某句话来针对性回复！格式为 [引用:要引用的原文内容]回复内容\n   - 适合在回应用户之前说的某句具体的话、澄清误解、表达对某句话的感受时使用\n   - 引用的内容会显示在你消息的上方，让用户知道你在回复哪句话\n   - 示例：[引用:我今天好累啊]心疼你... ||| 早点休息好不好？\n`;
           }
 
           // 添加AI表情包功能提示（仅在非线下模式时启用）
@@ -15740,23 +16150,42 @@
               replyParts = [aiReply.trim() || "嗯～"];
             }
 
-            // 进一步分割：把表情包标签分离成单独的消息
+            // 进一步分割：把特殊标签分离成单独的消息
             replyParts = replyParts.flatMap((part) => {
-              // 匹配 [sticker:xxx] 或 [表情:xxx] 或 [表情包:xxx]
-              const stickerRegex = /(\[(sticker|表情|表情包)[：:][^\]]+\])/gi;
-              // 用表情包标签分割，同时保留标签本身
+              // 匹配所有特殊标签：表情包、转账、红包、位置、语音、撤回、收款、退款
+              const specialTagRegex =
+                /(\[(sticker|表情|表情包|转账|红包|位置|语音)[：:][^\]]+\]|\[撤回\]|\[收款\]|\[退款\])/gi;
+              // 用标签分割，同时保留标签本身
               const segments = part
-                .split(stickerRegex)
+                .split(specialTagRegex)
                 .filter(
                   (s) =>
-                    s && s.trim() && !["sticker", "表情", "表情包"].includes(s)
+                    s &&
+                    s.trim() &&
+                    ![
+                      "sticker",
+                      "表情",
+                      "表情包",
+                      "转账",
+                      "红包",
+                      "位置",
+                      "语音",
+                      "撤回",
+                      "收款",
+                      "退款",
+                    ].includes(s)
                 );
               return segments.map((s) => s.trim()).filter((s) => s);
             });
 
-            // 只朗读最后一条，或者朗读所有？为了体验，建议朗读所有连在一起
+            // 只朗读文字消息
             textToRead = replyParts
-              .filter((p) => !p.match(/^\[(sticker|表情|表情包)[：:]/i))
+              .filter(
+                (p) =>
+                  !p.match(
+                    /^\[(sticker|表情|表情包|转账|红包|位置|语音|撤回|收款|退款)[：:]?/i
+                  )
+              )
               .join("，");
 
             for (let i = 0; i < replyParts.length; i++) {
@@ -15765,14 +16194,95 @@
               );
 
               const partContent = replyParts[i];
+
+              // 检查是否是撤回标签
+              const isRecallTag = /^\[撤回\]$/i.test(partContent.trim());
+              if (isRecallTag) {
+                // 撤回上一条AI消息
+                const history = chatHistories[savedCharId];
+                if (history && history.length > 0) {
+                  // 找到最后一条AI消息并标记为撤回
+                  for (let j = history.length - 1; j >= 0; j--) {
+                    if (
+                      history[j].role === "assistant" &&
+                      !history[j].isRecalled
+                    ) {
+                      history[j].isRecalled = true;
+                      break;
+                    }
+                  }
+                  saveAndRenderForChar(savedCharId);
+                }
+                continue; // 不保存撤回标签本身
+              }
+
+              // 检查是否是收款标签
+              const isAcceptTag = /^\[收款\]$/i.test(partContent.trim());
+              if (isAcceptTag) {
+                // 找到最近一条用户发的待处理转账并接收
+                const history = chatHistories[savedCharId];
+                if (history) {
+                  for (let j = history.length - 1; j >= 0; j--) {
+                    if (
+                      history[j].role === "user" &&
+                      history[j].transferId &&
+                      history[j].transferStatus === "pending"
+                    ) {
+                      updateUserTransferStatus(history[j].transferId, true);
+                      break;
+                    }
+                  }
+                }
+                continue; // 不保存收款标签本身
+              }
+
+              // 检查是否是退款标签
+              const isRejectTag = /^\[退款\]$/i.test(partContent.trim());
+              if (isRejectTag) {
+                // 找到最近一条用户发的待处理转账并退回
+                const history = chatHistories[savedCharId];
+                if (history) {
+                  for (let j = history.length - 1; j >= 0; j--) {
+                    if (
+                      history[j].role === "user" &&
+                      history[j].transferId &&
+                      history[j].transferStatus === "pending"
+                    ) {
+                      updateUserTransferStatus(history[j].transferId, false);
+                      break;
+                    }
+                  }
+                }
+                continue; // 不保存退款标签本身
+              }
+
               const isVoiceMsg = /^\[语音[:：](.+)\]$/.test(partContent);
               const isStickerMsg = /^\[(sticker|表情|表情包)[：:]/i.test(
                 partContent
               );
 
+              // 检查是否包含引用标签 [引用:xxx]内容
+              let quoteInfo = null;
+              let actualContent = partContent;
+              const quoteMatch = partContent.match(
+                /^\[引用[:：]([^\]]+)\](.*)$/s
+              );
+              if (quoteMatch) {
+                quoteInfo = {
+                  sender: "我", // AI引用的是用户说的话
+                  senderRole: "user",
+                  content: quoteMatch[1],
+                  displayContent:
+                    quoteMatch[1].length > 50
+                      ? quoteMatch[1].substring(0, 50) + "..."
+                      : quoteMatch[1],
+                };
+                actualContent = quoteMatch[2].trim() || partContent; // 如果没有回复内容，保留原始
+              }
+
               const msgObj = {
                 role: "assistant",
-                content: partContent,
+                content: actualContent,
                 time: new Date().toLocaleTimeString("zh-CN", {
                   hour: "2-digit",
                   minute: "2-digit",
@@ -15780,10 +16290,15 @@
                 audioUrl: null,
               };
 
+              // 添加引用信息
+              if (quoteInfo) {
+                msgObj.quote = quoteInfo;
+              }
+
               chatHistories[savedCharId].push(msgObj);
               saveAndRenderForChar(savedCharId);
               // 【新增】更新列表预览 (每次循环都更新，这样可以看到对方正在一句句发)
-              updateCharacterLastMessage(savedCharId, partContent);
+              updateCharacterLastMessage(savedCharId, actualContent);
 
               // 【修复】检查聊天对话页面是否打开，如果没打开则显示通知弹窗和红点（只在最后一条消息时）
               if (i === replyParts.length - 1) {
@@ -16060,6 +16575,13 @@
         document.getElementById("avatarSizeValue").textContent =
           avatarSize + "px";
         applyAvatarSize(avatarSize);
+
+        // 气泡间距
+        const bubbleGap = char.bubbleGap || 6;
+        document.getElementById("bubbleGapSlider").value = bubbleGap;
+        document.getElementById("bubbleGapValue").textContent =
+          bubbleGap + "px";
+        applyBubbleGap(bubbleGap);
 
         // 置顶设置
         document.getElementById("settingsPinned").checked =
@@ -16366,6 +16888,45 @@
         `;
 
         if (!document.getElementById("avatarSizeStyle")) {
+          document.head.appendChild(style);
+        }
+      }
+
+      // 更新气泡间距预览
+      function updateBubbleGapPreview(gap) {
+        document.getElementById("bubbleGapValue").textContent = gap + "px";
+        applyBubbleGap(gap);
+      }
+
+      // 保存气泡间距设置
+      async function saveBubbleGap(gap) {
+        if (!currentChatCharId) return;
+
+        const char = window.characters.find((c) => c.id === currentChatCharId);
+        if (char) {
+          char.bubbleGap = parseInt(gap);
+          await localforage.setItem("characters", window.characters);
+        }
+      }
+
+      // 应用气泡间距
+      function applyBubbleGap(gap) {
+        const style =
+          document.getElementById("bubbleGapStyle") ||
+          document.createElement("style");
+        style.id = "bubbleGapStyle";
+
+        const gapNum = parseInt(gap);
+        style.textContent = `
+          .msg-wrapper {
+            margin-bottom: ${gapNum}px !important;
+          }
+          .msg-row {
+            gap: ${gapNum}px !important;
+          }
+        `;
+
+        if (!document.getElementById("bubbleGapStyle")) {
           document.head.appendChild(style);
         }
       }
@@ -17837,9 +18398,20 @@
               );
               currentGroup = [];
             }
-            html += `<div class="msg-system-tip">${
-              msg.role === "user" ? "你" : "对方"
-            }撤回了一条消息</div>`;
+
+            // 区分用户撤回和AI撤回
+            if (msg.role === "user") {
+              html += `<div class="msg-system-tip">你撤回了一条消息</div>`;
+            } else {
+              // AI撤回，用户可以点击查看原内容
+              const recalledContent = (msg.content || "")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .substring(0, 50);
+              html += `<div class="msg-system-tip msg-recalled-ai" onclick="showRecalledContent(${index})">
+                对方撤回了一条消息 <span style="color:#f48fb1;font-size:0.75rem;">[点击查看]</span>
+              </div>`;
+            }
             lastRole = null;
             return;
           }
@@ -17962,6 +18534,7 @@
 
         // 构建菜单内容
         let menuHtml = `<div class="menu-item" onclick="handleCopyMsg()">复制</div>`;
+        menuHtml += `<div class="menu-item" onclick="handleQuoteMsg()">引用</div>`;
 
         if (isUser) {
           menuHtml += `<div class="menu-item" onclick="handleRecallMsg()">撤回</div>`;
@@ -18007,7 +18580,24 @@
         }
       }
 
+      // 整行点击处理（多选模式下）
+      function handleWrapperClick(event, index) {
+        if (isSelectionMode && index !== undefined) {
+          event.stopPropagation();
+          if (selectedIndices.has(index)) {
+            selectedIndices.delete(index);
+          } else {
+            selectedIndices.add(index);
+          }
+          updateSelectionUI();
+          renderConversation();
+        }
+      }
+
       // 5. 菜单功能实现
+
+      // 当前引用的消息
+      var currentQuote = null;
 
       // 复制
       function handleCopyMsg() {
@@ -18015,6 +18605,48 @@
         navigator.clipboard.writeText(msg.content).then(() => {
           showToast("已复制");
         });
+        hideContextMenu();
+      }
+
+      // 引用消息
+      function handleQuoteMsg() {
+        const msg = chatHistories[currentChatCharId][activeMsgIndex];
+        const char = characters.find((c) => c.id === currentChatCharId);
+
+        // 获取发送者名称
+        const senderName =
+          msg.role === "user" ? "我" : char?.note || char?.name || "TA";
+
+        // 清理消息内容用于显示（去掉HTML标签）
+        let content = msg.content || "";
+        content = content.replace(/<[^>]+>/g, "").trim();
+        if (content.length > 50) content = content.substring(0, 50) + "...";
+
+        // 保存引用信息
+        currentQuote = {
+          msgIndex: activeMsgIndex,
+          sender: senderName,
+          senderRole: msg.role,
+          content: msg.content,
+          displayContent: content,
+        };
+
+        // 显示引用预览
+        document.getElementById("quotePreview").style.display = "flex";
+        document.getElementById("quotePreviewSender").textContent = senderName;
+        document.getElementById("quotePreviewText").textContent = content;
+
+        // 聚焦输入框
+        document.getElementById("convInput").focus();
+
+        hideContextMenu();
+        showToast("已引用消息");
+      }
+
+      // 取消引用
+      function cancelQuote() {
+        currentQuote = null;
+        document.getElementById("quotePreview").style.display = "none";
       }
 
       // 撤回 (核心功能：AI可见，用户不可见)
@@ -18027,6 +18659,20 @@
 
         renderConversation();
         showToast("消息已撤回");
+        hideContextMenu();
+      }
+
+      // 查看AI撤回的消息内容
+      function showRecalledContent(msgIndex) {
+        const msg = chatHistories[currentChatCharId][msgIndex];
+        if (!msg) return;
+
+        let content = msg.content || "";
+        // 清理HTML标签用于显示
+        content = content.replace(/<[^>]+>/g, "").substring(0, 200);
+        if (content.length >= 200) content += "...";
+
+        alert(`对方撤回的内容：\n\n${content}`);
       }
 
       // 删除 (核心功能：AI失忆)
@@ -18388,6 +19034,47 @@
         localforage.setItem("voiceConfig", voiceConfig);
         showToast("语音配置已保存 🎙️");
       }
+
+      // 播放嵌入式语音标签
+      async function playInlineVoice(el, text) {
+        if (!text) return;
+
+        // 检查是否有语音配置
+        const settings = chatSettings[currentChatCharId] || {};
+        if (!settings.voiceId) {
+          showToast("此角色未配置语音");
+          return;
+        }
+
+        el.innerHTML = "🔊 播放中...";
+        el.style.pointerEvents = "none";
+
+        try {
+          const audioUrl = await generateSpeech(text, currentChatCharId);
+          if (audioUrl) {
+            const audio = new Audio(audioUrl);
+            audio.play();
+            audio.onended = () => {
+              el.innerHTML = `🎤 ${
+                text.length > 20 ? text.substring(0, 20) + "..." : text
+              }`;
+              el.style.pointerEvents = "auto";
+            };
+          } else {
+            el.innerHTML = `🎤 ${
+              text.length > 20 ? text.substring(0, 20) + "..." : text
+            }`;
+            el.style.pointerEvents = "auto";
+          }
+        } catch (e) {
+          console.error("语音播放失败", e);
+          el.innerHTML = `🎤 ${
+            text.length > 20 ? text.substring(0, 20) + "..." : text
+          }`;
+          el.style.pointerEvents = "auto";
+        }
+      }
+
       // ==================== 优化版：generateSpeech (更自然的断句) ====================
       async function generateSpeech(text, charId) {
         // 1. 获取 ID 和 Key
@@ -19791,6 +20478,11 @@
 
       // 查看大图 (简单的全屏预览)
       function showFullImage(src) {
+        // 多选模式下不放大图片
+        if (typeof isSelectionMode !== "undefined" && isSelectionMode) {
+          return;
+        }
+
         const overlay = document.createElement("div");
         overlay.style.cssText = `
         position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -19858,22 +20550,26 @@
       }
       function sendFakeLocation() {
         // 打开位置选择弹窗
-        document.getElementById('locationModal').classList.add('active');
-        document.getElementById('locationNameInput').value = '';
-        document.getElementById('locationAddressInput').value = '';
+        document.getElementById("locationModal").classList.add("active");
+        document.getElementById("locationNameInput").value = "";
+        document.getElementById("locationAddressInput").value = "";
         closeChatPanel();
       }
 
       function closeLocationModal() {
-        document.getElementById('locationModal').classList.remove('active');
+        document.getElementById("locationModal").classList.remove("active");
       }
 
       function confirmSendLocation() {
-        const name = document.getElementById('locationNameInput').value.trim() || '我的位置';
-        const address = document.getElementById('locationAddressInput').value.trim() || '点击查看详情';
-        
+        const name =
+          document.getElementById("locationNameInput").value.trim() ||
+          "我的位置";
+        const address =
+          document.getElementById("locationAddressInput").value.trim() ||
+          "点击查看详情";
+
         const locationHtml = `
-          <div class="location-card" onclick="alert('正在打开地图...')">
+          <div class="location-card">
             <div class="location-card-map">
               <div class="location-card-map-bg"></div>
               <div class="location-card-map-icon">📍</div>
@@ -19882,385 +20578,465 @@
               <div class="location-card-name">${name}</div>
               <div class="location-card-address">${address}</div>
             </div>
-            <div class="location-card-action">🗺️ 查看位置</div>
           </div>
         `;
-        
+
         sendMediaMessage(locationHtml, "location");
         closeLocationModal();
       }
 
-      // AI发送位置卡片
+      // AI发送位置卡片 (保留兼容)
       function aiSendLocation(name, address) {
-        const locationHtml = `
-          <div class="location-card" onclick="alert('正在打开地图...')">
+        return `
+          <div class="location-card">
             <div class="location-card-map">
               <div class="location-card-map-bg"></div>
               <div class="location-card-map-icon">📍</div>
             </div>
             <div class="location-card-info">
-              <div class="location-card-name">${name || 'TA的位置'}</div>
-              <div class="location-card-address">${address || '点击查看详情'}</div>
+              <div class="location-card-name">${name || "TA的位置"}</div>
+              <div class="location-card-address">${
+                address || "点击查看详情"
+              }</div>
             </div>
-            <div class="location-card-action">🗺️ 查看位置</div>
           </div>
         `;
-        return locationHtml;
       }
 
       /* ==================== 钱包系统 ==================== */
       window.walletData = {
         balance: 0,
-        history: []
+        history: [],
       };
 
       // 初始化钱包数据
       async function initWalletData() {
         try {
-          const saved = await localforage.getItem('walletData');
+          const saved = await localforage.getItem("walletData");
           if (saved) {
             window.walletData = saved;
           }
           updateWalletDisplay();
         } catch (e) {
-          console.error('钱包数据加载失败', e);
+          console.error("钱包数据加载失败", e);
         }
       }
 
       // 保存钱包数据
       async function saveWalletData() {
         try {
-          await localforage.setItem('walletData', window.walletData);
+          await localforage.setItem("walletData", window.walletData);
         } catch (e) {
-          console.error('钱包数据保存失败', e);
+          console.error("钱包数据保存失败", e);
         }
       }
 
       // 更新钱包显示
       function updateWalletDisplay() {
-        const balanceEl = document.getElementById('walletBalance');
+        // 更新钱包页面的余额
+        const balanceEl = document.getElementById("walletBalanceDisplay");
         if (balanceEl) {
           balanceEl.textContent = window.walletData.balance.toFixed(2);
         }
       }
 
+      // 打开钱包页面
+      function openWalletPage() {
+        document.getElementById("walletPage").classList.add("active");
+        updateWalletDisplay();
+        renderWalletHistoryPage();
+      }
+
+      // 关闭钱包页面
+      function closeWalletPage() {
+        document.getElementById("walletPage").classList.remove("active");
+      }
+
+      // 渲染钱包历史记录
+      function renderWalletHistoryPage() {
+        const list = document.getElementById("walletHistoryListPage");
+        const history = window.walletData.history || [];
+
+        if (history.length === 0) {
+          list.innerHTML =
+            '<div class="wallet-history-empty">暂无交易记录</div>';
+          return;
+        }
+
+        let html = "";
+        history.slice(0, 50).forEach((item) => {
+          const isIncome = item.type === "recharge" || item.type === "receive";
+          html += `
+            <div class="wallet-history-item">
+              <div class="wallet-history-icon ${
+                isIncome ? "income" : "expense"
+              }">
+                ${
+                  item.type === "recharge"
+                    ? "💳"
+                    : item.type === "receive"
+                    ? "📥"
+                    : "📤"
+                }
+              </div>
+              <div class="wallet-history-info">
+                <div class="wallet-history-desc">${item.desc}</div>
+                <div class="wallet-history-time">${item.time}</div>
+              </div>
+              <div class="wallet-history-amount ${
+                isIncome ? "income" : "expense"
+              }">
+                ${isIncome ? "+" : "-"}¥${item.amount.toFixed(2)}
+              </div>
+            </div>
+          `;
+        });
+
+        list.innerHTML = html;
+      }
+
       // 打开充值弹窗
       function openRechargeModal() {
-        document.getElementById('rechargeModal').classList.add('active');
-        document.getElementById('rechargeCustomAmount').value = '';
+        document.getElementById("rechargeModal").classList.add("active");
+        document.getElementById("rechargeCustomAmount").value = "";
         // 清除选中状态
-        document.querySelectorAll('.recharge-amount-btn').forEach(btn => {
-          btn.classList.remove('selected');
+        document.querySelectorAll(".recharge-amount-btn").forEach((btn) => {
+          btn.classList.remove("selected");
         });
       }
 
       function closeRechargeModal() {
-        document.getElementById('rechargeModal').classList.remove('active');
+        document.getElementById("rechargeModal").classList.remove("active");
       }
 
       function selectRechargeAmount(amount) {
-        document.getElementById('rechargeCustomAmount').value = amount;
-        document.querySelectorAll('.recharge-amount-btn').forEach(btn => {
-          btn.classList.remove('selected');
+        document.getElementById("rechargeCustomAmount").value = amount;
+        document.querySelectorAll(".recharge-amount-btn").forEach((btn) => {
+          btn.classList.remove("selected");
           if (btn.textContent.includes(amount)) {
-            btn.classList.add('selected');
+            btn.classList.add("selected");
           }
         });
       }
 
       function clearRechargeSelection() {
-        document.querySelectorAll('.recharge-amount-btn').forEach(btn => {
-          btn.classList.remove('selected');
+        document.querySelectorAll(".recharge-amount-btn").forEach((btn) => {
+          btn.classList.remove("selected");
         });
       }
 
       function confirmRecharge() {
-        const amount = parseFloat(document.getElementById('rechargeCustomAmount').value);
+        const amount = parseFloat(
+          document.getElementById("rechargeCustomAmount").value
+        );
         if (!amount || amount <= 0) {
-          showToast('请输入有效金额');
+          showToast("请输入有效金额");
           return;
         }
-        
+
         window.walletData.balance += amount;
         window.walletData.history.unshift({
           id: Date.now(),
-          type: 'recharge',
+          type: "recharge",
           amount: amount,
-          desc: '钱包充值',
-          time: new Date().toLocaleString('zh-CN', {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'})
+          desc: "钱包充值",
+          time: new Date().toLocaleString("zh-CN", {
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
         });
-        
+
         saveWalletData();
         updateWalletDisplay();
+        renderWalletHistoryPage(); // 刷新历史列表
         closeRechargeModal();
         showToast(`充值成功！余额 ¥${window.walletData.balance.toFixed(2)}`);
-      }
-
-      // 查看钱包明细
-      function viewWalletHistory() {
-        const section = document.getElementById('walletHistorySection');
-        const list = document.getElementById('walletHistoryList');
-        
-        if (section.style.display === 'none') {
-          section.style.display = 'block';
-          renderWalletHistory();
-        } else {
-          section.style.display = 'none';
-        }
-      }
-
-      function renderWalletHistory() {
-        const list = document.getElementById('walletHistoryList');
-        const history = window.walletData.history || [];
-        
-        if (history.length === 0) {
-          list.innerHTML = '<div class="wallet-history-empty">暂无交易记录</div>';
-          return;
-        }
-        
-        let html = '';
-        history.slice(0, 20).forEach(item => {
-          const isIncome = item.type === 'recharge' || item.type === 'receive';
-          html += `
-            <div class="wallet-history-item">
-              <div class="wallet-history-icon ${isIncome ? 'income' : 'expense'}">
-                ${item.type === 'recharge' ? '💳' : item.type === 'receive' ? '📥' : '📤'}
-              </div>
-              <div class="wallet-history-info">
-                <div class="wallet-history-title">${item.desc}</div>
-                <div class="wallet-history-time">${item.time}</div>
-              </div>
-              <div class="wallet-history-amount ${isIncome ? 'income' : 'expense'}">
-                ${isIncome ? '+' : '-'}¥${item.amount.toFixed(2)}
-              </div>
-            </div>
-          `;
-        });
-        
-        list.innerHTML = html;
       }
 
       /* ==================== 转账功能 ==================== */
       function openTransferModal() {
         if (!currentChatCharId) {
-          showToast('请先打开一个对话');
+          showToast("请先打开一个对话");
           return;
         }
-        
-        const char = characters.find(c => c.id === currentChatCharId);
+
+        const char = characters.find((c) => c.id === currentChatCharId);
         if (!char) return;
-        
-        document.getElementById('sendTransferModal').classList.add('active');
-        document.getElementById('transferToName').textContent = `转给：${char.name}`;
-        document.getElementById('transferAmountInput').value = '';
-        document.getElementById('transferNoteInput').value = '';
-        document.getElementById('transferBalanceHint').textContent = `可用余额：¥${window.walletData.balance.toFixed(2)}`;
+
+        document.getElementById("sendTransferModal").classList.add("active");
+        document.getElementById(
+          "transferToName"
+        ).textContent = `转给：${char.name}`;
+        document.getElementById("transferAmountInput").value = "";
+        document.getElementById("transferNoteInput").value = "";
+        document.getElementById(
+          "transferBalanceHint"
+        ).textContent = `可用余额：¥${window.walletData.balance.toFixed(2)}`;
         closeChatPanel();
       }
 
       function closeTransferModal() {
-        document.getElementById('sendTransferModal').classList.remove('active');
+        document.getElementById("sendTransferModal").classList.remove("active");
       }
 
       function confirmTransfer() {
-        const amount = parseFloat(document.getElementById('transferAmountInput').value);
-        const note = document.getElementById('transferNoteInput').value.trim() || '转账';
-        
+        const amount = parseFloat(
+          document.getElementById("transferAmountInput").value
+        );
+        const note =
+          document.getElementById("transferNoteInput").value.trim() || "转账";
+
         if (!amount || amount <= 0) {
-          showToast('请输入有效金额');
+          showToast("请输入有效金额");
           return;
         }
-        
+
         if (amount > window.walletData.balance) {
-          showToast('余额不足');
+          showToast("余额不足");
           return;
         }
-        
-        const char = characters.find(c => c.id === currentChatCharId);
+
+        const char = characters.find((c) => c.id === currentChatCharId);
         if (!char) return;
-        
+
         // 扣款
         window.walletData.balance -= amount;
         window.walletData.history.unshift({
           id: Date.now(),
-          type: 'send',
+          type: "send",
           amount: amount,
           desc: `转账给 ${char.name}`,
-          time: new Date().toLocaleString('zh-CN', {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'})
+          time: new Date().toLocaleString("zh-CN", {
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
         });
         saveWalletData();
         updateWalletDisplay();
-        
-        // 发送转账卡片消息
-        const transferId = Date.now();
-        const transferHtml = `
-          <div class="transfer-card" id="transfer_${transferId}">
+
+        // 发送转账卡片消息 - 使用特殊格式存储，渲染时会转换
+        const transferId = "user_tf_" + Date.now();
+
+        // 直接存储HTML到消息中
+        if (!chatHistories[currentChatCharId])
+          chatHistories[currentChatCharId] = [];
+        chatHistories[currentChatCharId].push({
+          role: "user",
+          content: `<div class="transfer-card" data-transfer-id="${transferId}" data-status="pending">
             <div class="transfer-card-header">
-              <div class="transfer-card-icon">💸</div>
+              <div class="transfer-card-icon">💰</div>
               <div class="transfer-card-info">
-                <div class="transfer-card-title">转账给TA</div>
-                <div class="transfer-card-from">来自：我</div>
+                <div class="transfer-card-title">${note}</div>
+                <div class="transfer-card-amount">${amount.toFixed(2)}</div>
               </div>
             </div>
-            <div class="transfer-card-amount">${amount.toFixed(2)}</div>
-            <div class="transfer-card-note">${note}</div>
-            <div class="transfer-card-status">等待对方确认...</div>
-          </div>
-        `;
-        
-        sendMediaMessage(transferHtml, 'transfer');
+            <div class="transfer-card-footer">
+              <span>微信转账</span>
+              <span class="transfer-card-status pending">待确认</span>
+            </div>
+          </div>`,
+          isHtml: true,
+          transferId: transferId,
+          transferAmount: amount,
+          transferStatus: "pending",
+          time: new Date().toLocaleTimeString("zh-CN", {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+        });
+
+        localforage.setItem("chatHistories", chatHistories);
+        renderConversation();
         closeTransferModal();
-        
-        // 模拟AI决定是否接受转账（随机或基于金额）
-        setTimeout(() => {
-          const shouldAccept = Math.random() > 0.2; // 80%概率接受
-          handleAITransferResponse(transferId, amount, shouldAccept, char.name);
-        }, 2000 + Math.random() * 3000);
+
+        // 不再自动触发AI回复，让用户自己发消息
       }
 
-      function handleAITransferResponse(transferId, amount, accepted, charName) {
-        // 更新转账卡片状态
-        const card = document.getElementById(`transfer_${transferId}`);
-        if (card) {
-          const statusEl = card.querySelector('.transfer-card-status');
-          if (statusEl) {
-            if (accepted) {
-              statusEl.className = 'transfer-card-status accepted';
-              statusEl.textContent = '✓ 对方已收款';
-            } else {
-              statusEl.className = 'transfer-card-status rejected';
-              statusEl.textContent = '✗ 对方已退回';
+      // 更新用户发送的转账状态（AI接受或拒绝时调用）
+      function updateUserTransferStatus(transferId, accepted) {
+        const history = chatHistories[currentChatCharId] || [];
+        for (let i = 0; i < history.length; i++) {
+          if (history[i].transferId === transferId) {
+            history[i].transferStatus = accepted ? "accepted" : "rejected";
+            // 更新HTML内容
+            history[i].content = history[i].content
+              .replace(
+                'data-status="pending"',
+                `data-status="${accepted ? "accepted" : "rejected"}"`
+              )
+              .replace(
+                'class="transfer-card-status pending">待确认',
+                `class="transfer-card-status ${
+                  accepted ? "accepted" : "rejected"
+                }">${accepted ? "已收款" : "已退回"}`
+              );
+
+            if (!accepted) {
               // 退款
-              window.walletData.balance += amount;
+              window.walletData.balance += history[i].transferAmount;
               window.walletData.history.unshift({
                 id: Date.now(),
-                type: 'receive',
-                amount: amount,
-                desc: `${charName} 退回转账`,
-                time: new Date().toLocaleString('zh-CN', {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'})
+                type: "receive",
+                amount: history[i].transferAmount,
+                desc: "转账被退回",
+                time: new Date().toLocaleString("zh-CN", {
+                  month: "2-digit",
+                  day: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                }),
               });
               saveWalletData();
               updateWalletDisplay();
             }
+            break;
           }
         }
-        
-        // AI发送回复消息
-        if (!chatHistories[currentChatCharId]) chatHistories[currentChatCharId] = [];
-        const aiMsg = {
-          role: 'assistant',
-          content: accepted ? 
-            `收到啦～谢谢你的${amount.toFixed(2)}元！💕` : 
-            `这个...我不能收你的钱呢，给你退回去啦～`,
-          time: new Date().toLocaleTimeString('zh-CN', {hour: '2-digit', minute: '2-digit'})
-        };
-        chatHistories[currentChatCharId].push(aiMsg);
-        localforage.setItem('chatHistories', chatHistories);
+        localforage.setItem("chatHistories", chatHistories);
         renderConversation();
       }
 
-      // AI向用户转账
-      function aiSendTransfer(amount, note) {
-        const transferId = Date.now();
-        const transferHtml = `
-          <div class="transfer-card" id="transfer_${transferId}" data-amount="${amount}">
-            <div class="transfer-card-header">
-              <div class="transfer-card-icon">💸</div>
-              <div class="transfer-card-info">
-                <div class="transfer-card-title">TA给你转账</div>
-                <div class="transfer-card-from">来自：TA</div>
-              </div>
-            </div>
-            <div class="transfer-card-amount">${amount.toFixed(2)}</div>
-            <div class="transfer-card-note">${note || '转账'}</div>
-            <div class="transfer-card-actions">
-              <button class="transfer-card-btn reject" onclick="rejectAITransfer('${transferId}', ${amount})">退回</button>
-              <button class="transfer-card-btn accept" onclick="acceptAITransfer('${transferId}', ${amount})">收款</button>
-            </div>
-          </div>
-        `;
-        return transferHtml;
-      }
+      // AI向用户转账 - 收款/退回
+      function acceptAITransfer(msgIdx, amount, btnEl) {
+        // 获取角色名字
+        const char = characters.find((c) => c.id === currentChatCharId);
+        const charName = char ? char.name : "TA";
 
-      function acceptAITransfer(transferId, amount) {
         // 收款
-        window.walletData.balance += amount;
+        window.walletData.balance += parseFloat(amount);
         window.walletData.history.unshift({
           id: Date.now(),
-          type: 'receive',
-          amount: amount,
-          desc: '收到TA的转账',
-          time: new Date().toLocaleString('zh-CN', {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'})
+          type: "receive",
+          amount: parseFloat(amount),
+          desc: `收到 ${charName} 的转账`,
+          time: new Date().toLocaleString("zh-CN", {
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
         });
         saveWalletData();
         updateWalletDisplay();
-        
-        // 更新卡片
-        const card = document.getElementById(`transfer_${transferId}`);
-        if (card) {
-          const actionsEl = card.querySelector('.transfer-card-actions');
-          if (actionsEl) {
-            actionsEl.innerHTML = '<div class="transfer-card-status accepted">✓ 已收款</div>';
-          }
+
+        // 更新消息状态
+        const history = chatHistories[currentChatCharId] || [];
+        if (history[msgIdx]) {
+          history[msgIdx].transferStatus = "accepted";
+          localforage.setItem("chatHistories", chatHistories);
+          renderConversation();
         }
-        
-        showToast(`收款成功！+¥${amount.toFixed(2)}`);
+
+        showToast(`收款成功！+¥${parseFloat(amount).toFixed(2)}`);
       }
 
-      function rejectAITransfer(transferId, amount) {
-        // 更新卡片
-        const card = document.getElementById(`transfer_${transferId}`);
-        if (card) {
-          const actionsEl = card.querySelector('.transfer-card-actions');
-          if (actionsEl) {
-            actionsEl.innerHTML = '<div class="transfer-card-status rejected">✗ 已退回</div>';
-          }
+      function rejectAITransfer(msgIdx, btnEl) {
+        // 更新消息状态
+        const history = chatHistories[currentChatCharId] || [];
+        if (history[msgIdx]) {
+          history[msgIdx].transferStatus = "rejected";
+          localforage.setItem("chatHistories", chatHistories);
+          renderConversation();
         }
-        
-        showToast('已退回转账');
+
+        showToast("已退回转账");
       }
 
       /* ==================== 重Roll功能 ==================== */
       async function rerollAIReply() {
         if (!currentChatCharId) {
-          showToast('请先打开一个对话');
+          showToast("请先打开一个对话");
           return;
         }
-        
+
         const history = chatHistories[currentChatCharId] || [];
         if (history.length === 0) {
-          showToast('没有可以重新生成的消息');
+          showToast("没有可以重新生成的消息");
           return;
         }
-        
-        // 找到最后一条AI消息
-        let lastAiIndex = -1;
-        for (let i = history.length - 1; i >= 0; i--) {
-          if (history[i].role === 'assistant') {
-            lastAiIndex = i;
-            break;
-          }
+
+        // 从后往前删除所有连续的AI消息（因为即时模式下AI会发多条）
+        let deletedCount = 0;
+        while (
+          history.length > 0 &&
+          history[history.length - 1].role === "assistant"
+        ) {
+          history.pop();
+          deletedCount++;
         }
-        
-        if (lastAiIndex === -1) {
-          showToast('没有找到AI消息');
+
+        if (deletedCount === 0) {
+          showToast("最后一条不是AI消息，无法重roll");
           return;
         }
-        
-        // 删除最后一条AI消息
-        history.splice(lastAiIndex, 1);
+
+        // 保存并重新渲染
         chatHistories[currentChatCharId] = history;
-        await localforage.setItem('chatHistories', chatHistories);
-        
-        // 重新渲染
+        await localforage.setItem("chatHistories", chatHistories);
         renderConversation();
-        
+
         // 关闭面板
         closeChatPanel();
-        
-        // 重新请求AI回复
-        showToast('正在重新生成...');
+
+        // 重新请求AI回复（不显示提示）
         requestAIReply();
+      }
+
+      /* ==================== AI特殊消息处理 ==================== */
+      // 处理AI回复中的特殊标签
+      function processAISpecialTags(content) {
+        let processed = content;
+
+        // 处理转账标签 [转账:金额:说明] 或 [转账:金额]
+        const transferMatch = processed.match(
+          /\[转账[:：](\d+(?:\.\d+)?)(?:[:：]([^\]]*))?\]/
+        );
+        if (transferMatch) {
+          const amount = transferMatch[1];
+          const note = transferMatch[2] || "转账给你";
+          processed = processed.replace(transferMatch[0], "");
+          return {
+            text: processed.trim(),
+            specialCard: generateAITransferCard(amount, note),
+            type: "transfer",
+          };
+        }
+
+        // 处理位置标签 [位置:名称:地址] 或 [位置:名称]
+        const locationMatch = processed.match(
+          /\[位置[:：]([^\]:：]+)(?:[:：]([^\]]*))?\]/
+        );
+        if (locationMatch) {
+          const name = locationMatch[1];
+          const address = locationMatch[2] || "";
+          processed = processed.replace(locationMatch[0], "");
+          return {
+            text: processed.trim(),
+            specialCard: generateAILocationCard(name, address),
+            type: "location",
+          };
+        }
+
+        // 处理红包标签 [红包:金额:说明]
+        const redpacketMatch = processed.match(
+          /\[红包[:：](\d+(?:\.\d+)?)(?:[:：]([^\]]*))?\]/
+        );
+        if (redpacketMatch) {
+          const amount = redpacketMatch[1];
+          const note = redpacketMatch[2] || "恭喜发财";
+          processed = processed.replace(redpacketMatch[0], "");
+          return {
+            text: processed.trim(),
+            specialCard: generateAITransferCard(amount, note),
+            type: "redpacket",
+          };
+        }
+
+        return { text: processed, specialCard: null, type: null };
       }
 
       // 页面加载时初始化钱包
@@ -24539,7 +25315,10 @@ ${userName}在你的动态下留言了，你需要回复。
         clearChatHistoryFromSettings,
         // 气泡和消息操作
         handleBubbleClick,
+        handleWrapperClick,
         handleCopyMsg,
+        handleQuoteMsg,
+        cancelQuote,
         handleRecallMsg,
         handleDeleteMsg,
         handleEditMsg,
@@ -24547,6 +25326,11 @@ ${userName}在你的动态下留言了，你需要回复。
         deleteSelectedMessages,
         exitSelectionMode,
         handleMultiSelect,
+        showRecalledContent,
+        // 气泡间距
+        updateBubbleGapPreview,
+        saveBubbleGap,
+        applyBubbleGap,
         // 摘要功能
         triggerManualSummary,
         viewSummaries,
@@ -24579,6 +25363,7 @@ ${userName}在你的动态下留言了，你需要回复。
         saveVoiceConfig,
         toggleVoiceText,
         playVoiceMessage,
+        playInlineVoice,
         handleVoiceBubbleTouchStart,
         handleVoiceBubbleTouchEnd,
         // 聊天面板
@@ -24599,19 +25384,19 @@ ${userName}在你的动态下留言了，你需要回复。
         initWalletData,
         saveWalletData,
         updateWalletDisplay,
+        openWalletPage,
+        closeWalletPage,
+        renderWalletHistoryPage,
         openRechargeModal,
         closeRechargeModal,
         selectRechargeAmount,
         clearRechargeSelection,
         confirmRecharge,
-        viewWalletHistory,
-        renderWalletHistory,
         // 转账功能
         openTransferModal,
         closeTransferModal,
         confirmTransfer,
-        handleAITransferResponse,
-        aiSendTransfer,
+        updateUserTransferStatus,
         acceptAITransfer,
         rejectAITransfer,
         // 重Roll功能
@@ -24862,52 +25647,180 @@ ${userName}在你的动态下留言了，你需要回复。
       <div class="notification-time" id="notificationTime">刚刚</div>
     </div>
 
+    <!-- 钱包详情页 -->
+    <div class="wallet-page" id="walletPage">
+      <div class="wallet-page-header">
+        <button class="wallet-page-back" onclick="closeWalletPage()">‹</button>
+        <span>我的钱包</span>
+        <span style="width: 30px"></span>
+      </div>
+      <div class="wallet-page-content">
+        <div class="wallet-balance-card">
+          <div class="wallet-balance-label">账户余额（元）</div>
+          <div class="wallet-balance-value" id="walletBalanceDisplay">0.00</div>
+          <div class="wallet-balance-actions">
+            <button class="wallet-action-btn" onclick="openRechargeModal()">
+              <span>💳</span>
+              <span>充值</span>
+            </button>
+          </div>
+        </div>
+        <div class="wallet-history-section">
+          <div class="wallet-history-title">交易记录</div>
+          <div class="wallet-history-list" id="walletHistoryListPage">
+            <div class="wallet-history-empty">暂无交易记录</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- 充值弹窗 -->
-    <div class="recharge-modal" id="rechargeModal" onclick="if(event.target===this)closeRechargeModal()">
+    <div
+      class="recharge-modal"
+      id="rechargeModal"
+      onclick="if(event.target===this)closeRechargeModal()"
+    >
       <div class="recharge-modal-content">
         <div class="recharge-modal-title">💰 钱包充值</div>
         <div class="recharge-amount-grid">
-          <button class="recharge-amount-btn" onclick="selectRechargeAmount(10)">¥10</button>
-          <button class="recharge-amount-btn" onclick="selectRechargeAmount(50)">¥50</button>
-          <button class="recharge-amount-btn" onclick="selectRechargeAmount(100)">¥100</button>
-          <button class="recharge-amount-btn" onclick="selectRechargeAmount(200)">¥200</button>
-          <button class="recharge-amount-btn" onclick="selectRechargeAmount(500)">¥500</button>
-          <button class="recharge-amount-btn" onclick="selectRechargeAmount(1000)">¥1000</button>
+          <button
+            class="recharge-amount-btn"
+            onclick="selectRechargeAmount(10)"
+          >
+            ¥10
+          </button>
+          <button
+            class="recharge-amount-btn"
+            onclick="selectRechargeAmount(50)"
+          >
+            ¥50
+          </button>
+          <button
+            class="recharge-amount-btn"
+            onclick="selectRechargeAmount(100)"
+          >
+            ¥100
+          </button>
+          <button
+            class="recharge-amount-btn"
+            onclick="selectRechargeAmount(200)"
+          >
+            ¥200
+          </button>
+          <button
+            class="recharge-amount-btn"
+            onclick="selectRechargeAmount(500)"
+          >
+            ¥500
+          </button>
+          <button
+            class="recharge-amount-btn"
+            onclick="selectRechargeAmount(1000)"
+          >
+            ¥1000
+          </button>
         </div>
-        <input type="number" class="recharge-custom-input" id="rechargeCustomAmount" placeholder="自定义金额" oninput="clearRechargeSelection()">
+        <input
+          type="number"
+          class="recharge-custom-input"
+          id="rechargeCustomAmount"
+          placeholder="自定义金额"
+          oninput="clearRechargeSelection()"
+        />
         <div class="recharge-modal-btns">
-          <button class="recharge-modal-btn cancel" onclick="closeRechargeModal()">取消</button>
-          <button class="recharge-modal-btn confirm" onclick="confirmRecharge()">确认充值</button>
+          <button
+            class="recharge-modal-btn cancel"
+            onclick="closeRechargeModal()"
+          >
+            取消
+          </button>
+          <button
+            class="recharge-modal-btn confirm"
+            onclick="confirmRecharge()"
+          >
+            确认充值
+          </button>
         </div>
       </div>
     </div>
 
     <!-- 转账弹窗 -->
-    <div class="send-transfer-modal" id="sendTransferModal" onclick="if(event.target===this)closeTransferModal()">
+    <div
+      class="send-transfer-modal"
+      id="sendTransferModal"
+      onclick="if(event.target===this)closeTransferModal()"
+    >
       <div class="send-transfer-modal-content">
         <div class="send-transfer-title">💸 转账给TA</div>
         <div class="send-transfer-to" id="transferToName">转给：角色名</div>
-        <input type="number" class="send-transfer-input" id="transferAmountInput" placeholder="0.00">
-        <div class="send-transfer-balance" id="transferBalanceHint">可用余额：¥0.00</div>
-        <input type="text" class="send-transfer-note-input" id="transferNoteInput" placeholder="添加转账说明（可选）">
+        <input
+          type="number"
+          class="send-transfer-input"
+          id="transferAmountInput"
+          placeholder="0.00"
+        />
+        <div class="send-transfer-balance" id="transferBalanceHint">
+          可用余额：¥0.00
+        </div>
+        <input
+          type="text"
+          class="send-transfer-note-input"
+          id="transferNoteInput"
+          placeholder="添加转账说明（可选）"
+        />
         <div class="recharge-modal-btns">
-          <button class="recharge-modal-btn cancel" onclick="closeTransferModal()">取消</button>
-          <button class="recharge-modal-btn confirm" onclick="confirmTransfer()">确认转账</button>
+          <button
+            class="recharge-modal-btn cancel"
+            onclick="closeTransferModal()"
+          >
+            取消
+          </button>
+          <button
+            class="recharge-modal-btn confirm"
+            onclick="confirmTransfer()"
+          >
+            确认转账
+          </button>
         </div>
       </div>
     </div>
 
     <!-- 位置选择弹窗 -->
-    <div class="send-transfer-modal" id="locationModal" onclick="if(event.target===this)closeLocationModal()">
+    <div
+      class="send-transfer-modal"
+      id="locationModal"
+      onclick="if(event.target===this)closeLocationModal()"
+    >
       <div class="send-transfer-modal-content">
         <div class="send-transfer-title">📍 发送位置</div>
-        <div style="margin-bottom:16px;">
-          <input type="text" class="send-transfer-note-input" id="locationNameInput" placeholder="位置名称，如：星巴克咖啡" style="margin-bottom:8px;">
-          <input type="text" class="send-transfer-note-input" id="locationAddressInput" placeholder="详细地址（可选）">
+        <div style="margin-bottom: 16px">
+          <input
+            type="text"
+            class="send-transfer-note-input"
+            id="locationNameInput"
+            placeholder="位置名称，如：星巴克咖啡"
+            style="margin-bottom: 8px"
+          />
+          <input
+            type="text"
+            class="send-transfer-note-input"
+            id="locationAddressInput"
+            placeholder="详细地址（可选）"
+          />
         </div>
         <div class="recharge-modal-btns">
-          <button class="recharge-modal-btn cancel" onclick="closeLocationModal()">取消</button>
-          <button class="recharge-modal-btn confirm" onclick="confirmSendLocation()">发送位置</button>
+          <button
+            class="recharge-modal-btn cancel"
+            onclick="closeLocationModal()"
+          >
+            取消
+          </button>
+          <button
+            class="recharge-modal-btn confirm"
+            onclick="confirmSendLocation()"
+          >
+            发送位置
+          </button>
         </div>
       </div>
     </div>
