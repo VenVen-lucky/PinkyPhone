@@ -21,7 +21,7 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Satisfy&display=swap"
       rel="stylesheet"
     />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js?v=1.7"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js?v=1.1"></script>
     <style>
       * {
         margin: 0;
@@ -686,6 +686,10 @@
         border: none;
         font-size: 16px;
         cursor: pointer;
+        color: #000;
+      }
+      .chat-header-btn svg {
+        stroke: #000;
       }
 
       .chat-content {
@@ -4472,11 +4476,14 @@
         -webkit-backdrop-filter: blur(10px);
         border-radius: 50%;
         font-size: 18px;
-        color: var(--text-primary);
+        color: #000;
         cursor: pointer;
         display: flex;
         align-items: center;
         justify-content: center;
+      }
+      .conv-back-btn svg {
+        stroke: #000;
       }
 
       .conv-title-section {
@@ -4667,7 +4674,298 @@
         padding: 0 4px;
       }
 
-      /* 系统消息卡片样式 - 用于督促助手绑定等系统事件 */
+      /* 图片消息样式 */
+      .msg-image {
+        border-radius: 12px;
+        overflow: hidden;
+        max-width: 200px;
+        cursor: pointer;
+        position: relative;
+      }
+      .msg-image img {
+        width: 100%;
+        height: auto;
+        display: block;
+        max-height: 250px;
+        object-fit: cover;
+      }
+      /* 占位图样式 */
+      .msg-image-placeholder {
+        width: 180px;
+        height: 140px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+      }
+      .msg-row.user .msg-image-placeholder {
+        background: linear-gradient(135deg, #f48fb1 0%, #ec407a 100%);
+      }
+      .msg-image-placeholder-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 8px;
+      }
+      .msg-image-placeholder-icon svg {
+        stroke: #66bb6a;
+      }
+      .msg-row.user .msg-image-placeholder-icon svg {
+        stroke: #fff;
+      }
+      .msg-image-placeholder-text {
+        font-size: 0.75rem;
+        color: #66bb6a;
+        font-weight: 500;
+      }
+      .msg-row.user .msg-image-placeholder-text {
+        color: #fff;
+      }
+      /* 真实图片消息 */
+      .msg-real-image {
+        max-width: 200px;
+        border-radius: 12px;
+        overflow: hidden;
+        cursor: pointer;
+      }
+      .msg-real-image img {
+        width: 100%;
+        height: auto;
+        display: block;
+        max-height: 300px;
+        object-fit: cover;
+      }
+      .image-message-bubble {
+        padding: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+      }
+      /* 图片描述弹窗 */
+      .image-desc-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.6);
+        z-index: 10005;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      .image-desc-modal.active {
+        display: flex;
+      }
+      .image-desc-content {
+        background: white;
+        border-radius: 20px;
+        max-width: 320px;
+        width: 100%;
+        overflow: hidden;
+        animation: modalPop 0.25s ease;
+      }
+      .image-desc-header {
+        padding: 16px 20px;
+        border-bottom: 1px solid #f0f0f0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .image-desc-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #333;
+      }
+      .image-desc-close {
+        width: 28px;
+        height: 28px;
+        border: none;
+        background: #f5f5f5;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      .image-desc-body {
+        padding: 20px;
+      }
+      .image-desc-preview {
+        width: 100%;
+        height: 160px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 16px;
+        overflow: hidden;
+      }
+      .image-desc-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .image-desc-preview-icon {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        color: #66bb6a;
+      }
+      .image-desc-text {
+        font-size: 0.95rem;
+        line-height: 1.6;
+        color: #333;
+        background: #f9f9f9;
+        padding: 14px 16px;
+        border-radius: 12px;
+        word-break: break-word;
+      }
+      .image-desc-input {
+        width: 100%;
+        min-height: 80px;
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 12px;
+        font-size: 0.9rem;
+        resize: none;
+        font-family: inherit;
+      }
+      .image-desc-input:focus {
+        outline: none;
+        border-color: #f48fb1;
+      }
+      .image-desc-footer {
+        padding: 16px 20px;
+        border-top: 1px solid #f0f0f0;
+        display: flex;
+        gap: 10px;
+      }
+      .image-desc-btn {
+        flex: 1;
+        padding: 12px;
+        border: none;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+      }
+      .image-desc-btn.cancel {
+        background: #f5f5f5;
+        color: #666;
+      }
+      .image-desc-btn.confirm {
+        background: linear-gradient(135deg, #f48fb1, #ec407a);
+        color: white;
+      }
+      /* 发送图片选择弹窗 */
+      .send-image-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 10004;
+        display: none;
+        align-items: flex-end;
+        justify-content: center;
+      }
+      .send-image-modal.active {
+        display: flex;
+      }
+      .send-image-options {
+        background: white;
+        border-radius: 20px 20px 0 0;
+        width: 100%;
+        max-width: 500px;
+        padding: 20px;
+        padding-bottom: calc(20px + env(safe-area-inset-bottom));
+        animation: slideUp 0.3s ease;
+      }
+      @keyframes slideUp {
+        from { transform: translateY(100%); }
+        to { transform: translateY(0); }
+      }
+      .send-image-title {
+        text-align: center;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 20px;
+      }
+      .send-image-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        margin-bottom: 16px;
+      }
+      .send-image-grid.two-cols {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .send-image-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        padding: 20px 12px;
+        border-radius: 16px;
+        background: #f9f9f9;
+        transition: all 0.2s;
+      }
+      .send-image-hint {
+        font-size: 0.7rem;
+        color: #999;
+        margin-top: -2px;
+      }
+      .send-image-item:active {
+        transform: scale(0.95);
+        background: #f0f0f0;
+      }
+      .send-image-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .send-image-icon.album {
+        background: linear-gradient(135deg, #81d4fa, #4fc3f7);
+      }
+      .send-image-icon.camera {
+        background: linear-gradient(135deg, #a5d6a7, #66bb6a);
+      }
+      .send-image-icon.desc {
+        background: linear-gradient(135deg, #ffcc80, #ffa726);
+      }
+      .send-image-icon svg {
+        stroke: white;
+      }
+      .send-image-label {
+        font-size: 0.8rem;
+        color: #666;
+      }
+      .send-image-cancel {
+        width: 100%;
+        padding: 14px;
+        border: none;
+        background: #f5f5f5;
+        border-radius: 12px;
+        font-size: 0.95rem;
+        color: #666;
+        cursor: pointer;
+      }
       .msg-system-card {
         width: 100%;
         display: flex;
@@ -5712,6 +6010,50 @@
       }
       .msg-wrapper.selecting {
         transform: none !important;
+      }
+
+      /* 多选模式 - 每个气泡的选择器 */
+      .bubble-with-selector {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .bubble-with-selector.ai {
+        flex-direction: row;
+      }
+      .bubble-with-selector.user {
+        flex-direction: row-reverse;
+      }
+      .bubble-with-selector .msg-bubble {
+        flex: 0 1 auto;
+      }
+      .bubble-selector {
+        width: 24px;
+        height: 24px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+      }
+      .bubble-selector-inner {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 2px solid #ccc;
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      }
+      .bubble-selector.selected .bubble-selector-inner {
+        background: linear-gradient(135deg, #f48fb1, #ec407a);
+        border-color: #ec407a;
+      }
+      .bubble-selector:active .bubble-selector-inner {
+        transform: scale(0.85);
       }
 
       /* 4. 撤回消息样式 */
@@ -7054,6 +7396,10 @@
         overflow: hidden;
         border: 3px solid rgba(255,255,255,0.3);
         animation: floatPulse 2s ease-in-out infinite;
+        color: white;
+      }
+      .call-floating-bubble svg {
+        stroke: white;
       }
       .call-floating-bubble.active {
         display: flex;
@@ -7095,6 +7441,9 @@
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
+      }
+      .call-minimize-btn svg {
+        stroke: white;
       }
       .call-top-info {
         flex: 1;
@@ -7454,6 +7803,9 @@
         justify-content: center;
         flex-shrink: 0;
       }
+      .call-send-btn svg {
+        stroke: white;
+      }
 
       /* 通话按钮区域 - 透明底栏，按钮分散，增加间距 */
       .call-buttons-area {
@@ -7492,6 +7844,10 @@
         cursor: pointer;
         transition: transform 0.2s, box-shadow 0.2s;
         backdrop-filter: blur(10px);
+        color: white;
+      }
+      .call-btn svg {
+        stroke: white;
       }
       .call-btn:active {
         transform: scale(0.95);
@@ -7649,6 +8005,10 @@
       }
       .incoming-call-type-icon {
         font-size: 1.1rem;
+        color: white;
+      }
+      .incoming-call-type-icon svg {
+        stroke: white;
       }
 
       .incoming-call-actions {
@@ -7674,6 +8034,10 @@
         font-size: 28px;
         cursor: pointer;
         transition: transform 0.2s, box-shadow 0.2s;
+        color: white;
+      }
+      .incoming-call-btn svg {
+        stroke: white;
       }
       .incoming-call-btn:active {
         transform: scale(0.95);
@@ -9327,6 +9691,10 @@
         align-items: center;
         justify-content: center;
         transition: all 0.2s;
+        color: #000;
+      }
+      .worldbook-header-btn svg {
+        stroke: #000;
       }
 
       .worldbook-header-btn:active {
@@ -10232,7 +10600,10 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #c2185b;
+        color: #000;
+      }
+      .preset-back-btn svg {
+        stroke: #000;
       }
 
       .preset-title {
@@ -10247,12 +10618,15 @@
         width: 36px;
         height: 36px;
         border: none;
-        background: linear-gradient(135deg, #f48fb1, #f06292);
+        background: rgba(255, 255, 255, 0.8);
         border-radius: 12px;
         font-size: 16px;
         cursor: pointer;
-        color: white;
-        box-shadow: 0 2px 8px rgba(244,143,177,0.4);
+        color: #000;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+      .preset-header-btn svg {
+        stroke: #000;
       }
 
       .preset-content {
@@ -13917,7 +14291,28 @@
 
         <div class="chat-panel" id="plusPanel">
           <div class="panel-grid">
-            <div class="panel-item" onclick="handleCameraAction()">
+            <div class="panel-item" onclick="rerollAIReply()">
+              <div class="panel-icon-box bg-reroll">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <polyline points="23 4 23 10 17 10"></polyline>
+                  <polyline points="1 20 1 14 7 14"></polyline>
+                  <path
+                    d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"
+                  ></path>
+                </svg>
+              </div>
+              <span class="panel-label">重roll</span>
+            </div>
+            <div class="panel-item" onclick="openSendImageModal()">
               <div class="panel-icon-box bg-camera">
                 <svg
                   width="24"
@@ -13929,13 +14324,12 @@
                   stroke-linecap="round"
                   stroke-linejoin="round"
                 >
-                  <path
-                    d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"
-                  ></path>
-                  <circle cx="12" cy="13" r="4"></circle>
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                  <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                  <polyline points="21 15 16 10 5 21"></polyline>
                 </svg>
               </div>
-              <span class="panel-label">拍摄</span>
+              <span class="panel-label">照片</span>
             </div>
             <div class="panel-item" onclick="startVoiceCall()">
               <div class="panel-icon-box bg-call">
@@ -14013,27 +14407,6 @@
                 </svg>
               </div>
               <span class="panel-label">转账</span>
-            </div>
-            <div class="panel-item" onclick="rerollAIReply()">
-              <div class="panel-icon-box bg-reroll">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <polyline points="23 4 23 10 17 10"></polyline>
-                  <polyline points="1 20 1 14 7 14"></polyline>
-                  <path
-                    d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"
-                  ></path>
-                </svg>
-              </div>
-              <span class="panel-label">重roll</span>
             </div>
             <div class="panel-item" onclick="openReadTogether()">
               <div class="panel-icon-box bg-book">
@@ -17424,6 +17797,10 @@
         const avatarSize = char.avatarSize || 40;
         applyAvatarSize(avatarSize);
 
+        // 应用气泡间距设置
+        const bubbleGap = char.bubbleGap || 6;
+        applyBubbleGap(bubbleGap);
+
         // 生成火花 HTML
         let sparkHtml = "";
         // 注意：这里读取的是 chatSettings 里的 flameData，或者 characters 里的
@@ -17506,7 +17883,26 @@
                 m.audioDuration || Math.ceil(voiceText.length / 5) + '"';
               const textVisible = m.voiceTextVisible ? "visible" : "";
 
-              return `
+              // 多选模式下的选择器
+              const voiceSelectorHtml = isSelecting
+                ? `
+                <div class="bubble-selector ${
+                  isSelected ? "selected" : ""
+                }" onclick="event.stopPropagation();toggleMessageSelection(${
+                    m.originalIndex
+                  })">
+                  <div class="bubble-selector-inner">
+                    ${
+                      isSelected
+                        ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>'
+                        : ""
+                    }
+                  </div>
+                </div>
+              `
+                : "";
+
+              const voiceBubbleHtml = `
             <div class="${bubbleClass} voice-message-bubble"
                     data-index="${m.originalIndex}"
                     data-voice-text="${escapeHtml(voiceText)}"
@@ -17540,6 +17936,173 @@
                     </div>
                 </div>
             </div>`;
+
+              if (isSelecting) {
+                return `<div class="bubble-with-selector ai">${voiceSelectorHtml}${voiceBubbleHtml}</div>`;
+              }
+              return voiceBubbleHtml;
+            }
+
+            // 5.5 图片消息处理
+            if (m.type === "image") {
+              const isAi = m.role === "assistant";
+
+              // 多选模式下的选择器
+              const imgSelectorHtml = isSelecting
+                ? `
+                <div class="bubble-selector ${
+                  isSelected ? "selected" : ""
+                }" onclick="event.stopPropagation();toggleMessageSelection(${
+                    m.originalIndex
+                  })">
+                  <div class="bubble-selector-inner">
+                    ${
+                      isSelected
+                        ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>'
+                        : ""
+                    }
+                  </div>
+                </div>
+              `
+                : "";
+
+              if (m.imageType === "real" && m.imageData) {
+                // 真实图片
+                const realImgHtml = `
+            <div class="${bubbleClass} image-message-bubble"
+                    data-index="${m.originalIndex}"
+                    oncontextmenu="return false;"
+                    ontouchstart="handleTouchStart(event, ${m.originalIndex})"
+                    ontouchend="handleTouchEnd()"
+                    ontouchmove="handleTouchMove(event)"
+                    onmousedown="handleMouseDown(event, ${m.originalIndex})"
+                    onmouseup="handleMouseUp()"
+            >
+                <div class="msg-real-image" onclick="viewRealImage('${m.imageData}')">
+                    <img src="${m.imageData}" alt="图片"/>
+                </div>
+            </div>`;
+                if (isSelecting) {
+                  return `<div class="bubble-with-selector ${
+                    isUser ? "user" : "ai"
+                  }">${imgSelectorHtml}${realImgHtml}</div>`;
+                }
+                return realImgHtml;
+              } else if (m.imageType === "placeholder" && m.imageDesc) {
+                // 占位图
+                const iconColor = isAi ? "#66bb6a" : "#fff";
+                const bgGradient = isAi
+                  ? "linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%)"
+                  : "linear-gradient(135deg, #f48fb1 0%, #ec407a 100%)";
+                const placeholderHtml = `
+            <div class="${bubbleClass} image-message-bubble"
+                    data-index="${m.originalIndex}"
+                    oncontextmenu="return false;"
+                    ontouchstart="handleTouchStart(event, ${m.originalIndex})"
+                    ontouchend="handleTouchEnd()"
+                    ontouchmove="handleTouchMove(event)"
+                    onmousedown="handleMouseDown(event, ${m.originalIndex})"
+                    onmouseup="handleMouseUp()"
+            >
+                <div class="msg-image-placeholder" style="background:${bgGradient};" onclick="viewImageDescription('${escapeHtml(
+                  m.imageDesc
+                ).replace(/'/g, "\\'")}', ${isAi})">
+                    <div class="msg-image-placeholder-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="${iconColor}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                    </div>
+                    <div class="msg-image-placeholder-text" style="color:${iconColor};">点击查看图片描述</div>
+                </div>
+            </div>`;
+                if (isSelecting) {
+                  return `<div class="bubble-with-selector ${
+                    isUser ? "user" : "ai"
+                  }">${imgSelectorHtml}${placeholderHtml}</div>`;
+                }
+                return placeholderHtml;
+              }
+            }
+
+            // 5.6 检查AI发送的图片标签 [图片:内容]
+            const imageTagMatch =
+              rawContent.match && rawContent.match(/^\[图片[:：](.+)\]$/);
+            if (imageTagMatch && !isUser) {
+              const imageContent = imageTagMatch[1].trim();
+              // 检测是否为URL
+              const isUrl = /^https?:\/\//i.test(imageContent);
+
+              // 多选模式下的选择器
+              const aiImgSelectorHtml = isSelecting
+                ? `
+                <div class="bubble-selector ${
+                  isSelected ? "selected" : ""
+                }" onclick="event.stopPropagation();toggleMessageSelection(${
+                    m.originalIndex
+                  })">
+                  <div class="bubble-selector-inner">
+                    ${
+                      isSelected
+                        ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>'
+                        : ""
+                    }
+                  </div>
+                </div>
+              `
+                : "";
+
+              if (isUrl) {
+                // 如果是URL，直接显示图片
+                const urlImgHtml = `
+            <div class="${bubbleClass} image-message-bubble"
+                    data-index="${m.originalIndex}"
+                    oncontextmenu="return false;"
+                    ontouchstart="handleTouchStart(event, ${m.originalIndex})"
+                    ontouchend="handleTouchEnd()"
+                    ontouchmove="handleTouchMove(event)"
+                    onmousedown="handleMouseDown(event, ${m.originalIndex})"
+                    onmouseup="handleMouseUp()"
+            >
+                <div class="msg-real-image" onclick="viewRealImage('${imageContent}')">
+                    <img src="${imageContent}" alt="图片" onerror="this.parentElement.innerHTML='<div style=\\'padding:20px;color:#999;\\'>图片加载失败</div>'"/>
+                </div>
+            </div>`;
+                if (isSelecting) {
+                  return `<div class="bubble-with-selector ai">${aiImgSelectorHtml}${urlImgHtml}</div>`;
+                }
+                return urlImgHtml;
+              } else {
+                // 如果是描述文字，显示占位图
+                const descImgHtml = `
+            <div class="${bubbleClass} image-message-bubble"
+                    data-index="${m.originalIndex}"
+                    oncontextmenu="return false;"
+                    ontouchstart="handleTouchStart(event, ${m.originalIndex})"
+                    ontouchend="handleTouchEnd()"
+                    ontouchmove="handleTouchMove(event)"
+                    onmousedown="handleMouseDown(event, ${m.originalIndex})"
+                    onmouseup="handleMouseUp()"
+            >
+                <div class="msg-image-placeholder" style="background:linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);" onclick="viewImageDescription('${escapeHtml(
+                  imageContent
+                ).replace(/'/g, "\\'")}', true)">
+                    <div class="msg-image-placeholder-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#66bb6a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                    </div>
+                    <div class="msg-image-placeholder-text" style="color:#66bb6a;">点击查看图片描述</div>
+                </div>
+            </div>`;
+                if (isSelecting) {
+                  return `<div class="bubble-with-selector ai">${aiImgSelectorHtml}${descImgHtml}</div>`;
+                }
+                return descImgHtml;
+              }
             }
 
             // 6. 普通/富文本消息处理
@@ -17723,7 +18286,47 @@
               `;
             }
 
-            // 普通气泡 HTML
+            // 多选模式下为每个气泡生成选择器
+            const bubbleSelectorHtml = isSelecting
+              ? `
+              <div class="bubble-selector ${
+                isSelected ? "selected" : ""
+              }" onclick="event.stopPropagation();toggleMessageSelection(${
+                  m.originalIndex
+                })">
+                <div class="bubble-selector-inner">
+                  ${
+                    isSelected
+                      ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>'
+                      : ""
+                  }
+                </div>
+              </div>
+            `
+              : "";
+
+            // 普通气泡 HTML - 多选模式时包裹选择器
+            if (isSelecting) {
+              return `
+        <div class="bubble-with-selector ${isUser ? "user" : "ai"}">
+            ${bubbleSelectorHtml}
+            <div class="${bubbleClass}"
+                    data-index="${m.originalIndex}"
+                    ${specialBubbleStyle}
+                    oncontextmenu="return false;"
+                    ontouchstart="handleTouchStart(event, ${m.originalIndex})"
+                    ontouchend="handleTouchEnd()"
+                    ontouchmove="handleTouchMove(event)"
+                    onmousedown="handleMouseDown(event, ${m.originalIndex})"
+                    onmouseup="handleMouseUp()"
+                    onclick="handleBubbleClick(event, ${m.originalIndex})"
+            >
+                ${quoteHtml}${contentHtml}
+            </div>
+        </div>`;
+            }
+
+            // 普通模式气泡 HTML
             return `
         <div class="${bubbleClass}"
                 data-index="${m.originalIndex}"
@@ -17759,7 +18362,9 @@
           : "";
 
         return `
-    <div class="msg-wrapper ${isUser ? "user" : "ai"}" ${wrapperClickHandler}>
+    <div class="msg-wrapper ${isUser ? "user" : "ai"} ${
+          isSelecting ? "selecting" : ""
+        }" ${wrapperClickHandler}>
         <div class="chat-avatar-small">
             ${avatarHtml}
         </div>
@@ -18020,6 +18625,34 @@
                 if (m.role === "system" && m.isHidden) {
                   return { role: "system", content: m.content };
                 }
+
+                // 处理图片消息 - 支持多模态
+                if (
+                  m.type === "image" &&
+                  m.imageType === "real" &&
+                  m.imageData
+                ) {
+                  // 用户发送的真实图片，构建多模态消息
+                  return {
+                    role: "user",
+                    content: [
+                      {
+                        type: "text",
+                        text:
+                          m.content ||
+                          "用户发送了一张图片，请描述或回应这张图片。",
+                      },
+                      {
+                        type: "image_url",
+                        image_url: {
+                          url: m.imageData,
+                          detail: "auto",
+                        },
+                      },
+                    ],
+                  };
+                }
+
                 // 普通消息
                 return {
                   role: m.role === "user" ? "user" : "assistant",
@@ -18907,6 +19540,13 @@
 
         // 应用到当前聊天界面
         applyAvatarVisibility(showAi, showUser);
+
+        // 即时保存设置
+        if (currentChatCharId && chatSettings[currentChatCharId]) {
+          chatSettings[currentChatCharId].showAiAvatar = showAi;
+          chatSettings[currentChatCharId].showUserAvatar = showUser;
+          localforage.setItem("chatSettings", chatSettings);
+        }
       }
 
       // 更新头像大小预览
@@ -20668,6 +21308,18 @@
           updateSelectionUI();
           renderConversation();
         }
+      }
+
+      // 选择器点击切换选中状态
+      function toggleMessageSelection(index) {
+        if (!isSelectionMode) return;
+        if (selectedIndices.has(index)) {
+          selectedIndices.delete(index);
+        } else {
+          selectedIndices.add(index);
+        }
+        updateSelectionUI();
+        renderConversation();
       }
 
       // 整行点击处理（多选模式下）
@@ -22638,6 +23290,196 @@
       // 7. 模拟功能：拍照/位置
       function handleCameraAction() {
         alert("相机功能开发中... (可使用相册发图)");
+      }
+
+      /* ==================== 图片消息功能 ==================== */
+      // 打开发送图片选择弹窗
+      function openSendImageModal() {
+        closeChatPanel();
+        document.getElementById("sendImageModal").classList.add("active");
+      }
+
+      // 关闭发送图片选择弹窗
+      function closeSendImageModal() {
+        document.getElementById("sendImageModal").classList.remove("active");
+      }
+
+      // 选择真实图片（支持相册、拍照、文件）
+      function selectRealImage() {
+        closeSendImageModal();
+        document.getElementById("realImageInput").click();
+      }
+
+      // 处理选择的图片
+      async function handleRealImageSelect(input) {
+        if (input.files && input.files[0]) {
+          const file = input.files[0];
+          try {
+            const compressedData = await compressImage(file, 600, 0.7);
+            sendRealImage(compressedData);
+          } catch (e) {
+            // 压缩失败时直接读取
+            const reader = new FileReader();
+            reader.onload = function (e) {
+              sendRealImage(e.target.result);
+            };
+            reader.readAsDataURL(file);
+          }
+          input.value = "";
+        }
+      }
+
+      // 发送真实图片
+      function sendRealImage(dataUrl) {
+        if (!currentChatCharId) {
+          showToast("请先打开一个对话");
+          return;
+        }
+
+        if (!chatHistories[currentChatCharId]) {
+          chatHistories[currentChatCharId] = [];
+        }
+
+        const msgObj = {
+          role: "user",
+          type: "image",
+          imageType: "real",
+          imageData: dataUrl,
+          content: "[用户发送了一张图片]",
+          time: new Date().toLocaleTimeString("zh-CN", {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+        };
+
+        chatHistories[currentChatCharId].push(msgObj);
+        localforage.setItem("chatHistories", chatHistories);
+        renderConversation();
+        updateCharacterLastMessage(currentChatCharId, "[图片]");
+        showToast("图片已发送");
+      }
+
+      // 打开描述图编辑弹窗
+      function openDescImageModal() {
+        closeSendImageModal();
+        const modal = document.getElementById("imageDescModal");
+        const title = document.getElementById("imageDescTitle");
+        const text = document.getElementById("imageDescText");
+        const input = document.getElementById("imageDescInput");
+        const footer = document.getElementById("imageDescFooter");
+        const preview = document.getElementById("imageDescPreview");
+
+        title.textContent = "发送描述图";
+        text.style.display = "none";
+        input.style.display = "block";
+        input.value = "";
+        footer.style.display = "flex";
+        preview.innerHTML = `
+          <div class="image-desc-preview-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+              <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+            <span style="font-size:0.8rem;color:#66bb6a;">描述图片内容</span>
+          </div>
+        `;
+
+        modal.classList.add("active");
+        modal.dataset.mode = "edit";
+      }
+
+      // 确认发送描述图
+      function confirmSendDescImage() {
+        const input = document.getElementById("imageDescInput");
+        const desc = input.value.trim();
+
+        if (!desc) {
+          showToast("请输入图片描述");
+          return;
+        }
+
+        if (!currentChatCharId) {
+          showToast("请先打开一个对话");
+          return;
+        }
+
+        if (!chatHistories[currentChatCharId]) {
+          chatHistories[currentChatCharId] = [];
+        }
+
+        const msgObj = {
+          role: "user",
+          type: "image",
+          imageType: "placeholder",
+          imageDesc: desc,
+          content: "[用户发送了一张图片: " + desc + "]",
+          time: new Date().toLocaleTimeString("zh-CN", {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+        };
+
+        chatHistories[currentChatCharId].push(msgObj);
+        localforage.setItem("chatHistories", chatHistories);
+        renderConversation();
+        updateCharacterLastMessage(currentChatCharId, "[图片]");
+
+        closeImageDescModal();
+        showToast("描述图已发送");
+      }
+
+      // 关闭图片描述弹窗
+      function closeImageDescModal() {
+        document.getElementById("imageDescModal").classList.remove("active");
+      }
+
+      // 查看图片描述（点击占位图时调用）
+      function viewImageDescription(desc, isAi) {
+        const modal = document.getElementById("imageDescModal");
+        const title = document.getElementById("imageDescTitle");
+        const text = document.getElementById("imageDescText");
+        const input = document.getElementById("imageDescInput");
+        const footer = document.getElementById("imageDescFooter");
+        const preview = document.getElementById("imageDescPreview");
+
+        title.textContent = isAi ? "AI发送的图片" : "你发送的图片";
+        text.textContent = desc;
+        text.style.display = "block";
+        input.style.display = "none";
+        footer.style.display = "none";
+
+        const iconColor = isAi ? "#66bb6a" : "#ec407a";
+        const bgGradient = isAi
+          ? "linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%)"
+          : "linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%)";
+
+        preview.style.background = bgGradient;
+        preview.innerHTML = `
+          <div class="image-desc-preview-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="${iconColor}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+              <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+          </div>
+        `;
+
+        modal.classList.add("active");
+        modal.dataset.mode = "view";
+      }
+
+      // 查看真实图片
+      function viewRealImage(imageData) {
+        const modal = document.getElementById("imageViewModal");
+        const img = document.getElementById("imageViewImg");
+        img.src = imageData;
+        modal.classList.add("active");
+      }
+
+      // 关闭图片查看弹窗
+      function closeImageViewModal() {
+        document.getElementById("imageViewModal").classList.remove("active");
       }
 
       /* ==================== 语音/视频通话功能 ==================== */
@@ -29773,5 +30615,154 @@ ${userName}在你的动态下留言了，你需要回复。
         </div>
       </div>
     </div>
+
+    <!-- 发送图片选择弹窗 -->
+    <div
+      class="send-image-modal"
+      id="sendImageModal"
+      onclick="if(event.target===this)closeSendImageModal()"
+    >
+      <div class="send-image-options">
+        <div class="send-image-title">发送图片</div>
+        <div class="send-image-grid two-cols">
+          <div class="send-image-item" onclick="selectRealImage()">
+            <div class="send-image-icon album">
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+              </svg>
+            </div>
+            <span class="send-image-label">选择图片</span>
+            <span class="send-image-hint">相册/拍照/文件</span>
+          </div>
+          <div class="send-image-item" onclick="openDescImageModal()">
+            <div class="send-image-icon desc">
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+                ></path>
+                <path
+                  d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
+                ></path>
+              </svg>
+            </div>
+            <span class="send-image-label">描述图</span>
+            <span class="send-image-hint">用文字描述图片</span>
+          </div>
+        </div>
+        <button class="send-image-cancel" onclick="closeSendImageModal()">
+          取消
+        </button>
+      </div>
+    </div>
+
+    <!-- 图片描述查看/编辑弹窗 -->
+    <div
+      class="image-desc-modal"
+      id="imageDescModal"
+      onclick="if(event.target===this)closeImageDescModal()"
+    >
+      <div class="image-desc-content">
+        <div class="image-desc-header">
+          <span class="image-desc-title" id="imageDescTitle">图片描述</span>
+          <button class="image-desc-close" onclick="closeImageDescModal()">
+            ✕
+          </button>
+        </div>
+        <div class="image-desc-body">
+          <div class="image-desc-preview" id="imageDescPreview">
+            <div class="image-desc-preview-icon">
+              <svg
+                width="40"
+                height="40"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+              </svg>
+              <span style="font-size: 0.8rem">点击查看描述</span>
+            </div>
+          </div>
+          <!-- 查看模式 -->
+          <div
+            class="image-desc-text"
+            id="imageDescText"
+            style="display: none"
+          ></div>
+          <!-- 编辑模式 -->
+          <textarea
+            class="image-desc-input"
+            id="imageDescInput"
+            placeholder="描述这张图片的内容...&#10;例如：一张夕阳下海边的照片，金色的阳光洒在海面上..."
+            style="display: none"
+          ></textarea>
+        </div>
+        <div
+          class="image-desc-footer"
+          id="imageDescFooter"
+          style="display: none"
+        >
+          <button class="image-desc-btn cancel" onclick="closeImageDescModal()">
+            取消
+          </button>
+          <button
+            class="image-desc-btn confirm"
+            onclick="confirmSendDescImage()"
+          >
+            发送
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 图片查看弹窗 -->
+    <div
+      class="image-desc-modal"
+      id="imageViewModal"
+      onclick="closeImageViewModal()"
+    >
+      <div style="max-width: 90%; max-height: 80vh">
+        <img
+          id="imageViewImg"
+          src=""
+          style="max-width: 100%; max-height: 80vh; border-radius: 12px"
+        />
+      </div>
+    </div>
+
+    <!-- 隐藏的图片输入 -->
+    <input
+      type="file"
+      id="realImageInput"
+      hidden
+      accept="image/*"
+      capture="environment"
+      onchange="handleRealImageSelect(this)"
+    />
   </body>
 </html>
