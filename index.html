@@ -21,7 +21,7 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Satisfy&display=swap"
       rel="stylesheet"
     />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js?v=1.1"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js?v=1.8"></script>
     <style>
       * {
         margin: 0;
@@ -6973,7 +6973,6 @@
       }
       .call-overlay.video-call {
         background: #000;
-        display: block;
       }
       .call-overlay.video-call.active {
         display: block;
@@ -18187,6 +18186,12 @@
           summaries: chatSettings[currentChatCharId]?.summaries || [],
           summarizedCount:
             chatSettings[currentChatCharId]?.summarizedCount || 0,
+
+          // 保持视频通话图片不被覆盖
+          videoCallPartnerImage:
+            chatSettings[currentChatCharId]?.videoCallPartnerImage || null,
+          videoCallSelfImage:
+            chatSettings[currentChatCharId]?.videoCallSelfImage || null,
         };
 
         // 4. 保存
@@ -21799,41 +21804,87 @@
         applyCallBubbleColors(userColor, userOpacity, aiColor, aiOpacity);
       }
 
-      // 处理视频通话画面上传
+      // 处理视频通话画面上传（带压缩）
       function handleVideoCallImageUpload(input, type) {
         const file = input.files[0];
         if (!file) return;
 
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          const dataUrl = e.target.result;
+        // 如果是图片，进行压缩
+        if (file.type.startsWith("image/")) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            const img = new Image();
+            img.onload = function () {
+              // 压缩图片
+              const canvas = document.createElement("canvas");
+              const maxSize = 800; // 最大宽高
+              let width = img.width;
+              let height = img.height;
 
-          if (type === "partner") {
-            document.getElementById("videoCallPartnerImg").src = dataUrl;
-            document.getElementById("videoCallPartnerImg").style.display =
-              "block";
-            document.getElementById(
-              "videoCallPartnerPlaceholder"
-            ).style.display = "none";
-          } else {
-            document.getElementById("videoCallSelfImg").src = dataUrl;
-            document.getElementById("videoCallSelfImg").style.display = "block";
-            document.getElementById("videoCallSelfPlaceholder").style.display =
-              "none";
-          }
+              if (width > height && width > maxSize) {
+                height = (height * maxSize) / width;
+                width = maxSize;
+              } else if (height > maxSize) {
+                width = (width * maxSize) / height;
+                height = maxSize;
+              }
 
-          // 保存到设置
-          if (!currentChatCharId) return;
-          const settings = chatSettings[currentChatCharId] || {};
-          if (type === "partner") {
-            settings.videoCallPartnerImage = dataUrl;
-          } else {
-            settings.videoCallSelfImage = dataUrl;
-          }
-          chatSettings[currentChatCharId] = settings;
-          localforage.setItem("chatSettings", chatSettings);
-        };
-        reader.readAsDataURL(file);
+              canvas.width = width;
+              canvas.height = height;
+              const ctx = canvas.getContext("2d");
+              ctx.drawImage(img, 0, 0, width, height);
+
+              // 转为较小的JPEG
+              const dataUrl = canvas.toDataURL("image/jpeg", 0.7);
+
+              applyVideoCallImage(dataUrl, type);
+            };
+            img.src = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        } else {
+          // 视频文件直接使用（不压缩）
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            applyVideoCallImage(e.target.result, type);
+          };
+          reader.readAsDataURL(file);
+        }
+      }
+
+      // 应用视频通话图片
+      function applyVideoCallImage(dataUrl, type) {
+        if (type === "partner") {
+          document.getElementById("videoCallPartnerImg").src = dataUrl;
+          document.getElementById("videoCallPartnerImg").style.display =
+            "block";
+          document.getElementById("videoCallPartnerPlaceholder").style.display =
+            "none";
+        } else {
+          document.getElementById("videoCallSelfImg").src = dataUrl;
+          document.getElementById("videoCallSelfImg").style.display = "block";
+          document.getElementById("videoCallSelfPlaceholder").style.display =
+            "none";
+        }
+
+        // 保存到设置
+        if (!currentChatCharId) return;
+        const settings = chatSettings[currentChatCharId] || {};
+        if (type === "partner") {
+          settings.videoCallPartnerImage = dataUrl;
+        } else {
+          settings.videoCallSelfImage = dataUrl;
+        }
+        chatSettings[currentChatCharId] = settings;
+        localforage
+          .setItem("chatSettings", chatSettings)
+          .then(() => {
+            console.log("视频通话图片已保存", type);
+          })
+          .catch((err) => {
+            console.error("保存视频通话图片失败:", err);
+            showToast("图片太大，保存失败");
+          });
       }
 
       // 清除视频画面
@@ -21884,6 +21935,15 @@
         if (!char) return;
 
         const settings = chatSettings[currentChatCharId] || {};
+
+        // 调试：检查视频通话图片
+        console.log("发起通话，检查设置:", {
+          type,
+          hasPartnerImage: !!settings.videoCallPartnerImage,
+          hasSelfImage: !!settings.videoCallSelfImage,
+          partnerImageLength: settings.videoCallPartnerImage?.length,
+          selfImageLength: settings.videoCallSelfImage?.length,
+        });
 
         // 加载通话气泡颜色
         loadCallBubbleColors(currentChatCharId);
