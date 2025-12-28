@@ -160,62 +160,53 @@
 
       /* Profile Card Widget - 创意透明名片 */
       .profile-widget {
-        background: linear-gradient(135deg, rgba(255,255,255,0.3), rgba(255,255,255,0.1));
-        backdrop-filter: blur(20px) saturate(180%);
-        -webkit-backdrop-filter: blur(20px) saturate(180%);
+        background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.05));
+        backdrop-filter: blur(12px) saturate(150%);
+        -webkit-backdrop-filter: blur(12px) saturate(150%);
         border-radius: 24px;
-        padding: 16px;
+        padding: 24px 16px;
         margin-top: 0;
         position: relative;
-        border: 1px solid rgba(255, 255, 255, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+      }
+
+      /* 名片布局容器 - 左列 + 头像 + 右列 */
+      .profile-card-layout {
         display: flex;
         align-items: center;
-        gap: 14px;
-        overflow: hidden;
+        justify-content: center;
+        gap: 24px;
       }
 
-      .profile-widget::before {
-        content: "";
-        position: absolute;
-        top: -50%;
-        right: -30%;
-        width: 120px;
-        height: 120px;
-        background: radial-gradient(circle, rgba(244,143,177,0.3) 0%, transparent 70%);
-        border-radius: 50%;
-        pointer-events: none;
+      /* 左右两列标签 */
+      .profile-tags-column {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
       }
 
-      .profile-widget::after {
-        content: "";
-        position: absolute;
-        bottom: -30%;
-        left: -20%;
-        width: 80px;
-        height: 80px;
-        background: radial-gradient(circle, rgba(129,212,250,0.3) 0%, transparent 70%);
-        border-radius: 50%;
-        pointer-events: none;
+      /* 中间头像区域 */
+      .profile-avatar-center {
+        position: relative;
+        flex-shrink: 0;
       }
 
       .profile-avatar {
-        width: 60px;
-        height: 60px;
+        width: 72px;
+        height: 72px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #fce4ec, #e1bee7, #bbdefb);
-        padding: 2px;
-        box-shadow: 0 4px 15px rgba(244, 143, 177, 0.25);
         cursor: pointer;
-        flex-shrink: 0;
         position: relative;
-        z-index: 1;
+        overflow: hidden;
       }
 
       .profile-avatar-inner {
         width: 100%;
         height: 100%;
         border-radius: 50%;
-        background: #fff;
+        background: rgba(255, 255, 255, 0.5);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -229,38 +220,205 @@
         object-fit: cover;
       }
 
+      /* 四个标签按钮 */
+      .profile-tag {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(180, 180, 180, 0.25);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border-radius: 22px;
+        padding: 14px 20px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        min-width: 105px;
+      }
+
+      .profile-tag:active {
+        transform: scale(0.96);
+        background: rgba(180, 180, 180, 0.35);
+      }
+
+      .profile-tag-text {
+        font-size: 0.82rem;
+        font-weight: 500;
+        color: rgba(60, 60, 60, 0.65);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 70px;
+      }
+
+      /* 隐藏旧的profile-info相关样式，保持兼容 */
       .profile-info {
-        flex: 1;
-        min-width: 0;
+        display: none;
+      }
+
+      .profile-name,
+      .profile-handle,
+      .profile-bio {
+        display: none;
+      }
+
+      /* 恋爱纪念日小组件 */
+      .love-widget {
+        background: linear-gradient(135deg, rgba(255,255,255,0.25), rgba(255,255,255,0.08));
+        backdrop-filter: blur(12px) saturate(150%);
+        -webkit-backdrop-filter: blur(12px) saturate(150%);
+        border-radius: 20px;
+        padding: 12px;
+        position: relative;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+        text-align: center;
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .love-widget-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-size: cover;
+        background-position: center;
+        border-radius: 20px;
+        z-index: 0;
+      }
+
+      .love-widget > *:not(.love-widget-bg) {
         position: relative;
         z-index: 1;
       }
 
-      .profile-name {
-        font-size: 1.1rem;
-        font-weight: 700;
-        color: var(--text-primary);
-        margin-bottom: 2px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+      .love-days-row {
+        display: flex;
+        align-items: baseline;
+        justify-content: center;
+        gap: 4px;
+        margin-bottom: 10px;
+        cursor: pointer;
       }
 
-      .profile-handle {
-        font-size: 0.75rem;
-        color: var(--accent-pink);
-        margin-bottom: 6px;
+      .love-days-number {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: rgba(60, 60, 60, 0.75);
+        letter-spacing: 1px;
+      }
+
+      .love-days-unit {
+        font-size: 0.85rem;
+        color: rgba(60, 60, 60, 0.55);
         font-weight: 500;
       }
 
-      .profile-bio {
-        font-size: 0.8rem;
-        color: var(--text-secondary);
-        line-height: 1.4;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
+      .love-avatars-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0;
+        margin-bottom: 10px;
+      }
+
+      .love-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        cursor: pointer;
         overflow: hidden;
+        background: rgba(255, 255, 255, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        z-index: 1;
+      }
+
+      .love-avatar:first-child {
+        margin-right: -8px;
+        z-index: 2;
+      }
+
+      .love-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .love-avatar-placeholder {
+        font-size: 18px;
+        color: rgba(180, 180, 180, 0.6);
+      }
+
+      .love-title-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        margin-bottom: 4px;
+        cursor: pointer;
+      }
+
+      .love-title-icon {
+        font-size: 11px;
+        opacity: 0.7;
+      }
+
+      .love-title-text {
+        font-size: 0.75rem;
+        color: rgba(60, 60, 60, 0.65);
+        font-weight: 500;
+      }
+
+      .love-date {
+        font-size: 0.7rem;
+        color: rgba(60, 60, 60, 0.5);
+        cursor: pointer;
+      }
+
+      /* 小组件浅色/深色字体模式 */
+      .love-widget.text-light .love-days-number,
+      .love-widget.text-light .love-days-unit,
+      .love-widget.text-light .love-title-text,
+      .love-widget.text-light .love-date {
+        color: rgba(255, 255, 255, 0.9);
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+      }
+
+      /* 小组件选项弹窗 */
+      .love-widget-options {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .love-widget-option {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 16px;
+        background: rgba(200, 200, 200, 0.2);
+        border-radius: 12px;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+
+      .love-widget-option:active {
+        background: rgba(200, 200, 200, 0.4);
+      }
+
+      .love-widget-option-icon {
+        font-size: 18px;
       }
 
       .profile-location {
@@ -280,7 +438,14 @@
       .apps-grid {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
-        gap: 16px 12px;
+        gap: 20px 12px;
+        align-items: start;
+      }
+
+      /* 小组件占2x2位置 */
+      .widget-2x2 {
+        grid-column: span 2;
+        grid-row: span 2;
       }
 
       .app-item {
@@ -11375,58 +11540,74 @@
 
     <div class="phone-container">
       <div class="main-content">
-        <!-- Profile Widget -->
+        <!-- Profile Widget - 创意名片 -->
         <div class="profile-widget">
-          <div
-            class="profile-avatar"
-            onclick="document.getElementById('avatarInput').click()"
-          >
-            <div class="profile-avatar-inner">
-              <span id="avatarPlaceholder"
-                ><svg
-                  width="28"
-                  height="28"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#f48fb1"
-                  stroke-width="1.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="12" cy="7" r="4"></circle></svg
-              ></span>
-              <img id="avatarImg" src="" alt="" style="display: none" />
+          <div class="profile-card-layout">
+            <!-- 左侧两个标签 -->
+            <div class="profile-tags-column">
+              <div class="profile-tag" onclick="openTagEditModal('leftTop')">
+                <span class="profile-tag-text" id="tagLeftTop"></span>
+              </div>
+              <div class="profile-tag" onclick="openTagEditModal('leftBottom')">
+                <span class="profile-tag-text" id="tagLeftBottom"></span>
+              </div>
+            </div>
+
+            <!-- 中间头像 -->
+            <div class="profile-avatar-center">
+              <div
+                class="profile-avatar"
+                onclick="document.getElementById('avatarInput').click()"
+              >
+                <div class="profile-avatar-inner">
+                  <span id="avatarPlaceholder">
+                    <svg
+                      width="28"
+                      height="28"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#f48fb1"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path
+                        d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"
+                      ></path>
+                      <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                  </span>
+                  <img id="avatarImg" src="" alt="" style="display: none" />
+                </div>
+              </div>
+            </div>
+            <input
+              type="file"
+              id="avatarInput"
+              class="hidden-input"
+              accept="image/*"
+              onchange="handleAvatarUpload(this)"
+            />
+
+            <!-- 右侧两个标签 -->
+            <div class="profile-tags-column">
+              <div class="profile-tag" onclick="openTagEditModal('rightTop')">
+                <span class="profile-tag-text" id="tagRightTop"></span>
+              </div>
+              <div
+                class="profile-tag"
+                onclick="openTagEditModal('rightBottom')"
+              >
+                <span class="profile-tag-text" id="tagRightBottom"></span>
+              </div>
             </div>
           </div>
-          <input
-            type="file"
-            id="avatarInput"
-            class="hidden-input"
-            accept="image/*"
-            onchange="handleAvatarUpload(this)"
-          />
 
-          <div class="profile-info">
-            <div
-              class="profile-name"
-              id="profileName"
-              onclick="openEditModal('name')"
-            >
-              用户名
-            </div>
-            <div
-              class="profile-handle"
-              id="profileHandle"
-              onclick="openEditModal('handle')"
-            >
-              @YourHandle
-            </div>
-            <div
-              class="profile-bio"
-              id="profileBio"
-              onclick="openEditModal('bio')"
-            >
+          <!-- 隐藏的旧profile-info，保持数据兼容 -->
+          <div class="profile-info" style="display: none">
+            <div class="profile-name" id="profileName">用户名</div>
+            <div class="profile-handle" id="profileHandle">@YourHandle</div>
+            <div class="profile-bio" id="profileBio">
               点击编辑你的个性签名 ★
             </div>
           </div>
@@ -11435,6 +11616,81 @@
         <!-- Apps -->
         <div class="apps-section">
           <div class="apps-grid">
+            <!-- 恋爱纪念日小组件 (2x2) -->
+            <div
+              class="love-widget widget-2x2"
+              id="loveWidget"
+              onclick="handleLoveWidgetClick(event)"
+            >
+              <div class="love-widget-bg" id="loveWidgetBg"></div>
+              <div
+                class="love-days-row"
+                onclick="openLoveEditModal('startDate')"
+              >
+                <span class="love-days-number" id="loveDaysNumber">0</span>
+                <span class="love-days-unit">天</span>
+              </div>
+
+              <div class="love-avatars-row">
+                <div
+                  class="love-avatar"
+                  onclick="document.getElementById('loveAvatar1Input').click()"
+                >
+                  <img
+                    class="love-avatar-placeholder-img"
+                    id="loveAvatar1Placeholder"
+                    src="https://www.yn12377.cn/jubao/upload/smjb/2025/12/28/b7957012b29e42bdbf237cb27f46bb91.jpg"
+                  />
+                  <img id="loveAvatar1Img" src="" style="display: none" />
+                </div>
+                <div
+                  class="love-avatar"
+                  onclick="document.getElementById('loveAvatar2Input').click()"
+                >
+                  <img
+                    class="love-avatar-placeholder-img"
+                    id="loveAvatar2Placeholder"
+                    src="https://www.yn12377.cn/jubao/upload/smjb/2025/12/28/b7957012b29e42bdbf237cb27f46bb91.jpg"
+                  />
+                  <img id="loveAvatar2Img" src="" style="display: none" />
+                </div>
+              </div>
+              <input
+                type="file"
+                id="loveAvatar1Input"
+                class="hidden-input"
+                accept="image/*"
+                onchange="handleLoveAvatarUpload(1, this)"
+              />
+              <input
+                type="file"
+                id="loveAvatar2Input"
+                class="hidden-input"
+                accept="image/*"
+                onchange="handleLoveAvatarUpload(2, this)"
+              />
+              <input
+                type="file"
+                id="loveWidgetBgInput"
+                class="hidden-input"
+                accept="image/*"
+                onchange="handleLoveWidgetBgUpload(this)"
+              />
+
+              <div class="love-title-row" onclick="openLoveEditModal('title')">
+                <span class="love-title-text" id="loveTitleText">恋爱纪念</span>
+              </div>
+
+              <div
+                class="love-date"
+                id="loveDateText"
+                onclick="openLoveEditModal('startDate')"
+              >
+                2024.01.01
+              </div>
+            </div>
+
+            <!-- App图标 -->
             <div class="app-item" onclick="openPage('chatPage')">
               <div class="app-icon gradient-pink">聊天</div>
               <span class="app-name">聊天</span>
@@ -11450,6 +11706,14 @@
             <div class="app-item" onclick="openPage('forumPage')">
               <div class="app-icon gradient-purple">论坛</div>
               <span class="app-name">论坛</span>
+            </div>
+            <div class="app-item" onclick="openPage('coupleSpacePage')">
+              <div class="app-icon gradient-pink">情侣</div>
+              <span class="app-name">情侣空间</span>
+            </div>
+            <div class="app-item" onclick="openPage('companionPage')">
+              <div class="app-icon gradient-blue">陪伴</div>
+              <span class="app-name">陪伴</span>
             </div>
           </div>
         </div>
@@ -13305,6 +13569,26 @@
         <div class="page-content">论坛功能开发中...</div>
       </div>
 
+      <div id="coupleSpacePage" class="page">
+        <div class="page-header">
+          <button class="back-btn" onclick="closePage('coupleSpacePage')">
+            ←
+          </button>
+          <h1 class="page-title">情侣空间</h1>
+        </div>
+        <div class="page-content">情侣空间功能开发中...</div>
+      </div>
+
+      <div id="companionPage" class="page">
+        <div class="page-header">
+          <button class="back-btn" onclick="closePage('companionPage')">
+            ←
+          </button>
+          <h1 class="page-title">陪伴</h1>
+        </div>
+        <div class="page-content">陪伴功能开发中...</div>
+      </div>
+
       <div id="apiPage" class="page api-settings-page">
         <div class="page-header">
           <button class="back-btn" onclick="closePage('apiPage')">←</button>
@@ -14077,6 +14361,89 @@
             保存
           </button>
         </div>
+      </div>
+    </div>
+
+    <!-- 名片标签编辑弹窗 -->
+    <div class="edit-modal" id="tagEditModal">
+      <div class="edit-modal-content">
+        <div class="edit-modal-title" id="tagEditTitle">编辑标签</div>
+        <input
+          type="text"
+          class="edit-input"
+          id="tagEditInput"
+          placeholder="请输入..."
+          maxlength="10"
+        />
+        <div class="edit-buttons">
+          <button
+            class="edit-btn edit-btn-cancel"
+            onclick="closeTagEditModal()"
+          >
+            取消
+          </button>
+          <button class="edit-btn edit-btn-save" onclick="saveTagEdit()">
+            保存
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 恋爱纪念编辑弹窗 -->
+    <div class="edit-modal" id="loveEditModal">
+      <div class="edit-modal-content">
+        <div class="edit-modal-title" id="loveEditTitle">编辑</div>
+        <input
+          type="text"
+          class="edit-input"
+          id="loveEditInput"
+          placeholder="请输入..."
+        />
+        <div class="edit-buttons">
+          <button
+            class="edit-btn edit-btn-cancel"
+            onclick="closeLoveEditModal()"
+          >
+            取消
+          </button>
+          <button class="edit-btn edit-btn-save" onclick="saveLoveEdit()">
+            保存
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 恋爱小组件选项弹窗 -->
+    <div class="edit-modal" id="loveWidgetOptionsModal">
+      <div class="edit-modal-content" style="padding: 16px">
+        <div class="edit-modal-title">小组件设置</div>
+        <div class="love-widget-options">
+          <div class="love-widget-option" onclick="triggerLoveWidgetBgUpload()">
+            <span class="love-widget-option-icon">🖼️</span>
+            <span>更换背景图</span>
+          </div>
+          <div
+            class="love-widget-option"
+            onclick="setLoveWidgetTextColor('dark')"
+          >
+            <span class="love-widget-option-icon">⬛</span>
+            <span>字体改黑色</span>
+          </div>
+          <div
+            class="love-widget-option"
+            onclick="setLoveWidgetTextColor('light')"
+          >
+            <span class="love-widget-option-icon">⬜</span>
+            <span>字体改白色</span>
+          </div>
+        </div>
+        <button
+          class="edit-btn edit-btn-cancel"
+          style="width: 100%; margin-top: 12px"
+          onclick="closeLoveWidgetOptionsModal()"
+        >
+          取消
+        </button>
       </div>
     </div>
 
@@ -15895,27 +16262,40 @@
       window.editingEntryIndex = null; // 正在编辑的条目索引
       window.tempWorldbookEntries = []; // 临时条目列表
 
+      // 全局安全读取函数，处理数据损坏情况
+      async function safeLocalforageGet(key) {
+        try {
+          return await localforage.getItem(key);
+        } catch (e) {
+          console.warn(`读取 ${key} 失败:`, e.message);
+          return null;
+        }
+      }
+
       // 2. 创建一个异步启动函数
       async function initApp() {
         try {
           console.log("正在通过 localforage 加载数据...");
 
+          // 使用全局安全读取函数
+          const safeGet = safeLocalforageGet;
+
           // 并行读取所有数据，速度更快
           const values = await Promise.all([
-            localforage.getItem("fontPresets"),
-            localforage.getItem("activeFontId"),
-            localforage.getItem("readTogetherData"),
-            localforage.getItem("characters"),
-            localforage.getItem("apiPresets"),
-            localforage.getItem("chatHistories"),
-            localforage.getItem("chatSettings"),
-            localforage.getItem("userPersonaPresets"),
-            localforage.getItem("bookshelfData"),
-            localforage.getItem("voiceConfig"),
-            localforage.getItem("avatarImg"), // 头像单独读取
-            localforage.getItem("activePresetId"), // API预设选中状态
-            localforage.getItem("worldbooks"), // 世界书数据
-            localforage.getItem("worldbookGroups"), // 世界书分组
+            safeGet("fontPresets"),
+            safeGet("activeFontId"),
+            safeGet("readTogetherData"),
+            safeGet("characters"),
+            safeGet("apiPresets"),
+            safeGet("chatHistories"),
+            safeGet("chatSettings"),
+            safeGet("userPersonaPresets"),
+            safeGet("bookshelfData"),
+            safeGet("voiceConfig"),
+            safeGet("avatarImg"),
+            safeGet("activePresetId"),
+            safeGet("worldbooks"),
+            safeGet("worldbookGroups"),
           ]);
 
           // 赋值（如果读取为 null，就用默认值）
@@ -15964,7 +16344,7 @@
             location: "profileLocation",
           };
           for (const field of fields) {
-            const val = await localforage.getItem("profile_" + field);
+            const val = await safeGet("profile_" + field);
             if (val) {
               const el = document.getElementById(elementMap[field]);
               if (el) {
@@ -15995,7 +16375,35 @@
           }
         } catch (err) {
           console.error("初始化失败:", err);
-          alert("数据加载出错，请查看控制台");
+
+          // 使用默认值初始化，不清除数据
+          console.warn("部分数据加载失败，使用默认值继续...");
+
+          window.fontPresets = window.fontPresets || [];
+          window.activeFontId = window.activeFontId || "system";
+          window.readTogetherData = window.readTogetherData || {};
+          window.characters = window.characters || [];
+          window.apiPresets = window.apiPresets || [];
+          window.chatHistories = window.chatHistories || {};
+          window.chatSettings = window.chatSettings || {};
+          window.userPersonaPresets = window.userPersonaPresets || [];
+          window.bookshelfData = window.bookshelfData || [];
+          window.voiceConfig = window.voiceConfig || {};
+          window.savedActivePresetId = window.savedActivePresetId || null;
+          window.worldbooks = window.worldbooks || [];
+          window.worldbookGroups = window.worldbookGroups || [];
+
+          // 尝试渲染界面
+          try {
+            renderCharacters();
+            renderApiPresets();
+            updateActiveConfigDisplay();
+            loadVoiceSettings();
+            initUserPersonaPresets();
+            initPresetSystem();
+          } catch (renderErr) {
+            console.error("渲染失败:", renderErr);
+          }
         }
       }
 
@@ -16013,7 +16421,12 @@
       // 初始化预设系统
       async function initPresetSystem() {
         try {
-          const savedPresets = await localforage.getItem("userPresets");
+          let savedPresets = null;
+          try {
+            savedPresets = await safeLocalforageGet("userPresets");
+          } catch (e) {
+            console.warn("读取预设数据失败:", e.message);
+          }
           window.presets = savedPresets || [];
           console.log(
             "✓ 预设系统初始化完成，共",
@@ -17012,6 +17425,254 @@
         closeEditModal();
       }
 
+      // 标签编辑功能
+      let currentTagPosition = null;
+
+      function openTagEditModal(position) {
+        currentTagPosition = position;
+        const modal = document.getElementById("tagEditModal");
+        const title = document.getElementById("tagEditTitle");
+        const input = document.getElementById("tagEditInput");
+
+        const positionNames = {
+          leftTop: "左上标签",
+          leftBottom: "左下标签",
+          rightTop: "右上标签",
+          rightBottom: "右下标签",
+        };
+
+        title.textContent = "编辑" + positionNames[position];
+
+        // 加载已保存的数据
+        const savedText =
+          localStorage.getItem("tag_" + position + "_text") || "";
+        input.value = savedText;
+
+        modal.classList.add("active");
+        input.focus();
+      }
+
+      function closeTagEditModal() {
+        document.getElementById("tagEditModal").classList.remove("active");
+      }
+
+      function saveTagEdit() {
+        const input = document.getElementById("tagEditInput");
+        const value = input.value.trim();
+
+        localStorage.setItem("tag_" + currentTagPosition + "_text", value);
+
+        // 更新界面
+        const elementMap = {
+          leftTop: "tagLeftTop",
+          leftBottom: "tagLeftBottom",
+          rightTop: "tagRightTop",
+          rightBottom: "tagRightBottom",
+        };
+        const textElement = document.getElementById(
+          elementMap[currentTagPosition]
+        );
+        if (textElement) {
+          textElement.textContent = value;
+        }
+
+        closeTagEditModal();
+      }
+
+      function loadTagsData() {
+        const positions = ["leftTop", "leftBottom", "rightTop", "rightBottom"];
+        const elementMap = {
+          leftTop: "tagLeftTop",
+          leftBottom: "tagLeftBottom",
+          rightTop: "tagRightTop",
+          rightBottom: "tagRightBottom",
+        };
+
+        positions.forEach((position) => {
+          const savedText =
+            localStorage.getItem("tag_" + position + "_text") || "";
+          const textElement = document.getElementById(elementMap[position]);
+          if (textElement) {
+            textElement.textContent = savedText;
+          }
+        });
+      }
+
+      // ==================== 恋爱纪念组件功能 ====================
+      let currentLoveEditField = null;
+
+      function openLoveEditModal(field) {
+        currentLoveEditField = field;
+        const modal = document.getElementById("loveEditModal");
+        const title = document.getElementById("loveEditTitle");
+        const input = document.getElementById("loveEditInput");
+
+        if (field === "title") {
+          title.textContent = "编辑标题";
+          input.placeholder = "请输入标题文字";
+          input.type = "text";
+          input.value = localStorage.getItem("love_title") || "恋爱纪念";
+        } else if (field === "startDate") {
+          title.textContent = "设置开始日期";
+          input.placeholder = "格式：2024.01.01";
+          input.type = "text";
+          input.value = localStorage.getItem("love_start_date") || "";
+        }
+
+        modal.classList.add("active");
+        input.focus();
+      }
+
+      function closeLoveEditModal() {
+        document.getElementById("loveEditModal").classList.remove("active");
+      }
+
+      function saveLoveEdit() {
+        const input = document.getElementById("loveEditInput");
+        const value = input.value.trim();
+
+        if (currentLoveEditField === "title" && value) {
+          localStorage.setItem("love_title", value);
+          document.getElementById("loveTitleText").textContent = value;
+        } else if (currentLoveEditField === "startDate" && value) {
+          localStorage.setItem("love_start_date", value);
+          document.getElementById("loveDateText").textContent = value;
+          updateLoveDays();
+        }
+
+        closeLoveEditModal();
+      }
+
+      function updateLoveDays() {
+        const dateStr = localStorage.getItem("love_start_date");
+        if (dateStr) {
+          // 解析日期格式 2024.01.01 或 2024-01-01
+          const parts = dateStr.replace(/\./g, "-").split("-");
+          if (parts.length === 3) {
+            const startDate = new Date(parts[0], parts[1] - 1, parts[2]);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            startDate.setHours(0, 0, 0, 0);
+            const diffTime = today - startDate;
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            document.getElementById("loveDaysNumber").textContent =
+              diffDays >= 0 ? diffDays : 0;
+          }
+        }
+      }
+
+      async function handleLoveAvatarUpload(index, input) {
+        const file = input.files[0];
+        if (file) {
+          try {
+            const compressedData = await compressImage(file, 300, 0.7);
+            const img = document.getElementById("loveAvatar" + index + "Img");
+            const placeholder = document.getElementById(
+              "loveAvatar" + index + "Placeholder"
+            );
+            img.src = compressedData;
+            img.style.display = "block";
+            placeholder.style.display = "none";
+            localStorage.setItem("love_avatar_" + index, compressedData);
+          } catch (e) {
+            alert("图片处理失败，请重试");
+          }
+        }
+      }
+
+      function loadLoveWidgetData() {
+        // 加载头像
+        for (let i = 1; i <= 2; i++) {
+          const avatarData = localStorage.getItem("love_avatar_" + i);
+          if (avatarData) {
+            const img = document.getElementById("loveAvatar" + i + "Img");
+            const placeholder = document.getElementById(
+              "loveAvatar" + i + "Placeholder"
+            );
+            img.src = avatarData;
+            img.style.display = "block";
+            placeholder.style.display = "none";
+          }
+        }
+
+        // 加载标题
+        const title = localStorage.getItem("love_title");
+        if (title) {
+          document.getElementById("loveTitleText").textContent = title;
+        }
+
+        // 加载日期并计算天数
+        const dateStr = localStorage.getItem("love_start_date");
+        if (dateStr) {
+          document.getElementById("loveDateText").textContent = dateStr;
+          updateLoveDays();
+        }
+
+        // 加载背景图
+        const bgData = localStorage.getItem("love_widget_bg");
+        if (bgData) {
+          document.getElementById("loveWidgetBg").style.backgroundImage =
+            "url(" + bgData + ")";
+        }
+
+        // 加载字体颜色
+        const textColor = localStorage.getItem("love_widget_text_color");
+        if (textColor === "light") {
+          document.getElementById("loveWidget").classList.add("text-light");
+        }
+      }
+
+      // 点击小组件空白区域打开选项
+      function handleLoveWidgetClick(event) {
+        // 如果点击的是小组件本身或背景层，打开选项弹窗
+        if (
+          event.target.id === "loveWidget" ||
+          event.target.id === "loveWidgetBg"
+        ) {
+          document
+            .getElementById("loveWidgetOptionsModal")
+            .classList.add("active");
+        }
+      }
+
+      function closeLoveWidgetOptionsModal() {
+        document
+          .getElementById("loveWidgetOptionsModal")
+          .classList.remove("active");
+      }
+
+      function triggerLoveWidgetBgUpload() {
+        closeLoveWidgetOptionsModal();
+        document.getElementById("loveWidgetBgInput").click();
+      }
+
+      function setLoveWidgetTextColor(mode) {
+        const widget = document.getElementById("loveWidget");
+        if (mode === "light") {
+          widget.classList.add("text-light");
+          localStorage.setItem("love_widget_text_color", "light");
+        } else {
+          widget.classList.remove("text-light");
+          localStorage.setItem("love_widget_text_color", "dark");
+        }
+        closeLoveWidgetOptionsModal();
+      }
+
+      // 处理背景图上传
+      async function handleLoveWidgetBgUpload(input) {
+        const file = input.files[0];
+        if (file) {
+          try {
+            const compressedData = await compressImage(file, 500, 0.8);
+            document.getElementById("loveWidgetBg").style.backgroundImage =
+              "url(" + compressedData + ")";
+            localStorage.setItem("love_widget_bg", compressedData);
+          } catch (e) {
+            alert("图片处理失败，请重试");
+          }
+        }
+      }
+
       // Page navigation
       // Load saved data
       function loadSavedData() {
@@ -17045,6 +17706,12 @@
             }
           }
         });
+
+        // 加载名片标签数据
+        loadTagsData();
+
+        // 加载恋爱纪念组件数据
+        loadLoveWidgetData();
       }
 
       // Close modal on outside click
@@ -17056,12 +17723,57 @@
           }
         });
 
+      // 标签编辑弹窗点击外部关闭
+      document
+        .getElementById("tagEditModal")
+        .addEventListener("click", function (e) {
+          if (e.target === this) {
+            closeTagEditModal();
+          }
+        });
+
       // Enter key to save
       document
         .getElementById("editInput")
         .addEventListener("keypress", function (e) {
           if (e.key === "Enter") {
             saveEdit();
+          }
+        });
+
+      // 标签编辑弹窗回车保存
+      document
+        .getElementById("tagEditInput")
+        .addEventListener("keypress", function (e) {
+          if (e.key === "Enter") {
+            saveTagEdit();
+          }
+        });
+
+      // 恋爱纪念弹窗点击外部关闭
+      document
+        .getElementById("loveEditModal")
+        .addEventListener("click", function (e) {
+          if (e.target === this) {
+            closeLoveEditModal();
+          }
+        });
+
+      // 恋爱纪念弹窗回车保存
+      document
+        .getElementById("loveEditInput")
+        .addEventListener("keypress", function (e) {
+          if (e.key === "Enter") {
+            saveLoveEdit();
+          }
+        });
+
+      // 小组件选项弹窗点击外部关闭
+      document
+        .getElementById("loveWidgetOptionsModal")
+        .addEventListener("click", function (e) {
+          if (e.target === this) {
+            closeLoveWidgetOptionsModal();
           }
         });
 
@@ -17779,9 +18491,14 @@
         }
 
         // 确保chatHistories是最新的
-        const savedHistories = await localforage.getItem("chatHistories");
-        if (savedHistories) {
-          chatHistories = savedHistories;
+        try {
+          const savedHistories = await safeLocalforageGet("chatHistories");
+          if (savedHistories) {
+            chatHistories = savedHistories;
+          }
+        } catch (e) {
+          console.warn("读取聊天记录失败:", e.message);
+          // 使用内存中的数据继续
         }
 
         // Load chat history
@@ -22229,10 +22946,8 @@
       async function initStickerPanel() {
         try {
           // 读取数据
-          const savedStickers = await localforage.getItem("customStickers");
-          const savedCategories = await localforage.getItem(
-            "stickerCategories"
-          );
+          const savedStickers = await safeLocalforageGet("customStickers");
+          const savedCategories = await safeLocalforageGet("stickerCategories");
 
           // === 数据迁移逻辑 (防止旧用户报错) ===
           if (Array.isArray(savedStickers) && savedStickers.length > 0) {
@@ -22267,13 +22982,13 @@
           // 搜索关键词
           window.stickerSearchKeyword = "";
           // AI绑定的分类（从本地存储读取）
-          const savedAiCat = await localforage.getItem("aiStickerCategory");
+          const savedAiCat = await safeLocalforageGet("aiStickerCategory");
           // AI绑定数据（新版：每个角色可绑定多个分类）
-          const savedBindings = await localforage.getItem("aiStickerBindings");
+          const savedBindings = await safeLocalforageGet("aiStickerBindings");
           window.aiStickerBindings = savedBindings || {};
 
           // 迁移旧版单一绑定数据
-          const oldSingleBinding = await localforage.getItem(
+          const oldSingleBinding = await safeLocalforageGet(
             "aiStickerCategory"
           );
           if (
@@ -25005,7 +25720,7 @@
       // 初始化钱包数据
       async function initWalletData() {
         try {
-          const saved = await localforage.getItem("walletData");
+          const saved = await safeLocalforageGet("walletData");
           if (saved) {
             window.walletData = saved;
           }
@@ -26048,17 +26763,17 @@
 
       async function initTodoSystem() {
         try {
-          const savedTodos = await localforage.getItem("todoList");
+          const savedTodos = await safeLocalforageGet("todoList");
           window.todoList = savedTodos || [];
 
-          const savedBindings = await localforage.getItem("todoAiBindings");
+          const savedBindings = await safeLocalforageGet("todoAiBindings");
           window.todoAiBindings = savedBindings || {};
 
-          const savedCategories = await localforage.getItem("todoCategories");
+          const savedCategories = await safeLocalforageGet("todoCategories");
           if (savedCategories && savedCategories.length > 0)
             window.todoCategories = savedCategories;
 
-          const savedSettings = await localforage.getItem("todoSettings");
+          const savedSettings = await safeLocalforageGet("todoSettings");
           if (savedSettings)
             window.todoSettings = { ...window.todoSettings, ...savedSettings };
 
@@ -26736,7 +27451,7 @@
 
       async function initPeriodSystem() {
         try {
-          const saved = await localforage.getItem("periodData");
+          const saved = await safeLocalforageGet("periodData");
           if (saved) window.periodData = { ...window.periodData, ...saved };
           updatePeriodDisplay();
           renderPeriodCalendar();
@@ -26943,7 +27658,7 @@
 
       // 初始化动态系统
       async function initMomentsSystem() {
-        const saved = await localforage.getItem("momentsData");
+        const saved = await safeLocalforageGet("momentsData");
         if (saved) {
           window.momentsData = saved;
         }
@@ -28505,7 +29220,7 @@ ${userName}在你的动态下留言了，你需要回复。
       // 加载外观设置
       async function loadAppearanceSettings() {
         try {
-          const saved = await localforage.getItem("appearanceSettings");
+          const saved = await safeLocalforageGet("appearanceSettings");
           if (saved) {
             window.appearanceSettings = saved;
             applyAppearanceSettings();
@@ -28541,23 +29256,23 @@ ${userName}在你的动态下留言了，你需要回复。
             el.style.color = settings.fontColor;
           });
 
-        // 应用APP名称和图标
+        // 应用APP名称和图标 (love-widget是第1个子元素，所以app从第2个开始)
         const appMappings = {
           chat: {
-            iconSelector: ".apps-grid .app-item:nth-child(1) .app-icon",
-            nameSelector: ".apps-grid .app-item:nth-child(1) .app-name",
+            iconSelector: ".apps-grid > .app-item:nth-child(2) .app-icon",
+            nameSelector: ".apps-grid > .app-item:nth-child(2) .app-name",
           },
           worldbook: {
-            iconSelector: ".apps-grid .app-item:nth-child(2) .app-icon",
-            nameSelector: ".apps-grid .app-item:nth-child(2) .app-name",
+            iconSelector: ".apps-grid > .app-item:nth-child(3) .app-icon",
+            nameSelector: ".apps-grid > .app-item:nth-child(3) .app-name",
           },
           preset: {
-            iconSelector: ".apps-grid .app-item:nth-child(3) .app-icon",
-            nameSelector: ".apps-grid .app-item:nth-child(3) .app-name",
+            iconSelector: ".apps-grid > .app-item:nth-child(4) .app-icon",
+            nameSelector: ".apps-grid > .app-item:nth-child(4) .app-name",
           },
           forum: {
-            iconSelector: ".apps-grid .app-item:nth-child(4) .app-icon",
-            nameSelector: ".apps-grid .app-item:nth-child(4) .app-name",
+            iconSelector: ".apps-grid > .app-item:nth-child(5) .app-icon",
+            nameSelector: ".apps-grid > .app-item:nth-child(5) .app-name",
           },
           api: {
             iconSelector: ".dock .dock-item:nth-child(1) .dock-icon",
@@ -28667,7 +29382,7 @@ ${userName}在你的动态下留言了，你需要回复。
       // 加载分组
       async function loadCustomGroups() {
         try {
-          const saved = await localforage.getItem("customGroups");
+          const saved = await safeLocalforageGet("customGroups");
           window.customGroups = saved || [];
           updateGroupSelect();
         } catch (e) {
@@ -29648,6 +30363,20 @@ ${userName}在你的动态下留言了，你需要回复。
         openEditModal,
         closeEditModal,
         saveEdit,
+        // 标签编辑
+        openTagEditModal,
+        closeTagEditModal,
+        saveTagEdit,
+        // 恋爱纪念组件
+        openLoveEditModal,
+        closeLoveEditModal,
+        saveLoveEdit,
+        handleLoveAvatarUpload,
+        handleLoveWidgetClick,
+        handleLoveWidgetBgUpload,
+        closeLoveWidgetOptionsModal,
+        triggerLoveWidgetBgUpload,
+        setLoveWidgetTextColor,
         // 聊天标签切换
         switchChatTab,
         handleHeaderBtn,
