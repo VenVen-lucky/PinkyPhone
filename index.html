@@ -21,7 +21,7 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Satisfy&display=swap"
       rel="stylesheet"
     />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js?v=1.7"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js?v=1.6"></script>
     <style>
       * {
         margin: 0;
@@ -855,6 +855,637 @@
       }
       .chat-header-btn svg {
         stroke: #000;
+      }
+
+      .chat-header-btns {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      /* ==================== 群聊相关样式 ==================== */
+      .create-group-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 600;
+        display: none;
+        align-items: flex-end;
+        justify-content: center;
+      }
+      .create-group-modal.active {
+        display: flex;
+      }
+      .create-group-content {
+        background: #fff;
+        width: 100%;
+        max-height: 85vh;
+        border-radius: 24px 24px 0 0;
+        display: flex;
+        flex-direction: column;
+        animation: slideUpModal 0.3s ease;
+      }
+      .create-group-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px;
+        border-bottom: 1px solid #f0f0f0;
+      }
+      .create-group-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #c2185b;
+      }
+      .create-group-close {
+        width: 32px;
+        height: 32px;
+        border: none;
+        background: rgba(0,0,0,0.05);
+        border-radius: 50%;
+        font-size: 16px;
+        cursor: pointer;
+        color: #666;
+      }
+      .create-group-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+      }
+      .create-group-input-section {
+        margin-bottom: 20px;
+      }
+      .create-group-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #666;
+        margin-bottom: 8px;
+        display: block;
+      }
+      .create-group-input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #f0f0f0;
+        border-radius: 12px;
+        font-size: 0.95rem;
+        outline: none;
+        transition: all 0.2s;
+        background: #fafafa;
+      }
+      .create-group-input:focus {
+        border-color: #f48fb1;
+        background: white;
+      }
+      .create-group-avatar-section {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 20px;
+      }
+      .create-group-avatar {
+        width: 64px;
+        height: 64px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, #fce4ec, #f8bbd9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        cursor: pointer;
+        overflow: hidden;
+        border: 2px solid rgba(244, 143, 177, 0.3);
+      }
+      .create-group-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .create-group-avatar-hint {
+        font-size: 0.85rem;
+        color: #999;
+      }
+      .create-group-members-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .create-group-members-count {
+        font-size: 0.8rem;
+        color: #f48fb1;
+        font-weight: 500;
+      }
+      .create-group-members-list {
+        max-height: 300px;
+        overflow-y: auto;
+      }
+      .create-group-member-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        background: #f8f8f8;
+        border-radius: 12px;
+        margin-bottom: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: 2px solid transparent;
+      }
+      .create-group-member-item:active {
+        transform: scale(0.98);
+      }
+      .create-group-member-item.selected {
+        border-color: #f48fb1;
+        background: #fff5f8;
+      }
+      .create-group-member-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #fce4ec, #fff0f5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        overflow: hidden;
+        flex-shrink: 0;
+      }
+      .create-group-member-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .create-group-member-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .create-group-member-name {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #333;
+      }
+      .create-group-member-note {
+        font-size: 0.75rem;
+        color: #999;
+        margin-top: 2px;
+      }
+      .create-group-member-check {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        border: 2px solid #e0e0e0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        flex-shrink: 0;
+      }
+      .create-group-member-item.selected .create-group-member-check {
+        background: linear-gradient(135deg, #f48fb1, #f06292);
+        border-color: transparent;
+      }
+      .create-group-member-item.selected .create-group-member-check::after {
+        content: "✓";
+        color: white;
+        font-size: 12px;
+        font-weight: bold;
+      }
+      .create-group-empty {
+        text-align: center;
+        padding: 40px 20px;
+        color: #999;
+      }
+      .create-group-empty-icon {
+        font-size: 48px;
+        margin-bottom: 12px;
+        opacity: 0.5;
+      }
+      .create-group-footer {
+        padding: 16px 20px;
+        padding-bottom: calc(16px + env(safe-area-inset-bottom));
+        border-top: 1px solid #f0f0f0;
+        display: flex;
+        gap: 12px;
+      }
+      .create-group-btn {
+        flex: 1;
+        padding: 14px;
+        border: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .create-group-btn.cancel {
+        background: #f5f5f5;
+        color: #666;
+      }
+      .create-group-btn.confirm {
+        background: linear-gradient(135deg, #f48fb1, #f06292);
+        color: white;
+        box-shadow: 0 4px 15px rgba(244,143,177,0.4);
+      }
+      .create-group-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      /* 群聊消息项标识 */
+      .message-item.group-chat {
+        position: relative;
+      }
+      .message-item.group-chat .message-avatar {
+        position: relative;
+      }
+      .message-item.group-chat .message-avatar::after {
+        content: "";
+        position: absolute;
+        bottom: -2px;
+        right: -2px;
+        width: 16px;
+        height: 16px;
+        background: linear-gradient(135deg, #f48fb1, #f06292);
+        border-radius: 50%;
+        border: 2px solid white;
+      }
+      .group-avatar-stack {
+        width: 48px;
+        height: 48px;
+        position: relative;
+      }
+      .group-avatar-stack .avatar-mini {
+        position: absolute;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        border: 2px solid white;
+        background: linear-gradient(135deg, #fce4ec, #fff0f5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        overflow: hidden;
+      }
+      .group-avatar-stack .avatar-mini img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .group-avatar-stack .avatar-mini:nth-child(1) {
+        top: 0;
+        left: 0;
+        z-index: 3;
+      }
+      .group-avatar-stack .avatar-mini:nth-child(2) {
+        top: 0;
+        right: 0;
+        z-index: 2;
+      }
+      .group-avatar-stack .avatar-mini:nth-child(3) {
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1;
+      }
+      .group-avatar-stack .avatar-mini.more {
+        background: rgba(0,0,0,0.5);
+        color: white;
+        font-size: 10px;
+        font-weight: 600;
+      }
+
+      /* 群聊对话页面 - 消息带头像和名字 */
+      .msg-row.ai.group-msg {
+        padding-left: 40px;
+        position: relative;
+      }
+      .msg-row.ai.group-msg .msg-sender-avatar {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #fce4ec, #fff0f5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        overflow: hidden;
+      }
+      .msg-row.ai.group-msg .msg-sender-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .msg-sender-name {
+        font-size: 0.75rem;
+        color: #f48fb1;
+        margin-bottom: 4px;
+        font-weight: 500;
+      }
+
+      /* 群聊设置页面 */
+      .group-settings-section {
+        background: white;
+        border-radius: 16px;
+        margin-bottom: 16px;
+        overflow: hidden;
+      }
+      .group-settings-title {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #999;
+        padding: 12px 16px 8px;
+      }
+      .group-members-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 12px 16px;
+      }
+      .group-member-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 60px;
+      }
+      .group-member-card-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #fce4ec, #fff0f5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        margin-bottom: 6px;
+        overflow: hidden;
+        position: relative;
+      }
+      .group-member-card-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .group-member-card-avatar .remove-btn {
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        width: 18px;
+        height: 18px;
+        background: #ff5252;
+        color: white;
+        border-radius: 50%;
+        font-size: 10px;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+      }
+      .group-member-card:hover .remove-btn {
+        display: flex;
+      }
+      .group-member-card-name {
+        font-size: 0.75rem;
+        color: #666;
+        text-align: center;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .group-add-member-card {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: #f5f5f5;
+        border: 2px dashed #ddd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        color: #999;
+        cursor: pointer;
+        margin-bottom: 6px;
+      }
+      .group-add-member-card:active {
+        background: #eee;
+      }
+
+      /* 群聊设置增强样式 */
+      #groupChatSettingsPage {
+        -webkit-overflow-scrolling: touch;
+      }
+      #groupChatSettingsPage .settings-content {
+        -webkit-overflow-scrolling: touch;
+        touch-action: pan-y;
+      }
+      #groupChatSettingsPage .settings-header {
+        position: relative;
+        z-index: 10;
+      }
+      #groupChatSettingsPage .settings-close-btn {
+        position: relative;
+        z-index: 11;
+      }
+      .group-settings-member-display {
+        background: #fafafa;
+        border-radius: 12px;
+        padding: 16px;
+        margin-top: 12px;
+      }
+      .group-settings-member-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        justify-content: flex-start;
+      }
+      .group-settings-member-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 64px;
+      }
+      .group-settings-member-avatar {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #fce4ec, #fff0f5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        overflow: hidden;
+        border: 2px solid white;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+      .group-settings-member-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .group-settings-member-name {
+        font-size: 0.75rem;
+        color: #666;
+        margin-top: 6px;
+        text-align: center;
+        max-width: 64px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .group-manage-btn {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, #fff0f5, #fce4ec);
+        border: 1px solid #f8bbd0;
+        border-radius: 12px;
+        color: #e91e63;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 12px;
+      }
+      .group-manage-btn:active {
+        background: linear-gradient(135deg, #fce4ec, #f8bbd0);
+      }
+
+      /* 实时预览区域 */
+      .chat-preview-container {
+        background: linear-gradient(135deg, #f5f5f5, #eeeeee);
+        border-radius: 16px;
+        padding: 16px;
+        margin-top: 12px;
+      }
+      .chat-preview-title {
+        font-size: 0.82rem;
+        color: #999;
+        margin-bottom: 12px;
+      }
+      .chat-preview-box {
+        background: white;
+        border-radius: 12px;
+        padding: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      }
+      .chat-preview-group-name {
+        text-align: center;
+        font-size: 0.75rem;
+        color: #999;
+        margin-bottom: 10px;
+      }
+      .chat-preview-msg {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        margin-bottom: 10px;
+      }
+      .chat-preview-msg.user {
+        flex-direction: row-reverse;
+      }
+      .chat-preview-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #fce4ec, #fff0f5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        overflow: hidden;
+        flex-shrink: 0;
+      }
+      .chat-preview-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .chat-preview-content {
+        max-width: 70%;
+      }
+      .chat-preview-name {
+        font-size: 0.7rem;
+        color: #999;
+        margin-bottom: 3px;
+      }
+      .chat-preview-msg.user .chat-preview-name {
+        text-align: right;
+      }
+      .chat-preview-bubble {
+        padding: 8px 12px;
+        border-radius: 12px;
+        font-size: 0.82rem;
+        background: white;
+        border: 1px solid #f0f0f0;
+      }
+      .chat-preview-msg.user .chat-preview-bubble {
+        background: linear-gradient(135deg, #f8bbd0, #f48fb1);
+        color: white;
+        border: none;
+      }
+      .chat-preview-time {
+        font-size: 0.65rem;
+        color: #bbb;
+        margin-top: 3px;
+      }
+      .chat-preview-msg.user .chat-preview-time {
+        text-align: right;
+      }
+      .chat-preview-owner-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, #f48fb1, #e91e63);
+        color: white;
+        font-size: 0.6rem;
+        padding: 2px 6px;
+        border-radius: 8px;
+        margin-right: 4px;
+      }
+
+      /* 数据操作按钮组 */
+      .data-actions-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 12px;
+      }
+      .data-action-btn {
+        padding: 14px 12px;
+        border: 1px solid #f0f0f0;
+        border-radius: 12px;
+        background: white;
+        color: #666;
+        font-size: 0.85rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+      }
+      .data-action-btn:active {
+        background: #f5f5f5;
+      }
+      .data-action-btn.full-width {
+        grid-column: 1 / -1;
+      }
+      .data-action-btn.danger {
+        background: #fff5f5;
+        color: #f44336;
+        border-color: #ffcdd2;
+      }
+      .data-action-btn.danger:active {
+        background: #ffebee;
       }
 
       .chat-content {
@@ -11725,13 +12356,37 @@
         <div class="chat-header">
           <button class="back-btn" onclick="closePage('chatPage')">←</button>
           <h1 class="chat-title" id="chatAppTitle">Message</h1>
-          <button
-            class="chat-header-btn"
-            id="chatHeaderBtn"
-            onclick="handleHeaderBtn()"
-          >
-            +
-          </button>
+          <div class="chat-header-btns">
+            <button
+              class="chat-header-btn"
+              id="createGroupBtn"
+              onclick="openCreateGroupModal()"
+              title="创建群聊"
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+            </button>
+            <button
+              class="chat-header-btn"
+              id="chatHeaderBtn"
+              onclick="handleHeaderBtn()"
+            >
+              +
+            </button>
+          </div>
         </div>
 
         <!-- Chat App Content -->
@@ -14563,6 +15218,143 @@
       </div>
     </div>
 
+    <!-- Create Group Chat Modal -->
+    <div
+      class="create-group-modal"
+      id="createGroupModal"
+      onclick="if(event.target===this)closeCreateGroupModal()"
+    >
+      <div class="create-group-content">
+        <div class="create-group-header">
+          <span class="create-group-title">创建群聊</span>
+          <button class="create-group-close" onclick="closeCreateGroupModal()">
+            ✕
+          </button>
+        </div>
+        <div class="create-group-body">
+          <!-- 群聊头像 -->
+          <div class="create-group-avatar-section">
+            <div
+              class="create-group-avatar"
+              id="groupAvatarPreview"
+              onclick="document.getElementById('groupAvatarInput').click()"
+            >
+              <span id="groupAvatarPlaceholder">👥</span>
+              <img id="groupAvatarImg" src="" style="display: none" />
+            </div>
+            <div class="create-group-avatar-hint">点击上传群头像（可选）</div>
+            <input
+              type="file"
+              id="groupAvatarInput"
+              accept="image/*"
+              style="display: none"
+              onchange="previewGroupAvatar(this)"
+            />
+          </div>
+
+          <!-- 群聊名称 -->
+          <div class="create-group-input-section">
+            <label class="create-group-label"
+              >群聊名称 <span style="color: #f48fb1">*</span></label
+            >
+            <input
+              type="text"
+              class="create-group-input"
+              id="groupNameInput"
+              placeholder="输入群聊名称..."
+              oninput="checkGroupCreateValid()"
+            />
+          </div>
+
+          <!-- 选择成员 -->
+          <div class="create-group-members-title">
+            <span>选择群成员</span>
+            <span class="create-group-members-count" id="selectedMembersCount"
+              >已选 0 人</span
+            >
+          </div>
+          <div class="create-group-members-list" id="groupMembersList">
+            <!-- 角色列表会动态渲染 -->
+          </div>
+        </div>
+        <div class="create-group-footer">
+          <button
+            class="create-group-btn cancel"
+            onclick="closeCreateGroupModal()"
+          >
+            取消
+          </button>
+          <button
+            class="create-group-btn confirm"
+            id="createGroupConfirmBtn"
+            onclick="createGroupChat()"
+            disabled
+          >
+            创建群聊
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Group Settings Modal (添加群成员) -->
+    <div
+      class="create-group-modal"
+      id="addGroupMemberModal"
+      onclick="if(event.target===this)closeAddGroupMemberModal()"
+    >
+      <div class="create-group-content">
+        <div class="create-group-header">
+          <span class="create-group-title">添加群成员</span>
+          <button
+            class="create-group-close"
+            onclick="closeAddGroupMemberModal()"
+          >
+            ✕
+          </button>
+        </div>
+        <div class="create-group-body">
+          <div class="create-group-members-title">
+            <span>选择要添加的成员</span>
+            <span class="create-group-members-count" id="addMembersCount"
+              >已选 0 人</span
+            >
+          </div>
+          <div class="create-group-members-list" id="addMembersList">
+            <!-- 可添加的角色列表 -->
+          </div>
+        </div>
+        <div class="create-group-footer">
+          <button
+            class="create-group-btn cancel"
+            onclick="closeAddGroupMemberModal()"
+          >
+            取消
+          </button>
+          <button
+            class="create-group-btn confirm"
+            id="addMemberConfirmBtn"
+            onclick="confirmAddGroupMembers()"
+            disabled
+          >
+            添加
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 群聊专用设置页面 -->
+    <div class="chat-settings-page" id="groupChatSettingsPage">
+      <div class="settings-header">
+        <div class="settings-header-title">群聊设置</div>
+        <button class="settings-close-btn" onclick="closeGroupChatSettings()">
+          ✕
+        </button>
+      </div>
+      <div class="settings-content" id="groupSettingsContent">
+        <!-- 动态生成内容 -->
+      </div>
+    </div>
+
     <div class="chat-conversation-page" id="chatConversationPage">
       <div class="conv-header">
         <button class="conv-back-btn" onclick="closeConversation()">‹</button>
@@ -16296,6 +17088,7 @@
             safeGet("activePresetId"),
             safeGet("worldbooks"),
             safeGet("worldbookGroups"),
+            safeGet("groupChats"), // 添加群聊数据加载
           ]);
 
           // 赋值（如果读取为 null，就用默认值）
@@ -16318,6 +17111,10 @@
           // 世界书数据
           window.worldbooks = values[12] || [];
           window.worldbookGroups = values[13] || [];
+
+          // 群聊数据
+          groupChats = values[14] || [];
+
           // 【✓ 关键修复开始】
           // 必须手动更新 activePresetId 变量，否则界面渲染时不知道刚才读到了什么
           if (window.savedActivePresetId) {
@@ -17952,10 +18749,789 @@
         closeCreateCharModal();
       }
 
+      // ==================== 群聊功能 ====================
+      var groupChats = []; // 群聊列表
+      var tempGroupAvatar = null; // 临时群头像
+      var selectedGroupMembers = []; // 选中的群成员
+      var currentGroupId = null; // 当前群聊ID
+      var tempAddMembers = []; // 临时添加成员
+
+      // 打开创建群聊弹窗
+      function openCreateGroupModal() {
+        if (characters.length < 2) {
+          alert("请先创建至少2个AI角色才能建群哦～");
+          return;
+        }
+        document.getElementById("createGroupModal").classList.add("active");
+        document.getElementById("groupNameInput").value = "";
+        document.getElementById("groupAvatarImg").style.display = "none";
+        document.getElementById("groupAvatarPlaceholder").style.display =
+          "block";
+        tempGroupAvatar = null;
+        selectedGroupMembers = [];
+        renderGroupMembersList();
+        checkGroupCreateValid();
+      }
+
+      // 关闭创建群聊弹窗
+      function closeCreateGroupModal() {
+        document.getElementById("createGroupModal").classList.remove("active");
+        selectedGroupMembers = [];
+        tempGroupAvatar = null;
+      }
+
+      // 预览群头像
+      async function previewGroupAvatar(input) {
+        const file = input.files[0];
+        if (file) {
+          const compressedData = await compressImage(file, 300, 0.7);
+          const img = document.getElementById("groupAvatarImg");
+          const placeholder = document.getElementById("groupAvatarPlaceholder");
+          img.src = compressedData;
+          img.style.display = "block";
+          placeholder.style.display = "none";
+          tempGroupAvatar = compressedData;
+        }
+      }
+
+      // 渲染群成员选择列表
+      function renderGroupMembersList() {
+        const container = document.getElementById("groupMembersList");
+        if (characters.length === 0) {
+          container.innerHTML = `
+            <div class="create-group-empty">
+              <div class="create-group-empty-icon">😢</div>
+              <div>还没有可添加的角色</div>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = characters
+          .map((char) => {
+            const isSelected = selectedGroupMembers.includes(char.id);
+            const displayName = char.note || char.name;
+            return `
+            <div class="create-group-member-item ${
+              isSelected ? "selected" : ""
+            }" onclick="toggleGroupMember(${char.id})">
+              <div class="create-group-member-avatar">
+                ${
+                  char.avatar
+                    ? `<img src="${char.avatar}" alt="${char.name}">`
+                    : char.name.charAt(0)
+                }
+              </div>
+              <div class="create-group-member-info">
+                <div class="create-group-member-name">${displayName}</div>
+                ${
+                  char.note && char.note !== char.name
+                    ? `<div class="create-group-member-note">真名: ${char.name}</div>`
+                    : ""
+                }
+              </div>
+              <div class="create-group-member-check"></div>
+            </div>
+          `;
+          })
+          .join("");
+      }
+
+      // 切换成员选中状态
+      function toggleGroupMember(charId) {
+        const index = selectedGroupMembers.indexOf(charId);
+        if (index > -1) {
+          selectedGroupMembers.splice(index, 1);
+        } else {
+          selectedGroupMembers.push(charId);
+        }
+        renderGroupMembersList();
+        checkGroupCreateValid();
+      }
+
+      // 检查是否可以创建群聊
+      function checkGroupCreateValid() {
+        const name = document.getElementById("groupNameInput").value.trim();
+        const btn = document.getElementById("createGroupConfirmBtn");
+        const countEl = document.getElementById("selectedMembersCount");
+
+        countEl.textContent = `已选 ${selectedGroupMembers.length} 人`;
+
+        if (name && selectedGroupMembers.length >= 2) {
+          btn.disabled = false;
+        } else {
+          btn.disabled = true;
+        }
+      }
+
+      // 创建群聊
+      async function createGroupChat() {
+        const name = document.getElementById("groupNameInput").value.trim();
+        if (!name || selectedGroupMembers.length < 2) {
+          alert("请输入群名称并选择至少2个成员");
+          return;
+        }
+
+        const groupChat = {
+          id: Date.now(),
+          isGroup: true,
+          name: name,
+          avatar: tempGroupAvatar,
+          members: selectedGroupMembers,
+          lastMessage: "群聊已创建",
+          lastTime: "刚刚",
+          unread: 0,
+          createdAt: new Date().toISOString(),
+        };
+
+        groupChats.push(groupChat);
+        await localforage.setItem("groupChats", groupChats);
+
+        showToast(`群聊「${name}」创建成功！`);
+        closeCreateGroupModal();
+        renderCharacters();
+      }
+
+      // 生成群聊头像（多人头像堆叠）
+      function renderGroupAvatarStack(group) {
+        const members = group.members.slice(0, 3);
+        let avatarsHtml = members
+          .map((memberId) => {
+            const char = characters.find((c) => c.id === memberId);
+            if (!char) return '<div class="avatar-mini">?</div>';
+            return `<div class="avatar-mini">${
+              char.avatar ? `<img src="${char.avatar}">` : char.name.charAt(0)
+            }</div>`;
+          })
+          .join("");
+
+        if (group.members.length > 3) {
+          avatarsHtml += `<div class="avatar-mini more">+${
+            group.members.length - 3
+          }</div>`;
+        }
+
+        return `<div class="group-avatar-stack">${avatarsHtml}</div>`;
+      }
+
+      // 打开群聊对话
+      function openGroupConversation(groupId) {
+        currentGroupId = groupId;
+        currentChatCharId = null; // 清除单聊ID
+
+        const group = groupChats.find((g) => g.id === groupId);
+        if (!group) return;
+
+        document.getElementById("chatConversationPage").classList.add("active");
+        document.getElementById("convName").textContent = group.name;
+
+        // 设置群头像
+        const avatarEl = document.getElementById("convAvatar");
+        if (group.avatar) {
+          avatarEl.innerHTML = `<img src="${group.avatar}" style="width:100%;height:100%;object-fit:cover;">`;
+        } else {
+          avatarEl.innerHTML = "👥";
+        }
+
+        // 加载群聊消息
+        loadGroupMessages(groupId);
+      }
+
+      // 加载群聊消息
+      async function loadGroupMessages(groupId) {
+        const messagesKey = `group_messages_${groupId}`;
+        const messages = (await localforage.getItem(messagesKey)) || [];
+        const container = document.getElementById("convMessages");
+
+        if (messages.length === 0) {
+          container.innerHTML = `
+            <div class="conv-empty">
+              <div class="conv-empty-icon">👥</div>
+              <div class="conv-empty-text">群聊已创建，开始聊天吧～</div>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = messages
+          .map((msg) => {
+            if (msg.role === "user") {
+              return `
+              <div class="msg-row user">
+                <div class="msg-bubble">${escapeHtml(msg.content)}</div>
+                <div class="msg-time">${msg.time || ""}</div>
+              </div>
+            `;
+            } else {
+              // AI消息显示发送者名字
+              const char = characters.find((c) => c.id === msg.charId);
+              const charName = char ? char.note || char.name : "成员";
+              const charAvatar = char?.avatar;
+              return `
+              <div class="msg-row ai group-msg">
+                <div class="msg-sender-avatar">
+                  ${
+                    charAvatar
+                      ? `<img src="${charAvatar}">`
+                      : charName.charAt(0)
+                  }
+                </div>
+                <div class="msg-sender-name">${charName}</div>
+                <div class="msg-bubble">${escapeHtml(msg.content)}</div>
+                <div class="msg-time">${msg.time || ""}</div>
+              </div>
+            `;
+            }
+          })
+          .join("");
+
+        container.scrollTop = container.scrollHeight;
+      }
+
+      // 群聊发送消息
+      async function sendGroupMessage(content) {
+        if (!currentGroupId || !content.trim()) return;
+
+        const group = groupChats.find((g) => g.id === currentGroupId);
+        if (!group) return;
+
+        const messagesKey = `group_messages_${currentGroupId}`;
+        const messages = (await localforage.getItem(messagesKey)) || [];
+
+        // 添加用户消息
+        const userMsg = {
+          role: "user",
+          content: content.trim(),
+          time: new Date().toLocaleTimeString("zh-CN", {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+        };
+        messages.push(userMsg);
+        await localforage.setItem(messagesKey, messages);
+
+        // 重新渲染
+        loadGroupMessages(currentGroupId);
+
+        // 更新群聊最后消息
+        group.lastMessage = content.trim().substring(0, 30);
+        group.lastTime = "刚刚";
+        await localforage.setItem("groupChats", groupChats);
+        renderCharacters();
+
+        // 随机选择一个或多个成员回复
+        setTimeout(() => requestGroupAIReply(content), 1000);
+      }
+
+      // 群聊AI回复（随机成员）
+      async function requestGroupAIReply(userMessage) {
+        const group = groupChats.find((g) => g.id === currentGroupId);
+        if (!group) return;
+
+        // 随机选择1-2个成员回复
+        const numReplies = Math.random() > 0.5 ? 2 : 1;
+        const shuffledMembers = [...group.members].sort(
+          () => Math.random() - 0.5
+        );
+        const replyingMembers = shuffledMembers.slice(
+          0,
+          Math.min(numReplies, shuffledMembers.length)
+        );
+
+        for (const memberId of replyingMembers) {
+          const char = characters.find((c) => c.id === memberId);
+          if (!char) continue;
+
+          // 调用AI获取回复（使用该角色的设定）
+          try {
+            const reply = await getGroupMemberReply(char, userMessage, group);
+            if (reply) {
+              const messagesKey = `group_messages_${currentGroupId}`;
+              const messages = (await localforage.getItem(messagesKey)) || [];
+
+              messages.push({
+                role: "assistant",
+                charId: memberId,
+                content: reply,
+                time: new Date().toLocaleTimeString("zh-CN", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                }),
+              });
+
+              await localforage.setItem(messagesKey, messages);
+              loadGroupMessages(currentGroupId);
+
+              // 更新群聊最后消息
+              const charName = char.note || char.name;
+              group.lastMessage = `${charName}: ${reply.substring(0, 20)}`;
+              group.lastTime = "刚刚";
+              await localforage.setItem("groupChats", groupChats);
+              renderCharacters();
+            }
+          } catch (e) {
+            console.error("群聊AI回复失败:", e);
+          }
+
+          // 等待一段时间再让下一个成员回复
+          await new Promise((r) => setTimeout(r, 1500 + Math.random() * 1000));
+        }
+      }
+
+      // 获取群成员的AI回复
+      async function getGroupMemberReply(char, userMessage, group) {
+        const preset = apiPresets.find((p) => p.id == activePresetId);
+        if (!preset || !preset.url || !preset.key) {
+          return `[${char.note || char.name}]：API未配置，无法回复`;
+        }
+
+        // 获取该角色的个人设置（人设等）
+        const charSettings = chatSettings[char.id] || {};
+        const charName = charSettings.charName || char.name;
+        const charPersona = charSettings.persona || char.description || "";
+
+        // 获取群聊设置
+        const groupSettings = group.settings || {};
+        const userNickname = groupSettings.myNickname || "用户";
+        const userPersona = groupSettings.myPersona || "";
+
+        // 获取所有群成员信息
+        const memberInfos = group.members
+          .map((id) => {
+            const c = characters.find((ch) => ch.id === id);
+            if (!c) return null;
+            const s = chatSettings[c.id] || {};
+            return {
+              id: c.id,
+              name: s.charName || c.name,
+              displayName: c.note || c.name,
+              persona: s.persona || c.description || "",
+            };
+          })
+          .filter(Boolean);
+
+        const memberNames = memberInfos.map((m) => m.displayName).join("、");
+
+        // 构建群聊系统提示 - 严格遵循人设
+        let systemPrompt = `【角色设定】
+你是「${charName}」，正在一个群聊中参与对话。
+
+【你的人设 - 必须严格遵守】
+${charPersona || `你是${charName}，性格友好，说话自然。`}
+
+【群聊信息】
+- 群名：${group.name}
+- 群成员：${memberNames}
+
+【用户信息】
+- 用户昵称：${userNickname}
+${userPersona ? `- 用户人设：${userPersona}` : ""}
+
+【其他群成员的人设参考】
+${memberInfos
+  .filter((m) => m.id !== char.id)
+  .map((m) => `- ${m.displayName}：${m.persona || "暂无人设"}`)
+  .join("\n")}
+
+【回复规则 - 必须遵守】
+1. 你必须始终以「${charName}」的身份和人设回复，不可偏离角色
+2. 保持你的性格特点、说话风格、口头禅等
+3. 回复要简短自然，像真实群聊一样（通常1-3句话）
+4. 可以与其他成员互动，也可以只回复用户
+5. 不要使用过于正式的语言，保持轻松的群聊氛围
+6. 不要在回复中标注自己的名字或身份`;
+
+        // 加入时间感知
+        if (groupSettings.timeAware !== false) {
+          systemPrompt += `\n\n【当前时间】${new Date().toLocaleString(
+            "zh-CN"
+          )}`;
+        }
+
+        // 获取群聊历史消息作为上下文
+        const messagesKey = `group_messages_${group.id}`;
+        let groupHistory = (await localforage.getItem(messagesKey)) || [];
+        const contextCount = groupSettings.contextCount || 20;
+        groupHistory = groupHistory.slice(-contextCount);
+
+        // 构建对话历史
+        const conversationHistory = groupHistory
+          .map((msg) => {
+            if (msg.role === "user") {
+              return {
+                role: "user",
+                content: `[${userNickname}]: ${msg.content}`,
+              };
+            } else if (msg.role === "assistant") {
+              const sender = characters.find((c) => c.id === msg.charId);
+              const senderName = sender ? sender.note || sender.name : "成员";
+              return {
+                role: "assistant",
+                content: `[${senderName}]: ${msg.content}`,
+              };
+            } else if (msg.role === "system") {
+              return { role: "system", content: msg.content };
+            }
+            return null;
+          })
+          .filter(Boolean);
+
+        // 处理记忆互通
+        let memoryLinkContent = "";
+        if (groupSettings.memoryLink && groupSettings.memoryLinkCount > 0) {
+          const linkedCharId = parseInt(groupSettings.memoryLink);
+          if (linkedCharId && chatHistories[linkedCharId]) {
+            const linkedHistory = chatHistories[linkedCharId].slice(
+              -groupSettings.memoryLinkCount
+            );
+            const linkedChar = characters.find((c) => c.id === linkedCharId);
+            const linkedCharName = linkedChar
+              ? linkedChar.note || linkedChar.name
+              : "角色";
+
+            if (linkedHistory.length > 0) {
+              memoryLinkContent = `\n\n【记忆互通 - 来自与「${linkedCharName}」的聊天记录】\n以下是用户与${linkedCharName}的最近${linkedHistory.length}条对话，供你参考了解用户的近况：\n`;
+              linkedHistory.forEach((msg) => {
+                if (msg.role === "user") {
+                  memoryLinkContent += `${userNickname}: ${msg.content}\n`;
+                } else if (msg.role === "assistant") {
+                  memoryLinkContent += `${linkedCharName}: ${msg.content}\n`;
+                }
+              });
+              memoryLinkContent += `【记忆互通结束】\n`;
+            }
+          }
+        }
+
+        if (memoryLinkContent) {
+          systemPrompt += memoryLinkContent;
+        }
+
+        // 构建最终的消息数组
+        const messages = [{ role: "system", content: systemPrompt }];
+
+        // 添加历史对话
+        if (conversationHistory.length > 0) {
+          // 将历史消息合并为一条系统消息，提供上下文
+          const historyText = conversationHistory
+            .map((m) => m.content)
+            .join("\n");
+          messages.push({
+            role: "system",
+            content: `【群聊历史记录】\n${historyText}\n【历史记录结束】`,
+          });
+        }
+
+        // 添加当前用户消息
+        messages.push({
+          role: "user",
+          content: `[${userNickname}]: ${userMessage}\n\n请以「${charName}」的身份回复（直接输出回复内容，不要带角色名前缀）：`,
+        });
+
+        try {
+          // 确保URL格式正确
+          let apiUrl = preset.url.replace(/\/$/, "");
+          if (!apiUrl.endsWith("/chat/completions")) {
+            if (apiUrl.endsWith("/v1")) {
+              apiUrl += "/chat/completions";
+            } else if (!apiUrl.includes("/chat/completions")) {
+              apiUrl += "/v1/chat/completions";
+            }
+          }
+
+          const response = await fetch(apiUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${preset.key}`,
+            },
+            body: JSON.stringify({
+              model: preset.model || "gpt-3.5-turbo",
+              messages: messages,
+              max_tokens: 300,
+              temperature:
+                preset.temperature !== undefined
+                  ? Number(preset.temperature)
+                  : 0.8,
+            }),
+          });
+
+          const data = await response.json();
+          if (data.choices && data.choices[0]) {
+            let reply = data.choices[0].message.content;
+            // 清理可能的角色名前缀
+            reply = reply.replace(/^\[.*?\]:\s*/g, "").trim();
+            reply = reply
+              .replace(new RegExp(`^${charName}[：:]\s*`, "g"), "")
+              .trim();
+            return reply;
+          }
+        } catch (e) {
+          console.error("群聊AI请求失败:", e);
+        }
+        return null;
+      }
+
+      // 打开添加群成员弹窗
+      function openAddGroupMemberModal() {
+        if (!currentGroupId) return;
+        const group = groupChats.find((g) => g.id === currentGroupId);
+        if (!group) return;
+
+        tempAddMembers = [];
+        document.getElementById("addGroupMemberModal").classList.add("active");
+        renderAddMembersList(group);
+      }
+
+      // 关闭添加群成员弹窗
+      function closeAddGroupMemberModal() {
+        document
+          .getElementById("addGroupMemberModal")
+          .classList.remove("active");
+        tempAddMembers = [];
+      }
+
+      // 渲染可添加的成员列表
+      function renderAddMembersList(group) {
+        const container = document.getElementById("addMembersList");
+        const availableChars = characters.filter(
+          (c) => !group.members.includes(c.id)
+        );
+
+        if (availableChars.length === 0) {
+          container.innerHTML = `
+            <div class="create-group-empty">
+              <div class="create-group-empty-icon">🎉</div>
+              <div>所有角色都已在群里啦</div>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = availableChars
+          .map((char) => {
+            const isSelected = tempAddMembers.includes(char.id);
+            const displayName = char.note || char.name;
+            return `
+            <div class="create-group-member-item ${
+              isSelected ? "selected" : ""
+            }" onclick="toggleAddMember(${char.id})">
+              <div class="create-group-member-avatar">
+                ${
+                  char.avatar
+                    ? `<img src="${char.avatar}">`
+                    : char.name.charAt(0)
+                }
+              </div>
+              <div class="create-group-member-info">
+                <div class="create-group-member-name">${displayName}</div>
+              </div>
+              <div class="create-group-member-check"></div>
+            </div>
+          `;
+          })
+          .join("");
+      }
+
+      // 切换添加成员选中状态
+      function toggleAddMember(charId) {
+        const index = tempAddMembers.indexOf(charId);
+        if (index > -1) {
+          tempAddMembers.splice(index, 1);
+        } else {
+          tempAddMembers.push(charId);
+        }
+
+        const group = groupChats.find((g) => g.id === currentGroupId);
+        if (group) renderAddMembersList(group);
+
+        document.getElementById(
+          "addMembersCount"
+        ).textContent = `已选 ${tempAddMembers.length} 人`;
+        document.getElementById("addMemberConfirmBtn").disabled =
+          tempAddMembers.length === 0;
+      }
+
+      // 确认添加群成员
+      async function confirmAddGroupMembers() {
+        if (tempAddMembers.length === 0 || !currentGroupId) return;
+
+        const group = groupChats.find((g) => g.id === currentGroupId);
+        if (!group) return;
+
+        group.members = [...group.members, ...tempAddMembers];
+        await localforage.setItem("groupChats", groupChats);
+
+        // 添加系统消息
+        const messagesKey = `group_messages_${currentGroupId}`;
+        const messages = (await localforage.getItem(messagesKey)) || [];
+        const addedNames = tempAddMembers
+          .map((id) => {
+            const char = characters.find((c) => c.id === id);
+            return char ? char.note || char.name : "成员";
+          })
+          .join("、");
+
+        messages.push({
+          role: "system",
+          content: `${addedNames} 加入了群聊`,
+          time: new Date().toLocaleTimeString("zh-CN", {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+        });
+        await localforage.setItem(messagesKey, messages);
+
+        showToast(`已添加 ${tempAddMembers.length} 位成员`);
+        closeAddGroupMemberModal();
+        loadGroupMessages(currentGroupId);
+        renderGroupSettingsMembers();
+      }
+
+      // 从群聊中移除成员
+      async function removeGroupMember(charId) {
+        if (!currentGroupId) return;
+        const group = groupChats.find((g) => g.id === currentGroupId);
+        if (!group) return;
+
+        if (group.members.length <= 2) {
+          alert("群聊至少需要2个成员");
+          return;
+        }
+
+        const char = characters.find((c) => c.id === charId);
+        const charName = char ? char.note || char.name : "成员";
+
+        if (!confirm(`确定要将「${charName}」移出群聊吗？`)) return;
+
+        group.members = group.members.filter((id) => id !== charId);
+        await localforage.setItem("groupChats", groupChats);
+
+        // 添加系统消息
+        const messagesKey = `group_messages_${currentGroupId}`;
+        const messages = (await localforage.getItem(messagesKey)) || [];
+        messages.push({
+          role: "system",
+          content: `${charName} 离开了群聊`,
+          time: new Date().toLocaleTimeString("zh-CN", {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+        });
+        await localforage.setItem(messagesKey, messages);
+
+        showToast(`已移除 ${charName}`);
+        loadGroupMessages(currentGroupId);
+        renderGroupSettingsMembers();
+      }
+
+      // 解散群聊
+      window.dissolveGroup = async function () {
+        if (!currentGroupId) return;
+        const group = groupChats.find((g) => g.id === currentGroupId);
+        if (!group) return;
+
+        if (!confirm(`确定要解散群聊「${group.name}」吗？聊天记录将被删除。`))
+          return;
+
+        // 删除聊天记录
+        await localforage.removeItem(`group_messages_${currentGroupId}`);
+
+        // 删除群聊
+        groupChats = groupChats.filter((g) => g.id !== currentGroupId);
+        await localforage.setItem("groupChats", groupChats);
+
+        showToast("群聊已解散");
+        closeGroupChatSettings();
+        closeConversation();
+        renderCharacters();
+      };
+
+      // 渲染群聊设置中的成员列表
+      function renderGroupSettingsMembers() {
+        if (!currentGroupId) return;
+        const group = groupChats.find((g) => g.id === currentGroupId);
+        if (!group) return;
+
+        // 更新旧的群成员网格（如果存在）
+        const container = document.getElementById("groupMembersGrid");
+        if (container) {
+          let html = group.members
+            .map((memberId) => {
+              const char = characters.find((c) => c.id === memberId);
+              if (!char) return "";
+              const displayName = char.note || char.name;
+              return `
+              <div class="group-member-card">
+                <div class="group-member-card-avatar">
+                  ${
+                    char.avatar
+                      ? `<img src="${char.avatar}">`
+                      : char.name.charAt(0)
+                  }
+                  <div class="remove-btn" onclick="removeGroupMember(${
+                    char.id
+                  })">✕</div>
+                </div>
+                <div class="group-member-card-name">${displayName}</div>
+              </div>
+            `;
+            })
+            .join("");
+
+          // 添加"添加成员"按钮
+          html += `
+            <div class="group-member-card">
+              <div class="group-add-member-card" onclick="openAddGroupMemberModal()">+</div>
+              <div class="group-member-card-name">添加</div>
+            </div>
+          `;
+
+          container.innerHTML = html;
+        }
+
+        // 更新新的群聊设置页面成员列表（如果存在）
+        const newContainer = document.getElementById(
+          "groupSettingsMembersList"
+        );
+        if (newContainer) {
+          const members = group.members
+            .map((id) => characters.find((c) => c.id === id))
+            .filter(Boolean);
+          newContainer.innerHTML = members
+            .map(
+              (m) => `
+            <div class="group-settings-member-item">
+              <div class="group-settings-member-avatar">
+                ${
+                  m.avatar ? `<img src="${m.avatar}" alt="">` : m.name.charAt(0)
+                }
+              </div>
+              <div class="group-settings-member-name">${m.name}</div>
+            </div>
+          `
+            )
+            .join("");
+        }
+      }
+
+      // 初始化加载群聊数据
+      async function loadGroupChats() {
+        try {
+          groupChats = (await localforage.getItem("groupChats")) || [];
+        } catch (e) {
+          groupChats = [];
+        }
+      }
+
       function renderCharacters() {
         const container = document.getElementById("messageList");
 
-        if (characters.length === 0) {
+        // 检查是否既没有角色也没有群聊
+        if (
+          characters.length === 0 &&
+          (!groupChats || groupChats.length === 0)
+        ) {
           container.innerHTML = `
                                     <div class="empty-state" id="emptyMessages">
                                         <div class="empty-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></div>
@@ -18027,7 +19603,68 @@
           `;
         };
 
+        // 生成群聊卡片HTML的函数
+        const renderGroupCard = (group) => {
+          const memberCount = group.members ? group.members.length : 0;
+          let avatarHtml = "";
+
+          if (group.avatar) {
+            avatarHtml = `<img src="${group.avatar}" alt="${group.name}">`;
+          } else if (group.members && group.members.length > 0) {
+            // 生成成员头像堆叠
+            const members = group.members.slice(0, 3);
+            let stackHtml = members
+              .map((memberId) => {
+                const char = characters.find((c) => c.id === memberId);
+                if (!char) return '<div class="avatar-mini">?</div>';
+                return `<div class="avatar-mini">${
+                  char.avatar
+                    ? `<img src="${char.avatar}">`
+                    : char.name.charAt(0)
+                }</div>`;
+              })
+              .join("");
+            if (group.members.length > 3) {
+              stackHtml += `<div class="avatar-mini more">+${
+                group.members.length - 3
+              }</div>`;
+            }
+            avatarHtml = `<div class="group-avatar-stack">${stackHtml}</div>`;
+          } else {
+            avatarHtml = "👥";
+          }
+
+          return `
+            <div class="message-item group-chat" data-group-id="${group.id}">
+              <div class="message-avatar">
+                ${avatarHtml}
+              </div>
+              <div class="message-info">
+                <div class="message-top">
+                  <span class="message-name">${
+                    group.name
+                  } <span style="font-size:0.7rem;color:#999;">(${memberCount}人)</span></span>
+                  <span class="message-time">${group.lastTime || ""}</span>
+                </div>
+                <div class="message-preview">${
+                  group.lastMessage || "点击开始群聊～"
+                }</div>
+              </div>
+              ${
+                group.unread > 0
+                  ? `<div class="message-badge">${group.unread}</div>`
+                  : ""
+              }
+            </div>
+          `;
+        };
+
         let html = "";
+
+        // 先渲染群聊
+        if (groupChats && groupChats.length > 0) {
+          html += groupChats.map((group) => renderGroupCard(group)).join("");
+        }
 
         // 置顶的角色
         if (pinnedChars.length > 0) {
@@ -18061,12 +19698,25 @@
 
         container.innerHTML = html;
 
-        document.querySelectorAll(".message-item").forEach((item) => {
-          item.onclick = function () {
-            const charId = parseInt(this.dataset.id);
-            openConversation(charId);
-          };
-        });
+        // 绑定单聊点击事件
+        document
+          .querySelectorAll(".message-item:not(.group-chat)")
+          .forEach((item) => {
+            item.onclick = function () {
+              const charId = parseInt(this.dataset.id);
+              openConversation(charId);
+            };
+          });
+
+        // 绑定群聊点击事件
+        document
+          .querySelectorAll(".message-item.group-chat")
+          .forEach((item) => {
+            item.onclick = function () {
+              const groupId = parseInt(this.dataset.groupId);
+              openGroupConversation(groupId);
+            };
+          });
       }
 
       // 切换分组展开/收起
@@ -18542,6 +20192,7 @@
           .classList.remove("active");
         document.getElementById("convMenu").classList.remove("active");
         currentChatCharId = null;
+        currentGroupId = null; // 清除群聊ID
 
         // 刷新表情面板的绑定状态显示
         if (typeof renderCategoryBar === "function") {
@@ -19114,6 +20765,14 @@
         const text = input.value.trim();
         if (!text) return;
 
+        // 检查是否是群聊
+        if (currentGroupId) {
+          sendGroupMessage(text);
+          input.value = "";
+          input.style.height = "auto";
+          return;
+        }
+
         if (!chatHistories[currentChatCharId]) {
           chatHistories[currentChatCharId] = [];
         }
@@ -19155,6 +20814,18 @@
       }
 
       async function requestAIReply() {
+        // 检查是否是群聊
+        if (currentGroupId) {
+          const input = document.getElementById("convInput");
+          const text = input.value.trim();
+          if (text) {
+            sendGroupMessage(text);
+            input.value = "";
+            input.style.height = "auto";
+          }
+          return;
+        }
+
         const apiConfig = getActiveApiConfig();
         if (!apiConfig || !apiConfig.url || !apiConfig.key) {
           showToast("请先配置并选择 API 预设");
@@ -19840,6 +21511,12 @@
 
       // Open chat settings
       function openChatSettings() {
+        // 检查是否是群聊设置
+        if (currentGroupId) {
+          openGroupChatSettings();
+          return;
+        }
+
         if (!currentChatCharId) return;
 
         const char = characters.find((c) => c.id === currentChatCharId);
@@ -19883,6 +21560,663 @@
         // Show settings page
         document.getElementById("chatSettingsPage").classList.add("active");
       }
+
+      // 打开群聊设置
+      function openGroupChatSettings() {
+        const group = groupChats.find((g) => g.id === currentGroupId);
+        if (!group) return;
+
+        // 初始化群聊设置
+        if (!group.settings) {
+          group.settings = {
+            myNickname: "我",
+            myPersona: "",
+            backgroundActivity: false,
+            timeAware: true,
+            background: "",
+            memoryLink: "",
+            memoryLinkCount: 5,
+            contextCount: 20,
+          };
+        }
+        // 确保新字段存在
+        if (group.settings.memoryLink === undefined)
+          group.settings.memoryLink = "";
+        if (group.settings.memoryLinkCount === undefined)
+          group.settings.memoryLinkCount = 5;
+        if (group.settings.contextCount === undefined)
+          group.settings.contextCount = 20;
+
+        const settingsPage = document.getElementById("groupChatSettingsPage");
+        const content = document.getElementById("groupSettingsContent");
+
+        // 获取群成员信息
+        const members = group.members
+          .map((id) => characters.find((c) => c.id === id))
+          .filter(Boolean);
+
+        // 获取群聊消息数
+        const messagesKey = "group_messages_" + currentGroupId;
+        localforage.getItem(messagesKey).then((msgs) => {
+          const msgCount = (msgs || []).length;
+          document.getElementById("groupMsgCount").textContent = msgCount;
+        });
+
+        // 生成成员显示HTML
+        const membersHtml = members
+          .map(
+            (m) => `
+          <div class="group-settings-member-item">
+            <div class="group-settings-member-avatar">
+              ${m.avatar ? `<img src="${m.avatar}" alt="">` : m.name.charAt(0)}
+            </div>
+            <div class="group-settings-member-name">${m.name}</div>
+          </div>
+        `
+          )
+          .join("");
+
+        // 生成实时预览HTML
+        const firstMember = members[0];
+        const previewHtml = `
+          <div class="chat-preview-group-name">${group.name}</div>
+          <div class="chat-preview-msg">
+            <div class="chat-preview-avatar">
+              ${
+                firstMember?.avatar
+                  ? `<img src="${firstMember.avatar}" alt="">`
+                  : firstMember?.name?.charAt(0) || "?"
+              }
+            </div>
+            <div class="chat-preview-content">
+              <div class="chat-preview-name">${
+                firstMember?.name || "成员"
+              }</div>
+              <div class="chat-preview-bubble">对方消息预览</div>
+              <div class="chat-preview-time">10:00</div>
+            </div>
+          </div>
+          <div class="chat-preview-msg user">
+            <div class="chat-preview-avatar">
+              ${
+                group.settings.myAvatar
+                  ? `<img src="${group.settings.myAvatar}" alt="">`
+                  : "👤"
+              }
+            </div>
+            <div class="chat-preview-content">
+              <div class="chat-preview-name"><span class="chat-preview-owner-badge">群主</span>${
+                group.settings.myNickname || "我"
+              }</div>
+              <div class="chat-preview-bubble">我的消息预览</div>
+              <div class="chat-preview-time">10:00</div>
+            </div>
+          </div>
+        `;
+
+        content.innerHTML = `
+          <!-- 基础资料 -->
+          <div class="settings-section">
+            <div class="section-header">
+              <div class="section-icon" style="background:linear-gradient(135deg, #fff3e0, #ffe0b2);">📝</div>
+              <span class="section-title">基础资料</span>
+            </div>
+            <div class="section-body">
+              <div class="form-group">
+                <label class="form-label">群聊名称 <span class="form-hint">(AI只认这个，修改会影响记忆)</span></label>
+                <input type="text" class="form-input" id="groupSettingsName" value="${
+                  group.name || ""
+                }" placeholder="输入群聊名称...">
+              </div>
+              <div class="form-group">
+                <label class="form-label">我的群昵称</label>
+                <input type="text" class="form-input" id="groupSettingsMyNickname" value="${
+                  group.settings.myNickname || "我"
+                }" placeholder="输入我的群昵称...">
+              </div>
+              <div class="avatar-upload-row">
+                <div class="avatar-upload-col">
+                  <div class="avatar-upload-label">群头像</div>
+                  <div class="avatar-preview" id="groupAvatarPreview" onclick="document.getElementById('groupSettingsAvatarInput').click()">
+                    ${
+                      group.avatar
+                        ? `<img src="${group.avatar}" style="width:100%;height:100%;object-fit:cover;display:block;">`
+                        : '<span style="font-size:24px;">👥</span>'
+                    }
+                  </div>
+                  <input type="file" id="groupSettingsAvatarInput" class="hidden-input" accept="image/*" onchange="previewGroupSettingsAvatar(this)">
+                  <div class="avatar-actions">
+                    <button class="avatar-action-btn" onclick="document.getElementById('groupSettingsAvatarInput').click()">上传</button>
+                  </div>
+                </div>
+                <div class="avatar-upload-col">
+                  <div class="avatar-upload-label">我的头像</div>
+                  <div class="avatar-preview" id="groupMyAvatarPreview" onclick="document.getElementById('groupSettingsMyAvatarInput').click()">
+                    ${
+                      group.settings.myAvatar
+                        ? `<img src="${group.settings.myAvatar}" style="width:100%;height:100%;object-fit:cover;display:block;">`
+                        : '<span style="font-size:24px;">👤</span>'
+                    }
+                  </div>
+                  <input type="file" id="groupSettingsMyAvatarInput" class="hidden-input" accept="image/*" onchange="previewGroupSettingsMyAvatar(this)">
+                  <div class="avatar-actions">
+                    <button class="avatar-action-btn" onclick="document.getElementById('groupSettingsMyAvatarInput').click()">上传</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- AI大脑与设定 -->
+          <div class="settings-section">
+            <div class="section-header">
+              <div class="section-icon" style="background:linear-gradient(135deg, #fce4ec, #f8bbd0);">🧠</div>
+              <span class="section-title">AI大脑与设定</span>
+            </div>
+            <div class="section-body">
+              <div class="form-group">
+                <label class="form-label">我的人设 (My Persona)</label>
+                <textarea class="form-input form-textarea" id="groupSettingsMyPersona" placeholder="描述你在群聊中的身份和设定...">${
+                  group.settings.myPersona || ""
+                }</textarea>
+              </div>
+              <div class="form-group">
+                <label class="form-label">群成员设定</label>
+                <div class="group-settings-member-display">
+                  <div class="group-settings-member-row" id="groupSettingsMembersList">
+                    ${membersHtml}
+                  </div>
+                </div>
+                <button class="group-manage-btn" onclick="openGroupMemberManager()">
+                  👥 管理群成员
+                </button>
+              </div>
+              <div class="form-group">
+                <label class="form-label">记忆互通 <span class="form-hint">(选择要链接的聊天)</span></label>
+                <div class="form-select-wrapper">
+                  <select class="form-select" id="groupSettingsMemoryLink" onchange="updateGroupMemoryLink()">
+                    <option value="">-- 不互通 --</option>
+                    ${characters
+                      .filter((c) => !group.members.includes(c.id))
+                      .map(
+                        (c) =>
+                          `<option value="${c.id}" ${
+                            group.settings.memoryLink == c.id ? "selected" : ""
+                          }>${c.note || c.name}</option>`
+                      )
+                      .join("")}
+                  </select>
+                </div>
+                <div class="form-hint" style="margin-top:6px;font-size:0.75rem;color:#999;">
+                  互通后，群里的AI可以了解你与该角色的聊天内容
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">互通条数</label>
+                <div class="number-input-row">
+                  <input type="number" class="number-input" id="groupSettingsMemoryLinkCount" 
+                    value="${
+                      group.settings.memoryLinkCount || 5
+                    }" min="1" max="50" 
+                    onchange="updateGroupMemoryLinkCount()">
+                  <span class="form-hint">条最近消息</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">上下文记忆条数</label>
+                <div class="number-input-row">
+                  <input type="number" class="number-input" id="groupSettingsContextCount" 
+                    value="${
+                      group.settings.contextCount || 20
+                    }" min="5" max="100"
+                    onchange="updateGroupContextCount()">
+                  <span class="form-hint">条群聊历史消息</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 玩法与模式 -->
+          <div class="settings-section">
+            <div class="section-header">
+              <div class="section-icon" style="background:linear-gradient(135deg, #e3f2fd, #bbdefb);">🎮</div>
+              <span class="section-title">玩法与模式</span>
+            </div>
+            <div class="section-body">
+              <div class="toggle-row">
+                <div>
+                  <div class="toggle-label">群聊后台实时活动</div>
+                  <div class="toggle-sublabel">成员会在后台自动聊天</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="groupSettingsBackgroundActivity" ${
+                    group.settings.backgroundActivity ? "checked" : ""
+                  }>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+              <div class="toggle-row">
+                <div>
+                  <div class="toggle-label">实时时间感知</div>
+                  <div class="toggle-sublabel">AI感知当前时间</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" id="groupSettingsTimeAware" ${
+                    group.settings.timeAware !== false ? "checked" : ""
+                  }>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- 视觉美化 -->
+          <div class="settings-section">
+            <div class="section-header">
+              <div class="section-icon" style="background:linear-gradient(135deg, #f3e5f5, #e1bee7);">🎨</div>
+              <span class="section-title">视觉美化</span>
+            </div>
+            <div class="section-body">
+              <div class="chat-preview-container">
+                <div class="chat-preview-title">实时预览</div>
+                <div class="chat-preview-box" id="groupChatPreviewBox">
+                  ${previewHtml}
+                </div>
+              </div>
+              <div class="form-group" style="margin-top:16px;">
+                <label class="form-label">聊天背景</label>
+                <div class="avatar-upload-row" style="justify-content:flex-start;">
+                  <div class="avatar-upload-col">
+                    <div class="avatar-preview" id="groupBgPreview" onclick="document.getElementById('groupSettingsBgInput').click()" style="width:80px;height:140px;border-radius:12px;">
+                      ${
+                        group.settings.background
+                          ? `<img src="${group.settings.background}" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:12px;">`
+                          : '<span style="font-size:12px;color:#ccc;">无背景</span>'
+                      }
+                    </div>
+                    <input type="file" id="groupSettingsBgInput" class="hidden-input" accept="image/*" onchange="previewGroupSettingsBackground(this)">
+                    <div class="avatar-actions">
+                      <button class="avatar-action-btn" onclick="document.getElementById('groupSettingsBgInput').click()">上传</button>
+                      <button class="avatar-action-btn" onclick="clearGroupSettingsBackground()">清除</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 数据与操作 -->
+          <div class="settings-section">
+            <div class="section-header">
+              <div class="section-icon" style="background:linear-gradient(135deg, #e8f5e9, #c8e6c9);">💾</div>
+              <span class="section-title">数据与操作</span>
+            </div>
+            <div class="section-body">
+              <div style="display:flex;gap:16px;margin-bottom:16px;">
+                <div style="flex:1;text-align:center;padding:12px;background:#f5f5f5;border-radius:12px;">
+                  <div style="font-size:0.75rem;color:#999;">总消息</div>
+                  <div style="font-size:1.2rem;font-weight:600;color:#666;" id="groupMsgCount">0</div>
+                </div>
+                <div style="flex:1;text-align:center;padding:12px;background:#f5f5f5;border-radius:12px;">
+                  <div style="font-size:0.75rem;color:#999;">群成员</div>
+                  <div style="font-size:1.2rem;font-weight:600;color:#666;">${
+                    members.length
+                  }</div>
+                </div>
+              </div>
+              <div class="data-actions-grid">
+                <button class="data-action-btn" onclick="exportGroupChat()">📤 导出聊天记录</button>
+                <button class="data-action-btn" onclick="searchGroupChat()">🔍 查找聊天内容</button>
+                <button class="data-action-btn full-width" onclick="clearGroupChat()">🧹 清空聊天记录</button>
+                <button class="data-action-btn full-width danger" onclick="dissolveGroup()">⚠️ 解散群聊</button>
+              </div>
+            </div>
+          </div>
+        `;
+
+        settingsPage.classList.add("active");
+      }
+
+      // 关闭群聊设置
+      window.closeGroupChatSettings = function () {
+        // 保存设置
+        const group = groupChats.find((g) => g.id === currentGroupId);
+        if (group) {
+          const nameInput = document.getElementById("groupSettingsName");
+          const nicknameInput = document.getElementById(
+            "groupSettingsMyNickname"
+          );
+          const personaInput = document.getElementById(
+            "groupSettingsMyPersona"
+          );
+          const bgActivityInput = document.getElementById(
+            "groupSettingsBackgroundActivity"
+          );
+          const timeAwareInput = document.getElementById(
+            "groupSettingsTimeAware"
+          );
+          const memoryLinkInput = document.getElementById(
+            "groupSettingsMemoryLink"
+          );
+          const memoryLinkCountInput = document.getElementById(
+            "groupSettingsMemoryLinkCount"
+          );
+          const contextCountInput = document.getElementById(
+            "groupSettingsContextCount"
+          );
+
+          if (nameInput) group.name = nameInput.value || group.name;
+
+          group.settings = group.settings || {};
+          if (nicknameInput)
+            group.settings.myNickname = nicknameInput.value || "我";
+          if (personaInput) group.settings.myPersona = personaInput.value || "";
+          if (bgActivityInput)
+            group.settings.backgroundActivity = bgActivityInput.checked;
+          if (timeAwareInput) group.settings.timeAware = timeAwareInput.checked;
+          if (memoryLinkInput)
+            group.settings.memoryLink = memoryLinkInput.value || "";
+          if (memoryLinkCountInput)
+            group.settings.memoryLinkCount =
+              parseInt(memoryLinkCountInput.value) || 5;
+          if (contextCountInput)
+            group.settings.contextCount =
+              parseInt(contextCountInput.value) || 20;
+
+          localforage.setItem("groupChats", groupChats);
+        }
+
+        const settingsPage = document.getElementById("groupChatSettingsPage");
+        if (settingsPage) {
+          settingsPage.classList.remove("active");
+        }
+      };
+
+      // 更新群聊记忆互通设置
+      window.updateGroupMemoryLink = function () {
+        const group = groupChats.find((g) => g.id === currentGroupId);
+        if (!group) return;
+        group.settings = group.settings || {};
+        group.settings.memoryLink =
+          document.getElementById("groupSettingsMemoryLink").value || "";
+        localforage.setItem("groupChats", groupChats);
+      };
+
+      window.updateGroupMemoryLinkCount = function () {
+        const group = groupChats.find((g) => g.id === currentGroupId);
+        if (!group) return;
+        group.settings = group.settings || {};
+        group.settings.memoryLinkCount =
+          parseInt(
+            document.getElementById("groupSettingsMemoryLinkCount").value
+          ) || 5;
+        localforage.setItem("groupChats", groupChats);
+      };
+
+      window.updateGroupContextCount = function () {
+        const group = groupChats.find((g) => g.id === currentGroupId);
+        if (!group) return;
+        group.settings = group.settings || {};
+        group.settings.contextCount =
+          parseInt(
+            document.getElementById("groupSettingsContextCount").value
+          ) || 20;
+        localforage.setItem("groupChats", groupChats);
+      };
+
+      // 保存群聊设置
+      function saveGroupSettings() {
+        const group = groupChats.find((g) => g.id === currentGroupId);
+        if (!group) return;
+
+        group.name =
+          document.getElementById("groupSettingsName").value || group.name;
+        group.settings = group.settings || {};
+        group.settings.myNickname =
+          document.getElementById("groupSettingsMyNickname").value || "我";
+        group.settings.myPersona =
+          document.getElementById("groupSettingsMyPersona").value || "";
+        group.settings.backgroundActivity = document.getElementById(
+          "groupSettingsBackgroundActivity"
+        ).checked;
+        group.settings.timeAware = document.getElementById(
+          "groupSettingsTimeAware"
+        ).checked;
+
+        // 记忆互通设置
+        const memoryLinkInput = document.getElementById(
+          "groupSettingsMemoryLink"
+        );
+        const memoryLinkCountInput = document.getElementById(
+          "groupSettingsMemoryLinkCount"
+        );
+        const contextCountInput = document.getElementById(
+          "groupSettingsContextCount"
+        );
+        if (memoryLinkInput)
+          group.settings.memoryLink = memoryLinkInput.value || "";
+        if (memoryLinkCountInput)
+          group.settings.memoryLinkCount =
+            parseInt(memoryLinkCountInput.value) || 5;
+        if (contextCountInput)
+          group.settings.contextCount = parseInt(contextCountInput.value) || 20;
+
+        localforage.setItem("groupChats", groupChats);
+        showToast("群聊设置已保存");
+      }
+
+      // 预览群设置中的群头像
+      window.previewGroupSettingsAvatar = function (input) {
+        if (input.files && input.files[0]) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            const preview = document.getElementById("groupAvatarPreview");
+            preview.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;display:block;">`;
+
+            const group = groupChats.find((g) => g.id === currentGroupId);
+            if (group) {
+              group.avatar = e.target.result;
+              localforage.setItem("groupChats", groupChats);
+            }
+          };
+          reader.readAsDataURL(input.files[0]);
+        }
+      };
+
+      // 预览群设置中我的头像
+      window.previewGroupSettingsMyAvatar = function (input) {
+        if (input.files && input.files[0]) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            const preview = document.getElementById("groupMyAvatarPreview");
+            preview.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;display:block;">`;
+
+            const group = groupChats.find((g) => g.id === currentGroupId);
+            if (group) {
+              group.settings = group.settings || {};
+              group.settings.myAvatar = e.target.result;
+              localforage.setItem("groupChats", groupChats);
+              updateGroupChatPreview();
+            }
+          };
+          reader.readAsDataURL(input.files[0]);
+        }
+      };
+
+      // 预览群聊背景
+      window.previewGroupSettingsBackground = function (input) {
+        if (input.files && input.files[0]) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            const preview = document.getElementById("groupBgPreview");
+            preview.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:12px;">`;
+
+            const group = groupChats.find((g) => g.id === currentGroupId);
+            if (group) {
+              group.settings = group.settings || {};
+              group.settings.background = e.target.result;
+              localforage.setItem("groupChats", groupChats);
+            }
+          };
+          reader.readAsDataURL(input.files[0]);
+        }
+      };
+
+      // 清除群聊背景
+      window.clearGroupSettingsBackground = function () {
+        const preview = document.getElementById("groupBgPreview");
+        preview.innerHTML =
+          '<span style="font-size:12px;color:#ccc;">无背景</span>';
+
+        const group = groupChats.find((g) => g.id === currentGroupId);
+        if (group && group.settings) {
+          group.settings.background = "";
+          localforage.setItem("groupChats", groupChats);
+        }
+      };
+
+      // 更新群聊预览
+      function updateGroupChatPreview() {
+        const group = groupChats.find((g) => g.id === currentGroupId);
+        if (!group) return;
+
+        const members = group.members
+          .map((id) => characters.find((c) => c.id === id))
+          .filter(Boolean);
+        const firstMember = members[0];
+
+        const previewBox = document.getElementById("groupChatPreviewBox");
+        if (previewBox) {
+          previewBox.innerHTML = `
+            <div class="chat-preview-group-name">${group.name}</div>
+            <div class="chat-preview-msg">
+              <div class="chat-preview-avatar">
+                ${
+                  firstMember?.avatar
+                    ? `<img src="${firstMember.avatar}" alt="">`
+                    : firstMember?.name?.charAt(0) || "?"
+                }
+              </div>
+              <div class="chat-preview-content">
+                <div class="chat-preview-name">${
+                  firstMember?.name || "成员"
+                }</div>
+                <div class="chat-preview-bubble">对方消息预览</div>
+                <div class="chat-preview-time">10:00</div>
+              </div>
+            </div>
+            <div class="chat-preview-msg user">
+              <div class="chat-preview-avatar">
+                ${
+                  group.settings?.myAvatar
+                    ? `<img src="${group.settings.myAvatar}" alt="">`
+                    : "👤"
+                }
+              </div>
+              <div class="chat-preview-content">
+                <div class="chat-preview-name"><span class="chat-preview-owner-badge">群主</span>${
+                  group.settings?.myNickname || "我"
+                }</div>
+                <div class="chat-preview-bubble">我的消息预览</div>
+                <div class="chat-preview-time">10:00</div>
+              </div>
+            </div>
+          `;
+        }
+      }
+
+      // 打开群成员管理
+      window.openGroupMemberManager = function () {
+        closeGroupChatSettings();
+        setTimeout(() => {
+          openAddGroupMemberModal();
+        }, 300);
+      };
+
+      // 导出群聊记录
+      window.exportGroupChat = function () {
+        const group = groupChats.find((g) => g.id === currentGroupId);
+        if (!group) return;
+
+        const messagesKey = "group_messages_" + currentGroupId;
+        localforage.getItem(messagesKey).then((messages) => {
+          if (!messages || messages.length === 0) {
+            showToast("没有聊天记录可导出");
+            return;
+          }
+
+          const members = group.members
+            .map((id) => characters.find((c) => c.id === id))
+            .filter(Boolean);
+          let text = `群聊: ${group.name}\n成员: ${members
+            .map((m) => m.name)
+            .join(", ")}\n导出时间: ${new Date().toLocaleString()}\n\n`;
+
+          messages.forEach((msg) => {
+            if (msg.role === "user") {
+              text += `[${msg.time || ""}] ${
+                group.settings?.myNickname || "我"
+              }: ${msg.content}\n`;
+            } else if (msg.role === "assistant") {
+              const member = characters.find((c) => c.id === msg.charId);
+              text += `[${msg.time || ""}] ${member?.name || "成员"}: ${
+                msg.content
+              }\n`;
+            } else if (msg.role === "system") {
+              text += `--- ${msg.content} ---\n`;
+            }
+          });
+
+          const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `群聊_${group.name}_${new Date()
+            .toISOString()
+            .slice(0, 10)}.txt`;
+          a.click();
+          URL.revokeObjectURL(url);
+          showToast("导出成功");
+        });
+      };
+
+      // 查找群聊内容
+      window.searchGroupChat = function () {
+        const keyword = prompt("请输入要搜索的关键词:");
+        if (!keyword || !keyword.trim()) return;
+
+        const messagesKey = "group_messages_" + currentGroupId;
+        localforage.getItem(messagesKey).then((messages) => {
+          if (!messages || messages.length === 0) {
+            showToast("没有聊天记录");
+            return;
+          }
+
+          const results = messages.filter(
+            (msg) =>
+              msg.content &&
+              msg.content.toLowerCase().includes(keyword.toLowerCase())
+          );
+
+          if (results.length === 0) {
+            showToast(`未找到包含 "${keyword}" 的消息`);
+          } else {
+            showToast(`找到 ${results.length} 条相关消息`);
+            // 可以在这里显示搜索结果弹窗
+          }
+        });
+      };
+
+      // 清空群聊记录
+      window.clearGroupChat = function () {
+        if (!confirm("确定要清空所有群聊记录吗？此操作不可恢复！")) return;
+
+        const messagesKey = "group_messages_" + currentGroupId;
+        localforage.setItem(messagesKey, []).then(() => {
+          showToast("聊天记录已清空");
+          document.getElementById("groupMsgCount").textContent = "0";
+        });
+      };
 
       // Load settings data into form
       function loadSettingsToForm(settings, char) {
@@ -20372,6 +22706,11 @@
       // Close chat settings
       function closeChatSettings() {
         document.getElementById("chatSettingsPage").classList.remove("active");
+        // 隐藏群成员设置区域（如果存在）
+        const membersSection = document.getElementById("groupMembersSection");
+        if (membersSection) {
+          membersSection.style.display = "none";
+        }
       }
 
       function saveChatSettings() {
