@@ -21,7 +21,7 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Satisfy&display=swap"
       rel="stylesheet"
     />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js?v=1.9"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js?v=1.7"></script>
     <style>
       * {
         margin: 0;
@@ -16365,6 +16365,7 @@
           loadVoiceSettings();
           initUserPersonaPresets();
           initPresetSystem(); // 初始化预设系统
+          loadSavedData(); // 加载名片、标签、小组件数据
 
           // 如果有自定义字体，应用它
           if (window.activeFontId !== "system") {
@@ -16401,6 +16402,7 @@
             loadVoiceSettings();
             initUserPersonaPresets();
             initPresetSystem();
+            loadSavedData(); // 加载名片、标签、小组件数据
           } catch (renderErr) {
             console.error("渲染失败:", renderErr);
           }
