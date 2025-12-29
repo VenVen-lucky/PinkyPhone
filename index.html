@@ -21,7 +21,7 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Satisfy&display=swap"
       rel="stylesheet"
     />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js?v=1.4"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js?v=1.9"></script>
     <style>
             * {
               margin: 0;
@@ -22842,7 +22842,29 @@ ${memberInfos
               }
             }
           } else {
-            systemContent += `\n【模式：即时通讯】\n1. 像真人一样口语化聊天，**禁止使用括号()包裹任何内容**，直接说话即可。\n2. **必须**拆分为多条短消息，使用 ||| 分隔。\n3. **语音消息功能**：你可以发送语音消息！格式为 [语音:要说的内容]。\n   - 语音消息适合表达亲密、撒娇、安慰等情感场景\n   - 不要每条都发语音，自然地穿插在文字消息中（大约20-30%概率）\n   - 语音内容应该口语化、自然，可以带语气词如"嗯~"、"啊"、"呢"\n   - 示例：宝贝 ||| [语音:想你了呢，今天有没有乖乖吃饭呀~] ||| 记得早点休息哦\n4. **发送转账**：你可以给用户发转账！格式为 [转账:金额:说明]\n   - 适合在节日祝福、表达感谢、安慰心情等场景使用\n   - 金额一般在1-200之间，不要太频繁使用\n   - 示例：生日快乐！ ||| [转账:88.88:生日红包~] ||| 希望你喜欢\n5. **接收/退回用户转账**：当用户给你发转账时，你可以选择接收或退回\n   - 接收转账格式：[收款]  退回转账格式：[退款]\n   - 收到转账后自然地感谢或拒绝，不要每次都收，偶尔也要客气地退回\n   - 示例（接收）：哇谢谢宝贝！ ||| [收款] ||| 我会好好用的～\n   - 示例（退回）：这个我不能收啦！ ||| [退款] ||| 你自己留着花吧～\n6. **位置功能**：你可以发送位置卡片！格式为 [位置:地点名称:详细地址]\n   - 适合在约会、见面、分享当前位置等场景使用\n   - 示例：我到啦！ ||| [位置:星巴克咖啡:南京路步行街店] ||| 你快来～\n7. **撤回功能**：你可以撤回刚发的消息！格式为 [撤回]\n   - 适合在说错话、发错消息、后悔、害羞等场景使用\n   - 撤回后用户仍能看到你撤回了什么\n   - 示例：我喜欢你... ||| [撤回] ||| 没什么！\n8. **引用回复功能**：你可以引用用户之前说的某句话来针对性回复！格式为 [引用:要引用的原文内容]回复内容\n   - 适合在回应用户之前说的某句具体的话、澄清误解、表达对某句话的感受时使用\n   - 引用的内容会显示在你消息的上方，让用户知道你在回复哪句话\n   - 示例：[引用:我今天好累啊]心疼你... ||| 早点休息好不好？\n9. **发起通话功能**：你可以主动给用户打电话！格式为 [打电话:语音] 或 [打电话:视频]\n   - 适合在想念用户、有重要事情要说、想听用户声音等场景使用\n   - 不要太频繁使用，在对话自然发展到想通话的时候再用\n   - 示例：好想你啊... ||| [打电话:语音] ||| 我想听听你的声音\n10. **发送图片功能**：你可以发送图片！格式为 [图片:图片描述]\n   - 适合在分享自拍、风景、宠物照片等场景使用\n   - 图片描述要具体生动，描述图片内容（因为用户会看到这个描述）\n   - 示例：看看我今天的穿搭！ ||| [图片:穿着白色连衣裙，在阳光下微笑自拍，背景是公园的樱花树]\n   - 示例：[图片:一只橘猫正在键盘上打滚，毛茸茸的很可爱] ||| 我家猫又在捣乱啦\n`;
+            systemContent += `\n【模式：即时通讯】
+**最重要的规则：你必须把回复拆分成多条短消息，用 ||| 分隔！每条消息不超过30字！**
+
+格式示例：
+- 正确：嗯嗯 ||| 我知道啦 ||| 你放心好了～
+- 正确：宝贝 ||| 想你了 ||| 今天过得怎么样？
+- 错误：嗯嗯，我知道啦，你放心好了～（这样是错的，没有用|||分隔）
+
+规则：
+1. 像真人发微信一样，一条一条短消息，**必须用 ||| 分隔**
+2. 每条消息简短口语化，不要写长段落
+3. 禁止使用括号()包裹动作或心理描写
+4. **语音消息**：[语音:内容] - 适合撒娇、安慰等场景，约20-30%概率使用
+5. **转账**：[转账:金额:说明] - 节日祝福、表达感谢时使用
+6. **收款/退款**：[收款] 或 [退款] - 回应用户转账
+7. **位置**：[位置:地点名:详细地址] - 约会见面时使用
+8. **撤回**：[撤回] - 说错话、害羞时使用
+9. **引用**：[引用:原文]回复内容 - 针对性回复某句话
+10. **打电话**：[打电话:语音] 或 [打电话:视频]
+11. **图片**：[图片:图片描述]
+
+再次强调：**绝对不能输出一大段话！必须用 ||| 拆分成多条短消息！**
+`;
           }
 
           // 添加AI表情包功能提示（仅在非线下模式时启用）
@@ -23025,6 +23047,21 @@ ${memberInfos
               .split("|||")
               .map((s) => s.trim())
               .filter((s) => s && s !== "...");
+
+            // 【修复】如果AI没有使用|||分隔符，且内容较长，尝试智能分割
+            if (replyParts.length === 1 && replyParts[0].length > 50) {
+              const longText = replyParts[0];
+              // 尝试按中文句号、问号、感叹号、换行分割
+              const smartParts = longText
+                .split(/(?<=[。！？\n])\s*/)
+                .map((s) => s.trim())
+                .filter((s) => s);
+
+              // 如果分割出了多个部分，使用智能分割的结果
+              if (smartParts.length > 1) {
+                replyParts = smartParts;
+              }
+            }
 
             // 如果分割后没有有效内容，使用原始回复
             if (replyParts.length === 0) {
@@ -33173,6 +33210,156 @@ ${formatRequirement}
             document.removeEventListener("mouseup", stopResize);
             document.removeEventListener("touchmove", onResize);
             document.removeEventListener("touchend", stopResize);
+          }
+        });
+      })();
+
+      // 悬浮球拖动功能
+      (function initFloatingBtnDrag() {
+        document.addEventListener("DOMContentLoaded", function () {
+          const btn = document.getElementById("readFloatingBtn");
+          if (!btn) return;
+
+          let isDragging = false;
+          let hasMoved = false;
+          let startX, startY, startLeft, startTop;
+          let longPressTimer = null;
+          const LONG_PRESS_DURATION = 300;
+
+          btn.addEventListener("touchstart", handleTouchStart, {
+            passive: false,
+          });
+          btn.addEventListener("mousedown", handleMouseDown);
+
+          function handleTouchStart(e) {
+            const touch = e.touches[0];
+            startX = touch.clientX;
+            startY = touch.clientY;
+            hasMoved = false;
+
+            const rect = btn.getBoundingClientRect();
+            startLeft = rect.left;
+            startTop = rect.top;
+
+            longPressTimer = setTimeout(() => {
+              isDragging = true;
+              btn.style.animation = "none";
+              btn.style.transform = "scale(1.1)";
+            }, LONG_PRESS_DURATION);
+
+            document.addEventListener("touchmove", handleTouchMove, {
+              passive: false,
+            });
+            document.addEventListener("touchend", handleTouchEnd);
+          }
+
+          function handleMouseDown(e) {
+            startX = e.clientX;
+            startY = e.clientY;
+            hasMoved = false;
+
+            const rect = btn.getBoundingClientRect();
+            startLeft = rect.left;
+            startTop = rect.top;
+
+            longPressTimer = setTimeout(() => {
+              isDragging = true;
+              btn.style.animation = "none";
+              btn.style.transform = "scale(1.1)";
+            }, LONG_PRESS_DURATION);
+
+            document.addEventListener("mousemove", handleMouseMove);
+            document.addEventListener("mouseup", handleMouseUp);
+          }
+
+          function handleTouchMove(e) {
+            const touch = e.touches[0];
+            const deltaX = touch.clientX - startX;
+            const deltaY = touch.clientY - startY;
+
+            if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) {
+              if (longPressTimer) {
+                clearTimeout(longPressTimer);
+                longPressTimer = null;
+              }
+              if (!isDragging) {
+                isDragging = true;
+                btn.style.animation = "none";
+                btn.style.transform = "scale(1.1)";
+              }
+              hasMoved = true;
+            }
+
+            if (isDragging) {
+              e.preventDefault();
+              moveBtn(deltaX, deltaY);
+            }
+          }
+
+          function handleMouseMove(e) {
+            const deltaX = e.clientX - startX;
+            const deltaY = e.clientY - startY;
+
+            if (Math.abs(deltaX) > 5 || Math.abs(deltaY) > 5) {
+              if (longPressTimer) {
+                clearTimeout(longPressTimer);
+                longPressTimer = null;
+              }
+              if (!isDragging) {
+                isDragging = true;
+                btn.style.animation = "none";
+                btn.style.transform = "scale(1.1)";
+              }
+              hasMoved = true;
+            }
+
+            if (isDragging) {
+              moveBtn(deltaX, deltaY);
+            }
+          }
+
+          function moveBtn(deltaX, deltaY) {
+            let newLeft = startLeft + deltaX;
+            let newTop = startTop + deltaY;
+
+            const maxLeft = window.innerWidth - btn.offsetWidth;
+            const maxTop = window.innerHeight - btn.offsetHeight;
+            newLeft = Math.max(0, Math.min(newLeft, maxLeft));
+            newTop = Math.max(0, Math.min(newTop, maxTop));
+
+            btn.style.left = newLeft + "px";
+            btn.style.top = newTop + "px";
+            btn.style.right = "auto";
+            btn.style.bottom = "auto";
+          }
+
+          function handleTouchEnd(e) {
+            cleanup();
+            if (hasMoved) {
+              e.preventDefault();
+            }
+          }
+
+          function handleMouseUp(e) {
+            cleanup();
+            if (hasMoved) {
+              e.preventDefault();
+              e.stopPropagation();
+            }
+          }
+
+          function cleanup() {
+            if (longPressTimer) {
+              clearTimeout(longPressTimer);
+              longPressTimer = null;
+            }
+            isDragging = false;
+            btn.style.transform = "";
+            btn.style.animation = "floatBounce 2s ease-in-out infinite";
+            document.removeEventListener("touchmove", handleTouchMove);
+            document.removeEventListener("touchend", handleTouchEnd);
+            document.removeEventListener("mousemove", handleMouseMove);
+            document.removeEventListener("mouseup", handleMouseUp);
           }
         });
       })();
