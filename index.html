@@ -21,7 +21,7 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Satisfy&display=swap"
       rel="stylesheet"
     />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js?v=1.9"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js?v=1.4"></script>
     <style>
             * {
               margin: 0;
@@ -22843,27 +22843,28 @@ ${memberInfos
             }
           } else {
             systemContent += `\n【模式：即时通讯】
-**最重要的规则：你必须把回复拆分成多条短消息，用 ||| 分隔！每条消息不超过30字！**
+1. 像真人一样口语化聊天，**禁止使用括号()包裹任何内容**，直接说话即可。
+2. **必须**拆分为多条短消息，使用 ||| 分隔。每条消息简短口语化。
+3. **语音消息**：格式为 [语音:要说的内容]
+   - 适合撒娇、安慰等场景，约20-30%概率使用
+   - **重要：语音标签必须独立成一条消息，前后用|||分隔！**
+   - ✓正确：宝贝 ||| [语音:想你了呢~] ||| 记得早点休息
+   - ✗错误：[语音:想你了]记得早点休息（标签和文字不能连在一起！）
+4. **转账**：格式为 [转账:金额:说明]
+   - **重要：转账标签必须独立成一条消息！**
+   - ✓正确：生日快乐！ ||| [转账:88.88:生日红包~] ||| 希望你喜欢
+5. **收款/退款**：[收款] 或 [退款]，必须独立成一条
+6. **位置**：格式为 [位置:地点名称:详细地址]
+   - **重要：位置标签必须独立成一条消息！**
+   - ✓正确：我到啦！ ||| [位置:星巴克:南京路店] ||| 你快来
+7. **撤回**：[撤回]，必须独立成一条
+8. **引用回复**：[引用:原文内容]回复内容
+9. **打电话**：[打电话:语音] 或 [打电话:视频]，必须独立成一条
+10. **图片**：格式为 [图片:图片描述]
+   - **重要：图片标签必须独立成一条消息！**
+   - ✓正确：看看这个！ ||| [图片:一只可爱的猫咪] ||| 好可爱吧
 
-格式示例：
-- 正确：嗯嗯 ||| 我知道啦 ||| 你放心好了～
-- 正确：宝贝 ||| 想你了 ||| 今天过得怎么样？
-- 错误：嗯嗯，我知道啦，你放心好了～（这样是错的，没有用|||分隔）
-
-规则：
-1. 像真人发微信一样，一条一条短消息，**必须用 ||| 分隔**
-2. 每条消息简短口语化，不要写长段落
-3. 禁止使用括号()包裹动作或心理描写
-4. **语音消息**：[语音:内容] - 适合撒娇、安慰等场景，约20-30%概率使用
-5. **转账**：[转账:金额:说明] - 节日祝福、表达感谢时使用
-6. **收款/退款**：[收款] 或 [退款] - 回应用户转账
-7. **位置**：[位置:地点名:详细地址] - 约会见面时使用
-8. **撤回**：[撤回] - 说错话、害羞时使用
-9. **引用**：[引用:原文]回复内容 - 针对性回复某句话
-10. **打电话**：[打电话:语音] 或 [打电话:视频]
-11. **图片**：[图片:图片描述]
-
-再次强调：**绝对不能输出一大段话！必须用 ||| 拆分成多条短消息！**
+**核心规则：所有方括号[]格式的特殊标签，都必须用|||与普通文字分开，不能连在一起写！**
 `;
           }
 
@@ -23048,21 +23049,6 @@ ${memberInfos
               .map((s) => s.trim())
               .filter((s) => s && s !== "...");
 
-            // 【修复】如果AI没有使用|||分隔符，且内容较长，尝试智能分割
-            if (replyParts.length === 1 && replyParts[0].length > 50) {
-              const longText = replyParts[0];
-              // 尝试按中文句号、问号、感叹号、换行分割
-              const smartParts = longText
-                .split(/(?<=[。！？\n])\s*/)
-                .map((s) => s.trim())
-                .filter((s) => s);
-
-              // 如果分割出了多个部分，使用智能分割的结果
-              if (smartParts.length > 1) {
-                replyParts = smartParts;
-              }
-            }
-
             // 如果分割后没有有效内容，使用原始回复
             if (replyParts.length === 0) {
               replyParts = [aiReply.trim() || "嗯～"];
@@ -23070,31 +23056,50 @@ ${memberInfos
 
             // 进一步分割：把特殊标签分离成单独的消息
             replyParts = replyParts.flatMap((part) => {
-              // 匹配所有特殊标签：表情包、转账、红包、位置、语音、撤回、收款、退款、打电话
+              // 匹配所有特殊标签：表情包、转账、红包、位置、语音、撤回、收款、退款、打电话、图片
+              // 使用更精确的正则，确保标签能被正确分离
               const specialTagRegex =
-                /(\[(sticker|表情|表情包|转账|红包|位置|语音|打电话)[：:][^\]]+\]|\[撤回\]|\[收款\]|\[退款\])/gi;
-              // 用标签分割，同时保留标签本身
-              const segments = part
-                .split(specialTagRegex)
-                .filter(
-                  (s) =>
-                    s &&
-                    s.trim() &&
-                    ![
-                      "sticker",
-                      "表情",
-                      "表情包",
-                      "转账",
-                      "红包",
-                      "位置",
-                      "语音",
-                      "撤回",
-                      "收款",
-                      "退款",
-                      "打电话",
-                    ].includes(s)
-                );
-              return segments.map((s) => s.trim()).filter((s) => s);
+                /(\[(sticker|表情|表情包|转账|红包|位置|语音|打电话|图片)[：:][^\]]+\]|\[撤回\]|\[收款\]|\[退款\])/gi;
+              
+              // 先找出所有特殊标签的位置
+              const tags = [];
+              let match;
+              const regex = new RegExp(specialTagRegex.source, 'gi');
+              while ((match = regex.exec(part)) !== null) {
+                tags.push({
+                  tag: match[0],
+                  start: match.index,
+                  end: match.index + match[0].length
+                });
+              }
+              
+              // 如果没有特殊标签，直接返回原内容
+              if (tags.length === 0) {
+                return [part.trim()].filter(s => s);
+              }
+              
+              // 分割文本和标签
+              const segments = [];
+              let lastEnd = 0;
+              
+              for (const tag of tags) {
+                // 添加标签前的文本
+                if (tag.start > lastEnd) {
+                  const text = part.slice(lastEnd, tag.start).trim();
+                  if (text) segments.push(text);
+                }
+                // 添加标签本身
+                segments.push(tag.tag);
+                lastEnd = tag.end;
+              }
+              
+              // 添加最后一个标签后的文本
+              if (lastEnd < part.length) {
+                const text = part.slice(lastEnd).trim();
+                if (text) segments.push(text);
+              }
+              
+              return segments;
             });
 
             // 只朗读文字消息
@@ -33226,9 +33231,7 @@ ${formatRequirement}
           let longPressTimer = null;
           const LONG_PRESS_DURATION = 300;
 
-          btn.addEventListener("touchstart", handleTouchStart, {
-            passive: false,
-          });
+          btn.addEventListener("touchstart", handleTouchStart, { passive: false });
           btn.addEventListener("mousedown", handleMouseDown);
 
           function handleTouchStart(e) {
@@ -33247,9 +33250,7 @@ ${formatRequirement}
               btn.style.transform = "scale(1.1)";
             }, LONG_PRESS_DURATION);
 
-            document.addEventListener("touchmove", handleTouchMove, {
-              passive: false,
-            });
+            document.addEventListener("touchmove", handleTouchMove, { passive: false });
             document.addEventListener("touchend", handleTouchEnd);
           }
 
