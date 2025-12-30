@@ -14,14 +14,14 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <!-- 设置主题颜色，让状态栏区域与背景一致 -->
     <meta name="theme-color" content="#fce4ec" />
-    <title>Pinky Phone</title>
+    <title>SillyTavern</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Satisfy&display=swap"
       rel="stylesheet"
     />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js?v=1.3"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js?v=1.4"></script>
     <style>
             * {
               margin: 0;
@@ -1847,6 +1847,8 @@
               background: #fff;
               min-height: 100%;
               padding-bottom: 80px;
+              margin: 0 -12px; /* 抵消父容器的padding */
+              width: calc(100% + 24px);
             }
 
             /* 个人名片区域 - QQ空间风格 */
@@ -1858,18 +1860,38 @@
             .moment-cover {
               width: 100%;
               height: 200px;
+              padding-top: env(safe-area-inset-top, 0px);
               background: linear-gradient(135deg, #f8bbd9 0%, #f48fb1 50%, #ec407a 100%);
               position: relative;
               overflow: hidden;
+              box-sizing: content-box;
             }
             .moment-cover img {
               width: 100%;
               height: 100%;
               object-fit: cover;
             }
+            .moment-cover-back {
+              position: absolute;
+              top: calc(12px + env(safe-area-inset-top, 0px));
+              left: 12px;
+              width: 32px;
+              height: 32px;
+              background: rgba(0,0,0,0.3);
+              border: none;
+              border-radius: 50%;
+              color: #fff;
+              font-size: 18px;
+              cursor: pointer;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              backdrop-filter: blur(4px);
+              z-index: 10;
+            }
             .moment-cover-edit {
               position: absolute;
-              top: 12px;
+              top: calc(12px + env(safe-area-inset-top, 0px));
               right: 12px;
               width: 32px;
               height: 32px;
@@ -2057,7 +2079,7 @@
               width: 100%;
               display: block;
             }
-
+            
             /* 图片描述占位符 */
             .ig-post-text-img {
               width: 100%;
@@ -2873,6 +2895,7 @@
               display: flex;
               align-items: center;
               padding: 14px 16px;
+              padding-top: calc(14px + env(safe-area-inset-top, 20px));
               background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%);
               border-bottom: none;
               box-shadow: 0 2px 8px rgba(236, 64, 122, 0.15);
@@ -13232,32 +13255,17 @@
           <!-- Moments Tab (QQ空间风格动态) -->
           <div class="chat-tab-content" id="momentsTab">
             <!-- 返回按钮 -->
-            <button class="tab-back-btn" onclick="closePage('chatPage')">
-              ←
-            </button>
+            <button class="tab-back-btn" onclick="closePage('chatPage')">←</button>
             <!-- 个人名片区域 -->
             <div class="moment-profile-card">
-              <div
-                class="moment-cover"
-                id="momentCover"
-                onclick="changeMomentCover()"
-              >
-                <img id="momentCoverImg" src="" style="display: none" />
-                <button
-                  class="moment-cover-edit"
-                  onclick="event.stopPropagation();changeMomentCover()"
-                >
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <path
-                      d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"
-                    ></path>
+              <div class="moment-cover" id="momentCover" onclick="changeMomentCover()">
+                <img id="momentCoverImg" src="" style="display:none;">
+                <button class="moment-cover-back" onclick="event.stopPropagation();switchChatTab('messages')">
+                  ‹
+                </button>
+                <button class="moment-cover-edit" onclick="event.stopPropagation();changeMomentCover()">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
                     <circle cx="12" cy="13" r="4"></circle>
                   </svg>
                 </button>
@@ -13265,55 +13273,23 @@
               <div class="moment-profile-info">
                 <div class="moment-avatar-row">
                   <div class="moment-avatar-wrap">
-                    <div
-                      class="moment-avatar"
-                      id="momentAvatar"
-                      onclick="changeMomentAvatar()"
-                    >
+                    <div class="moment-avatar" id="momentAvatar" onclick="changeMomentAvatar()">
                       <span id="momentAvatarEmoji">😊</span>
-                      <img id="momentAvatarImg" src="" style="display: none" />
+                      <img id="momentAvatarImg" src="" style="display:none;">
                     </div>
-                    <button
-                      class="moment-avatar-edit"
-                      onclick="event.stopPropagation();changeMomentAvatar()"
-                    >
-                      <svg
-                        width="10"
-                        height="10"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2.5"
-                      >
-                        <path
-                          d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"
-                        ></path>
+                    <button class="moment-avatar-edit" onclick="event.stopPropagation();changeMomentAvatar()">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
                         <circle cx="12" cy="13" r="4"></circle>
                       </svg>
                     </button>
                   </div>
                   <div class="moment-name-area">
-                    <div
-                      class="moment-nickname"
-                      id="momentNickname"
-                      onclick="editMomentNickname()"
-                    >
-                      用户
-                    </div>
-                    <div
-                      class="moment-handle"
-                      id="momentHandle"
-                      onclick="editMomentHandle()"
-                    >
-                      @username
-                    </div>
+                    <div class="moment-nickname" id="momentNickname" onclick="editMomentNickname()">用户</div>
+                    <div class="moment-handle" id="momentHandle" onclick="editMomentHandle()">@username</div>
                   </div>
                 </div>
-                <div
-                  class="moment-signature"
-                  id="momentSignature"
-                  onclick="editMomentSignature()"
-                ></div>
+                <div class="moment-signature" id="momentSignature" onclick="editMomentSignature()"></div>
               </div>
             </div>
 
@@ -14283,20 +14259,14 @@
           <div class="chat-tab-content" id="profileTab">
             <!-- 顶栏 -->
             <div class="tab-header">
-              <button class="tab-header-back" onclick="closePage('chatPage')">
-                ←
-              </button>
+              <button class="tab-header-back" onclick="closePage('chatPage')">←</button>
               <span class="tab-header-title">Me</span>
-              <span style="width: 36px"></span>
+              <span style="width:36px;"></span>
             </div>
             <!-- Profile Header -->
             <div class="profile-header-card">
               <div class="profile-main">
-                <div
-                  class="profile-avatar-large"
-                  id="meProfileAvatar"
-                  onclick="changeMomentAvatar()"
-                >
+                <div class="profile-avatar-large" id="meProfileAvatar" onclick="changeMomentAvatar()">
                   <svg
                     width="32"
                     height="32"
@@ -14312,20 +14282,8 @@
                   </svg>
                 </div>
                 <div class="profile-info-main">
-                  <div
-                    class="profile-name-large"
-                    id="meProfileName"
-                    onclick="editMomentNickname()"
-                  >
-                    我的昵称
-                  </div>
-                  <div
-                    class="profile-id"
-                    id="meProfileHandle"
-                    onclick="editMomentHandle()"
-                  >
-                    @username
-                  </div>
+                  <div class="profile-name-large" id="meProfileName" onclick="editMomentNickname()">我的昵称</div>
+                  <div class="profile-id" id="meProfileHandle" onclick="editMomentHandle()">@username</div>
                 </div>
               </div>
             </div>
@@ -14392,7 +14350,7 @@
                     <polyline points="12 6 12 12 16 14"></polyline></svg
                 ></span>
                 <span class="menu-text">后台活动</span>
-                <span class="menu-arrow" style="color: #f48fb1">›</span>
+                <span class="menu-arrow" style="color:#f48fb1;">›</span>
               </div>
             </div>
           </div>
@@ -16458,9 +16416,7 @@
                   stroke-linecap="round"
                   stroke-linejoin="round"
                 >
-                  <path
-                    d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"
-                  ></path>
+                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
                   <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
                   <line x1="12" y1="19" x2="12" y2="23"></line>
                   <line x1="8" y1="23" x2="16" y2="23"></line>
@@ -17701,479 +17657,116 @@
             </div>
             <div class="form-group">
               <label class="form-label">聊天气泡样式</label>
-              <div class="form-hint" style="margin-bottom: 12px">
-                自定义气泡背景、透明度和字体颜色
-              </div>
-
+              <div class="form-hint" style="margin-bottom: 12px;">自定义气泡背景、透明度和字体颜色</div>
+              
               <!-- 我的气泡 -->
-              <div
-                style="
-                  background: rgba(244, 143, 177, 0.1);
-                  padding: 12px;
-                  border-radius: 12px;
-                  margin-bottom: 12px;
-                "
-              >
-                <div
-                  style="
-                    font-size: 0.85rem;
-                    color: #333;
-                    font-weight: 500;
-                    margin-bottom: 10px;
-                  "
-                >
-                  💬 我的气泡
-                </div>
-
+              <div style="background: rgba(244,143,177,0.1); padding: 12px; border-radius: 12px; margin-bottom: 12px;">
+                <div style="font-size: 0.85rem; color: #333; font-weight: 500; margin-bottom: 10px;">💬 我的气泡</div>
+                
                 <!-- 背景颜色 -->
-                <div style="margin-bottom: 10px">
-                  <span
-                    style="
-                      font-size: 0.75rem;
-                      color: #666;
-                      display: block;
-                      margin-bottom: 6px;
-                    "
-                    >背景颜色</span
-                  >
-                  <div
-                    style="
-                      display: flex;
-                      align-items: center;
-                      gap: 8px;
-                      flex-wrap: wrap;
-                    "
-                  >
-                    <div
-                      class="color-preset-grid"
-                      style="display: flex; gap: 4px; flex-wrap: wrap"
-                    >
-                      <div
-                        class="color-preset"
-                        style="background: #fce4ec"
-                        onclick="setChatUserBubbleBg('#fce4ec')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #f8bbd9"
-                        onclick="setChatUserBubbleBg('#f8bbd9')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #f48fb1"
-                        onclick="setChatUserBubbleBg('#f48fb1')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #e1bee7"
-                        onclick="setChatUserBubbleBg('#e1bee7')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #bbdefb"
-                        onclick="setChatUserBubbleBg('#bbdefb')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #b2ebf2"
-                        onclick="setChatUserBubbleBg('#b2ebf2')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #c8e6c9"
-                        onclick="setChatUserBubbleBg('#c8e6c9')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #fff9c4"
-                        onclick="setChatUserBubbleBg('#fff9c4')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #ffe0b2"
-                        onclick="setChatUserBubbleBg('#ffe0b2')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #d7ccc8"
-                        onclick="setChatUserBubbleBg('#d7ccc8')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #ffffff"
-                        onclick="setChatUserBubbleBg('#ffffff')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #37474f"
-                        onclick="setChatUserBubbleBg('#37474f')"
-                      ></div>
+                <div style="margin-bottom: 10px;">
+                  <span style="font-size: 0.75rem; color: #666; display: block; margin-bottom: 6px;">背景颜色</span>
+                  <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                    <div class="color-preset-grid" style="display: flex; gap: 4px; flex-wrap: wrap;">
+                      <div class="color-preset" style="background: #fce4ec" onclick="setChatUserBubbleBg('#fce4ec')"></div>
+                      <div class="color-preset" style="background: #f8bbd9" onclick="setChatUserBubbleBg('#f8bbd9')"></div>
+                      <div class="color-preset" style="background: #f48fb1" onclick="setChatUserBubbleBg('#f48fb1')"></div>
+                      <div class="color-preset" style="background: #e1bee7" onclick="setChatUserBubbleBg('#e1bee7')"></div>
+                      <div class="color-preset" style="background: #bbdefb" onclick="setChatUserBubbleBg('#bbdefb')"></div>
+                      <div class="color-preset" style="background: #b2ebf2" onclick="setChatUserBubbleBg('#b2ebf2')"></div>
+                      <div class="color-preset" style="background: #c8e6c9" onclick="setChatUserBubbleBg('#c8e6c9')"></div>
+                      <div class="color-preset" style="background: #fff9c4" onclick="setChatUserBubbleBg('#fff9c4')"></div>
+                      <div class="color-preset" style="background: #ffe0b2" onclick="setChatUserBubbleBg('#ffe0b2')"></div>
+                      <div class="color-preset" style="background: #d7ccc8" onclick="setChatUserBubbleBg('#d7ccc8')"></div>
+                      <div class="color-preset" style="background: #ffffff" onclick="setChatUserBubbleBg('#ffffff')"></div>
+                      <div class="color-preset" style="background: #37474f" onclick="setChatUserBubbleBg('#37474f')"></div>
                     </div>
-                    <input
-                      type="color"
-                      id="settingsChatUserBubbleBg"
-                      value="#f8bbd9"
-                      class="color-picker-input"
-                      onchange="previewChatBubbleStyle()"
-                    />
+                    <input type="color" id="settingsChatUserBubbleBg" value="#f8bbd9" class="color-picker-input" onchange="previewChatBubbleStyle()" />
                   </div>
                 </div>
-
+                
                 <!-- 透明度 -->
-                <div
-                  style="
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    margin-bottom: 10px;
-                  "
-                >
-                  <span style="font-size: 0.75rem; color: #666; width: 50px"
-                    >透明度</span
-                  >
-                  <input
-                    type="range"
-                    id="settingsChatUserBubbleOpacity"
-                    min="30"
-                    max="100"
-                    value="100"
-                    style="flex: 1"
-                    oninput="previewChatBubbleStyle(); document.getElementById('chatUserOpacityLabel').textContent=this.value+'%'"
-                  />
-                  <span
-                    id="chatUserOpacityLabel"
-                    style="font-size: 0.7rem; color: #999; width: 35px"
-                    >100%</span
-                  >
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+                  <span style="font-size: 0.75rem; color: #666; width: 50px;">透明度</span>
+                  <input type="range" id="settingsChatUserBubbleOpacity" min="30" max="100" value="100" style="flex: 1" oninput="previewChatBubbleStyle(); document.getElementById('chatUserOpacityLabel').textContent=this.value+'%'" />
+                  <span id="chatUserOpacityLabel" style="font-size: 0.7rem; color: #999; width: 35px;">100%</span>
                 </div>
-
+                
                 <!-- 字体颜色 -->
                 <div>
-                  <span
-                    style="
-                      font-size: 0.75rem;
-                      color: #666;
-                      display: block;
-                      margin-bottom: 6px;
-                    "
-                    >字体颜色</span
-                  >
-                  <div
-                    style="
-                      display: flex;
-                      align-items: center;
-                      gap: 8px;
-                      flex-wrap: wrap;
-                    "
-                  >
-                    <div
-                      class="color-preset-grid"
-                      style="display: flex; gap: 4px; flex-wrap: wrap"
-                    >
-                      <div
-                        class="color-preset"
-                        style="background: #c2185b"
-                        onclick="setChatUserTextColor('#c2185b')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #e91e63"
-                        onclick="setChatUserTextColor('#e91e63')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #7b1fa2"
-                        onclick="setChatUserTextColor('#7b1fa2')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #512da8"
-                        onclick="setChatUserTextColor('#512da8')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #1976d2"
-                        onclick="setChatUserTextColor('#1976d2')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #0097a7"
-                        onclick="setChatUserTextColor('#0097a7')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #388e3c"
-                        onclick="setChatUserTextColor('#388e3c')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #f57c00"
-                        onclick="setChatUserTextColor('#f57c00')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #5d4037"
-                        onclick="setChatUserTextColor('#5d4037')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #37474f"
-                        onclick="setChatUserTextColor('#37474f')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #ffffff"
-                        onclick="setChatUserTextColor('#ffffff')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #000000"
-                        onclick="setChatUserTextColor('#000000')"
-                      ></div>
+                  <span style="font-size: 0.75rem; color: #666; display: block; margin-bottom: 6px;">字体颜色</span>
+                  <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                    <div class="color-preset-grid" style="display: flex; gap: 4px; flex-wrap: wrap;">
+                      <div class="color-preset" style="background: #c2185b" onclick="setChatUserTextColor('#c2185b')"></div>
+                      <div class="color-preset" style="background: #e91e63" onclick="setChatUserTextColor('#e91e63')"></div>
+                      <div class="color-preset" style="background: #7b1fa2" onclick="setChatUserTextColor('#7b1fa2')"></div>
+                      <div class="color-preset" style="background: #512da8" onclick="setChatUserTextColor('#512da8')"></div>
+                      <div class="color-preset" style="background: #1976d2" onclick="setChatUserTextColor('#1976d2')"></div>
+                      <div class="color-preset" style="background: #0097a7" onclick="setChatUserTextColor('#0097a7')"></div>
+                      <div class="color-preset" style="background: #388e3c" onclick="setChatUserTextColor('#388e3c')"></div>
+                      <div class="color-preset" style="background: #f57c00" onclick="setChatUserTextColor('#f57c00')"></div>
+                      <div class="color-preset" style="background: #5d4037" onclick="setChatUserTextColor('#5d4037')"></div>
+                      <div class="color-preset" style="background: #37474f" onclick="setChatUserTextColor('#37474f')"></div>
+                      <div class="color-preset" style="background: #ffffff" onclick="setChatUserTextColor('#ffffff')"></div>
+                      <div class="color-preset" style="background: #000000" onclick="setChatUserTextColor('#000000')"></div>
                     </div>
-                    <input
-                      type="color"
-                      id="settingsChatUserTextColor"
-                      value="#c2185b"
-                      class="color-picker-input"
-                      onchange="previewChatBubbleStyle()"
-                    />
+                    <input type="color" id="settingsChatUserTextColor" value="#c2185b" class="color-picker-input" onchange="previewChatBubbleStyle()" />
                   </div>
                 </div>
               </div>
-
+              
               <!-- TA的气泡 -->
-              <div
-                style="
-                  background: rgba(0, 0, 0, 0.03);
-                  padding: 12px;
-                  border-radius: 12px;
-                "
-              >
-                <div
-                  style="
-                    font-size: 0.85rem;
-                    color: #333;
-                    font-weight: 500;
-                    margin-bottom: 10px;
-                  "
-                >
-                  💭 TA的气泡
-                </div>
-
+              <div style="background: rgba(0,0,0,0.03); padding: 12px; border-radius: 12px;">
+                <div style="font-size: 0.85rem; color: #333; font-weight: 500; margin-bottom: 10px;">💭 TA的气泡</div>
+                
                 <!-- 背景颜色 -->
-                <div style="margin-bottom: 10px">
-                  <span
-                    style="
-                      font-size: 0.75rem;
-                      color: #666;
-                      display: block;
-                      margin-bottom: 6px;
-                    "
-                    >背景颜色</span
-                  >
-                  <div
-                    style="
-                      display: flex;
-                      align-items: center;
-                      gap: 8px;
-                      flex-wrap: wrap;
-                    "
-                  >
-                    <div
-                      class="color-preset-grid"
-                      style="display: flex; gap: 4px; flex-wrap: wrap"
-                    >
-                      <div
-                        class="color-preset"
-                        style="background: #ffffff"
-                        onclick="setChatAiBubbleBg('#ffffff')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #f5f5f5"
-                        onclick="setChatAiBubbleBg('#f5f5f5')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #eeeeee"
-                        onclick="setChatAiBubbleBg('#eeeeee')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #e0e0e0"
-                        onclick="setChatAiBubbleBg('#e0e0e0')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #fce4ec"
-                        onclick="setChatAiBubbleBg('#fce4ec')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #e3f2fd"
-                        onclick="setChatAiBubbleBg('#e3f2fd')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #e8f5e9"
-                        onclick="setChatAiBubbleBg('#e8f5e9')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #fff8e1"
-                        onclick="setChatAiBubbleBg('#fff8e1')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #efebe9"
-                        onclick="setChatAiBubbleBg('#efebe9')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #eceff1"
-                        onclick="setChatAiBubbleBg('#eceff1')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #37474f"
-                        onclick="setChatAiBubbleBg('#37474f')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #212121"
-                        onclick="setChatAiBubbleBg('#212121')"
-                      ></div>
+                <div style="margin-bottom: 10px;">
+                  <span style="font-size: 0.75rem; color: #666; display: block; margin-bottom: 6px;">背景颜色</span>
+                  <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                    <div class="color-preset-grid" style="display: flex; gap: 4px; flex-wrap: wrap;">
+                      <div class="color-preset" style="background: #ffffff" onclick="setChatAiBubbleBg('#ffffff')"></div>
+                      <div class="color-preset" style="background: #f5f5f5" onclick="setChatAiBubbleBg('#f5f5f5')"></div>
+                      <div class="color-preset" style="background: #eeeeee" onclick="setChatAiBubbleBg('#eeeeee')"></div>
+                      <div class="color-preset" style="background: #e0e0e0" onclick="setChatAiBubbleBg('#e0e0e0')"></div>
+                      <div class="color-preset" style="background: #fce4ec" onclick="setChatAiBubbleBg('#fce4ec')"></div>
+                      <div class="color-preset" style="background: #e3f2fd" onclick="setChatAiBubbleBg('#e3f2fd')"></div>
+                      <div class="color-preset" style="background: #e8f5e9" onclick="setChatAiBubbleBg('#e8f5e9')"></div>
+                      <div class="color-preset" style="background: #fff8e1" onclick="setChatAiBubbleBg('#fff8e1')"></div>
+                      <div class="color-preset" style="background: #efebe9" onclick="setChatAiBubbleBg('#efebe9')"></div>
+                      <div class="color-preset" style="background: #eceff1" onclick="setChatAiBubbleBg('#eceff1')"></div>
+                      <div class="color-preset" style="background: #37474f" onclick="setChatAiBubbleBg('#37474f')"></div>
+                      <div class="color-preset" style="background: #212121" onclick="setChatAiBubbleBg('#212121')"></div>
                     </div>
-                    <input
-                      type="color"
-                      id="settingsChatAiBubbleBg"
-                      value="#ffffff"
-                      class="color-picker-input"
-                      onchange="previewChatBubbleStyle()"
-                    />
+                    <input type="color" id="settingsChatAiBubbleBg" value="#ffffff" class="color-picker-input" onchange="previewChatBubbleStyle()" />
                   </div>
                 </div>
-
+                
                 <!-- 透明度 -->
-                <div
-                  style="
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    margin-bottom: 10px;
-                  "
-                >
-                  <span style="font-size: 0.75rem; color: #666; width: 50px"
-                    >透明度</span
-                  >
-                  <input
-                    type="range"
-                    id="settingsChatAiBubbleOpacity"
-                    min="30"
-                    max="100"
-                    value="100"
-                    style="flex: 1"
-                    oninput="previewChatBubbleStyle(); document.getElementById('chatAiOpacityLabel').textContent=this.value+'%'"
-                  />
-                  <span
-                    id="chatAiOpacityLabel"
-                    style="font-size: 0.7rem; color: #999; width: 35px"
-                    >100%</span
-                  >
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+                  <span style="font-size: 0.75rem; color: #666; width: 50px;">透明度</span>
+                  <input type="range" id="settingsChatAiBubbleOpacity" min="30" max="100" value="100" style="flex: 1" oninput="previewChatBubbleStyle(); document.getElementById('chatAiOpacityLabel').textContent=this.value+'%'" />
+                  <span id="chatAiOpacityLabel" style="font-size: 0.7rem; color: #999; width: 35px;">100%</span>
                 </div>
-
+                
                 <!-- 字体颜色 -->
                 <div>
-                  <span
-                    style="
-                      font-size: 0.75rem;
-                      color: #666;
-                      display: block;
-                      margin-bottom: 6px;
-                    "
-                    >字体颜色</span
-                  >
-                  <div
-                    style="
-                      display: flex;
-                      align-items: center;
-                      gap: 8px;
-                      flex-wrap: wrap;
-                    "
-                  >
-                    <div
-                      class="color-preset-grid"
-                      style="display: flex; gap: 4px; flex-wrap: wrap"
-                    >
-                      <div
-                        class="color-preset"
-                        style="background: #333333"
-                        onclick="setChatAiTextColor('#333333')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #37474f"
-                        onclick="setChatAiTextColor('#37474f')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #455a64"
-                        onclick="setChatAiTextColor('#455a64')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #616161"
-                        onclick="setChatAiTextColor('#616161')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #212121"
-                        onclick="setChatAiTextColor('#212121')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #1565c0"
-                        onclick="setChatAiTextColor('#1565c0')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #2e7d32"
-                        onclick="setChatAiTextColor('#2e7d32')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #ad1457"
-                        onclick="setChatAiTextColor('#ad1457')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #6a1b9a"
-                        onclick="setChatAiTextColor('#6a1b9a')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #5d4037"
-                        onclick="setChatAiTextColor('#5d4037')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #ffffff"
-                        onclick="setChatAiTextColor('#ffffff')"
-                      ></div>
-                      <div
-                        class="color-preset"
-                        style="background: #000000"
-                        onclick="setChatAiTextColor('#000000')"
-                      ></div>
+                  <span style="font-size: 0.75rem; color: #666; display: block; margin-bottom: 6px;">字体颜色</span>
+                  <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                    <div class="color-preset-grid" style="display: flex; gap: 4px; flex-wrap: wrap;">
+                      <div class="color-preset" style="background: #333333" onclick="setChatAiTextColor('#333333')"></div>
+                      <div class="color-preset" style="background: #37474f" onclick="setChatAiTextColor('#37474f')"></div>
+                      <div class="color-preset" style="background: #455a64" onclick="setChatAiTextColor('#455a64')"></div>
+                      <div class="color-preset" style="background: #616161" onclick="setChatAiTextColor('#616161')"></div>
+                      <div class="color-preset" style="background: #212121" onclick="setChatAiTextColor('#212121')"></div>
+                      <div class="color-preset" style="background: #1565c0" onclick="setChatAiTextColor('#1565c0')"></div>
+                      <div class="color-preset" style="background: #2e7d32" onclick="setChatAiTextColor('#2e7d32')"></div>
+                      <div class="color-preset" style="background: #ad1457" onclick="setChatAiTextColor('#ad1457')"></div>
+                      <div class="color-preset" style="background: #6a1b9a" onclick="setChatAiTextColor('#6a1b9a')"></div>
+                      <div class="color-preset" style="background: #5d4037" onclick="setChatAiTextColor('#5d4037')"></div>
+                      <div class="color-preset" style="background: #ffffff" onclick="setChatAiTextColor('#ffffff')"></div>
+                      <div class="color-preset" style="background: #000000" onclick="setChatAiTextColor('#000000')"></div>
                     </div>
-                    <input
-                      type="color"
-                      id="settingsChatAiTextColor"
-                      value="#333333"
-                      class="color-picker-input"
-                      onchange="previewChatBubbleStyle()"
-                    />
+                    <input type="color" id="settingsChatAiTextColor" value="#333333" class="color-picker-input" onchange="previewChatBubbleStyle()" />
                   </div>
                 </div>
               </div>
@@ -18348,16 +17941,16 @@
           window.fontPresets = values[0] || [];
           window.activeFontId = values[1] || "system";
           window.readTogetherData = values[2] || {};
-
+          
           // 刷新页面时自动关闭所有角色的读书模式
-          Object.keys(window.readTogetherData).forEach((charId) => {
+          Object.keys(window.readTogetherData).forEach(charId => {
             if (window.readTogetherData[charId]) {
               window.readTogetherData[charId].active = false;
             }
           });
           // 保存关闭状态
           localforage.setItem("readTogetherData", window.readTogetherData);
-
+          
           window.characters = values[3] || [];
           window.apiPresets = values[4] || [];
           window.chatHistories = values[5] || {};
@@ -19886,8 +19479,7 @@
         // 控制顶栏显示（Moment和Me页面隐藏顶栏）
         const chatHeader = document.querySelector(".chat-app > .chat-header");
         if (chatHeader) {
-          chatHeader.style.display =
-            tabName === "moments" || tabName === "profile" ? "none" : "";
+          chatHeader.style.display = (tabName === "moments" || tabName === "profile") ? "none" : "";
         }
 
         // 切换到moments时清除朋友圈小红点
@@ -20254,8 +19846,7 @@
               // 检查是否是语音消息
               if (msg.isVoice) {
                 const voiceText = msg.voiceText || msg.content || "";
-                const duration =
-                  msg.duration || Math.ceil(voiceText.length / 10);
+                const duration = msg.duration || Math.ceil(voiceText.length / 10);
                 const textVisible = msg.voiceTextVisible ? "visible" : "";
                 return `
               <div class="msg-row user group-msg" 
@@ -20275,9 +19866,7 @@
                         <span></span><span></span><span></span><span></span><span></span>
                       </div>
                     </div>
-                    <div class="user-voice-text ${textVisible}" id="groupUserVoiceText-${index}">${escapeHtml(
-                  voiceText
-                )}</div>
+                    <div class="user-voice-text ${textVisible}" id="groupUserVoiceText-${index}">${escapeHtml(voiceText)}</div>
                     <div class="user-voice-to-text-btn" onclick="toggleGroupUserVoiceText(event, ${index})">
                       ${msg.voiceTextVisible ? "收起文字" : "转文字"}
                     </div>
@@ -20938,7 +20527,7 @@
           const groupSettings = group.settings || {};
           const userNickname = groupSettings.myNickname || "我";
           const userPersona = groupSettings.myPersona || "";
-
+          
           // 增强的时间感知
           const now = new Date();
           const currentTime = now.toLocaleString("zh-CN", {
@@ -20947,23 +20536,17 @@
             day: "numeric",
             weekday: "long",
             hour: "2-digit",
-            minute: "2-digit",
+            minute: "2-digit"
           });
-
+          
           // 计算距离上次对话过了多久
           let timeSinceLastChat = "";
           const messagesKeyForTime = `group_messages_${group.id}`;
-          const allMsgsForTime =
-            (await localforage.getItem(messagesKeyForTime)) || [];
-          const userMessagesForTime = allMsgsForTime.filter(
-            (m) => m.role === "user"
-          );
+          const allMsgsForTime = (await localforage.getItem(messagesKeyForTime)) || [];
+          const userMessagesForTime = allMsgsForTime.filter(m => m.role === "user");
           // 取倒数第二条用户消息（因为最后一条是刚发的）
-          const previousUserMsg =
-            userMessagesForTime.length >= 2
-              ? userMessagesForTime[userMessagesForTime.length - 2]
-              : null;
-
+          const previousUserMsg = userMessagesForTime.length >= 2 ? userMessagesForTime[userMessagesForTime.length - 2] : null;
+          
           if (previousUserMsg) {
             let lastTime = null;
             if (previousUserMsg.timestamp) {
@@ -20976,21 +20559,17 @@
                 lastTime.setDate(lastTime.getDate() - 1);
               }
             }
-
+            
             if (lastTime) {
               const diffMs = now - lastTime;
               const diffMins = Math.floor(diffMs / 60000);
               const diffHours = Math.floor(diffMins / 60);
               const diffDays = Math.floor(diffHours / 24);
-
+              
               if (diffDays > 0) {
-                timeSinceLastChat = `（用户${diffDays}天${
-                  diffHours % 24
-                }小时没在群里说话了，刚回来）`;
+                timeSinceLastChat = `（用户${diffDays}天${diffHours % 24}小时没在群里说话了，刚回来）`;
               } else if (diffHours > 0) {
-                timeSinceLastChat = `（用户${diffHours}小时${
-                  diffMins % 60
-                }分钟没在群里说话了，刚回来）`;
+                timeSinceLastChat = `（用户${diffHours}小时${diffMins % 60}分钟没在群里说话了，刚回来）`;
               } else if (diffMins > 5) {
                 timeSinceLastChat = `（用户${diffMins}分钟没在群里说话了）`;
               }
@@ -21219,10 +20798,7 @@ ${stickerPrompt}
           if (worldbookIds.length > 0) {
             // 将完整对话历史和用户消息合并用于关键词匹配
             const fullContext = historyText + " " + userMessage;
-            const worldbookContent = getWorldbookContentForAI(
-              worldbookIds,
-              fullContext
-            );
+            const worldbookContent = getWorldbookContentForAI(worldbookIds, fullContext);
             if (worldbookContent) {
               systemPrompt += `\n# 世界书设定（重要背景知识）\n${worldbookContent}\n`;
             }
@@ -22864,14 +22440,7 @@ ${memberInfos
         const aiBubbleBg = settings.chatAiBubbleBg || "#ffffff";
         const aiBubbleOpacity = settings.chatAiBubbleOpacity || 100;
         const aiTextColor = settings.chatAiTextColor || "#333333";
-        applyChatBubbleStyle(
-          userBubbleBg,
-          userBubbleOpacity,
-          userTextColor,
-          aiBubbleBg,
-          aiBubbleOpacity,
-          aiTextColor
-        );
+        applyChatBubbleStyle(userBubbleBg, userBubbleOpacity, userTextColor, aiBubbleBg, aiBubbleOpacity, aiTextColor);
 
         // 控制读书悬浮球显示 - 只在对应角色聊天时显示
         const readingData = window.readTogetherData[charId];
@@ -22962,21 +22531,13 @@ ${memberInfos
               const voiceText = m.voiceText || m.content || "";
               const duration = m.duration || Math.ceil(voiceText.length / 10);
               const textVisible = m.voiceTextVisible ? "visible" : "";
-
+              
               // 多选模式下的选择器
               const userVoiceSelectorHtml = isSelecting
                 ? `
-                <div class="bubble-selector ${
-                  isSelected ? "selected" : ""
-                }" onclick="event.stopPropagation();toggleMessageSelection(${
-                    m.originalIndex
-                  })">
+                <div class="bubble-selector ${isSelected ? "selected" : ""}" onclick="event.stopPropagation();toggleMessageSelection(${m.originalIndex})">
                   <div class="bubble-selector-inner">
-                    ${
-                      isSelected
-                        ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>'
-                        : ""
-                    }
+                    ${isSelected ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>' : ""}
                   </div>
                 </div>
               `
@@ -22994,20 +22555,14 @@ ${memberInfos
                     onmouseup="handleMouseUp()"
             >
                 <div class="user-voice-message">
-                    <div class="user-voice-bar" onclick="playUserVoiceBar(event, ${
-                      m.originalIndex
-                    })">
+                    <div class="user-voice-bar" onclick="playUserVoiceBar(event, ${m.originalIndex})">
                         <span class="user-voice-duration">${duration}"</span>
                         <div class="user-voice-waves">
                             <span></span><span></span><span></span><span></span><span></span>
                         </div>
                     </div>
-                    <div class="user-voice-text ${textVisible}" id="userVoiceText-${
-                m.originalIndex
-              }">${escapeHtml(voiceText)}</div>
-                    <div class="user-voice-to-text-btn" onclick="toggleUserVoiceText(event, ${
-                      m.originalIndex
-                    })">
+                    <div class="user-voice-text ${textVisible}" id="userVoiceText-${m.originalIndex}">${escapeHtml(voiceText)}</div>
+                    <div class="user-voice-to-text-btn" onclick="toggleUserVoiceText(event, ${m.originalIndex})">
                         ${m.voiceTextVisible ? "收起文字" : "转文字"}
                     </div>
                 </div>
@@ -23839,13 +23394,13 @@ ${memberInfos
               day: "numeric",
               weekday: "long",
               hour: "2-digit",
-              minute: "2-digit",
+              minute: "2-digit"
             });
-
+            
             // 计算距离上次对话过了多久
             let timeSinceLastChat = "";
-            const userMessages = history.filter((m) => m.role === "user");
-
+            const userMessages = history.filter(m => m.role === "user");
+            
             // 找最后一条有timestamp的用户消息（不是刚发的那条）
             // 从后往前找，跳过最后一条（因为那是刚发的）
             let lastTimestamp = null;
@@ -23855,28 +23410,24 @@ ${memberInfos
                 break;
               }
             }
-
+            
             if (lastTimestamp) {
               const diffMs = now.getTime() - lastTimestamp;
               if (diffMs > 0) {
                 const diffMins = Math.floor(diffMs / 60000);
                 const diffHours = Math.floor(diffMins / 60);
                 const diffDays = Math.floor(diffHours / 24);
-
+                
                 if (diffDays > 0) {
-                  timeSinceLastChat = `距离你们上一次对话已经过去了约${diffDays}天${
-                    diffHours % 24
-                  }小时`;
+                  timeSinceLastChat = `距离你们上一次对话已经过去了约${diffDays}天${diffHours % 24}小时`;
                 } else if (diffHours > 0) {
-                  timeSinceLastChat = `距离你们上一次对话已经过去了约${diffHours}小时${
-                    diffMins % 60
-                  }分钟`;
+                  timeSinceLastChat = `距离你们上一次对话已经过去了约${diffHours}小时${diffMins % 60}分钟`;
                 } else if (diffMins > 5) {
                   timeSinceLastChat = `距离你们上一次对话已经过去了约${diffMins}分钟`;
                 }
               }
             }
-
+            
             systemContent += `\n【⚠️ 重要：当前真实时间】\n`;
             systemContent += `现在是：${currentTimeStr}\n`;
             if (timeSinceLastChat) {
@@ -24172,28 +23723,28 @@ ${memberInfos
               // 使用更精确的正则，确保标签能被正确分离
               const specialTagRegex =
                 /(\[(sticker|表情|表情包|转账|红包|位置|语音|打电话|图片|发动态)[：:][^\]]+\]|\[撤回\]|\[收款\]|\[退款\])/gi;
-
+              
               // 先找出所有特殊标签的位置
               const tags = [];
               let match;
-              const regex = new RegExp(specialTagRegex.source, "gi");
+              const regex = new RegExp(specialTagRegex.source, 'gi');
               while ((match = regex.exec(part)) !== null) {
                 tags.push({
                   tag: match[0],
                   start: match.index,
-                  end: match.index + match[0].length,
+                  end: match.index + match[0].length
                 });
               }
-
+              
               // 如果没有特殊标签，直接返回原内容
               if (tags.length === 0) {
-                return [part.trim()].filter((s) => s);
+                return [part.trim()].filter(s => s);
               }
-
+              
               // 分割文本和标签
               const segments = [];
               let lastEnd = 0;
-
+              
               for (const tag of tags) {
                 // 添加标签前的文本
                 if (tag.start > lastEnd) {
@@ -24204,13 +23755,13 @@ ${memberInfos
                 segments.push(tag.tag);
                 lastEnd = tag.end;
               }
-
+              
               // 添加最后一个标签后的文本
               if (lastEnd < part.length) {
                 const text = part.slice(lastEnd).trim();
                 if (text) segments.push(text);
               }
-
+              
               return segments;
             });
 
@@ -24245,9 +23796,7 @@ ${memberInfos
 
               // 检查是否是发动态标签
               // 只支持标准格式: [发动态:内容]
-              const postMomentMatch = partContent.match(
-                /^\[发动态[:：]([\s\S]+)\]$/i
-              );
+              const postMomentMatch = partContent.match(/^\[发动态[:：]([\s\S]+)\]$/i);
               if (postMomentMatch) {
                 const momentContent = postMomentMatch[1].trim();
                 setTimeout(async () => {
@@ -24257,14 +23806,9 @@ ${memberInfos
               }
 
               // 检查AI是否输出了HTML格式的动态卡片（需要提取内容并真正发动态）
-              if (
-                partContent.includes("shared-post-card") ||
-                partContent.includes('class="shared-post')
-              ) {
+              if (partContent.includes('shared-post-card') || partContent.includes('class="shared-post')) {
                 // 尝试提取动态内容
-                const contentMatch = partContent.match(
-                  /shared-post-content[^>]*>([^<]+)</
-                );
+                const contentMatch = partContent.match(/shared-post-content[^>]*>([^<]+)</);
                 if (contentMatch) {
                   const extractedContent = contentMatch[1].trim();
                   setTimeout(async () => {
@@ -24380,7 +23924,9 @@ ${memberInfos
               updateCharacterLastMessage(savedCharId, actualContent);
 
               // 【修复】检查聊天对话页面是否打开，如果没打开则增加未读数（每条消息都增加）
-              const convPage = document.getElementById("chatConversationPage");
+              const convPage = document.getElementById(
+                "chatConversationPage"
+              );
               const isConvPageActive =
                 convPage && convPage.classList.contains("active");
               if (!isConvPageActive || currentChatCharId !== savedCharId) {
@@ -24981,9 +24527,7 @@ ${memberInfos
                   <!-- 世界书列表将动态生成 -->
                 </div>
                 <div class="form-hint" style="margin-top:6px;">选中的世界书内容会作为背景知识提供给AI</div>
-                <input type="hidden" id="groupSettingsWorldbook" value="${
-                  group.settings.worldbook || ""
-                }">
+                <input type="hidden" id="groupSettingsWorldbook" value="${group.settings.worldbook || ''}">
               </div>
             </div>
           </div>
@@ -25255,8 +24799,7 @@ ${memberInfos
             group.settings.myNickname = nicknameInput.value || "我";
           if (personaInput) group.settings.myPersona = personaInput.value || "";
           if (timeAwareInput) group.settings.timeAware = timeAwareInput.checked;
-          if (worldbookInput)
-            group.settings.worldbook = worldbookInput.value || "";
+          if (worldbookInput) group.settings.worldbook = worldbookInput.value || "";
 
           // 记忆互通已通过下拉框实时保存，这里不需要再处理
 
@@ -25513,11 +25056,9 @@ ${memberInfos
         group.settings.timeAware = document.getElementById(
           "groupSettingsTimeAware"
         ).checked;
-
+        
         // 保存世界书设置
-        const worldbookInput = document.getElementById(
-          "groupSettingsWorldbook"
-        );
+        const worldbookInput = document.getElementById("groupSettingsWorldbook");
         if (worldbookInput) {
           group.settings.worldbook = worldbookInput.value || "";
         }
@@ -26406,22 +25947,12 @@ ${memberInfos
         }
 
         // 聊天气泡背景样式加载
-        const chatUserBgInput = document.getElementById(
-          "settingsChatUserBubbleBg"
-        );
-        const chatUserOpacityInput = document.getElementById(
-          "settingsChatUserBubbleOpacity"
-        );
-        const chatUserTextInput = document.getElementById(
-          "settingsChatUserTextColor"
-        );
+        const chatUserBgInput = document.getElementById("settingsChatUserBubbleBg");
+        const chatUserOpacityInput = document.getElementById("settingsChatUserBubbleOpacity");
+        const chatUserTextInput = document.getElementById("settingsChatUserTextColor");
         const chatAiBgInput = document.getElementById("settingsChatAiBubbleBg");
-        const chatAiOpacityInput = document.getElementById(
-          "settingsChatAiBubbleOpacity"
-        );
-        const chatAiTextInput = document.getElementById(
-          "settingsChatAiTextColor"
-        );
+        const chatAiOpacityInput = document.getElementById("settingsChatAiBubbleOpacity");
+        const chatAiTextInput = document.getElementById("settingsChatAiTextColor");
 
         if (chatUserBgInput) {
           chatUserBgInput.value = settings.chatUserBubbleBg || "#f8bbd9";
@@ -26429,8 +25960,7 @@ ${memberInfos
         if (chatUserOpacityInput) {
           chatUserOpacityInput.value = settings.chatUserBubbleOpacity || 100;
           const label = document.getElementById("chatUserOpacityLabel");
-          if (label)
-            label.textContent = (settings.chatUserBubbleOpacity || 100) + "%";
+          if (label) label.textContent = (settings.chatUserBubbleOpacity || 100) + "%";
         }
         if (chatUserTextInput) {
           chatUserTextInput.value = settings.chatUserTextColor || "#c2185b";
@@ -26441,8 +25971,7 @@ ${memberInfos
         if (chatAiOpacityInput) {
           chatAiOpacityInput.value = settings.chatAiBubbleOpacity || 100;
           const label = document.getElementById("chatAiOpacityLabel");
-          if (label)
-            label.textContent = (settings.chatAiBubbleOpacity || 100) + "%";
+          if (label) label.textContent = (settings.chatAiBubbleOpacity || 100) + "%";
         }
         if (chatAiTextInput) {
           chatAiTextInput.value = settings.chatAiTextColor || "#333333";
@@ -27317,7 +26846,7 @@ ${memberInfos
       function handleNotificationClick() {
         const notification = document.getElementById("messageNotification");
         notification.classList.remove("show");
-
+        
         // 检查是否是动态通知
         if (notification.dataset.type === "moment") {
           notification.dataset.type = ""; // 清除标记
@@ -27335,16 +26864,16 @@ ${memberInfos
         if (pendingNotificationCharId) {
           const charIdToOpen = pendingNotificationCharId;
           pendingNotificationCharId = null;
-
+          
           // 先关闭当前可能打开的聊天页面
           const convPage = document.getElementById("chatConversationPage");
           if (convPage && convPage.classList.contains("active")) {
             convPage.classList.remove("active");
           }
-
+          
           // 切换到消息tab
           switchChatTab("messages");
-
+          
           // 延迟打开对应聊天，确保UI已更新
           setTimeout(() => {
             openConversation(charIdToOpen);
@@ -28732,21 +28261,21 @@ ${memberInfos
 
       // ==================== 收藏功能 ====================
       window.favoritesData = {
-        groups: [{ id: "default", name: "默认分组" }],
-        items: [],
+        groups: [{ id: 'default', name: '默认分组' }],
+        items: []
       };
       var pendingFavoriteData = null; // 待收藏的数据
-      var selectedFavoriteGroup = "default"; // 选中的分组
-      var currentFavoritesGroup = "all"; // 当前查看的分组
+      var selectedFavoriteGroup = 'default'; // 选中的分组
+      var currentFavoritesGroup = 'all'; // 当前查看的分组
 
       // 初始化收藏数据
       async function initFavoritesData() {
-        const saved = await safeLocalforageGet("favoritesData");
+        const saved = await safeLocalforageGet('favoritesData');
         if (saved) {
           window.favoritesData = saved;
           // 确保有默认分组
           if (!saved.groups || saved.groups.length === 0) {
-            window.favoritesData.groups = [{ id: "default", name: "默认分组" }];
+            window.favoritesData.groups = [{ id: 'default', name: '默认分组' }];
           }
           if (!saved.items) {
             window.favoritesData.items = [];
@@ -28756,75 +28285,61 @@ ${memberInfos
 
       // 保存收藏数据
       async function saveFavoritesData() {
-        await localforage.setItem("favoritesData", window.favoritesData);
+        await localforage.setItem('favoritesData', window.favoritesData);
       }
 
       // 长按消息收藏单条
       function handleFavoriteMsg() {
         hideContextMenu();
         const msg = chatHistories[currentChatCharId][activeMsgIndex];
-        const char = characters.find((c) => c.id === currentChatCharId);
-
+        const char = characters.find(c => c.id === currentChatCharId);
+        
         pendingFavoriteData = {
-          type: "message",
-          messages: [
-            {
-              role: msg.role,
-              content: msg.content,
-              senderName:
-                msg.role === "user"
-                  ? window.momentsData?.userProfile?.name || "我"
-                  : char?.note || char?.name || "AI",
-              senderAvatar:
-                msg.role === "user"
-                  ? window.momentsData?.userProfile?.avatarImg
-                  : char?.avatar,
-            },
-          ],
-          source: `来自与 ${char?.note || char?.name || "未知"} 的聊天`,
+          type: 'message',
+          messages: [{
+            role: msg.role,
+            content: msg.content,
+            senderName: msg.role === 'user' ? (window.momentsData?.userProfile?.name || '我') : (char?.note || char?.name || 'AI'),
+            senderAvatar: msg.role === 'user' ? window.momentsData?.userProfile?.avatarImg : char?.avatar
+          }],
+          source: `来自与 ${char?.note || char?.name || '未知'} 的聊天`,
           charId: currentChatCharId,
-          timestamp: Date.now(),
+          timestamp: Date.now()
         };
-
+        
         openFavoriteGroupModal();
       }
 
       // 多选收藏
       function favoriteSelectedMessages() {
         if (selectedIndices.size === 0) {
-          showToast("请先选择消息");
+          showToast('请先选择消息');
           return;
         }
 
-        const char = characters.find((c) => c.id === currentChatCharId);
+        const char = characters.find(c => c.id === currentChatCharId);
         const messages = [];
-
+        
         // 按顺序获取选中的消息
         const sortedIndices = Array.from(selectedIndices).sort((a, b) => a - b);
-        sortedIndices.forEach((idx) => {
+        sortedIndices.forEach(idx => {
           const msg = chatHistories[currentChatCharId][idx];
           if (msg) {
             messages.push({
               role: msg.role,
               content: msg.content,
-              senderName:
-                msg.role === "user"
-                  ? window.momentsData?.userProfile?.name || "我"
-                  : char?.note || char?.name || "AI",
-              senderAvatar:
-                msg.role === "user"
-                  ? window.momentsData?.userProfile?.avatarImg
-                  : char?.avatar,
+              senderName: msg.role === 'user' ? (window.momentsData?.userProfile?.name || '我') : (char?.note || char?.name || 'AI'),
+              senderAvatar: msg.role === 'user' ? window.momentsData?.userProfile?.avatarImg : char?.avatar
             });
           }
         });
 
         pendingFavoriteData = {
-          type: "message",
+          type: 'message',
           messages: messages,
-          source: `来自与 ${char?.note || char?.name || "未知"} 的聊天`,
+          source: `来自与 ${char?.note || char?.name || '未知'} 的聊天`,
           charId: currentChatCharId,
-          timestamp: Date.now(),
+          timestamp: Date.now()
         };
 
         exitSelectionMode();
@@ -28833,34 +28348,30 @@ ${memberInfos
 
       // 收藏动态
       function favoritePost(postId) {
-        const post = window.momentsData?.posts?.find(
-          (p) => String(p.id) === String(postId)
-        );
+        const post = window.momentsData?.posts?.find(p => String(p.id) === String(postId));
         if (!post) return;
 
         const profile = window.momentsData.userProfile;
         let authorName, authorAvatar;
-
+        
         if (post.isUser) {
           authorName = profile.name;
           authorAvatar = profile.avatarImg;
         } else {
-          const char = window.characters?.find(
-            (c) => String(c.id) === post.authorId
-          );
-          authorName = char ? char.note || char.name : "未知用户";
+          const char = window.characters?.find(c => String(c.id) === post.authorId);
+          authorName = char ? (char.note || char.name) : '未知用户';
           authorAvatar = char?.avatar;
         }
 
         pendingFavoriteData = {
-          type: "moment",
-          content: post.content || "",
-          image: post.image || post.textImage || "",
+          type: 'moment',
+          content: post.content || '',
+          image: post.image || post.textImage || '',
           authorName: authorName,
           authorAvatar: authorAvatar,
-          source: "来自动态",
+          source: '来自动态',
           postId: postId,
-          timestamp: Date.now(),
+          timestamp: Date.now()
         };
 
         openFavoriteGroupModal();
@@ -28868,38 +28379,26 @@ ${memberInfos
 
       // 打开分组选择弹窗
       function openFavoriteGroupModal() {
-        selectedFavoriteGroup = "default";
+        selectedFavoriteGroup = 'default';
         renderFavoriteGroupList();
-        document.getElementById("favoriteGroupModal").classList.add("active");
+        document.getElementById('favoriteGroupModal').classList.add('active');
       }
 
       // 关闭分组选择弹窗
       function closeFavoriteGroupModal() {
-        document
-          .getElementById("favoriteGroupModal")
-          .classList.remove("active");
+        document.getElementById('favoriteGroupModal').classList.remove('active');
         pendingFavoriteData = null;
       }
 
       // 渲染分组列表
       function renderFavoriteGroupList() {
-        const container = document.getElementById("favoriteGroupList");
-        container.innerHTML = window.favoritesData.groups
-          .map(
-            (group) => `
-          <div class="favorite-group-item ${
-            selectedFavoriteGroup === group.id ? "selected" : ""
-          }" onclick="selectFavoriteGroup('${group.id}')">
+        const container = document.getElementById('favoriteGroupList');
+        container.innerHTML = window.favoritesData.groups.map(group => `
+          <div class="favorite-group-item ${selectedFavoriteGroup === group.id ? 'selected' : ''}" onclick="selectFavoriteGroup('${group.id}')">
             <span class="group-name">${group.name}</span>
-            ${
-              selectedFavoriteGroup === group.id
-                ? '<span class="group-check">✓</span>'
-                : ""
-            }
+            ${selectedFavoriteGroup === group.id ? '<span class="group-check">✓</span>' : ''}
           </div>
-        `
-          )
-          .join("");
+        `).join('');
       }
 
       // 选择分组
@@ -28910,17 +28409,17 @@ ${memberInfos
 
       // 在弹窗中新建分组
       function addNewGroupInModal() {
-        const name = prompt("请输入分组名称：");
+        const name = prompt('请输入分组名称：');
         if (name && name.trim()) {
           const newGroup = {
-            id: "group_" + Date.now(),
-            name: name.trim(),
+            id: 'group_' + Date.now(),
+            name: name.trim()
           };
           window.favoritesData.groups.push(newGroup);
           saveFavoritesData();
           selectedFavoriteGroup = newGroup.id;
           renderFavoriteGroupList();
-          showToast("分组已创建");
+          showToast('分组已创建');
         }
       }
 
@@ -28932,51 +28431,43 @@ ${memberInfos
         }
 
         const newItem = {
-          id: "fav_" + Date.now(),
+          id: 'fav_' + Date.now(),
           groupId: selectedFavoriteGroup,
-          ...pendingFavoriteData,
+          ...pendingFavoriteData
         };
 
         window.favoritesData.items.push(newItem);
         await saveFavoritesData();
 
         closeFavoriteGroupModal();
-        showToast("★ 已收藏");
+        showToast('★ 已收藏');
       }
 
       // 打开收藏页面
       function openFavoritesPage() {
-        currentFavoritesGroup = "all";
+        currentFavoritesGroup = 'all';
         renderFavoritesTabs();
         renderFavoritesList();
-        document.getElementById("favoritesPage").classList.add("active");
+        document.getElementById('favoritesPage').classList.add('active');
       }
 
       // 关闭收藏页面
       function closeFavoritesPage() {
-        document.getElementById("favoritesPage").classList.remove("active");
+        document.getElementById('favoritesPage').classList.remove('active');
       }
 
       // 渲染分组标签
       function renderFavoritesTabs() {
-        const container = document.getElementById("favoritesTabs");
+        const container = document.getElementById('favoritesTabs');
         const allCount = window.favoritesData.items.length;
-
-        let html = `<button class="favorites-tab ${
-          currentFavoritesGroup === "all" ? "active" : ""
-        }" onclick="switchFavoritesGroup('all')">全部<span class="tab-count">${allCount}</span></button>`;
-
-        window.favoritesData.groups.forEach((group) => {
-          const count = window.favoritesData.items.filter(
-            (item) => item.groupId === group.id
-          ).length;
-          html += `<button class="favorites-tab ${
-            currentFavoritesGroup === group.id ? "active" : ""
-          }" onclick="switchFavoritesGroup('${group.id}')">${
-            group.name
-          }<span class="tab-count">${count}</span></button>`;
+        
+        let html = `<button class="favorites-tab ${currentFavoritesGroup === 'all' ? 'active' : ''}" onclick="switchFavoritesGroup('all')">全部<span class="tab-count">${allCount}</span></button>`;
+        
+        window.favoritesData.groups.forEach(group => {
+          const count = window.favoritesData.items.filter(item => item.groupId === group.id).length;
+          html += `<button class="favorites-tab ${currentFavoritesGroup === group.id ? 'active' : ''}" onclick="switchFavoritesGroup('${group.id}')">${group.name}<span class="tab-count">${count}</span></button>`;
         });
-
+        
         container.innerHTML = html;
       }
 
@@ -28989,18 +28480,16 @@ ${memberInfos
 
       // 渲染收藏列表
       function renderFavoritesList() {
-        const container = document.getElementById("favoritesList");
+        const container = document.getElementById('favoritesList');
         let items = window.favoritesData.items;
-
-        if (currentFavoritesGroup !== "all") {
-          items = items.filter(
-            (item) => item.groupId === currentFavoritesGroup
-          );
+        
+        if (currentFavoritesGroup !== 'all') {
+          items = items.filter(item => item.groupId === currentFavoritesGroup);
         }
-
+        
         // 按时间倒序
         items = items.sort((a, b) => b.timestamp - a.timestamp);
-
+        
         if (items.length === 0) {
           container.innerHTML = `
             <div class="favorites-empty">
@@ -29011,88 +28500,59 @@ ${memberInfos
           `;
           return;
         }
-
-        container.innerHTML = items
-          .map((item) => {
-            const timeStr = formatFavoriteTime(item.timestamp);
-
-            if (item.type === "message") {
-              // 聊天消息
-              const messagesHtml = item.messages
-                .map(
-                  (msg) => `
+        
+        container.innerHTML = items.map(item => {
+          const timeStr = formatFavoriteTime(item.timestamp);
+          
+          if (item.type === 'message') {
+            // 聊天消息
+            const messagesHtml = item.messages.map(msg => `
               <div style="margin-bottom:6px;">
-                <span style="color:#ec407a;font-weight:600;">${
-                  msg.senderName
-                }：</span>
-                <span>${escapeHtml(msg.content).replace(/\n/g, "<br>")}</span>
+                <span style="color:#ec407a;font-weight:600;">${msg.senderName}：</span>
+                <span>${escapeHtml(msg.content).replace(/\n/g, '<br>')}</span>
               </div>
-            `
-                )
-                .join("");
-
-              return `
+            `).join('');
+            
+            return `
               <div class="favorite-item">
                 <div class="favorite-item-header">
                   <div class="favorite-item-avatar">
-                    ${
-                      item.messages[0]?.senderAvatar
-                        ? `<img src="${item.messages[0].senderAvatar}">`
-                        : "💬"
-                    }
+                    ${item.messages[0]?.senderAvatar ? `<img src="${item.messages[0].senderAvatar}">` : '💬'}
                   </div>
                   <div class="favorite-item-info">
                     <div class="favorite-item-name">聊天记录</div>
                     <div class="favorite-item-time">${timeStr}</div>
                   </div>
-                  <button class="favorite-item-delete" onclick="deleteFavoriteItem('${
-                    item.id
-                  }')">✕</button>
+                  <button class="favorite-item-delete" onclick="deleteFavoriteItem('${item.id}')">✕</button>
                 </div>
                 <div class="favorite-item-content">${messagesHtml}</div>
                 <div class="favorite-item-source">${item.source}</div>
               </div>
             `;
-            } else if (item.type === "moment") {
-              // 动态
-              return `
+          } else if (item.type === 'moment') {
+            // 动态
+            return `
               <div class="favorite-item">
                 <div class="favorite-item-header">
                   <div class="favorite-item-avatar">
-                    ${
-                      item.authorAvatar
-                        ? `<img src="${item.authorAvatar}">`
-                        : "📷"
-                    }
+                    ${item.authorAvatar ? `<img src="${item.authorAvatar}">` : '📷'}
                   </div>
                   <div class="favorite-item-info">
                     <div class="favorite-item-name">${item.authorName}</div>
                     <div class="favorite-item-time">${timeStr}</div>
                   </div>
-                  <button class="favorite-item-delete" onclick="deleteFavoriteItem('${
-                    item.id
-                  }')">✕</button>
+                  <button class="favorite-item-delete" onclick="deleteFavoriteItem('${item.id}')">✕</button>
                 </div>
                 <div class="favorite-item-content moment-type">
-                  ${
-                    item.content ? `<div>${escapeHtml(item.content)}</div>` : ""
-                  }
-                  ${
-                    item.image
-                      ? `<div style="color:#999;font-size:0.8rem;margin-top:4px;">[图片] ${item.image.substring(
-                          0,
-                          30
-                        )}...</div>`
-                      : ""
-                  }
+                  ${item.content ? `<div>${escapeHtml(item.content)}</div>` : ''}
+                  ${item.image ? `<div style="color:#999;font-size:0.8rem;margin-top:4px;">[图片] ${item.image.substring(0, 30)}...</div>` : ''}
                 </div>
                 <div class="favorite-item-source">${item.source}</div>
               </div>
             `;
-            }
-            return "";
-          })
-          .join("");
+          }
+          return '';
+        }).join('');
       }
 
       // 格式化收藏时间
@@ -29100,11 +28560,11 @@ ${memberInfos
         const date = new Date(timestamp);
         const now = new Date();
         const diff = now - date;
-
-        if (diff < 60000) return "刚刚";
-        if (diff < 3600000) return Math.floor(diff / 60000) + "分钟前";
-        if (diff < 86400000) return Math.floor(diff / 3600000) + "小时前";
-
+        
+        if (diff < 60000) return '刚刚';
+        if (diff < 3600000) return Math.floor(diff / 60000) + '分钟前';
+        if (diff < 86400000) return Math.floor(diff / 3600000) + '小时前';
+        
         const month = date.getMonth() + 1;
         const day = date.getDate();
         if (date.getFullYear() === now.getFullYear()) {
@@ -29115,29 +28575,27 @@ ${memberInfos
 
       // 删除收藏项
       async function deleteFavoriteItem(itemId) {
-        if (!confirm("确定删除这条收藏吗？")) return;
-
-        window.favoritesData.items = window.favoritesData.items.filter(
-          (item) => item.id !== itemId
-        );
+        if (!confirm('确定删除这条收藏吗？')) return;
+        
+        window.favoritesData.items = window.favoritesData.items.filter(item => item.id !== itemId);
         await saveFavoritesData();
         renderFavoritesTabs();
         renderFavoritesList();
-        showToast("已删除");
+        showToast('已删除');
       }
 
       // 添加新分组（从收藏页面）
       function addFavoriteGroup() {
-        const name = prompt("请输入分组名称：");
+        const name = prompt('请输入分组名称：');
         if (name && name.trim()) {
           const newGroup = {
-            id: "group_" + Date.now(),
-            name: name.trim(),
+            id: 'group_' + Date.now(),
+            name: name.trim()
           };
           window.favoritesData.groups.push(newGroup);
           saveFavoritesData();
           renderFavoritesTabs();
-          showToast("分组已创建");
+          showToast('分组已创建');
         }
       }
 
@@ -31357,8 +30815,7 @@ ${memberInfos
         input.style.display = "none";
         footer.style.display = "none";
 
-        preview.style.background =
-          "linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%)";
+        preview.style.background = "linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%)";
         preview.innerHTML = `
           <div class="image-desc-preview-icon">
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ec407a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -31438,46 +30895,19 @@ ${memberInfos
 
       // 预览聊天气泡样式
       function previewChatBubbleStyle() {
-        const userBgColor =
-          document.getElementById("settingsChatUserBubbleBg")?.value ||
-          "#f8bbd9";
-        const userBgOpacity =
-          parseInt(
-            document.getElementById("settingsChatUserBubbleOpacity")?.value
-          ) || 100;
-        const userTextColor =
-          document.getElementById("settingsChatUserTextColor")?.value ||
-          "#c2185b";
-        const aiBgColor =
-          document.getElementById("settingsChatAiBubbleBg")?.value || "#ffffff";
-        const aiBgOpacity =
-          parseInt(
-            document.getElementById("settingsChatAiBubbleOpacity")?.value
-          ) || 100;
-        const aiTextColor =
-          document.getElementById("settingsChatAiTextColor")?.value ||
-          "#333333";
+        const userBgColor = document.getElementById("settingsChatUserBubbleBg")?.value || "#f8bbd9";
+        const userBgOpacity = parseInt(document.getElementById("settingsChatUserBubbleOpacity")?.value) || 100;
+        const userTextColor = document.getElementById("settingsChatUserTextColor")?.value || "#c2185b";
+        const aiBgColor = document.getElementById("settingsChatAiBubbleBg")?.value || "#ffffff";
+        const aiBgOpacity = parseInt(document.getElementById("settingsChatAiBubbleOpacity")?.value) || 100;
+        const aiTextColor = document.getElementById("settingsChatAiTextColor")?.value || "#333333";
 
         // 应用样式
-        applyChatBubbleStyle(
-          userBgColor,
-          userBgOpacity,
-          userTextColor,
-          aiBgColor,
-          aiBgOpacity,
-          aiTextColor
-        );
+        applyChatBubbleStyle(userBgColor, userBgOpacity, userTextColor, aiBgColor, aiBgOpacity, aiTextColor);
       }
 
       // 应用聊天气泡背景样式
-      function applyChatBubbleStyle(
-        userBgColor,
-        userBgOpacity,
-        userTextColor,
-        aiBgColor,
-        aiBgOpacity,
-        aiTextColor
-      ) {
+      function applyChatBubbleStyle(userBgColor, userBgOpacity, userTextColor, aiBgColor, aiBgOpacity, aiTextColor) {
         // 转换颜色为RGBA
         const hexToRgba = (hex, opacity) => {
           const r = parseInt(hex.slice(1, 3), 16);
@@ -31558,16 +30988,10 @@ ${memberInfos
         const aiOpacity = settings.chatAiBubbleOpacity || 100;
 
         // 更新设置面板的值
-        const userColorInput = document.getElementById(
-          "settingsChatUserBubbleBg"
-        );
-        const userOpacityInput = document.getElementById(
-          "settingsChatUserBubbleOpacity"
-        );
+        const userColorInput = document.getElementById("settingsChatUserBubbleBg");
+        const userOpacityInput = document.getElementById("settingsChatUserBubbleOpacity");
         const aiColorInput = document.getElementById("settingsChatAiBubbleBg");
-        const aiOpacityInput = document.getElementById(
-          "settingsChatAiBubbleOpacity"
-        );
+        const aiOpacityInput = document.getElementById("settingsChatAiBubbleOpacity");
         const userLabel = document.getElementById("chatUserOpacityLabel");
         const aiLabel = document.getElementById("chatAiOpacityLabel");
 
@@ -31794,7 +31218,7 @@ ${memberInfos
           clearTimeout(window.pendingPostCallReply);
           window.pendingPostCallReply = null;
         }
-
+        
         // 群聊通话 - 所有成员参与
         if (currentGroupId) {
           startGroupCall(type);
@@ -33820,7 +33244,7 @@ ${formatRequirement}
           await sendGroupVoiceMessage(voiceText, duration);
           return;
         }
-
+        
         if (!currentChatCharId) return;
 
         // 保存到聊天历史 - 使用特殊格式存储
@@ -33862,7 +33286,7 @@ ${formatRequirement}
       // 群聊发送语音消息
       async function sendGroupVoiceMessage(voiceText, duration) {
         if (!currentGroupId) return;
-
+        
         const group = groupChats.find((g) => g.id === currentGroupId);
         if (!group) return;
 
@@ -33902,11 +33326,8 @@ ${formatRequirement}
       function playGroupUserVoiceBar(event, msgIndex) {
         event.stopPropagation();
         const voiceBar = event.currentTarget;
-        const duration =
-          parseInt(
-            voiceBar.querySelector(".user-voice-duration")?.textContent
-          ) || 3;
-
+        const duration = parseInt(voiceBar.querySelector('.user-voice-duration')?.textContent) || 3;
+        
         // 如果已经在播放，停止
         if (voiceBar.classList.contains("playing")) {
           voiceBar.classList.remove("playing");
@@ -33914,11 +33335,9 @@ ${formatRequirement}
         }
 
         // 停止其他正在播放的
-        document
-          .querySelectorAll(".user-voice-bar.playing, .voice-bar.playing")
-          .forEach((bar) => {
-            bar.classList.remove("playing");
-          });
+        document.querySelectorAll(".user-voice-bar.playing, .voice-bar.playing").forEach(bar => {
+          bar.classList.remove("playing");
+        });
 
         // 添加播放状态
         voiceBar.classList.add("playing");
@@ -33932,16 +33351,14 @@ ${formatRequirement}
       // 切换群聊用户语音文字显示
       async function toggleGroupUserVoiceText(event, msgIndex) {
         event.stopPropagation();
-
-        const textEl = document.getElementById(
-          `groupUserVoiceText-${msgIndex}`
-        );
+        
+        const textEl = document.getElementById(`groupUserVoiceText-${msgIndex}`);
         const btn = event.currentTarget;
-
+        
         if (!textEl) return;
 
         const isVisible = textEl.classList.contains("visible");
-
+        
         if (isVisible) {
           textEl.classList.remove("visible");
           btn.textContent = "转文字";
@@ -34085,11 +33502,8 @@ ${formatRequirement}
       function playUserVoiceBar(event, msgIndex) {
         event.stopPropagation();
         const voiceBar = event.currentTarget;
-        const duration =
-          parseInt(
-            voiceBar.querySelector(".user-voice-duration")?.textContent
-          ) || 3;
-
+        const duration = parseInt(voiceBar.querySelector('.user-voice-duration')?.textContent) || 3;
+        
         // 如果已经在播放，停止
         if (voiceBar.classList.contains("playing")) {
           voiceBar.classList.remove("playing");
@@ -34097,11 +33511,9 @@ ${formatRequirement}
         }
 
         // 停止其他正在播放的
-        document
-          .querySelectorAll(".user-voice-bar.playing, .voice-bar.playing")
-          .forEach((bar) => {
-            bar.classList.remove("playing");
-          });
+        document.querySelectorAll(".user-voice-bar.playing, .voice-bar.playing").forEach(bar => {
+          bar.classList.remove("playing");
+        });
 
         // 添加播放状态
         voiceBar.classList.add("playing");
@@ -34115,14 +33527,14 @@ ${formatRequirement}
       // 切换用户语音文字显示
       async function toggleUserVoiceText(event, msgIndex) {
         event.stopPropagation();
-
+        
         const textEl = document.getElementById(`userVoiceText-${msgIndex}`);
         const btn = event.currentTarget;
-
+        
         if (!textEl) return;
 
         const isVisible = textEl.classList.contains("visible");
-
+        
         if (isVisible) {
           textEl.classList.remove("visible");
           btn.textContent = "转文字";
@@ -34132,12 +33544,8 @@ ${formatRequirement}
         }
 
         // 保存状态
-        if (
-          chatHistories[currentChatCharId] &&
-          chatHistories[currentChatCharId][msgIndex]
-        ) {
-          chatHistories[currentChatCharId][msgIndex].voiceTextVisible =
-            !isVisible;
+        if (chatHistories[currentChatCharId] && chatHistories[currentChatCharId][msgIndex]) {
+          chatHistories[currentChatCharId][msgIndex].voiceTextVisible = !isVisible;
           await localforage.setItem("chatHistories", chatHistories);
         }
       }
@@ -34148,9 +33556,7 @@ ${formatRequirement}
         if (element && element.getAttribute) {
           const text = element.getAttribute("data-voice-text");
           if (text) {
-            showToast(
-              `🎤 "${text.substring(0, 30)}${text.length > 30 ? "..." : ""}"`
-            );
+            showToast(`🎤 "${text.substring(0, 30)}${text.length > 30 ? '...' : ''}"`);
           }
         }
       }
@@ -35246,7 +34652,7 @@ ${formatRequirement}
       function startFloatingMode() {
         const charId = currentChatCharId; // 保存当前角色ID
         closeReadTogether();
-
+        
         // 如果当前角色有读书状态，立即显示悬浮球
         if (charId && window.readTogetherData[charId]?.active) {
           showFloatingBtn();
@@ -35474,9 +34880,7 @@ ${formatRequirement}
           let longPressTimer = null;
           const LONG_PRESS_DURATION = 300;
 
-          btn.addEventListener("touchstart", handleTouchStart, {
-            passive: false,
-          });
+          btn.addEventListener("touchstart", handleTouchStart, { passive: false });
           btn.addEventListener("mousedown", handleMouseDown);
 
           function handleTouchStart(e) {
@@ -35495,9 +34899,7 @@ ${formatRequirement}
               btn.style.transform = "scale(1.1)";
             }, LONG_PRESS_DURATION);
 
-            document.addEventListener("touchmove", handleTouchMove, {
-              passive: false,
-            });
+            document.addEventListener("touchmove", handleTouchMove, { passive: false });
             document.addEventListener("touchend", handleTouchEnd);
           }
 
@@ -36697,9 +36099,7 @@ ${formatRequirement}
         const current = window.momentsData.userProfile.handle || "";
         const newHandle = prompt("请输入用户名（不含@）:", current);
         if (newHandle !== null && newHandle.trim()) {
-          window.momentsData.userProfile.handle = newHandle
-            .trim()
-            .replace(/^@/, "");
+          window.momentsData.userProfile.handle = newHandle.trim().replace(/^@/, '');
           localforage.setItem("momentsData", window.momentsData);
           renderMomentsUI();
         }
@@ -36809,9 +36209,7 @@ ${formatRequirement}
           imageHtml = `
             <div class="ig-post-images">
               <div class="ig-post-text-img">
-                <div class="moment-img-placeholder" onclick="viewMomentImageDesc('${escapeHtml(
-                  post.textImage
-                ).replace(/'/g, "\\'")}')">
+                <div class="moment-img-placeholder" onclick="viewMomentImageDesc('${escapeHtml(post.textImage).replace(/'/g, "\\'")}')">
                   <div class="placeholder-icon">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                       <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
@@ -36820,11 +36218,7 @@ ${formatRequirement}
                     </svg>
                   </div>
                   <div class="placeholder-text">点击查看图片</div>
-                  <div class="placeholder-desc">${
-                    post.textImage.length > 20
-                      ? post.textImage.substring(0, 20) + "..."
-                      : post.textImage
-                  }</div>
+                  <div class="placeholder-desc">${post.textImage.length > 20 ? post.textImage.substring(0, 20) + '...' : post.textImage}</div>
                 </div>
               </div>
             </div>`;
@@ -36893,16 +36287,18 @@ ${formatRequirement}
           commentsHtml = `
             <div class="ig-post-comments">
               ${allComments
-                .map((c) => {
-                  const replyPart = c.replyTo
-                    ? `<span class="reply-to">回复 <span class="reply-name">${c.replyTo}</span>：</span>`
-                    : "";
-                  return `
+                .map(
+                  (c) => {
+                    const replyPart = c.replyTo 
+                      ? `<span class="reply-to">回复 <span class="reply-name">${c.replyTo}</span>：</span>` 
+                      : '';
+                    return `
                 <div class="ig-comment" onclick="setReplyTarget('${post.id}', '${c.authorName}')">
                   <span class="username">${c.authorName}</span>${replyPart}${c.content}
                 </div>
               `;
-                })
+                  }
+                )
                 .join("")}
             </div>
           `;
@@ -36911,7 +36307,7 @@ ${formatRequirement}
         const postIdStr = String(post.id);
 
         // SVG图标
-        const likeIcon = liked
+        const likeIcon = liked 
           ? `<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`
           : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
         const commentIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`;
@@ -36950,9 +36346,7 @@ ${formatRequirement}
             ${imageHtml}
             <div class="ig-post-footer">
               <div class="ig-post-actions">
-                <button class="ig-action-btn ${
-                  liked ? "liked" : ""
-                }" onclick="toggleLike('${postIdStr}')">
+                <button class="ig-action-btn ${liked ? "liked" : ""}" onclick="toggleLike('${postIdStr}')">
                   ${likeIcon}<span>${likeData.length || ""}</span>
                 </button>
                 <div class="ig-action-divider"></div>
@@ -36964,9 +36358,7 @@ ${formatRequirement}
                   ${shareIcon}
                 </button>
                 <div class="ig-action-divider"></div>
-                <button class="ig-action-btn ${
-                  bookmarked ? "bookmarked" : ""
-                }" onclick="toggleBookmark('${postIdStr}')" title="收藏">
+                <button class="ig-action-btn ${bookmarked ? "bookmarked" : ""}" onclick="toggleBookmark('${postIdStr}')" title="收藏">
                   ${bookmarkIcon}
                 </button>
               </div>
@@ -37451,9 +36843,9 @@ ${persona ? `你的人设: ${persona}` : ""}
       // 频率对应的概率
       const frequencyProbabilities = {
         off: 0,
-        low: 0.2, // 低频: 20%概率
-        medium: 0.4, // 中频: 40%概率
-        high: 0.7, // 高频: 70%概率
+        low: 0.2,      // 低频: 20%概率
+        medium: 0.4,   // 中频: 40%概率
+        high: 0.7,     // 高频: 70%概率
       };
 
       // 初始化后台活动系统
@@ -37486,10 +36878,7 @@ ${persona ? `你的人设: ${persona}` : ""}
       function startBackgroundActivity() {
         if (backgroundActivityTimer) return;
         backgroundActivityEnabled = true;
-        backgroundActivityTimer = setInterval(
-          runBackgroundActivityTick,
-          backgroundActivityInterval * 1000
-        );
+        backgroundActivityTimer = setInterval(runBackgroundActivityTick, backgroundActivityInterval * 1000);
         console.log(`后台活动已启动，间隔 ${backgroundActivityInterval} 秒`);
         saveBackgroundActivitySettings();
       }
@@ -37521,7 +36910,7 @@ ${persona ? `你的人设: ${persona}` : ""}
           if (!char.id || !char.name) continue;
 
           const charId = String(char.id);
-          const frequency = backgroundActivityConfig[charId] || "off";
+          const frequency = backgroundActivityConfig[charId] || 'off';
           const probability = frequencyProbabilities[frequency];
 
           if (!probability || probability === 0) continue;
@@ -37537,11 +36926,7 @@ ${persona ? `你的人设: ${persona}` : ""}
 
           // 随机概率决定是否行动
           if (Math.random() < probability) {
-            console.log(
-              `角色 "${
-                char.note || char.name
-              }" (频率: ${frequency}) 被唤醒，准备后台活动...`
-            );
+            console.log(`角色 "${char.note || char.name}" (频率: ${frequency}) 被唤醒，准备后台活动...`);
             await triggerBackgroundAction(charId);
             lastActivityTime[charId] = Date.now();
           }
@@ -37550,9 +36935,7 @@ ${persona ? `你的人设: ${persona}` : ""}
 
       // 触发角色后台行动
       async function triggerBackgroundAction(charId) {
-        const char = window.characters?.find(
-          (c) => String(c.id) === String(charId)
-        );
+        const char = window.characters?.find(c => String(c.id) === String(charId));
         if (!char) {
           console.log("后台活动：找不到角色", charId);
           return;
@@ -37581,7 +36964,7 @@ ${persona ? `你的人设: ${persona}` : ""}
           showToast("请先配置API");
           return;
         }
-
+        
         if (!apiConfig.url || !apiConfig.key) {
           console.log("后台活动：API配置不完整", apiConfig);
           showToast("API配置不完整，请检查URL和Key");
@@ -37593,59 +36976,41 @@ ${persona ? `你的人设: ${persona}` : ""}
         const charName = char.note || char.name;
         const persona = charSettings.persona || char.description || "";
         const userName = window.momentsData?.userProfile?.name || "用户";
-
+        
         // 获取当前时间
         const now = new Date();
         const currentTime = now.toLocaleString("zh-CN", {
-          month: "long",
-          day: "numeric",
-          weekday: "long",
-          hour: "2-digit",
-          minute: "2-digit",
+          month: "long", day: "numeric", weekday: "long",
+          hour: "2-digit", minute: "2-digit"
         });
 
         // 获取最近聊天记录摘要
         const history = chatHistories[charId] || [];
-        const recentMessages = history
-          .slice(-10)
-          .map((m) => {
-            const role = m.role === "user" ? userName : charName;
-            const content = (m.content || "").substring(0, 50);
-            return `${role}: ${content}`;
-          })
-          .join("\n");
+        const recentMessages = history.slice(-10).map(m => {
+          const role = m.role === "user" ? userName : charName;
+          const content = (m.content || "").substring(0, 50);
+          return `${role}: ${content}`;
+        }).join("\n");
 
         // 获取最近动态列表
         let postsContext = "";
         const recentPosts = (window.momentsData?.posts || []).slice(0, 5);
         if (recentPosts.length > 0) {
           postsContext = "\n\n# 最近的动态列表:\n";
-          recentPosts.forEach((post) => {
-            const authorName = post.isUser
-              ? userName
-              : window.characters?.find((c) => String(c.id) === post.authorId)
-                  ?.note ||
-                window.characters?.find((c) => String(c.id) === post.authorId)
-                  ?.name ||
-                "朋友";
+          recentPosts.forEach(post => {
+            const authorName = post.isUser ? userName : 
+              (window.characters?.find(c => String(c.id) === post.authorId)?.note || 
+               window.characters?.find(c => String(c.id) === post.authorId)?.name || "朋友");
             const hasLiked = post.likes?.includes(charName) ? "[已点赞]" : "";
-            const hasCommented = post.comments?.some(
-              (c) => c.authorName === charName
-            )
-              ? "[已评论]"
-              : "";
+            const hasCommented = post.comments?.some(c => c.authorName === charName) ? "[已评论]" : "";
             const timeAgo = formatPostTime(post.timestamp);
-            postsContext += `- (ID:${post.id}) [${timeAgo}] ${authorName}: "${(
-              post.content || "图片"
-            ).substring(0, 30)}..." ${hasLiked}${hasCommented}\n`;
+            postsContext += `- (ID:${post.id}) [${timeAgo}] ${authorName}: "${(post.content || "图片").substring(0, 30)}..." ${hasLiked}${hasCommented}\n`;
           });
         }
 
         // 计算距离上次聊天的时间
         const lastMsg = history[history.length - 1];
-        const timeSinceChat = lastMsg
-          ? Math.floor((Date.now() - (lastMsg.timestamp || Date.now())) / 60000)
-          : 999;
+        const timeSinceChat = lastMsg ? Math.floor((Date.now() - (lastMsg.timestamp || Date.now())) / 60000) : 999;
 
         const systemPrompt = `# 任务
 你现在【就是】角色 "${charName}"。这是一个秘密的后台独立行动。
@@ -37679,7 +37044,7 @@ ${postsContext}
 
         try {
           console.log("后台活动：正在调用API...", apiConfig.url);
-
+          
           const response = await fetch(`${apiConfig.url}/chat/completions`, {
             method: "POST",
             headers: {
@@ -37690,10 +37055,7 @@ ${postsContext}
               model: apiConfig.model,
               messages: [
                 { role: "system", content: systemPrompt },
-                {
-                  role: "user",
-                  content: "请立即执行你的后台行动，只输出JSON。",
-                },
+                { role: "user", content: "请立即执行你的后台行动，只输出JSON。" },
               ],
               temperature: 0.9,
             }),
@@ -37708,9 +37070,9 @@ ${postsContext}
 
           const data = await response.json();
           console.log("后台活动API返回数据:", data);
-
+          
           let aiResponse = data.choices?.[0]?.message?.content?.trim();
-
+          
           if (!aiResponse) {
             console.log("后台活动：AI返回内容为空");
             showToast("AI未返回内容");
@@ -37723,10 +37085,7 @@ ${postsContext}
           let actions = [];
           try {
             // 清理可能的markdown代码块
-            aiResponse = aiResponse
-              .replace(/```json\n?/g, "")
-              .replace(/```\n?/g, "")
-              .trim();
+            aiResponse = aiResponse.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
             actions = JSON.parse(aiResponse);
             if (!Array.isArray(actions)) actions = [actions];
           } catch (e) {
@@ -37771,36 +37130,36 @@ ${postsContext}
             if (action.type === "message" && action.content) {
               // 发送消息给用户
               await sendBackgroundMessage(charId, action.content);
-              console.log(
-                `后台活动: ${charName} 主动发送消息: ${action.content}`
-              );
+              console.log(`后台活动: ${charName} 主动发送消息: ${action.content}`);
               showToast(`${charName} 发来消息`);
-            } else if (action.type === "post" && action.content) {
+            }
+            else if (action.type === "post" && action.content) {
               // 发布动态
               await createAiMomentPost(charId, action.content);
               console.log(`后台活动: ${charName} 发布了动态`);
               showToast(`${charName} 发布了动态`);
-            } else if (
-              action.type === "comment" &&
-              action.postId &&
-              action.content
-            ) {
+            }
+            else if (action.type === "comment" && action.postId && action.content) {
               // 评论动态
               await addAiComment(action.postId, charId, action.content);
               console.log(`后台活动: ${charName} 评论了动态 #${action.postId}`);
               showToast(`${charName} 评论了动态`);
-            } else if (action.type === "like" && action.postId) {
+            }
+            else if (action.type === "like" && action.postId) {
               // 点赞动态
               await addAiLike(action.postId, charId);
               console.log(`后台活动: ${charName} 点赞了动态 #${action.postId}`);
               showToast(`${charName} 点赞了动态`);
-            } else if (action.type === "skip") {
+            }
+            else if (action.type === "skip") {
               console.log(`后台活动: ${charName} 选择不行动`);
               showToast(`${charName} 暂时没有行动`);
-            } else {
+            }
+            else {
               console.log(`后台活动: 未知动作类型`, action);
             }
           }
+
         } catch (error) {
           console.error("后台活动出错:", error);
         }
@@ -37808,9 +37167,7 @@ ${postsContext}
 
       // 后台发送消息
       async function sendBackgroundMessage(charId, content) {
-        const char = window.characters?.find(
-          (c) => String(c.id) === String(charId)
-        );
+        const char = window.characters?.find(c => String(c.id) === String(charId));
         if (!char) return;
 
         if (!chatHistories[charId]) {
@@ -37836,37 +37193,25 @@ ${postsContext}
         }
 
         // 显示通知
-        showMessageNotification(
-          charId,
-          char.note || char.name,
-          char.avatar,
-          content
-        );
-
+        showMessageNotification(charId, char.note || char.name, char.avatar, content);
+        
         // 添加未读
         if (typeof addUnreadMessage === "function") {
           addUnreadMessage(charId);
         }
 
         // 如果当前正在看这个角色的聊天，刷新
-        if (
-          currentChatCharId === charId &&
-          typeof renderConversation === "function"
-        ) {
+        if (currentChatCharId === charId && typeof renderConversation === "function") {
           renderConversation();
         }
       }
 
       // AI评论动态
       async function addAiComment(postId, charId, content) {
-        const postIndex = window.momentsData?.posts?.findIndex(
-          (p) => String(p.id) === String(postId)
-        );
+        const postIndex = window.momentsData?.posts?.findIndex(p => String(p.id) === String(postId));
         if (postIndex === -1) return;
 
-        const char = window.characters?.find(
-          (c) => String(c.id) === String(charId)
-        );
+        const char = window.characters?.find(c => String(c.id) === String(charId));
         if (!char) return;
 
         const post = window.momentsData.posts[postIndex];
@@ -37887,14 +37232,10 @@ ${postsContext}
 
       // AI点赞动态
       async function addAiLike(postId, charId) {
-        const postIndex = window.momentsData?.posts?.findIndex(
-          (p) => String(p.id) === String(postId)
-        );
+        const postIndex = window.momentsData?.posts?.findIndex(p => String(p.id) === String(postId));
         if (postIndex === -1) return;
 
-        const char = window.characters?.find(
-          (c) => String(c.id) === String(charId)
-        );
+        const char = window.characters?.find(c => String(c.id) === String(charId));
         if (!char) return;
 
         const post = window.momentsData.posts[postIndex];
@@ -37911,9 +37252,7 @@ ${postsContext}
 
       // AI通过聊天发动态（用户让AI发动态时调用）
       async function createAiMomentPost(charId, content) {
-        const char = window.characters?.find(
-          (c) => String(c.id) === String(charId)
-        );
+        const char = window.characters?.find(c => String(c.id) === String(charId));
         if (!char) return null;
 
         const charName = char.note || char.name;
@@ -37952,12 +37291,12 @@ ${postsContext}
       function showMomentNotification(char, content) {
         const notification = document.getElementById("messageNotification");
         if (!notification) return;
-
+        
         const avatarEl = document.getElementById("notificationAvatar");
         const nameEl = document.getElementById("notificationName");
         const textEl = document.getElementById("notificationText");
         const timeEl = document.getElementById("notificationTime");
-
+        
         if (avatarEl) {
           if (char.avatar && char.avatar.startsWith("data:")) {
             avatarEl.innerHTML = `<img src="${char.avatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
@@ -37965,19 +37304,16 @@ ${postsContext}
             avatarEl.textContent = char.avatar || "AI";
           }
         }
-        if (nameEl)
-          nameEl.textContent = `${char.note || char.name} 发布了新动态`;
-        if (textEl)
-          textEl.textContent =
-            content.length > 30 ? content.substring(0, 30) + "..." : content;
+        if (nameEl) nameEl.textContent = `${char.note || char.name} 发布了新动态`;
+        if (textEl) textEl.textContent = content.length > 30 ? content.substring(0, 30) + "..." : content;
         if (timeEl) timeEl.textContent = "刚刚";
-
+        
         // 设置点击跳转到动态页面（标记为动态通知）
         pendingNotificationCharId = null; // 清除消息通知的charId
         notification.dataset.type = "moment"; // 标记为动态类型
-
+        
         notification.classList.add("show");
-
+        
         // 清除之前的定时器
         if (notificationTimeout) {
           clearTimeout(notificationTimeout);
@@ -38011,10 +37347,7 @@ ${postsContext}
         if (charId) {
           await triggerBackgroundAction(String(charId));
         } else if (window.characters && window.characters.length > 0) {
-          const randomChar =
-            window.characters[
-              Math.floor(Math.random() * window.characters.length)
-            ];
+          const randomChar = window.characters[Math.floor(Math.random() * window.characters.length)];
           await triggerBackgroundAction(String(randomChar.id));
         }
       }
@@ -38022,17 +37355,13 @@ ${postsContext}
       // ==================== 后台活动设置页面 ====================
       // 打开后台活动设置页面
       function openBackgroundActivityPage() {
-        document
-          .getElementById("backgroundActivityPage")
-          .classList.add("active");
+        document.getElementById("backgroundActivityPage").classList.add("active");
         renderBackgroundActivityPage();
       }
 
       // 关闭后台活动设置页面
       function closeBackgroundActivityPage() {
-        document
-          .getElementById("backgroundActivityPage")
-          .classList.remove("active");
+        document.getElementById("backgroundActivityPage").classList.remove("active");
       }
 
       // 更新开关UI
@@ -38042,8 +37371,7 @@ ${postsContext}
         const dot = btn.querySelector("div");
         if (backgroundActivityEnabled) {
           btn.style.background = "linear-gradient(135deg, #f48fb1, #ec407a)";
-          btn.style.boxShadow =
-            "inset 0 1px 3px rgba(0,0,0,0.1), 0 2px 6px rgba(236,64,122,0.3)";
+          btn.style.boxShadow = "inset 0 1px 3px rgba(0,0,0,0.1), 0 2px 6px rgba(236,64,122,0.3)";
           if (dot) dot.style.left = "24px";
         } else {
           btn.style.background = "#e0e0e0";
@@ -38056,7 +37384,7 @@ ${postsContext}
       function renderBackgroundActivityPage() {
         // 更新开关UI
         updateToggleUI();
-
+        
         // 更新间隔
         const intervalInput = document.getElementById("bgActivityInterval");
         if (intervalInput) {
@@ -38066,42 +37394,29 @@ ${postsContext}
         // 渲染角色列表
         const container = document.getElementById("bgActivityCharList");
         if (!container) return;
-
+        
         if (!window.characters || window.characters.length === 0) {
-          container.innerHTML =
-            '<div style="color:#999;text-align:center;padding:20px;">暂无角色，请先导入角色卡</div>';
+          container.innerHTML = '<div style="color:#999;text-align:center;padding:20px;">暂无角色，请先导入角色卡</div>';
           return;
         }
 
-        container.innerHTML = window.characters
-          .map((char) => {
-            const charId = String(char.id);
-            const charName = char.note || char.name;
-            const frequency = backgroundActivityConfig[charId] || "off";
+        container.innerHTML = window.characters.map(char => {
+          const charId = String(char.id);
+          const charName = char.note || char.name;
+          const frequency = backgroundActivityConfig[charId] || 'off';
+          
+          let avatarHtml;
+          if (char.avatar && (char.avatar.startsWith('data:') || char.avatar.startsWith('http'))) {
+            avatarHtml = `<img src="${char.avatar}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;box-shadow:0 2px 8px rgba(236,64,122,0.2);">`;
+          } else {
+            avatarHtml = `<div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#f48fb1,#ec407a);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:600;box-shadow:0 2px 8px rgba(236,64,122,0.3);">${(charName || 'AI').substring(0, 1)}</div>`;
+          }
 
-            let avatarHtml;
-            if (
-              char.avatar &&
-              (char.avatar.startsWith("data:") ||
-                char.avatar.startsWith("http"))
-            ) {
-              avatarHtml = `<img src="${char.avatar}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;box-shadow:0 2px 8px rgba(236,64,122,0.2);">`;
-            } else {
-              avatarHtml = `<div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#f48fb1,#ec407a);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:600;box-shadow:0 2px 8px rgba(236,64,122,0.3);">${(
-                charName || "AI"
-              ).substring(0, 1)}</div>`;
-            }
+          // 根据频率显示不同颜色的指示器
+          const freqColors = { off: '#e0e0e0', low: '#f8bbd9', medium: '#f48fb1', high: '#ec407a' };
+          const freqColor = freqColors[frequency] || '#e0e0e0';
 
-            // 根据频率显示不同颜色的指示器
-            const freqColors = {
-              off: "#e0e0e0",
-              low: "#f8bbd9",
-              medium: "#f48fb1",
-              high: "#ec407a",
-            };
-            const freqColor = freqColors[frequency] || "#e0e0e0";
-
-            return `
+          return `
             <div style="display:flex;align-items:center;gap:12px;padding:14px;background:linear-gradient(135deg, #fff 0%, #fef8fa 100%);border-radius:14px;border:1px solid rgba(236,64,122,0.1);box-shadow:0 2px 6px rgba(236,64,122,0.05);">
               <div style="position:relative;">
                 ${avatarHtml}
@@ -38109,35 +37424,18 @@ ${postsContext}
               </div>
               <div style="flex:1;min-width:0;">
                 <div style="font-weight:600;color:#333;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:0.95rem;">${charName}</div>
-                <div style="font-size:0.75rem;color:#e91e63;margin-top:2px;opacity:0.7;">${
-                  frequency === "off"
-                    ? "未启用"
-                    : frequency === "low"
-                    ? "低频活动"
-                    : frequency === "medium"
-                    ? "中频活动"
-                    : "高频活动"
-                }</div>
+                <div style="font-size:0.75rem;color:#e91e63;margin-top:2px;opacity:0.7;">${frequency === 'off' ? '未启用' : frequency === 'low' ? '低频活动' : frequency === 'medium' ? '中频活动' : '高频活动'}</div>
               </div>
               <select onchange="updateCharFrequency('${charId}', this.value)" 
                 style="padding:10px 14px;border:2px solid rgba(236,64,122,0.2);border-radius:10px;font-size:0.9rem;background:#fff;color:#ad1457;font-weight:500;min-width:85px;cursor:pointer;">
-                <option value="off" ${
-                  frequency === "off" ? "selected" : ""
-                }>关闭</option>
-                <option value="low" ${
-                  frequency === "low" ? "selected" : ""
-                }>低频</option>
-                <option value="medium" ${
-                  frequency === "medium" ? "selected" : ""
-                }>中频</option>
-                <option value="high" ${
-                  frequency === "high" ? "selected" : ""
-                }>高频</option>
+                <option value="off" ${frequency === 'off' ? 'selected' : ''}>关闭</option>
+                <option value="low" ${frequency === 'low' ? 'selected' : ''}>低频</option>
+                <option value="medium" ${frequency === 'medium' ? 'selected' : ''}>中频</option>
+                <option value="high" ${frequency === 'high' ? 'selected' : ''}>高频</option>
               </select>
             </div>
           `;
-          })
-          .join("");
+        }).join('');
       }
 
       // 切换后台活动总开关
@@ -38156,11 +37454,11 @@ ${postsContext}
       function updateBackgroundActivityInterval() {
         const input = document.getElementById("bgActivityInterval");
         if (!input) return;
-
+        
         const value = parseInt(input.value) || 60;
         backgroundActivityInterval = Math.max(30, Math.min(600, value));
         input.value = backgroundActivityInterval;
-
+        
         // 如果正在运行，重启定时器
         if (backgroundActivityEnabled) {
           stopBackgroundActivity();
@@ -38174,39 +37472,28 @@ ${postsContext}
       function updateCharFrequency(charId, frequency) {
         backgroundActivityConfig[charId] = frequency;
         saveBackgroundActivitySettings();
-
-        const char = window.characters?.find(
-          (c) => String(c.id) === String(charId)
-        );
-        const charName = char?.note || char?.name || "角色";
-        const freqNames = {
-          off: "关闭",
-          low: "低频",
-          medium: "中频",
-          high: "高频",
-        };
+        
+        const char = window.characters?.find(c => String(c.id) === String(charId));
+        const charName = char?.note || char?.name || '角色';
+        const freqNames = { off: '关闭', low: '低频', medium: '中频', high: '高频' };
         showToast(`${charName} 设置为 ${freqNames[frequency]}`);
       }
 
       // 测试后台活动
       async function testBackgroundActivity() {
         // 找到已启用的角色
-        const enabledChars =
-          window.characters?.filter((c) => {
-            const freq = backgroundActivityConfig[String(c.id)];
-            return freq && freq !== "off";
-          }) || [];
-
+        const enabledChars = window.characters?.filter(c => {
+          const freq = backgroundActivityConfig[String(c.id)];
+          return freq && freq !== 'off';
+        }) || [];
+        
         if (enabledChars.length === 0) {
           showToast("请先为至少一个角色设置频率");
           return;
         }
-
-        const randomChar =
-          enabledChars[Math.floor(Math.random() * enabledChars.length)];
-        showToast(
-          `正在触发 ${randomChar.note || randomChar.name} 的后台活动...`
-        );
+        
+        const randomChar = enabledChars[Math.floor(Math.random() * enabledChars.length)];
+        showToast(`正在触发 ${randomChar.note || randomChar.name} 的后台活动...`);
         await triggerBackgroundAction(String(randomChar.id));
       }
 
@@ -38460,10 +37747,7 @@ ${postsContext}
         if (postIndex === -1) return;
 
         const profile = window.momentsData.userProfile;
-        const replyTo =
-          inlineReplyTarget?.postId === postId
-            ? inlineReplyTarget.authorName
-            : null;
+        const replyTo = inlineReplyTarget?.postId === postId ? inlineReplyTarget.authorName : null;
 
         const newComment = {
           id: Date.now(),
@@ -38475,8 +37759,7 @@ ${postsContext}
           replyTo: replyTo,
         };
 
-        window.momentsData.posts[postIndex].comments =
-          window.momentsData.posts[postIndex].comments || [];
+        window.momentsData.posts[postIndex].comments = window.momentsData.posts[postIndex].comments || [];
         window.momentsData.posts[postIndex].comments.push(newComment);
         await localforage.setItem("momentsData", window.momentsData);
 
@@ -38491,13 +37774,9 @@ ${postsContext}
         if (replyTo) {
           const post = window.momentsData.posts[postIndex];
           // 找到被回复的评论的authorId
-          const repliedComment = post.comments.find(
-            (c) => c.authorName === replyTo && c.authorId !== "user"
-          );
+          const repliedComment = post.comments.find(c => c.authorName === replyTo && c.authorId !== "user");
           if (repliedComment && window.characters) {
-            const char = window.characters.find(
-              (c) => String(c.id) === repliedComment.authorId
-            );
+            const char = window.characters.find(c => String(c.id) === repliedComment.authorId);
             if (char) {
               setTimeout(async () => {
                 const reply = await generateAiReplyWithAPI(char, content, post);
@@ -38522,9 +37801,7 @@ ${postsContext}
         else {
           const post = window.momentsData.posts[postIndex];
           if (!post.isUser && window.characters) {
-            const char = window.characters.find(
-              (c) => String(c.id) === post.authorId
-            );
+            const char = window.characters.find(c => String(c.id) === post.authorId);
             if (char && Math.random() > 0.3) {
               setTimeout(async () => {
                 const reply = await generateAiReplyWithAPI(char, content, post);
@@ -40790,10 +40067,7 @@ ${userName}在你的动态下留言了，你需要回复。
       <button
         class="selection-btn favorite"
         onclick="favoriteSelectedMessages()"
-        style="
-          background: linear-gradient(135deg, #f48fb1, #ec407a);
-          color: #fff;
-        "
+        style="background: linear-gradient(135deg, #f48fb1, #ec407a); color: #fff;"
       >
         ★ 收藏
       </button>
@@ -40811,9 +40085,7 @@ ${userName}在你的动态下留言了，你需要回复。
       <div class="favorites-header">
         <button class="favorites-back" onclick="closeFavoritesPage()">‹</button>
         <span class="favorites-title">我的收藏</span>
-        <button class="favorites-add-group" onclick="addFavoriteGroup()">
-          + 新建分组
-        </button>
+        <button class="favorites-add-group" onclick="addFavoriteGroup()">+ 新建分组</button>
       </div>
       <div class="favorites-tabs" id="favoritesTabs">
         <!-- 动态生成分组标签 -->
@@ -40828,225 +40100,68 @@ ${userName}在你的动态下留言了，你需要回复。
     <!-- 后台活动设置页面 -->
     <div class="favorites-page" id="backgroundActivityPage">
       <div class="favorites-header">
-        <button class="favorites-back" onclick="closeBackgroundActivityPage()">
-          ‹
-        </button>
+        <button class="favorites-back" onclick="closeBackgroundActivityPage()">‹</button>
         <span class="favorites-title">后台活动</span>
-        <span style="width: 80px"></span>
+        <span style="width:80px;"></span>
       </div>
-      <div
-        style="
-          padding: 16px;
-          overflow-y: auto;
-          height: calc(100% - 56px);
-          background: linear-gradient(180deg, #fef8fa 0%, #fff 100%);
-        "
-      >
+      <div style="padding:16px;overflow-y:auto;height:calc(100% - 56px);background:linear-gradient(180deg, #fef8fa 0%, #fff 100%);">
         <!-- 总开关 -->
-        <div
-          style="
-            background: linear-gradient(135deg, #fff 0%, #fff5f8 100%);
-            border-radius: 16px;
-            padding: 18px;
-            margin-bottom: 14px;
-            box-shadow: 0 2px 12px rgba(236, 64, 122, 0.1);
-            border: 1px solid rgba(236, 64, 122, 0.08);
-          "
-        >
-          <div
-            style="
-              display: flex;
-              align-items: center;
-              justify-content: space-between;
-            "
-          >
+        <div style="background:linear-gradient(135deg, #fff 0%, #fff5f8 100%);border-radius:16px;padding:18px;margin-bottom:14px;box-shadow:0 2px 12px rgba(236,64,122,0.1);border:1px solid rgba(236,64,122,0.08);">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
             <div>
-              <div style="font-weight: 600; color: #ad1457; font-size: 1rem">
-                启用后台活动
-              </div>
-              <div
-                style="
-                  font-size: 0.8rem;
-                  color: #e91e63;
-                  margin-top: 6px;
-                  opacity: 0.7;
-                "
-              >
-                AI角色会主动发消息、发动态、互动
-              </div>
+              <div style="font-weight:600;color:#ad1457;font-size:1rem;">启用后台活动</div>
+              <div style="font-size:0.8rem;color:#e91e63;margin-top:6px;opacity:0.7;">AI角色会主动发消息、发动态、互动</div>
             </div>
-            <div
-              id="bgActivityToggleBtn"
-              onclick="toggleBackgroundActivityEnabled()"
-              style="
-                width: 52px;
-                height: 30px;
-                border-radius: 15px;
-                background: #e0e0e0;
-                position: relative;
-                cursor: pointer;
-                transition: all 0.3s;
-                box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-              "
-            >
-              <div
-                style="
-                  width: 26px;
-                  height: 26px;
-                  border-radius: 50%;
-                  background: #fff;
-                  position: absolute;
-                  top: 2px;
-                  left: 2px;
-                  transition: all 0.3s;
-                  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-                "
-              ></div>
+            <div id="bgActivityToggleBtn" onclick="toggleBackgroundActivityEnabled()" 
+              style="width:52px;height:30px;border-radius:15px;background:#e0e0e0;position:relative;cursor:pointer;transition:all 0.3s;box-shadow:inset 0 1px 3px rgba(0,0,0,0.1);">
+              <div style="width:26px;height:26px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:all 0.3s;box-shadow:0 2px 6px rgba(0,0,0,0.2);"></div>
             </div>
           </div>
         </div>
 
         <!-- 检查间隔 -->
-        <div
-          style="
-            background: linear-gradient(135deg, #fff 0%, #fff5f8 100%);
-            border-radius: 16px;
-            padding: 18px;
-            margin-bottom: 14px;
-            box-shadow: 0 2px 12px rgba(236, 64, 122, 0.1);
-            border: 1px solid rgba(236, 64, 122, 0.08);
-          "
-        >
-          <div style="font-weight: 600; color: #ad1457; margin-bottom: 12px">
-            ⏱️ 检查间隔（秒）
-          </div>
-          <input
-            type="number"
-            id="bgActivityInterval"
-            value="60"
-            min="30"
-            max="600"
-            style="
-              width: 100%;
-              padding: 14px;
-              border: 2px solid rgba(236, 64, 122, 0.2);
-              border-radius: 12px;
-              font-size: 1rem;
-              box-sizing: border-box;
-              background: #fff;
-              color: #333;
-              transition: all 0.2s;
-            "
+        <div style="background:linear-gradient(135deg, #fff 0%, #fff5f8 100%);border-radius:16px;padding:18px;margin-bottom:14px;box-shadow:0 2px 12px rgba(236,64,122,0.1);border:1px solid rgba(236,64,122,0.08);">
+          <div style="font-weight:600;color:#ad1457;margin-bottom:12px;">⏱️ 检查间隔（秒）</div>
+          <input type="number" id="bgActivityInterval" value="60" min="30" max="600" 
+            style="width:100%;padding:14px;border:2px solid rgba(236,64,122,0.2);border-radius:12px;font-size:1rem;box-sizing:border-box;background:#fff;color:#333;transition:all 0.2s;"
             onfocus="this.style.borderColor='#f48fb1';this.style.boxShadow='0 0 0 3px rgba(244,143,177,0.2)'"
             onblur="this.style.borderColor='rgba(236,64,122,0.2)';this.style.boxShadow='none'"
-            onchange="updateBackgroundActivityInterval()"
-          />
-          <div
-            style="
-              font-size: 0.75rem;
-              color: #e91e63;
-              margin-top: 10px;
-              opacity: 0.7;
-            "
-          >
-            每隔多少秒检查一次是否触发后台活动（30-600秒）
-          </div>
+            onchange="updateBackgroundActivityInterval()">
+          <div style="font-size:0.75rem;color:#e91e63;margin-top:10px;opacity:0.7;">每隔多少秒检查一次是否触发后台活动（30-600秒）</div>
         </div>
 
         <!-- 角色频率设置 -->
-        <div
-          style="
-            background: linear-gradient(135deg, #fff 0%, #fff5f8 100%);
-            border-radius: 16px;
-            padding: 18px;
-            box-shadow: 0 2px 12px rgba(236, 64, 122, 0.1);
-            border: 1px solid rgba(236, 64, 122, 0.08);
-          "
-        >
-          <div style="font-weight: 600; color: #ad1457; margin-bottom: 10px">
-            👥 角色活动频率
+        <div style="background:linear-gradient(135deg, #fff 0%, #fff5f8 100%);border-radius:16px;padding:18px;box-shadow:0 2px 12px rgba(236,64,122,0.1);border:1px solid rgba(236,64,122,0.08);">
+          <div style="font-weight:600;color:#ad1457;margin-bottom:10px;">👥 角色活动频率</div>
+          <div style="font-size:0.75rem;color:#666;margin-bottom:16px;line-height:1.6;background:rgba(236,64,122,0.05);padding:12px;border-radius:10px;">
+            <span style="color:#e91e63;">●</span> 关闭 = 不参与后台活动<br>
+            <span style="color:#f48fb1;">●</span> 低频 = 每次检查20%概率<br>
+            <span style="color:#ec407a;">●</span> 中频 = 每次检查40%概率<br>
+            <span style="color:#c2185b;">●</span> 高频 = 每次检查70%概率
           </div>
-          <div
-            style="
-              font-size: 0.75rem;
-              color: #666;
-              margin-bottom: 16px;
-              line-height: 1.6;
-              background: rgba(236, 64, 122, 0.05);
-              padding: 12px;
-              border-radius: 10px;
-            "
-          >
-            <span style="color: #e91e63">●</span> 关闭 = 不参与后台活动<br />
-            <span style="color: #f48fb1">●</span> 低频 = 每次检查20%概率<br />
-            <span style="color: #ec407a">●</span> 中频 = 每次检查40%概率<br />
-            <span style="color: #c2185b">●</span> 高频 = 每次检查70%概率
-          </div>
-          <div
-            id="bgActivityCharList"
-            style="display: flex; flex-direction: column; gap: 12px"
-          >
+          <div id="bgActivityCharList" style="display:flex;flex-direction:column;gap:12px;">
             <!-- 动态生成角色列表 -->
           </div>
         </div>
-
+        
         <!-- 手动测试按钮 -->
-        <div
-          style="
-            background: linear-gradient(135deg, #fff 0%, #fff5f8 100%);
-            border-radius: 16px;
-            padding: 18px;
-            margin-top: 14px;
-            box-shadow: 0 2px 12px rgba(236, 64, 122, 0.1);
-            border: 1px solid rgba(236, 64, 122, 0.08);
-          "
-        >
-          <div style="font-weight: 600; color: #ad1457; margin-bottom: 12px">
-            🧪 测试
-          </div>
-          <button
-            onclick="testBackgroundActivity()"
-            style="
-              width: 100%;
-              padding: 14px;
-              background: linear-gradient(135deg, #f48fb1, #ec407a);
-              color: #fff;
-              border: none;
-              border-radius: 12px;
-              font-size: 1rem;
-              font-weight: 500;
-              cursor: pointer;
-              box-shadow: 0 4px 12px rgba(236, 64, 122, 0.3);
-              transition: all 0.2s;
-            "
+        <div style="background:linear-gradient(135deg, #fff 0%, #fff5f8 100%);border-radius:16px;padding:18px;margin-top:14px;box-shadow:0 2px 12px rgba(236,64,122,0.1);border:1px solid rgba(236,64,122,0.08);">
+          <div style="font-weight:600;color:#ad1457;margin-bottom:12px;">🧪 测试</div>
+          <button onclick="testBackgroundActivity()" 
+            style="width:100%;padding:14px;background:linear-gradient(135deg,#f48fb1,#ec407a);color:#fff;border:none;border-radius:12px;font-size:1rem;font-weight:500;cursor:pointer;box-shadow:0 4px 12px rgba(236,64,122,0.3);transition:all 0.2s;"
             onmousedown="this.style.transform='scale(0.98)';this.style.boxShadow='0 2px 6px rgba(236,64,122,0.3)'"
             onmouseup="this.style.transform='scale(1)';this.style.boxShadow='0 4px 12px rgba(236,64,122,0.3)'"
             ontouchstart="this.style.transform='scale(0.98)';this.style.boxShadow='0 2px 6px rgba(236,64,122,0.3)'"
-            ontouchend="this.style.transform='scale(1)';this.style.boxShadow='0 4px 12px rgba(236,64,122,0.3)'"
-          >
+            ontouchend="this.style.transform='scale(1)';this.style.boxShadow='0 4px 12px rgba(236,64,122,0.3)'">
             ✨ 立即触发一次后台活动
           </button>
-          <div
-            style="
-              font-size: 0.75rem;
-              color: #e91e63;
-              margin-top: 10px;
-              text-align: center;
-              opacity: 0.7;
-            "
-          >
-            随机选择一个已启用的角色执行后台活动
-          </div>
+          <div style="font-size:0.75rem;color:#e91e63;margin-top:10px;text-align:center;opacity:0.7;">随机选择一个已启用的角色执行后台活动</div>
         </div>
       </div>
     </div>
 
     <!-- 收藏分组选择弹窗 -->
-    <div
-      class="favorite-group-modal"
-      id="favoriteGroupModal"
-      onclick="if(event.target===this)closeFavoriteGroupModal()"
-    >
+    <div class="favorite-group-modal" id="favoriteGroupModal" onclick="if(event.target===this)closeFavoriteGroupModal()">
       <div class="favorite-group-content">
         <div class="favorite-group-header">选择收藏分组</div>
         <div class="favorite-group-list" id="favoriteGroupList">
@@ -41057,18 +40172,8 @@ ${userName}在你的动态下留言了，你需要回复。
           <span>新建分组</span>
         </div>
         <div class="favorite-group-footer">
-          <button
-            class="favorite-group-btn cancel"
-            onclick="closeFavoriteGroupModal()"
-          >
-            取消
-          </button>
-          <button
-            class="favorite-group-btn confirm"
-            onclick="confirmFavorite()"
-          >
-            确定
-          </button>
+          <button class="favorite-group-btn cancel" onclick="closeFavoriteGroupModal()">取消</button>
+          <button class="favorite-group-btn confirm" onclick="confirmFavorite()">确定</button>
         </div>
       </div>
     </div>
@@ -41716,34 +40821,12 @@ ${userName}在你的动态下留言了，你需要回复。
       id="voiceMessageModal"
       onclick="if(event.target===this)closeVoiceMessageModal()"
     >
-      <div class="send-image-options" style="max-width: 320px">
+      <div class="send-image-options" style="max-width:320px;">
         <div class="send-image-title">🎤 发送语音消息</div>
-        <div style="padding: 0 20px 20px">
-          <div
-            style="
-              width: 60px;
-              height: 60px;
-              margin: 0 auto 16px;
-              background: linear-gradient(135deg, #fce4ec, #f8bbd9);
-              border-radius: 50%;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-            "
-          >
-            <svg
-              width="30"
-              height="30"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#ec407a"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path
-                d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"
-              ></path>
+        <div style="padding:0 20px 20px;">
+          <div style="width:60px;height:60px;margin:0 auto 16px;background:linear-gradient(135deg,#fce4ec,#f8bbd9);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#ec407a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
               <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
               <line x1="12" y1="19" x2="12" y2="23"></line>
               <line x1="8" y1="23" x2="16" y2="23"></line>
@@ -41752,63 +40835,14 @@ ${userName}在你的动态下留言了，你需要回复。
           <textarea
             id="voiceMessageInput"
             placeholder="输入你想说的话..."
-            style="
-              width: 100%;
-              height: 80px;
-              border: 2px solid rgba(236, 64, 122, 0.2);
-              border-radius: 12px;
-              padding: 12px;
-              font-size: 1rem;
-              resize: none;
-              box-sizing: border-box;
-              outline: none;
-              font-family: inherit;
-            "
+            style="width:100%;height:80px;border:2px solid rgba(236,64,122,0.2);border-radius:12px;padding:12px;font-size:1rem;resize:none;box-sizing:border-box;outline:none;font-family:inherit;"
             onfocus="this.style.borderColor='#f48fb1'"
             onblur="this.style.borderColor='rgba(236,64,122,0.2)'"
           ></textarea>
-          <div
-            style="
-              text-align: center;
-              font-size: 0.8rem;
-              color: #999;
-              margin: 10px 0 16px;
-            "
-          >
-            输入内容会转换成语音消息发送
-          </div>
-          <div style="display: flex; gap: 12px">
-            <button
-              onclick="closeVoiceMessageModal()"
-              style="
-                flex: 1;
-                padding: 12px;
-                border-radius: 12px;
-                font-size: 1rem;
-                background: #f5f5f5;
-                color: #666;
-                border: none;
-                cursor: pointer;
-              "
-            >
-              取消
-            </button>
-            <button
-              onclick="sendVoiceMessage()"
-              style="
-                flex: 1;
-                padding: 12px;
-                border-radius: 12px;
-                font-size: 1rem;
-                background: linear-gradient(135deg, #f48fb1, #ec407a);
-                color: #fff;
-                border: none;
-                cursor: pointer;
-                box-shadow: 0 4px 12px rgba(236, 64, 122, 0.3);
-              "
-            >
-              发送语音
-            </button>
+          <div style="text-align:center;font-size:0.8rem;color:#999;margin:10px 0 16px;">输入内容会转换成语音消息发送</div>
+          <div style="display:flex;gap:12px;">
+            <button onclick="closeVoiceMessageModal()" style="flex:1;padding:12px;border-radius:12px;font-size:1rem;background:#f5f5f5;color:#666;border:none;cursor:pointer;">取消</button>
+            <button onclick="sendVoiceMessage()" style="flex:1;padding:12px;border-radius:12px;font-size:1rem;background:linear-gradient(135deg,#f48fb1,#ec407a);color:#fff;border:none;cursor:pointer;box-shadow:0 4px 12px rgba(236,64,122,0.3);">发送语音</button>
           </div>
         </div>
       </div>
