@@ -833,8 +833,18 @@
               background: rgba(255, 255, 255, 0.6);
               backdrop-filter: blur(10px);
               -webkit-backdrop-filter: blur(10px);
+              z-index: 1;
             }
 
+            .chat-title {
+              position: absolute;
+              left: 50%;
+              transform: translateX(-50%);
+              font-size: 1.1rem;
+              font-weight: 600;
+              color: var(--text-primary);
+            }
+            
             /* Tab页面独立返回按钮 */
             .tab-back-btn {
               position: fixed;
@@ -872,6 +882,9 @@
               position: sticky;
               top: 0;
               z-index: 10;
+              margin: 0 -12px; /* 抵消父容器的padding铺满两边 */
+              width: calc(100% + 24px);
+              box-sizing: border-box;
             }
             .tab-header-back {
               width: 36px;
@@ -889,11 +902,15 @@
               justify-content: center;
               box-shadow: 0 2px 8px rgba(0,0,0,0.06);
               transition: transform 0.2s;
+              z-index: 1;
             }
             .tab-header-back:active {
               transform: scale(0.95);
             }
             .tab-header-title {
+              position: absolute;
+              left: 50%;
+              transform: translateX(-50%);
               font-size: 1.1rem;
               font-weight: 600;
               color: var(--text-primary);
@@ -2894,11 +2911,13 @@
             .favorites-header {
               display: flex;
               align-items: center;
+              justify-content: space-between;
               padding: 14px 16px;
               padding-top: calc(14px + env(safe-area-inset-top, 20px));
               background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%);
               border-bottom: none;
               box-shadow: 0 2px 8px rgba(236, 64, 122, 0.15);
+              position: relative;
             }
             .favorites-back {
               background: rgba(255,255,255,0.3);
@@ -2910,18 +2929,21 @@
               border-radius: 8px;
               backdrop-filter: blur(10px);
               transition: all 0.2s;
+              min-width: 40px;
+              z-index: 1;
             }
             .favorites-back:active {
               background: rgba(255,255,255,0.5);
               transform: scale(0.95);
             }
             .favorites-title {
-              flex: 1;
+              position: absolute;
+              left: 50%;
+              transform: translateX(-50%);
               font-size: 1.1rem;
               font-weight: 600;
               color: #ad1457;
               text-align: center;
-              margin-right: 40px;
             }
             .favorites-add-group {
               background: rgba(255,255,255,0.4);
@@ -4730,6 +4752,8 @@
               background: #f5f5f5;
               min-height: 100%;
               overflow: hidden;
+              margin: 0 -12px; /* 抵消父容器的padding */
+              width: calc(100% + 24px);
             }
 
             .profile-header-card {
@@ -13254,8 +13278,6 @@
 
           <!-- Moments Tab (QQ空间风格动态) -->
           <div class="chat-tab-content" id="momentsTab">
-            <!-- 返回按钮 -->
-            <button class="tab-back-btn" onclick="closePage('chatPage')">←</button>
             <!-- 个人名片区域 -->
             <div class="moment-profile-card">
               <div class="moment-cover" id="momentCover" onclick="changeMomentCover()">
