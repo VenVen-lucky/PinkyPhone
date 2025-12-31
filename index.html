@@ -23011,6 +23011,46 @@ ${memberInfos
 
         let html = "";
 
+        // 获取角色最后消息时间戳的函数
+        const getLastMessageTime = (char) => {
+          // 优先使用角色自身保存的时间戳
+          if (char.lastTimestamp) {
+            return char.lastTimestamp;
+          }
+          // 否则从聊天记录获取
+          const history = chatHistories[char.id];
+          if (history && history.length > 0) {
+            const lastMsg = history[history.length - 1];
+            return lastMsg.timestamp || 0;
+          }
+          return 0;
+        };
+
+        // 对非置顶角色按最后消息时间排序（新消息在前）
+        normalChars.sort((a, b) => {
+          const timeA = getLastMessageTime(a);
+          const timeB = getLastMessageTime(b);
+          return timeB - timeA;
+        });
+
+        // 对分组内的角色也排序
+        Object.keys(groupedChars).forEach(groupName => {
+          groupedChars[groupName].sort((a, b) => {
+            const timeA = getLastMessageTime(a);
+            const timeB = getLastMessageTime(b);
+            return timeB - timeA;
+          });
+        });
+
+        // 对群聊也按时间排序
+        if (groupChats && groupChats.length > 0) {
+          groupChats.sort((a, b) => {
+            const timeA = a.lastTimestamp || 0;
+            const timeB = b.lastTimestamp || 0;
+            return timeB - timeA;
+          });
+        }
+
         // 先渲染群聊
         if (groupChats && groupChats.length > 0) {
           html += groupChats.map((group) => renderGroupCard(group)).join("");
@@ -24637,8 +24677,10 @@ ${memberInfos
 11. **发动态**：格式为 [发动态:动态内容]
    - 当用户让你发朋友圈/发动态时，使用此格式
    - **重要：必须用方括号包裹，内容写在冒号后面！**
-   - ✓正确：好的！ ||| [发动态:今天天气真好，和小姐姐一起看日落🌅 #美好的一天]
-   - ✗错误：直接写动态内容（不要用markdown格式、不要用**加粗**、不要用>引用）
+   - **禁止使用#话题标签、@提及，像真人发朋友圈一样自然**
+   - 如果想配图，在内容末尾加 [图片:描述]
+   - ✓正确：好的！ ||| [发动态:今天天气真好，和宝贝一起看日落🌅 [图片:夕阳西下的美景]]
+   - ✗错误：使用#话题 或 @某人
 
 **核心规则：所有方括号[]格式的特殊标签，都必须用|||与普通文字分开，不能连在一起写！**
 `;
@@ -24712,10 +24754,19 @@ ${memberInfos
                   };
                 }
 
+                // 处理带引用的消息
+                let msgContent = m.content;
+                if (m.quote && m.quote.content) {
+                  // 告诉AI用户引用了什么消息
+                  const quoteSender = m.quote.senderRole === 'user' ? '自己' : (settings.charName || char.name);
+                  msgContent = `[用户引用了${quoteSender}之前说的："${m.quote.displayContent || m.quote.content}"]
+${m.content}`;
+                }
+
                 // 普通消息
                 return {
                   role: m.role === "user" ? "user" : "assistant",
-                  content: m.content,
+                  content: msgContent,
                 };
               })
               .filter((m) => m.content), // 过滤空消息
@@ -24833,21 +24884,43 @@ ${memberInfos
             // 进一步分割：把特殊标签分离成单独的消息
             replyParts = replyParts.flatMap((part) => {
               // 匹配所有特殊标签：表情包、转账、红包、位置、语音、撤回、收款、退款、打电话、图片、发动态
-              // 使用更精确的正则，确保标签能被正确分离
+              // 图片和发动态标签内容可能包含其他标签，需要特殊处理
               const specialTagRegex =
-                /(\[(sticker|表情|表情包|转账|红包|位置|语音|打电话|图片|发动态)[：:][^\]]+\]|\[撤回\]|\[收款\]|\[退款\])/gi;
+                /(\[(sticker|表情|表情包|转账|红包|位置|语音|打电话)[：:][^\]]+\]|\[(图片|发动态)[：:].+?\](?=\s|$|[^\]]||||)|\[撤回\]|\[收款\]|\[退款\])/gi;
               
               // 先找出所有特殊标签的位置
               const tags = [];
               let match;
-              const regex = new RegExp(specialTagRegex.source, 'gi');
-              while ((match = regex.exec(part)) !== null) {
+              
+              // 单独处理图片和发动态标签（它们的内容可能更复杂）
+              const imgRegex = /\[(图片|发动态)[：:]([^\]]*(?:\[[^\]]*\][^\]]*)*)\]/gi;
+              while ((match = imgRegex.exec(part)) !== null) {
                 tags.push({
                   tag: match[0],
                   start: match.index,
                   end: match.index + match[0].length
                 });
               }
+              
+              // 处理其他简单标签
+              const simpleTagRegex = /(\[(sticker|表情|表情包|转账|红包|位置|语音|打电话)[：:][^\]]+\]|\[撤回\]|\[收款\]|\[退款\])/gi;
+              while ((match = simpleTagRegex.exec(part)) !== null) {
+                // 检查是否和已有标签重叠
+                const overlaps = tags.some(t => 
+                  (match.index >= t.start && match.index < t.end) ||
+                  (match.index + match[0].length > t.start && match.index + match[0].length <= t.end)
+                );
+                if (!overlaps) {
+                  tags.push({
+                    tag: match[0],
+                    start: match.index,
+                    end: match.index + match[0].length
+                  });
+                }
+              }
+              
+              // 按位置排序
+              tags.sort((a, b) => a.start - b.start);
               
               // 如果没有特殊标签，直接返回原内容
               if (tags.length === 0) {
@@ -24862,7 +24935,7 @@ ${memberInfos
                 // 添加标签前的文本
                 if (tag.start > lastEnd) {
                   const text = part.slice(lastEnd, tag.start).trim();
-                  if (text) segments.push(text);
+                  if (text && text !== ']') segments.push(text);
                 }
                 // 添加标签本身
                 segments.push(tag.tag);
@@ -24872,7 +24945,7 @@ ${memberInfos
               // 添加最后一个标签后的文本
               if (lastEnd < part.length) {
                 const text = part.slice(lastEnd).trim();
-                if (text) segments.push(text);
+                if (text && text !== ']') segments.push(text);
               }
               
               return segments;
@@ -24887,6 +24960,9 @@ ${memberInfos
                   )
               )
               .join("，");
+
+            // 过滤掉单独的方括号或空内容
+            replyParts = replyParts.filter(p => p && p.trim() !== ']' && p.trim() !== '[' && p.trim().length > 0);
 
             for (let i = 0; i < replyParts.length; i++) {
               await new Promise((resolve) =>
@@ -25197,6 +25273,7 @@ ${memberInfos
             hour: "2-digit",
             minute: "2-digit",
           });
+          char.lastTimestamp = Date.now(); // 添加时间戳用于排序
           localforage.setItem("characters", characters);
           renderCharacters();
         }
@@ -30627,10 +30704,7 @@ ${memberInfos
           "zh-CN",
           { hour: "2-digit", minute: "2-digit" }
         );
-
-        // 移到置顶 (像微信一样，最新消息排最前) - 可选
-        // const updatedChar = characters.splice(charIndex, 1)[0];
-        // characters.unshift(updatedChar);
+        characters[charIndex].lastTimestamp = Date.now(); // 添加时间戳用于排序
 
         localforage.setItem("characters", characters);
         renderCharacters(); // 刷新列表界面
@@ -39273,7 +39347,7 @@ ${postsContext}
 
 # 输出格式 (必须是JSON数组):
 - 发消息: [{"type":"message","content":"消息内容"}]
-- 发动态: [{"type":"post","content":"动态内容"}]
+- 发动态: [{"type":"post","content":"动态内容"}] 或带图片 [{"type":"post","content":"动态内容 [图片:图片描述]"}]
 - 评论: [{"type":"comment","postId":123,"content":"评论内容"}]
 - 点赞: [{"type":"like","postId":123}]
 - 不行动: [{"type":"skip"}]
@@ -39281,6 +39355,8 @@ ${postsContext}
 注意：
 - 内容要简短自然，符合角色性格
 - 发消息时可以发多条，模拟真人聊天习惯
+- 发动态时禁止使用#话题标签、@提及
+- 如果想配图，在内容末尾加 [图片:描述] 格式
 - 绝对禁止输出JSON以外的任何文字`;
 
         try {
@@ -39498,14 +39574,32 @@ ${postsContext}
 
         const charName = char.note || char.name;
 
+        // 解析图片标签 [图片:描述] 
+        let textContent = content;
+        let imageDescription = null;
+        
+        // 匹配 [图片:描述] 格式，兼容结尾没有]的情况
+        // 优先匹配完整格式 [图片:xxx]
+        let imageMatch = content.match(/\[图片[:：]([^\[]+)\]/i);
+        if (!imageMatch) {
+          // 如果没有结尾]，匹配到字符串末尾
+          imageMatch = content.match(/\[图片[:：](.+)$/i);
+        }
+        
+        if (imageMatch) {
+          imageDescription = imageMatch[1].trim();
+          // 从内容中移除图片标签（包括可能缺少]的情况）
+          textContent = content.replace(/\[图片[:：][^\[]*\]?/gi, '').trim();
+        }
+
         // 创建动态
         const newPost = {
           id: Date.now(),
           authorId: String(charId),
           isUser: false,
-          content: content,
+          content: textContent,
           image: null,
-          textImage: null,
+          textImage: imageDescription, // 使用图片描述
           timestamp: Date.now(),
           likes: [],
           comments: [],
@@ -39519,10 +39613,11 @@ ${postsContext}
         // 更新未读计数
         incrementUnreadMoments();
 
-        // 发送通知
-        showMomentNotification(char, content);
+        // 发送通知（只显示文字内容）
+        const notifyContent = textContent || (imageDescription ? `[图片] ${imageDescription}` : '发布了新动态');
+        showMomentNotification(char, notifyContent);
 
-        console.log(`${charName}发布了新动态: ${content}`);
+        console.log(`${charName}发布了新动态: ${textContent || imageDescription}`);
         renderMomentsUI();
 
         return newPost;
