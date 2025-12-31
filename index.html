@@ -5217,10 +5217,14 @@
               background: #fdf5f7;
               background-image: radial-gradient(circle, rgba(244,143,177,0.15) 2px, transparent 2px);
               background-size: 20px 20px;
+              display: flex;
+              flex-direction: column;
+              height: 100%;
             }
             #companionPage .page-header {
               background: transparent;
               margin-bottom: 0;
+              flex-shrink: 0;
             }
             
             /* Tab切换 */
@@ -5228,6 +5232,8 @@
               display: flex;
               background: #fff;
               border-bottom: 1px solid #f0f0f0;
+              margin-top: 8px;
+              flex-shrink: 0;
             }
             .companion-tab {
               flex: 1;
@@ -5283,13 +5289,6 @@
               width: 1px;
               height: 40px;
               background: rgba(255,255,255,0.3);
-            }
-            
-            /* 陪伴记录页面 */
-            .companion-history {
-              padding: 16px;
-              overflow-y: auto;
-              height: calc(100% - 110px);
             }
             
             /* 日历 */
@@ -5456,8 +5455,15 @@
             
             .companion-setup {
               padding: 16px;
+              padding-bottom: 100px;
               overflow-y: auto;
-              height: calc(100% - 110px);
+              flex: 1;
+            }
+            .companion-history {
+              padding: 16px;
+              padding-bottom: 100px;
+              overflow-y: auto;
+              flex: 1;
             }
             .companion-section {
               background: #fff;
