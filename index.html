@@ -5220,13 +5220,7 @@
             }
             #companionPage .page-header {
               background: transparent;
-              min-height: auto;
-              padding: 12px 16px;
-            }
-            #companionPage .page-header .back-btn {
-              position: relative;
-              top: 0;
-              left: 0;
+              margin-bottom: 0;
             }
             
             /* Tab切换 */
@@ -38564,28 +38558,52 @@ ${persona ? `你的人设: ${persona}` : ""}
         const char = characters.find(c => String(c.id) === String(companionState.charId));
         if (!char) return;
         
-        const settings = chatSettings[companionState.charId] || {};
+        const charId = companionState.charId;
+        const settings = chatSettings[charId] || {};
         const charName = char.note || char.name || 'AI';
         const task = companionState.task;
         const remainMins = Math.floor(companionState.remainingSeconds / 60);
         const totalMins = companionState.duration;
         const elapsedMins = Math.floor((companionState.totalSeconds - companionState.remainingSeconds) / 60);
         
-        const persona = settings.systemPrompt || char.description || '';
+        // 获取完整人设（和普通聊天一样）
+        const persona = settings.systemPrompt || settings.persona || char.description || '';
         
-        let prompt = '';
-        if (type === 'start') {
-          prompt = `用户开始${task}了（${totalMins}分钟）。用中文简短说一句加油的话。`;
-        } else if (type === 'encourage') {
-          prompt = `用户${task}中，已${elapsedMins}分钟，剩${remainMins}分钟。用中文简短鼓励一句。`;
-        } else if (type === 'complete') {
-          prompt = `用户完成${task}了！${totalMins}分钟！用中文简短夸一句。`;
-        } else if (type === 'quit') {
-          prompt = `用户停下${task}了。用中文简短安慰一句。`;
+        // 获取世界书内容
+        let worldbookContent = '';
+        const worldbookIds = settings.worldbook ? settings.worldbook.split(',').filter(s => s) : [];
+        if (worldbookIds.length > 0) {
+          worldbookContent = getWorldbookContentForAI(worldbookIds, task + ' 陪伴 鼓励');
         }
         
-        const systemPrompt = `你是${charName}。${persona || ''}
-陪伴用户${task}中。要求：用中文回复，像朋友说话，一句话就好，不要方括号，代入角色。`;
+        // 构建提示词
+        let situationPrompt = '';
+        if (type === 'start') {
+          situationPrompt = `用户刚刚开始${task}，计划进行${totalMins}分钟。请用你的方式说一句话给用户加油打气，表示你会陪着ta。`;
+        } else if (type === 'encourage') {
+          situationPrompt = `用户正在${task}中，已经坚持了${elapsedMins}分钟，还剩${remainMins}分钟。请用你的方式说一句鼓励的话，可以夸ta坚持得好，或提醒ta喝水休息。`;
+        } else if (type === 'complete') {
+          situationPrompt = `太棒了！用户完成了${task}，总共坚持了${totalMins}分钟！请用你的方式热情地表扬ta！`;
+        } else if (type === 'quit') {
+          situationPrompt = `用户中途停下了${task}，坚持了${elapsedMins}分钟。请用你的方式温柔地安慰ta，告诉ta没关系。`;
+        }
+        
+        const systemPrompt = `【角色设定 - 必须严格遵守】
+你是「${charName}」。
+
+【你的人设】
+${persona || `你是${charName}，性格温柔体贴。`}
+${worldbookContent ? `\n【世界观/背景设定】\n${worldbookContent}` : ''}
+
+【当前场景】
+你正在陪伴用户${task}。
+
+【回复要求】
+1. 必须完全代入「${charName}」的角色，保持人设中的性格、说话风格、口癖
+2. 用中文回复，简短自然，1-2句话
+3. 不要使用方括号[]、星号*等特殊格式
+4. 不要说"作为AI"、"作为一个"之类出戏的话
+5. 像真正的朋友/恋人一样说话`;
 
         try {
           const apiKey = settings.apiKey || (window.voiceConfig && window.voiceConfig.apiKey) || '';
@@ -38607,7 +38625,7 @@ ${persona ? `你的人设: ${persona}` : ""}
               model: model,
               messages: [
                 { role: 'system', content: systemPrompt },
-                { role: 'user', content: prompt }
+                { role: 'user', content: situationPrompt }
               ]
             })
           });
@@ -38840,26 +38858,42 @@ ${persona ? `你的人设: ${persona}` : ""}
         
         await localforage.setItem('chatHistories', chatHistories);
         
-        // 生成AI的后续对话
+        // 生成AI的后续对话 - 使用完整人设
         const settings = chatSettings[charId] || {};
         const charName = char.note || char.name || 'AI';
-        const persona = settings.systemPrompt || char.description || '';
+        const persona = settings.systemPrompt || settings.persona || char.description || '';
         
-        let contextInfo = `刚才你陪伴用户${task}了${completed ? totalMins : actualMins}分钟，用户${completed ? '完成了' : '中途停了'}。`;
-        if (chatSummary) {
-          contextInfo += `\n陪伴中你们聊过：\n${chatSummary}`;
+        // 获取世界书内容
+        let worldbookContent = '';
+        const worldbookIds = settings.worldbook ? settings.worldbook.split(',').filter(s => s) : [];
+        if (worldbookIds.length > 0) {
+          worldbookContent = getWorldbookContentForAI(worldbookIds, task + ' 陪伴 完成');
         }
         
-        const prompt = completed 
-          ? `用户完成了${task}！用中文简短地夸一下ta，像朋友聊天一样。`
-          : `用户停下了${task}，用中文简短地关心一下ta。`;
+        let contextInfo = `【刚才发生的事】你陪伴用户${task}了${completed ? totalMins : actualMins}分钟，用户${completed ? '成功完成了！' : '中途停下了'}。`;
+        if (chatSummary) {
+          contextInfo += `\n在陪伴过程中你们的对话：\n${chatSummary}`;
+        }
         
-        const systemPrompt = `你是${charName}。
-${persona || ''}
+        const situationPrompt = completed 
+          ? `用户刚刚完成了${task}！请用你的方式主动和用户聊天，可以继续表扬、关心ta的感受、或者聊聊相关话题。`
+          : `用户中途停下了${task}。请用你的方式主动关心用户，安慰ta、问问ta是不是累了或有什么事。`;
+        
+        const systemPrompt = `【角色设定 - 必须严格遵守】
+你是「${charName}」。
+
+【你的人设】
+${persona || `你是${charName}，性格温柔体贴。`}
+${worldbookContent ? `\n【世界观/背景设定】\n${worldbookContent}` : ''}
 
 ${contextInfo}
 
-要求：用中文回复，像朋友聊天，1-2句话，不要长，不要方括号，代入角色。`;
+【回复要求】
+1. 必须完全代入「${charName}」的角色，保持人设中的性格、说话风格、口癖
+2. 用中文回复，简短自然，1-2句话即可
+3. 不要使用方括号[]、星号*等特殊格式
+4. 不要说"作为AI"、"作为一个"之类出戏的话
+5. 像真正的朋友/恋人一样自然聊天`;
 
         try {
           const apiKey = settings.apiKey || (window.voiceConfig && window.voiceConfig.apiKey) || '';
@@ -38877,7 +38911,7 @@ ${contextInfo}
                 model: model,
                 messages: [
                   { role: 'system', content: systemPrompt },
-                  { role: 'user', content: prompt }
+                  { role: 'user', content: situationPrompt }
                 ]
               })
             });
@@ -38950,15 +38984,39 @@ ${contextInfo}
         const char = characters.find(c => String(c.id) === String(companionState.charId));
         if (!char) return;
         
-        const settings = chatSettings[companionState.charId] || {};
+        const charId = companionState.charId;
+        const settings = chatSettings[charId] || {};
         const charName = char.note || char.name || 'AI';
-        const persona = settings.systemPrompt || char.description || '';
+        const persona = settings.systemPrompt || settings.persona || char.description || '';
         const remainMins = Math.floor(companionState.remainingSeconds / 60);
         const elapsedMins = Math.floor((companionState.totalSeconds - companionState.remainingSeconds) / 60);
         
-        const systemPrompt = `你是${charName}。${persona || ''}
-陪伴用户${companionState.task}中（${elapsedMins}分钟了，剩${remainMins}分钟）。用户想休息聊聊。
-要求：用中文回复，像朋友聊天，简短自然，不要方括号，代入角色。`;
+        // 获取世界书内容
+        let worldbookContent = '';
+        const worldbookIds = settings.worldbook ? settings.worldbook.split(',').filter(s => s) : [];
+        if (worldbookIds.length > 0) {
+          // 用聊天内容匹配关键词
+          const chatContent = companionState.chatMessages.map(m => m.content).join(' ');
+          worldbookContent = getWorldbookContentForAI(worldbookIds, chatContent);
+        }
+        
+        const systemPrompt = `【角色设定 - 必须严格遵守】
+你是「${charName}」。
+
+【你的人设】
+${persona || `你是${charName}，性格温柔体贴。`}
+${worldbookContent ? `\n【世界观/背景设定】\n${worldbookContent}` : ''}
+
+【当前场景】
+你正在陪伴用户${companionState.task}（已进行${elapsedMins}分钟，还剩${remainMins}分钟）。
+用户想休息一下和你聊聊天。
+
+【回复要求】
+1. 必须完全代入「${charName}」的角色，保持人设中的性格、说话风格、口癖
+2. 用中文回复，简短自然
+3. 不要使用方括号[]、星号*等特殊格式
+4. 不要说"作为AI"之类出戏的话
+5. 像真正的朋友/恋人一样自然聊天`;
 
         try {
           const apiKey = settings.apiKey || (window.voiceConfig && window.voiceConfig.apiKey) || '';
@@ -38991,7 +39049,7 @@ ${contextInfo}
           
           const data = await response.json();
           let reply = data.choices?.[0]?.message?.content || '嗯嗯，我在听~';
-          reply = reply.replace(/\[.*?\]/g, '').trim();
+          reply = reply.replace(/\[.*?\]/g, '').replace(/\*.*?\*/g, '').trim();
           
           companionState.chatMessages.push({ role: 'ai', content: reply });
           renderCompanionChatMessages();
