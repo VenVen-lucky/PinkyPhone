@@ -5212,7 +5212,863 @@
               box-shadow: 0 2px 8px rgba(244, 143, 177, 0.4);
             }
 
+            /* ==================== 陪伴APP样式 ==================== */
+            #companionPage {
+              background: linear-gradient(180deg, #fef8fa 0%, #fff 100%);
+            }
+            #companionPage {
+              background: #fdf5f7;
+              background-image: radial-gradient(circle, rgba(244,143,177,0.15) 2px, transparent 2px);
+              background-size: 20px 20px;
+            }
+            #companionPage .page-header {
+              background: transparent;
+              padding-top: env(safe-area-inset-top, 12px);
+            }
+            
+            /* Tab切换 */
+            .companion-tabs {
+              display: flex;
+              background: #fff;
+              border-bottom: 1px solid #f0f0f0;
+            }
+            .companion-tab {
+              flex: 1;
+              text-align: center;
+              padding: 14px;
+              font-size: 0.95rem;
+              color: #999;
+              cursor: pointer;
+              position: relative;
+              transition: all 0.2s;
+            }
+            .companion-tab.active {
+              color: #ec407a;
+              font-weight: 600;
+            }
+            .companion-tab.active::after {
+              content: '';
+              position: absolute;
+              bottom: 0;
+              left: 50%;
+              transform: translateX(-50%);
+              width: 40px;
+              height: 3px;
+              background: linear-gradient(90deg, #f48fb1, #ec407a);
+              border-radius: 2px;
+            }
+            
+            /* 统计卡片 */
+            .companion-stats-card {
+              background: linear-gradient(135deg, #ec407a, #f48fb1);
+              border-radius: 16px;
+              padding: 20px;
+              display: flex;
+              justify-content: space-around;
+              align-items: center;
+              margin-bottom: 14px;
+              box-shadow: 0 4px 15px rgba(236,64,122,0.3);
+            }
+            .companion-stat-item {
+              text-align: center;
+            }
+            .companion-stat-value {
+              font-size: 1.8rem;
+              font-weight: 700;
+              color: #fff;
+            }
+            .companion-stat-label {
+              font-size: 0.75rem;
+              color: rgba(255,255,255,0.85);
+              margin-top: 4px;
+            }
+            .companion-stat-divider {
+              width: 1px;
+              height: 40px;
+              background: rgba(255,255,255,0.3);
+            }
+            
+            /* 陪伴记录页面 */
+            .companion-history {
+              padding: 16px;
+              overflow-y: auto;
+              height: calc(100% - 110px);
+            }
+            
+            /* 日历 */
+            .companion-calendar-section {
+              background: #fff;
+              border-radius: 16px;
+              padding: 16px;
+              margin-bottom: 16px;
+              box-shadow: 0 2px 10px rgba(236,64,122,0.08);
+            }
+            .companion-calendar-header {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 12px;
+            }
+            .companion-calendar-header span {
+              font-weight: 600;
+              color: #333;
+            }
+            .companion-calendar-nav {
+              background: none;
+              border: none;
+              font-size: 1.5rem;
+              color: #ec407a;
+              cursor: pointer;
+              padding: 0 10px;
+            }
+            .companion-calendar-weekdays {
+              display: grid;
+              grid-template-columns: repeat(7, 1fr);
+              text-align: center;
+              font-size: 0.75rem;
+              color: #999;
+              margin-bottom: 8px;
+            }
+            .companion-calendar-days {
+              display: grid;
+              grid-template-columns: repeat(7, 1fr);
+              gap: 4px;
+            }
+            .companion-calendar-day {
+              aspect-ratio: 1;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 0.85rem;
+              border-radius: 50%;
+              cursor: pointer;
+              position: relative;
+            }
+            .companion-calendar-day.other-month {
+              color: #ccc;
+            }
+            .companion-calendar-day.today {
+              background: #fce4ec;
+              color: #ec407a;
+              font-weight: 600;
+            }
+            .companion-calendar-day.has-record::after {
+              content: '';
+              position: absolute;
+              bottom: 2px;
+              width: 6px;
+              height: 6px;
+              background: #ec407a;
+              border-radius: 50%;
+            }
+            .companion-calendar-day.selected {
+              background: linear-gradient(135deg, #f48fb1, #ec407a);
+              color: #fff;
+            }
+            .companion-calendar-day.selected::after {
+              background: #fff;
+            }
+            
+            /* 记录列表 */
+            .companion-history-list {
+              display: flex;
+              flex-direction: column;
+              gap: 12px;
+            }
+            .companion-history-item {
+              background: #fff;
+              border-radius: 14px;
+              padding: 14px;
+              display: flex;
+              gap: 12px;
+              box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            }
+            .companion-history-avatar {
+              width: 48px;
+              height: 48px;
+              border-radius: 50%;
+              background: linear-gradient(135deg, #fce4ec, #f8bbd9);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 22px;
+              overflow: hidden;
+              flex-shrink: 0;
+            }
+            .companion-history-avatar img {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+            }
+            .companion-history-content {
+              flex: 1;
+              min-width: 0;
+            }
+            .companion-history-header {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 4px;
+            }
+            .companion-history-task {
+              font-weight: 600;
+              color: #333;
+              font-size: 0.95rem;
+            }
+            .companion-history-status {
+              font-size: 0.75rem;
+              padding: 2px 8px;
+              border-radius: 10px;
+            }
+            .companion-history-status.complete {
+              background: #e8f5e9;
+              color: #388e3c;
+            }
+            .companion-history-status.quit {
+              background: #fff3e0;
+              color: #f57c00;
+            }
+            .companion-history-meta {
+              display: flex;
+              gap: 12px;
+              font-size: 0.8rem;
+              color: #999;
+            }
+            .companion-history-char {
+              color: #ec407a;
+            }
+            
+            /* 空状态 */
+            .companion-history-empty {
+              text-align: center;
+              padding: 60px 20px;
+            }
+            .companion-history-empty .empty-icon {
+              font-size: 4rem;
+              margin-bottom: 16px;
+            }
+            .companion-history-empty .empty-text {
+              font-size: 1.1rem;
+              color: #666;
+              margin-bottom: 8px;
+            }
+            .companion-history-empty .empty-hint {
+              font-size: 0.85rem;
+              color: #999;
+            }
+            
+            .companion-setup {
+              padding: 16px;
+              overflow-y: auto;
+              height: calc(100% - 110px);
+            }
+            .companion-section {
+              background: #fff;
+              border-radius: 16px;
+              padding: 16px;
+              margin-bottom: 14px;
+              box-shadow: 0 2px 10px rgba(236,64,122,0.08);
+            }
+            .companion-section-title {
+              font-weight: 600;
+              color: #ad1457;
+              margin-bottom: 12px;
+              font-size: 0.95rem;
+            }
+            .companion-char-select {
+              display: flex;
+              gap: 12px;
+              overflow-x: auto;
+              padding: 4px 0;
+            }
+            .companion-char-item {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              gap: 6px;
+              cursor: pointer;
+              min-width: 70px;
+            }
+            .companion-char-item .avatar {
+              width: 56px;
+              height: 56px;
+              border-radius: 50%;
+              background: linear-gradient(135deg, #fce4ec, #f8bbd9);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 24px;
+              border: 3px solid transparent;
+              transition: all 0.2s;
+              overflow: hidden;
+            }
+            .companion-char-item .avatar img {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+            }
+            .companion-char-item.selected .avatar {
+              border-color: #ec407a;
+              box-shadow: 0 0 0 3px rgba(236,64,122,0.2);
+            }
+            .companion-char-item .name {
+              font-size: 0.75rem;
+              color: #666;
+              max-width: 60px;
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+              text-align: center;
+            }
+            .companion-input {
+              width: 100%;
+              padding: 12px 14px;
+              border: 2px solid #f0f0f0;
+              border-radius: 12px;
+              font-size: 0.95rem;
+              transition: all 0.2s;
+              box-sizing: border-box;
+            }
+            .companion-input:focus {
+              outline: none;
+              border-color: #f48fb1;
+            }
+            .companion-task-presets {
+              display: flex;
+              flex-wrap: wrap;
+              gap: 8px;
+              margin-top: 10px;
+            }
+            .companion-task-tag, .companion-duration-tag, .companion-freq-tag {
+              padding: 8px 14px;
+              background: #fce4ec;
+              border-radius: 20px;
+              font-size: 0.85rem;
+              color: #c2185b;
+              cursor: pointer;
+              transition: all 0.2s;
+            }
+            .companion-task-tag:active, .companion-duration-tag:active, .companion-freq-tag:active {
+              transform: scale(0.95);
+            }
+            .companion-duration-tag.active, .companion-freq-tag.active {
+              background: linear-gradient(135deg, #f48fb1, #ec407a);
+              color: #fff;
+            }
+            .companion-duration-select, .companion-freq-select {
+              display: flex;
+              flex-wrap: wrap;
+              gap: 8px;
+            }
+            .companion-start-btn {
+              width: 100%;
+              padding: 16px;
+              background: linear-gradient(135deg, #f48fb1, #ec407a);
+              color: #fff;
+              border: none;
+              border-radius: 16px;
+              font-size: 1.1rem;
+              font-weight: 600;
+              cursor: pointer;
+              box-shadow: 0 4px 15px rgba(236,64,122,0.35);
+              margin-top: 10px;
+            }
+            .companion-start-btn:active {
+              transform: scale(0.98);
+            }
+            
+            /* 背景列表区 */
+            .companion-bg-list {
+              display: flex;
+              flex-wrap: wrap;
+              gap: 8px;
+              margin-bottom: 10px;
+            }
+            .companion-bg-item {
+              width: 70px;
+              height: 70px;
+              border-radius: 10px;
+              overflow: hidden;
+              position: relative;
+              border: 2px solid transparent;
+            }
+            .companion-bg-item img,
+            .companion-bg-item video {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+            }
+            .companion-bg-item .bg-remove {
+              position: absolute;
+              top: 2px;
+              right: 2px;
+              width: 20px;
+              height: 20px;
+              background: rgba(0,0,0,0.6);
+              color: #fff;
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              cursor: pointer;
+              font-size: 12px;
+            }
+            .companion-bg-item.video::after {
+              content: '▶';
+              position: absolute;
+              bottom: 4px;
+              left: 4px;
+              background: rgba(0,0,0,0.6);
+              color: #fff;
+              font-size: 10px;
+              padding: 2px 5px;
+              border-radius: 4px;
+            }
+            .companion-bg-add {
+              width: 70px;
+              height: 70px;
+              border-radius: 10px;
+              border: 2px dashed #ddd;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+              cursor: pointer;
+              color: #999;
+              font-size: 0.7rem;
+              gap: 2px;
+            }
+            .companion-bg-add span:first-child {
+              font-size: 1.5rem;
+              line-height: 1;
+            }
+            .companion-bg-add:hover {
+              border-color: #f48fb1;
+              color: #f48fb1;
+            }
+            
+            /* 全屏背景轮播 */
+            .companion-fullscreen-bg {
+              position: absolute;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0;
+              background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+              z-index: 0;
+              overflow: hidden;
+            }
+            .companion-bg-slide {
+              position: absolute;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0;
+              background-size: cover;
+              background-position: center;
+              opacity: 0;
+              transition: opacity 1s ease-in-out;
+            }
+            .companion-bg-slide.active {
+              opacity: 1;
+            }
+            .companion-fullscreen-bg video {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+            }
+            .companion-fullscreen-bg .companion-bg-overlay {
+              position: absolute;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0;
+              background: rgba(0,0,0,0.35);
+            }
+            
+            /* 陪伴进行中界面（全屏沉浸式） */
+            .companion-active {
+              position: fixed;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: space-between;
+              padding: 40px 20px env(safe-area-inset-bottom, 20px);
+              box-sizing: border-box;
+              z-index: 9999;
+            }
+            .companion-fullscreen-bg {
+              position: absolute;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0;
+              background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+              z-index: 0;
+            }
+            .companion-fullscreen-bg img,
+            .companion-fullscreen-bg video {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+            }
+            .companion-fullscreen-bg .companion-bg-overlay {
+              position: absolute;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0;
+              background: rgba(0,0,0,0.4);
+            }
+            .companion-char-display {
+              position: relative;
+              z-index: 1;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              margin-top: 20px;
+            }
+            .companion-char-avatar {
+              width: 80px;
+              height: 80px;
+              border-radius: 50%;
+              background: rgba(255,255,255,0.95);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 36px;
+              box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+              overflow: hidden;
+              border: 3px solid rgba(255,255,255,0.8);
+            }
+            .companion-char-avatar img {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+            }
+            .companion-char-name {
+              margin-top: 10px;
+              font-size: 1rem;
+              font-weight: 600;
+              color: #fff;
+              text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            }
+            .companion-timer-section {
+              position: relative;
+              z-index: 1;
+              text-align: center;
+              flex: 1;
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              align-items: center;
+            }
+            
+            /* 翻页时钟样式 */
+            .flip-clock {
+              display: flex;
+              align-items: center;
+              gap: 8px;
+            }
+            .flip-unit {
+              perspective: 300px;
+            }
+            .flip-card {
+              width: 60px;
+              height: 80px;
+              position: relative;
+              transform-style: preserve-3d;
+            }
+            .flip-card-inner {
+              position: relative;
+              width: 100%;
+              height: 100%;
+            }
+            .flip-card-front,
+            .flip-card-back {
+              position: absolute;
+              width: 100%;
+              height: 100%;
+              background: linear-gradient(180deg, #2d2d2d 0%, #1a1a1a 50%, #2d2d2d 50%, #1a1a1a 100%);
+              border-radius: 8px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 3rem;
+              font-weight: 700;
+              color: #fff;
+              font-family: 'SF Pro Display', -apple-system, sans-serif;
+              box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+              backface-visibility: hidden;
+            }
+            .flip-card-front::after,
+            .flip-card-back::after {
+              content: '';
+              position: absolute;
+              left: 0;
+              right: 0;
+              top: 50%;
+              height: 1px;
+              background: rgba(0,0,0,0.4);
+            }
+            .flip-card.flipping .flip-card-inner {
+              animation: flipCard 0.6s ease-in-out;
+            }
+            @keyframes flipCard {
+              0% { transform: rotateX(0deg); }
+              50% { transform: rotateX(-90deg); }
+              100% { transform: rotateX(0deg); }
+            }
+            .flip-colon {
+              font-size: 3rem;
+              font-weight: 700;
+              color: #fff;
+              text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+              animation: colonBlink 1s infinite;
+            }
+            @keyframes colonBlink {
+              0%, 50% { opacity: 1; }
+              51%, 100% { opacity: 0.3; }
+            }
+            
+            .companion-task-name {
+              font-size: 1rem;
+              color: rgba(255,255,255,0.8);
+              margin-top: 16px;
+              text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            }
+            .companion-progress-bar {
+              width: 240px;
+              height: 4px;
+              background: rgba(255,255,255,0.2);
+              border-radius: 2px;
+              margin: 16px auto 0;
+              overflow: hidden;
+            }
+            .companion-progress-fill {
+              height: 100%;
+              background: linear-gradient(90deg, #f48fb1, #ec407a);
+              border-radius: 2px;
+              width: 0%;
+              transition: width 1s linear;
+            }
+            .companion-message-area {
+              position: relative;
+              z-index: 1;
+              width: 100%;
+              min-height: 80px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            }
+            .companion-message {
+              background: #fff;
+              padding: 14px 20px;
+              border-radius: 20px;
+              box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+              font-size: 0.95rem;
+              color: #333;
+              max-width: 90%;
+              text-align: center;
+              animation: companionMsgPop 0.3s ease;
+            }
+            @keyframes companionMsgPop {
+              0% { transform: scale(0.8); opacity: 0; }
+              100% { transform: scale(1); opacity: 1; }
+            }
+            .companion-actions {
+              position: relative;
+              z-index: 1;
+              display: flex;
+              gap: 10px;
+              flex-wrap: wrap;
+              justify-content: center;
+              padding-bottom: env(safe-area-inset-bottom, 10px);
+            }
+            .companion-action-btn {
+              padding: 12px 18px;
+              border: none;
+              border-radius: 25px;
+              font-size: 0.9rem;
+              cursor: pointer;
+              display: flex;
+              align-items: center;
+              gap: 6px;
+              transition: all 0.2s;
+              backdrop-filter: blur(10px);
+            }
+            .companion-action-btn.chat {
+              background: rgba(227,242,253,0.9);
+              color: #1976d2;
+            }
+            .companion-action-btn.pause {
+              background: rgba(255,243,224,0.9);
+              color: #f57c00;
+            }
+            .companion-action-btn.complete {
+              background: rgba(232,245,233,0.9);
+              color: #388e3c;
+            }
+            .companion-action-btn.quit {
+              background: rgba(255,235,238,0.9);
+              color: #d32f2f;
+            }
+            .companion-action-btn:active {
+              transform: scale(0.95);
+            }
+            
+            /* 聊天弹窗 */
+            .companion-chat-modal {
+              position: fixed;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0;
+              background: rgba(0,0,0,0.5);
+              z-index: 10000;
+              display: none;
+              align-items: flex-end;
+              justify-content: center;
+            }
+            .companion-chat-modal.active {
+              display: flex;
+            }
+            .companion-chat-container {
+              background: #fff;
+              width: 100%;
+              max-height: 70%;
+              border-radius: 20px 20px 0 0;
+              display: flex;
+              flex-direction: column;
+              animation: slideUpChat 0.3s ease;
+            }
+            @keyframes slideUpChat {
+              0% { transform: translateY(100%); }
+              100% { transform: translateY(0); }
+            }
+            .companion-chat-header {
+              padding: 16px 20px;
+              border-bottom: 1px solid #f0f0f0;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              font-weight: 600;
+              color: #333;
+            }
+            .companion-chat-header button {
+              background: none;
+              border: none;
+              font-size: 18px;
+              cursor: pointer;
+              color: #999;
+            }
+            .companion-chat-messages {
+              flex: 1;
+              overflow-y: auto;
+              padding: 16px;
+              display: flex;
+              flex-direction: column;
+              gap: 12px;
+              min-height: 200px;
+              max-height: 300px;
+            }
+            .companion-chat-msg {
+              max-width: 80%;
+              padding: 10px 14px;
+              border-radius: 16px;
+              font-size: 0.9rem;
+              line-height: 1.5;
+            }
+            .companion-chat-msg.ai {
+              background: #f5f5f5;
+              color: #333;
+              align-self: flex-start;
+              border-bottom-left-radius: 4px;
+            }
+            .companion-chat-msg.user {
+              background: linear-gradient(135deg, #f48fb1, #ec407a);
+              color: #fff;
+              align-self: flex-end;
+              border-bottom-right-radius: 4px;
+            }
+            .companion-chat-input-area {
+              padding: 12px 16px;
+              padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+              border-top: 1px solid #f0f0f0;
+              display: flex;
+              gap: 10px;
+            }
+            .companion-chat-input-area input {
+              flex: 1;
+              padding: 12px 16px;
+              border: 2px solid #f0f0f0;
+              border-radius: 25px;
+              font-size: 0.9rem;
+            }
+            .companion-chat-input-area input:focus {
+              outline: none;
+              border-color: #f48fb1;
+            }
+            .companion-chat-input-area button {
+              padding: 12px 20px;
+              background: linear-gradient(135deg, #f48fb1, #ec407a);
+              color: #fff;
+              border: none;
+              border-radius: 25px;
+              font-weight: 500;
+              cursor: pointer;
+            }
+
             /* ==================== API SETTINGS STYLES ==================== */
+            
+            /* 陪伴完成卡片样式 */
+            .msg-companion-card-wrap {
+              display: flex;
+              justify-content: center;
+              width: 100%;
+              margin: 16px 0;
+            }
+            .companion-result-card {
+              display: flex;
+              align-items: center;
+              gap: 12px;
+              padding: 14px 20px;
+              border-radius: 16px;
+            }
+            .companion-result-card.complete {
+              background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+              border: 1px solid rgba(76,175,80,0.2);
+            }
+            .companion-result-card.quit {
+              background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+              border: 1px solid rgba(255,152,0,0.2);
+            }
+            .companion-card-icon {
+              font-size: 1.8rem;
+            }
+            .companion-card-content {
+              flex: 1;
+            }
+            .companion-card-title {
+              font-weight: 600;
+              font-size: 0.95rem;
+              margin-bottom: 2px;
+            }
+            .companion-result-card.complete .companion-card-title {
+              color: #2e7d32;
+            }
+            .companion-result-card.quit .companion-card-title {
+              color: #ef6c00;
+            }
+            .companion-card-desc {
+              font-size: 0.8rem;
+              color: #666;
+            }
+            
             .api-settings-page {
               background: #f5f5f5 !important;
               padding: 0 !important;
@@ -13183,7 +14039,7 @@
               <div class="app-icon gradient-pink">情侣</div>
               <span class="app-name">情侣空间</span>
             </div>
-            <div class="app-item" onclick="openPage('companionPage')">
+            <div class="app-item" onclick="openCompanionPage()">
               <div class="app-icon gradient-blue">陪伴</div>
               <span class="app-name">陪伴</span>
             </div>
@@ -15052,13 +15908,240 @@
       </div>
 
       <div id="companionPage" class="page">
-        <div class="page-header">
-          <button class="back-btn" onclick="closePage('companionPage')">
+        <div class="page-header companion-header">
+          <button class="back-btn" onclick="closeCompanionPage()">
             ←
           </button>
           <h1 class="page-title">陪伴</h1>
+          <span style="width:40px;"></span>
         </div>
-        <div class="page-content">陪伴功能开发中...</div>
+        
+        <!-- Tab切换 -->
+        <div class="companion-tabs">
+          <div class="companion-tab active" onclick="switchCompanionTab('setup')" id="companionTabSetup">开始陪伴</div>
+          <div class="companion-tab" onclick="switchCompanionTab('history')" id="companionTabHistory">陪伴记录</div>
+        </div>
+        
+        <!-- 未开始陪伴时的设置界面 -->
+        <div class="companion-setup" id="companionSetup">
+          <!-- 数据统计卡片 -->
+          <div class="companion-stats-card" id="companionStatsCard">
+            <div class="companion-stat-item">
+              <div class="companion-stat-value" id="companionTotalTimes">0</div>
+              <div class="companion-stat-label">陪伴次数</div>
+            </div>
+            <div class="companion-stat-divider"></div>
+            <div class="companion-stat-item">
+              <div class="companion-stat-value" id="companionTotalHours">0</div>
+              <div class="companion-stat-label">总时长(小时)</div>
+            </div>
+            <div class="companion-stat-divider"></div>
+            <div class="companion-stat-item">
+              <div class="companion-stat-value" id="companionStreak">0</div>
+              <div class="companion-stat-label">连续天数</div>
+            </div>
+          </div>
+          
+          <!-- 选择AI角色 -->
+          <div class="companion-section">
+            <div class="companion-section-title">👤 选择陪伴角色</div>
+            <div class="companion-char-select" id="companionCharSelect">
+              <!-- 动态渲染角色列表 -->
+            </div>
+          </div>
+          
+          <!-- 陪伴项目 -->
+          <div class="companion-section">
+            <div class="companion-section-title">📝 陪伴项目</div>
+            <input type="text" class="companion-input" id="companionTaskInput" placeholder="输入你想做的事情，例如：学习英语、写论文...">
+          </div>
+          
+          <!-- 陪伴时长 -->
+          <div class="companion-section">
+            <div class="companion-section-title">⏱️ 陪伴时长（分钟）</div>
+            <input type="number" class="companion-input" id="companionDurationInput" placeholder="输入时长" value="45" min="1" max="480">
+          </div>
+          
+          <!-- 鼓励频率 -->
+          <div class="companion-section">
+            <div class="companion-section-title">💬 鼓励频率</div>
+            <div class="companion-freq-select">
+              <span class="companion-freq-tag" onclick="setEncourageFreq(3)">频繁(3分钟)</span>
+              <span class="companion-freq-tag active" onclick="setEncourageFreq(5)">适中(5分钟)</span>
+              <span class="companion-freq-tag" onclick="setEncourageFreq(10)">偶尔(10分钟)</span>
+              <span class="companion-freq-tag" onclick="setEncourageFreq(0)">安静陪伴</span>
+            </div>
+          </div>
+          
+          <!-- 语音鼓励 -->
+          <div class="companion-section">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div>
+                <div class="companion-section-title" style="margin-bottom:4px;">🔊 语音鼓励</div>
+                <div style="font-size:0.75rem;color:#999;">开启后AI会用语音给你加油</div>
+              </div>
+              <div id="companionVoiceToggle" onclick="toggleCompanionVoice()" 
+                style="width:50px;height:28px;border-radius:14px;background:#e0e0e0;position:relative;cursor:pointer;transition:all 0.3s;">
+                <div style="width:24px;height:24px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:all 0.3s;box-shadow:0 2px 4px rgba(0,0,0,0.2);"></div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 背景设置 -->
+          <div class="companion-section">
+            <div class="companion-section-title">🖼️ 陪伴背景</div>
+            <div class="companion-bg-list" id="companionBgList">
+              <!-- 已添加的背景预览 -->
+            </div>
+            <div class="companion-bg-add" onclick="document.getElementById('companionBgInput').click()">
+              <span>+</span>
+              <span>添加图片/视频</span>
+            </div>
+            <input type="file" id="companionBgInput" accept="image/*,video/*" multiple style="display:none;" onchange="handleCompanionBgSelect(event)">
+            <div style="font-size:0.75rem;color:#999;margin-top:8px;">支持多张图片轮播（每10秒切换）或单个视频</div>
+            
+            <!-- 轮播间隔设置 -->
+            <div id="companionBgIntervalSetting" style="display:none;margin-top:12px;">
+              <div style="font-size:0.85rem;color:#666;margin-bottom:6px;">轮播间隔（秒）</div>
+              <input type="number" class="companion-input" id="companionBgInterval" value="10" min="3" max="60" style="width:100px;">
+            </div>
+          </div>
+          
+          <!-- 开始按钮 -->
+          <button class="companion-start-btn" onclick="startCompanion()">
+            开始陪伴 ✨
+          </button>
+        </div>
+        
+        <!-- 陪伴记录页面 -->
+        <div class="companion-history" id="companionHistory" style="display:none;">
+          <!-- 月度日历 -->
+          <div class="companion-calendar-section">
+            <div class="companion-calendar-header">
+              <button class="companion-calendar-nav" onclick="changeCompanionMonth(-1)">‹</button>
+              <span id="companionCalendarTitle">2025年1月</span>
+              <button class="companion-calendar-nav" onclick="changeCompanionMonth(1)">›</button>
+            </div>
+            <div class="companion-calendar-weekdays">
+              <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
+            </div>
+            <div class="companion-calendar-days" id="companionCalendarDays">
+              <!-- 动态渲染日期 -->
+            </div>
+          </div>
+          
+          <!-- 记录列表 -->
+          <div class="companion-history-list" id="companionHistoryList">
+            <!-- 动态渲染记录 -->
+          </div>
+          
+          <!-- 空状态 -->
+          <div class="companion-history-empty" id="companionHistoryEmpty" style="display:none;">
+            <div class="empty-icon">📝</div>
+            <div class="empty-text">还没有陪伴记录</div>
+            <div class="empty-hint">开始你的第一次陪伴吧！</div>
+          </div>
+        </div>
+        
+        <!-- 陪伴进行中界面（全屏沉浸式） -->
+        <div class="companion-active" id="companionActive" style="display:none;">
+          <!-- 全屏背景（支持轮播） -->
+          <div class="companion-fullscreen-bg" id="companionFullscreenBg">
+            <div class="companion-bg-slide active" id="companionBgSlide1"></div>
+            <div class="companion-bg-slide" id="companionBgSlide2"></div>
+            <video id="companionBgVideo" style="display:none;" muted loop autoplay playsinline></video>
+            <div class="companion-bg-overlay"></div>
+          </div>
+          
+          <!-- AI角色显示 -->
+          <div class="companion-char-display">
+            <div class="companion-char-avatar" id="companionCharAvatar">😊</div>
+            <div class="companion-char-name" id="companionCharName">AI</div>
+          </div>
+          
+          <!-- 翻页计时器 -->
+          <div class="companion-timer-section">
+            <div class="flip-clock" id="flipClock">
+              <div class="flip-unit">
+                <div class="flip-card" id="flipMin1">
+                  <div class="flip-card-inner">
+                    <div class="flip-card-front">0</div>
+                    <div class="flip-card-back">0</div>
+                  </div>
+                </div>
+              </div>
+              <div class="flip-unit">
+                <div class="flip-card" id="flipMin2">
+                  <div class="flip-card-inner">
+                    <div class="flip-card-front">0</div>
+                    <div class="flip-card-back">0</div>
+                  </div>
+                </div>
+              </div>
+              <div class="flip-colon">:</div>
+              <div class="flip-unit">
+                <div class="flip-card" id="flipSec1">
+                  <div class="flip-card-inner">
+                    <div class="flip-card-front">0</div>
+                    <div class="flip-card-back">0</div>
+                  </div>
+                </div>
+              </div>
+              <div class="flip-unit">
+                <div class="flip-card" id="flipSec2">
+                  <div class="flip-card-inner">
+                    <div class="flip-card-front">0</div>
+                    <div class="flip-card-back">0</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="companion-task-name" id="companionTaskName">学习中...</div>
+            <div class="companion-progress-bar">
+              <div class="companion-progress-fill" id="companionProgressFill"></div>
+            </div>
+          </div>
+          
+          <!-- AI鼓励消息 -->
+          <div class="companion-message-area" id="companionMessageArea">
+            <div class="companion-message" id="companionMessage">
+              加油！我会一直陪着你~
+            </div>
+          </div>
+          
+          <!-- 底部操作 -->
+          <div class="companion-actions">
+            <button class="companion-action-btn chat" onclick="openCompanionChat()">
+              💬 聊聊天
+            </button>
+            <button class="companion-action-btn pause" id="companionPauseBtn" onclick="toggleCompanionPause()">
+              ⏸️ 暂停
+            </button>
+            <button class="companion-action-btn complete" onclick="completeCompanion()">
+              ✅ 完成
+            </button>
+            <button class="companion-action-btn quit" onclick="quitCompanion()">
+              ❌ 放弃
+            </button>
+          </div>
+        </div>
+        
+        <!-- 聊天弹窗 -->
+        <div class="companion-chat-modal" id="companionChatModal">
+          <div class="companion-chat-container">
+            <div class="companion-chat-header">
+              <span>和 <span id="companionChatCharName">AI</span> 聊聊</span>
+              <button onclick="closeCompanionChat()">✕</button>
+            </div>
+            <div class="companion-chat-messages" id="companionChatMessages">
+              <!-- 聊天消息 -->
+            </div>
+            <div class="companion-chat-input-area">
+              <input type="text" id="companionChatInput" placeholder="累了就和我说说话吧~" onkeypress="if(event.key==='Enter')sendCompanionChat()">
+              <button onclick="sendCompanionChat()">发送</button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div id="apiPage" class="page api-settings-page">
@@ -28114,6 +29197,37 @@ ${memberInfos
             return;
           }
 
+          // 处理陪伴卡片
+          if (msg.isCompanionCard && msg.companionData) {
+            if (currentGroup.length > 0) {
+              html += renderMessageGroup(
+                currentGroup,
+                lastRole,
+                aiAvatarSrc,
+                userAvatarSrc
+              );
+              currentGroup = [];
+            }
+            const cd = msg.companionData;
+            const cardClass = cd.completed ? 'companion-result-card complete' : 'companion-result-card quit';
+            const icon = cd.completed ? '🎉' : '💪';
+            const title = cd.completed ? '陪伴完成！' : '陪伴中断';
+            const desc = cd.completed 
+              ? `完成了「${cd.task}」${cd.duration}分钟`
+              : `「${cd.task}」${cd.duration}分钟`;
+            html += `<div class="msg-companion-card-wrap">
+              <div class="${cardClass}">
+                <div class="companion-card-icon">${icon}</div>
+                <div class="companion-card-content">
+                  <div class="companion-card-title">${title}</div>
+                  <div class="companion-card-desc">${desc}</div>
+                </div>
+              </div>
+            </div>`;
+            lastRole = null;
+            return;
+          }
+
           if (msg.role !== lastRole && currentGroup.length > 0) {
             html += renderMessageGroup(
               currentGroup,
@@ -36836,6 +37950,1061 @@ ${persona ? `你的人设: ${persona}` : ""}
         }
       }
 
+      // ==================== 陪伴APP功能 ====================
+      var companionState = {
+        active: false,
+        paused: false,
+        charId: null,
+        task: '',
+        duration: 45, // 分钟
+        encourageFreq: 5, // 分钟
+        remainingSeconds: 0,
+        totalSeconds: 0,
+        timerInterval: null,
+        encourageInterval: null,
+        chatMessages: [],
+        voiceEnabled: false,
+        backgrounds: [], // 多个背景 [{type: 'image'|'video', data: base64}]
+        bgInterval: 10, // 轮播间隔秒数
+        bgRotateTimer: null,
+        currentBgIndex: 0,
+        lastFlipTime: { min1: '', min2: '', sec1: '', sec2: '' }
+      };
+      
+      // 陪伴记录数据
+      var companionRecords = [];
+      var companionCalendarMonth = new Date();
+
+      // 加载陪伴记录
+      async function loadCompanionRecords() {
+        try {
+          const saved = await localforage.getItem('companionRecords');
+          companionRecords = saved || [];
+        } catch(e) {
+          companionRecords = [];
+        }
+      }
+
+      // 保存陪伴记录
+      async function saveCompanionRecords() {
+        await localforage.setItem('companionRecords', companionRecords);
+      }
+
+      // 添加陪伴记录
+      async function addCompanionRecord(record) {
+        companionRecords.unshift(record);
+        await saveCompanionRecords();
+        updateCompanionStats();
+      }
+
+      // 更新统计数据
+      function updateCompanionStats() {
+        const totalTimes = companionRecords.length;
+        const totalMinutes = companionRecords.reduce((sum, r) => sum + (r.duration || 0), 0);
+        const totalHours = (totalMinutes / 60).toFixed(1);
+        
+        // 计算连续天数
+        const streak = calculateCompanionStreak();
+        
+        const timesEl = document.getElementById('companionTotalTimes');
+        const hoursEl = document.getElementById('companionTotalHours');
+        const streakEl = document.getElementById('companionStreak');
+        
+        if (timesEl) timesEl.textContent = totalTimes;
+        if (hoursEl) hoursEl.textContent = totalHours;
+        if (streakEl) streakEl.textContent = streak;
+      }
+
+      // 计算连续天数
+      function calculateCompanionStreak() {
+        if (companionRecords.length === 0) return 0;
+        
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        // 获取有记录的日期集合
+        const recordDates = new Set();
+        companionRecords.forEach(r => {
+          const d = new Date(r.timestamp);
+          d.setHours(0, 0, 0, 0);
+          recordDates.add(d.getTime());
+        });
+        
+        let streak = 0;
+        let checkDate = new Date(today);
+        
+        // 如果今天没有记录，从昨天开始检查
+        if (!recordDates.has(checkDate.getTime())) {
+          checkDate.setDate(checkDate.getDate() - 1);
+        }
+        
+        while (recordDates.has(checkDate.getTime())) {
+          streak++;
+          checkDate.setDate(checkDate.getDate() - 1);
+        }
+        
+        return streak;
+      }
+
+      // 切换Tab
+      function switchCompanionTab(tab) {
+        const setupTab = document.getElementById('companionTabSetup');
+        const historyTab = document.getElementById('companionTabHistory');
+        const setupContent = document.getElementById('companionSetup');
+        const historyContent = document.getElementById('companionHistory');
+        
+        if (tab === 'setup') {
+          setupTab.classList.add('active');
+          historyTab.classList.remove('active');
+          setupContent.style.display = 'block';
+          historyContent.style.display = 'none';
+        } else {
+          setupTab.classList.remove('active');
+          historyTab.classList.add('active');
+          setupContent.style.display = 'none';
+          historyContent.style.display = 'block';
+          renderCompanionCalendar();
+          renderCompanionHistoryList();
+        }
+      }
+
+      // 渲染日历
+      function renderCompanionCalendar() {
+        const year = companionCalendarMonth.getFullYear();
+        const month = companionCalendarMonth.getMonth();
+        
+        document.getElementById('companionCalendarTitle').textContent = `${year}年${month + 1}月`;
+        
+        const container = document.getElementById('companionCalendarDays');
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        const startDayOfWeek = firstDay.getDay();
+        
+        // 获取本月有记录的日期
+        const recordDates = new Set();
+        companionRecords.forEach(r => {
+          const d = new Date(r.timestamp);
+          if (d.getFullYear() === year && d.getMonth() === month) {
+            recordDates.add(d.getDate());
+          }
+        });
+        
+        const today = new Date();
+        const isThisMonth = today.getFullYear() === year && today.getMonth() === month;
+        
+        let html = '';
+        
+        // 上月填充
+        const prevMonthDays = new Date(year, month, 0).getDate();
+        for (let i = startDayOfWeek - 1; i >= 0; i--) {
+          html += `<div class="companion-calendar-day other-month">${prevMonthDays - i}</div>`;
+        }
+        
+        // 本月日期
+        for (let day = 1; day <= lastDay.getDate(); day++) {
+          const isToday = isThisMonth && day === today.getDate();
+          const hasRecord = recordDates.has(day);
+          const classes = ['companion-calendar-day'];
+          if (isToday) classes.push('today');
+          if (hasRecord) classes.push('has-record');
+          html += `<div class="${classes.join(' ')}" onclick="selectCompanionDate(${year}, ${month}, ${day})">${day}</div>`;
+        }
+        
+        // 下月填充
+        const totalCells = Math.ceil((startDayOfWeek + lastDay.getDate()) / 7) * 7;
+        const remainingCells = totalCells - startDayOfWeek - lastDay.getDate();
+        for (let i = 1; i <= remainingCells; i++) {
+          html += `<div class="companion-calendar-day other-month">${i}</div>`;
+        }
+        
+        container.innerHTML = html;
+      }
+
+      // 切换月份
+      function changeCompanionMonth(delta) {
+        companionCalendarMonth.setMonth(companionCalendarMonth.getMonth() + delta);
+        renderCompanionCalendar();
+      }
+
+      // 选择日期筛选
+      function selectCompanionDate(year, month, day) {
+        // 移除其他选中
+        document.querySelectorAll('.companion-calendar-day.selected').forEach(el => el.classList.remove('selected'));
+        event.target.classList.add('selected');
+        
+        // 筛选显示该日期的记录
+        renderCompanionHistoryList(new Date(year, month, day));
+      }
+
+      // 渲染记录列表
+      function renderCompanionHistoryList(filterDate = null) {
+        const container = document.getElementById('companionHistoryList');
+        const emptyEl = document.getElementById('companionHistoryEmpty');
+        
+        let records = companionRecords;
+        
+        if (filterDate) {
+          filterDate.setHours(0, 0, 0, 0);
+          const nextDay = new Date(filterDate);
+          nextDay.setDate(nextDay.getDate() + 1);
+          
+          records = companionRecords.filter(r => {
+            const d = new Date(r.timestamp);
+            return d >= filterDate && d < nextDay;
+          });
+        }
+        
+        if (records.length === 0) {
+          container.innerHTML = '';
+          emptyEl.style.display = 'block';
+          return;
+        }
+        
+        emptyEl.style.display = 'none';
+        
+        container.innerHTML = records.map(record => {
+          const char = characters.find(c => String(c.id) === String(record.charId));
+          const avatarContent = char?.avatar 
+            ? `<img src="${char.avatar}">` 
+            : (char?.name ? char.name.charAt(0) : '😊');
+          const charName = char?.note || char?.name || 'AI';
+          
+          const date = new Date(record.timestamp);
+          const dateStr = `${date.getMonth() + 1}/${date.getDate()}`;
+          const timeStr = date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+          
+          return `
+            <div class="companion-history-item">
+              <div class="companion-history-avatar">${avatarContent}</div>
+              <div class="companion-history-content">
+                <div class="companion-history-header">
+                  <span class="companion-history-task">${record.task}</span>
+                  <span class="companion-history-status ${record.completed ? 'complete' : 'quit'}">${record.completed ? '完成' : '中断'}</span>
+                </div>
+                <div class="companion-history-meta">
+                  <span class="companion-history-char">🤖 ${charName}</span>
+                  <span>⏱️ ${record.duration}分钟</span>
+                  <span>📅 ${dateStr} ${timeStr}</span>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // 处理背景选择（支持多选）
+      function handleCompanionBgSelect(event) {
+        const files = event.target.files;
+        if (!files || files.length === 0) return;
+        
+        // 检查是否已有视频
+        const hasVideo = companionState.backgrounds.some(bg => bg.type === 'video');
+        
+        Array.from(files).forEach(file => {
+          const isVideo = file.type.startsWith('video/');
+          const isImage = file.type.startsWith('image/');
+          
+          if (!isVideo && !isImage) return;
+          
+          // 如果添加视频，清除所有图片；如果已有视频，不允许添加更多
+          if (isVideo) {
+            if (hasVideo) {
+              showToast('只能添加一个视频');
+              return;
+            }
+            companionState.backgrounds = []; // 清除图片
+          } else if (hasVideo) {
+            showToast('已有视频，请先删除视频再添加图片');
+            return;
+          }
+          
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            companionState.backgrounds.push({
+              type: isVideo ? 'video' : 'image',
+              data: e.target.result
+            });
+            renderCompanionBgList();
+          };
+          reader.readAsDataURL(file);
+        });
+        
+        // 清空input以便重复选择同一文件
+        event.target.value = '';
+      }
+
+      // 渲染背景列表
+      function renderCompanionBgList() {
+        const container = document.getElementById('companionBgList');
+        if (!container) return;
+        
+        container.innerHTML = companionState.backgrounds.map((bg, index) => {
+          if (bg.type === 'video') {
+            return `
+              <div class="companion-bg-item video">
+                <video src="${bg.data}" muted></video>
+                <div class="bg-remove" onclick="removeCompanionBgItem(${index})">✕</div>
+              </div>
+            `;
+          } else {
+            return `
+              <div class="companion-bg-item">
+                <img src="${bg.data}">
+                <div class="bg-remove" onclick="removeCompanionBgItem(${index})">✕</div>
+              </div>
+            `;
+          }
+        }).join('');
+        
+        // 显示/隐藏轮播间隔设置
+        const intervalSetting = document.getElementById('companionBgIntervalSetting');
+        if (intervalSetting) {
+          const imageCount = companionState.backgrounds.filter(bg => bg.type === 'image').length;
+          intervalSetting.style.display = imageCount > 1 ? 'block' : 'none';
+        }
+      }
+
+      // 删除单个背景
+      function removeCompanionBgItem(index) {
+        companionState.backgrounds.splice(index, 1);
+        renderCompanionBgList();
+      }
+
+      // 移除所有背景
+      function removeCompanionBg() {
+        companionState.backgrounds = [];
+        renderCompanionBgList();
+      }
+
+      // 开始背景轮播
+      function startBgRotation() {
+        if (companionState.backgrounds.length === 0) return;
+        
+        const hasVideo = companionState.backgrounds.some(bg => bg.type === 'video');
+        
+        if (hasVideo) {
+          // 视频模式
+          const video = companionState.backgrounds.find(bg => bg.type === 'video');
+          const bgVideo = document.getElementById('companionBgVideo');
+          bgVideo.src = video.data;
+          bgVideo.style.display = 'block';
+          bgVideo.play();
+          document.getElementById('companionBgSlide1').style.display = 'none';
+          document.getElementById('companionBgSlide2').style.display = 'none';
+        } else {
+          // 图片轮播模式
+          document.getElementById('companionBgVideo').style.display = 'none';
+          const slide1 = document.getElementById('companionBgSlide1');
+          const slide2 = document.getElementById('companionBgSlide2');
+          slide1.style.display = 'block';
+          slide2.style.display = 'block';
+          
+          companionState.currentBgIndex = 0;
+          slide1.style.backgroundImage = `url(${companionState.backgrounds[0].data})`;
+          slide1.classList.add('active');
+          slide2.classList.remove('active');
+          
+          if (companionState.backgrounds.length > 1) {
+            const interval = parseInt(document.getElementById('companionBgInterval')?.value) || 10;
+            companionState.bgInterval = interval;
+            
+            companionState.bgRotateTimer = setInterval(() => {
+              rotateBg();
+            }, interval * 1000);
+          }
+        }
+      }
+
+      // 切换背景图
+      function rotateBg() {
+        if (companionState.backgrounds.length <= 1) return;
+        
+        const slide1 = document.getElementById('companionBgSlide1');
+        const slide2 = document.getElementById('companionBgSlide2');
+        
+        companionState.currentBgIndex = (companionState.currentBgIndex + 1) % companionState.backgrounds.length;
+        const nextBg = companionState.backgrounds[companionState.currentBgIndex];
+        
+        if (slide1.classList.contains('active')) {
+          slide2.style.backgroundImage = `url(${nextBg.data})`;
+          slide1.classList.remove('active');
+          slide2.classList.add('active');
+        } else {
+          slide1.style.backgroundImage = `url(${nextBg.data})`;
+          slide2.classList.remove('active');
+          slide1.classList.add('active');
+        }
+      }
+
+      // 停止背景轮播
+      function stopBgRotation() {
+        if (companionState.bgRotateTimer) {
+          clearInterval(companionState.bgRotateTimer);
+          companionState.bgRotateTimer = null;
+        }
+        const bgVideo = document.getElementById('companionBgVideo');
+        if (bgVideo) {
+          bgVideo.pause();
+          bgVideo.src = '';
+        }
+      }
+
+      // 更新翻页时钟
+      function updateFlipClock(minutes, seconds) {
+        const min1 = Math.floor(minutes / 10).toString();
+        const min2 = (minutes % 10).toString();
+        const sec1 = Math.floor(seconds / 10).toString();
+        const sec2 = (seconds % 10).toString();
+        
+        updateFlipCard('flipMin1', min1, companionState.lastFlipTime.min1);
+        updateFlipCard('flipMin2', min2, companionState.lastFlipTime.min2);
+        updateFlipCard('flipSec1', sec1, companionState.lastFlipTime.sec1);
+        updateFlipCard('flipSec2', sec2, companionState.lastFlipTime.sec2);
+        
+        companionState.lastFlipTime = { min1, min2, sec1, sec2 };
+      }
+
+      function updateFlipCard(cardId, newValue, oldValue) {
+        const card = document.getElementById(cardId);
+        if (!card) return;
+        
+        const front = card.querySelector('.flip-card-front');
+        const back = card.querySelector('.flip-card-back');
+        
+        if (newValue !== oldValue && oldValue !== '') {
+          card.classList.add('flipping');
+          back.textContent = newValue;
+          
+          setTimeout(() => {
+            front.textContent = newValue;
+            card.classList.remove('flipping');
+          }, 300);
+        } else {
+          front.textContent = newValue;
+          back.textContent = newValue;
+        }
+      }
+
+      // 切换语音鼓励
+      function toggleCompanionVoice() {
+        companionState.voiceEnabled = !companionState.voiceEnabled;
+        const toggle = document.getElementById('companionVoiceToggle');
+        if (companionState.voiceEnabled) {
+          toggle.style.background = '#ec407a';
+          toggle.querySelector('div').style.left = '24px';
+        } else {
+          toggle.style.background = '#e0e0e0';
+          toggle.querySelector('div').style.left = '2px';
+        }
+      }
+
+      // 打开陪伴页面
+      async function openCompanionPage() {
+        openPage('companionPage');
+        await loadCompanionRecords();
+        renderCompanionCharSelect();
+        renderCompanionBgList();
+        updateCompanionStats();
+      }
+
+      // 关闭陪伴页面
+      function closeCompanionPage() {
+        if (companionState.active) {
+          if (!confirm('陪伴正在进行中，确定要离开吗？')) {
+            return;
+          }
+          quitCompanion(true);
+        }
+        closePage('companionPage');
+      }
+
+      // 渲染角色选择列表
+      function renderCompanionCharSelect() {
+        const container = document.getElementById('companionCharSelect');
+        if (!container) return;
+        
+        if (!characters || characters.length === 0) {
+          container.innerHTML = '<div style="color:#999;font-size:0.85rem;">还没有AI角色，请先添加角色~</div>';
+          return;
+        }
+        
+        container.innerHTML = characters.map(char => {
+          const isSelected = String(companionState.charId) === String(char.id);
+          const avatarContent = char.avatar 
+            ? `<img src="${char.avatar}" alt="">` 
+            : (char.name ? char.name.charAt(0) : '😊');
+          return `
+            <div class="companion-char-item ${isSelected ? 'selected' : ''}" onclick="selectCompanionChar(${char.id})">
+              <div class="avatar">${avatarContent}</div>
+              <div class="name">${char.note || char.name || 'AI'}</div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // 选择陪伴角色
+      function selectCompanionChar(charId) {
+        companionState.charId = charId;
+        renderCompanionCharSelect();
+      }
+
+      // 设置陪伴任务（保留但不用）
+      function setCompanionTask(task) {
+        document.getElementById('companionTaskInput').value = task;
+      }
+
+      // 设置陪伴时长（保留但不用）
+      function setCompanionDuration(minutes) {
+        companionState.duration = minutes;
+      }
+
+      // 设置鼓励频率
+      function setEncourageFreq(minutes) {
+        companionState.encourageFreq = minutes;
+        document.querySelectorAll('.companion-freq-tag').forEach(el => el.classList.remove('active'));
+        event.target.classList.add('active');
+      }
+
+      // 开始陪伴
+      function startCompanion() {
+        const task = document.getElementById('companionTaskInput').value.trim();
+        const durationInput = document.getElementById('companionDurationInput');
+        const duration = parseInt(durationInput.value) || 45;
+        
+        if (!companionState.charId) {
+          showToast('请先选择陪伴角色');
+          return;
+        }
+        if (!task) {
+          showToast('请输入陪伴项目');
+          return;
+        }
+        if (duration < 1 || duration > 480) {
+          showToast('陪伴时长请设置1-480分钟');
+          return;
+        }
+        
+        const char = characters.find(c => String(c.id) === String(companionState.charId));
+        if (!char) {
+          showToast('角色不存在');
+          return;
+        }
+        
+        companionState.active = true;
+        companionState.paused = false;
+        companionState.task = task;
+        companionState.duration = duration;
+        companionState.totalSeconds = duration * 60;
+        companionState.remainingSeconds = companionState.totalSeconds;
+        companionState.chatMessages = [];
+        companionState.lastFlipTime = { min1: '', min2: '', sec1: '', sec2: '' };
+        
+        // 切换界面
+        document.getElementById('companionSetup').style.display = 'none';
+        document.getElementById('companionActive').style.display = 'flex';
+        
+        // 启动背景轮播
+        startBgRotation();
+        
+        // 设置角色显示
+        const avatarEl = document.getElementById('companionCharAvatar');
+        if (char.avatar) {
+          avatarEl.innerHTML = `<img src="${char.avatar}" alt="">`;
+        } else {
+          avatarEl.textContent = char.name ? char.name.charAt(0) : '😊';
+        }
+        document.getElementById('companionCharName').textContent = char.note || char.name || 'AI';
+        document.getElementById('companionChatCharName').textContent = char.note || char.name || 'AI';
+        document.getElementById('companionTaskName').textContent = task + '中...';
+        
+        // 开始计时
+        updateCompanionTimer();
+        companionState.timerInterval = setInterval(() => {
+          if (!companionState.paused && companionState.remainingSeconds > 0) {
+            companionState.remainingSeconds--;
+            updateCompanionTimer();
+            
+            if (companionState.remainingSeconds === 0) {
+              completeCompanion();
+            }
+          }
+        }, 1000);
+        
+        // 发送开始鼓励
+        sendCompanionEncouragement('start');
+        
+        // 设置定期鼓励
+        if (companionState.encourageFreq > 0) {
+          companionState.encourageInterval = setInterval(() => {
+            if (!companionState.paused) {
+              sendCompanionEncouragement('encourage');
+            }
+          }, companionState.encourageFreq * 60 * 1000);
+        }
+      }
+
+      // 更新计时器显示（翻页时钟）
+      function updateCompanionTimer() {
+        const mins = Math.floor(companionState.remainingSeconds / 60);
+        const secs = companionState.remainingSeconds % 60;
+        
+        // 更新翻页时钟
+        updateFlipClock(mins, secs);
+        
+        // 更新进度条
+        const progress = ((companionState.totalSeconds - companionState.remainingSeconds) / companionState.totalSeconds) * 100;
+        document.getElementById('companionProgressFill').style.width = progress + '%';
+      }
+
+      // 发送AI鼓励消息
+      async function sendCompanionEncouragement(type) {
+        const char = characters.find(c => String(c.id) === String(companionState.charId));
+        if (!char) return;
+        
+        const settings = chatSettings[companionState.charId] || {};
+        const charName = char.note || char.name || 'AI';
+        const task = companionState.task;
+        const remainMins = Math.floor(companionState.remainingSeconds / 60);
+        const totalMins = companionState.duration;
+        const elapsedMins = Math.floor((companionState.totalSeconds - companionState.remainingSeconds) / 60);
+        
+        const persona = settings.systemPrompt || char.description || '';
+        
+        let prompt = '';
+        if (type === 'start') {
+          prompt = `用户开始${task}了（${totalMins}分钟）。用中文简短说一句加油的话。`;
+        } else if (type === 'encourage') {
+          prompt = `用户${task}中，已${elapsedMins}分钟，剩${remainMins}分钟。用中文简短鼓励一句。`;
+        } else if (type === 'complete') {
+          prompt = `用户完成${task}了！${totalMins}分钟！用中文简短夸一句。`;
+        } else if (type === 'quit') {
+          prompt = `用户停下${task}了。用中文简短安慰一句。`;
+        }
+        
+        const systemPrompt = `你是${charName}。${persona || ''}
+陪伴用户${task}中。要求：用中文回复，像朋友说话，一句话就好，不要方括号，代入角色。`;
+
+        try {
+          const apiKey = settings.apiKey || (window.voiceConfig && window.voiceConfig.apiKey) || '';
+          const apiUrl = settings.apiUrl || 'https://api.minimax.chat/v1/text/chatcompletion_v2';
+          const model = settings.model || 'MiniMax-Text-01';
+          
+          if (!apiKey) {
+            updateCompanionMessage(getDefaultEncouragement(type, charName));
+            return;
+          }
+          
+          const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${apiKey}`
+            },
+            body: JSON.stringify({
+              model: model,
+              messages: [
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: prompt }
+              ]
+            })
+          });
+          
+          const data = await response.json();
+          let message = data.choices?.[0]?.message?.content || getDefaultEncouragement(type, charName);
+          // 清理消息中的特殊标签
+          message = message.replace(/\[.*?\]/g, '').replace(/\*.*?\*/g, '').trim();
+          updateCompanionMessage(message);
+          
+          // 如果开启了语音鼓励，播放语音
+          if (companionState.voiceEnabled && message) {
+            playCompanionVoice(message);
+          }
+          
+        } catch (e) {
+          console.error('陪伴鼓励生成失败:', e);
+          updateCompanionMessage(getDefaultEncouragement(type, charName));
+        }
+      }
+
+      // 播放语音鼓励
+      async function playCompanionVoice(text) {
+        try {
+          const settings = chatSettings[companionState.charId] || {};
+          const voiceId = settings.voiceId;
+          const apiKey = settings.apiKey || (window.voiceConfig && window.voiceConfig.apiKey) || '';
+          const groupId = (window.voiceConfig && window.voiceConfig.groupId) || '1';
+          
+          if (!voiceId || !apiKey) {
+            console.log('未配置语音或API，跳过语音播放');
+            return;
+          }
+          
+          const response = await fetch(`https://api.minimax.chat/v1/t2a_v2?GroupId=${groupId}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${apiKey}`
+            },
+            body: JSON.stringify({
+              model: 'speech-01-turbo',
+              text: text,
+              voice_setting: {
+                voice_id: voiceId,
+                speed: 1.0,
+                vol: 1.0,
+                pitch: 0
+              },
+              audio_setting: {
+                sample_rate: 32000,
+                format: 'mp3'
+              }
+            })
+          });
+          
+          const data = await response.json();
+          console.log('TTS响应:', data);
+          
+          // MiniMax TTS API返回格式
+          const audioHex = data.data?.audio || data.audio_file;
+          if (audioHex) {
+            // MiniMax返回的audio是hex格式，需要转换
+            let audioData = audioHex;
+            try {
+              // 检查是否是hex格式（不是base64）
+              if (/^[0-9a-fA-F]+$/.test(audioHex.substring(0, 100))) {
+                // hex转Uint8Array再转base64
+                const hexPairs = audioHex.match(/.{1,2}/g) || [];
+                const bytes = new Uint8Array(hexPairs.map(byte => parseInt(byte, 16)));
+                // 分块转换避免栈溢出
+                let binary = '';
+                const chunkSize = 8192;
+                for (let i = 0; i < bytes.length; i += chunkSize) {
+                  binary += String.fromCharCode.apply(null, bytes.slice(i, i + chunkSize));
+                }
+                audioData = btoa(binary);
+              }
+              const audio = new Audio('data:audio/mp3;base64,' + audioData);
+              await audio.play();
+            } catch (playError) {
+              console.error('音频播放失败:', playError);
+            }
+          } else if (data.extra_info?.audio_file) {
+            try {
+              const audio = new Audio('data:audio/mp3;base64,' + data.extra_info.audio_file);
+              await audio.play();
+            } catch (playError) {
+              console.error('音频播放失败:', playError);
+            }
+          }
+        } catch (e) {
+          console.error('语音播放失败:', e);
+        }
+      }
+
+      // 默认鼓励语
+      function getDefaultEncouragement(type, charName) {
+        const encouragements = {
+          start: [`加油！我会一直陪着你~`, `开始啦！我在这里陪你哦~`, `一起努力吧！`],
+          encourage: [`你做得很好，继续加油！`, `休息一下眼睛吧~`, `记得喝水哦~`, `坚持就是胜利！`],
+          complete: [`太棒了！你做到了！`, `好厉害！我为你骄傲！`, `完成啦！辛苦了~`],
+          quit: [`没关系的，下次再加油~`, `休息一下也很重要哦`, `我会一直陪着你的~`]
+        };
+        const list = encouragements[type] || encouragements.encourage;
+        return list[Math.floor(Math.random() * list.length)];
+      }
+
+      // 更新鼓励消息显示
+      function updateCompanionMessage(message) {
+        const el = document.getElementById('companionMessage');
+        el.style.animation = 'none';
+        el.offsetHeight; // 触发重绘
+        el.textContent = message;
+        el.style.animation = 'companionMsgPop 0.3s ease';
+      }
+
+      // 暂停/继续
+      function toggleCompanionPause() {
+        companionState.paused = !companionState.paused;
+        const btn = document.getElementById('companionPauseBtn');
+        if (companionState.paused) {
+          btn.innerHTML = '▶️ 继续';
+          updateCompanionMessage('暂停了~准备好了就继续吧');
+        } else {
+          btn.innerHTML = '⏸️ 暂停';
+          updateCompanionMessage('继续加油！');
+        }
+      }
+
+      // 完成陪伴
+      async function completeCompanion() {
+        if (!companionState.active) return;
+        
+        clearInterval(companionState.timerInterval);
+        clearInterval(companionState.encourageInterval);
+        
+        // 发送完成鼓励
+        await sendCompanionEncouragement('complete');
+        
+        // 发送到聊天记录
+        await sendCompanionResultToChat(true);
+        
+        showToast('🎉 太棒了！陪伴完成！');
+        
+        setTimeout(() => {
+          resetCompanion();
+        }, 2000);
+      }
+
+      // 放弃陪伴
+      async function quitCompanion(silent = false) {
+        if (!companionState.active) return;
+        
+        if (!silent && !confirm('确定要放弃这次陪伴吗？')) {
+          return;
+        }
+        
+        clearInterval(companionState.timerInterval);
+        clearInterval(companionState.encourageInterval);
+        
+        if (!silent) {
+          await sendCompanionEncouragement('quit');
+        }
+        
+        resetCompanion();
+      }
+
+      // 重置陪伴状态
+      function resetCompanion() {
+        companionState.active = false;
+        companionState.paused = false;
+        companionState.remainingSeconds = 0;
+        companionState.chatMessages = [];
+        
+        // 停止背景轮播
+        stopBgRotation();
+        
+        document.getElementById('companionSetup').style.display = 'block';
+        document.getElementById('companionActive').style.display = 'none';
+        document.getElementById('companionPauseBtn').innerHTML = '⏸️ 暂停';
+      }
+
+      // 发送陪伴结果到聊天（卡片形式 + AI自动对话）
+      async function sendCompanionResultToChat(completed) {
+        const char = characters.find(c => String(c.id) === String(companionState.charId));
+        if (!char) return;
+        
+        const charId = companionState.charId;
+        const task = companionState.task;
+        const totalMins = companionState.duration;
+        const actualMins = Math.floor((companionState.totalSeconds - companionState.remainingSeconds) / 60);
+        const chatSummary = companionState.chatMessages.length > 0 
+          ? companionState.chatMessages.map(m => `${m.role === 'user' ? '用户' : char.note || char.name}: ${m.content}`).join('\n')
+          : '';
+        
+        // 保存陪伴记录
+        await addCompanionRecord({
+          charId: charId,
+          task: task,
+          duration: completed ? totalMins : actualMins,
+          totalDuration: totalMins,
+          completed: completed,
+          timestamp: Date.now()
+        });
+        
+        // 初始化聊天记录
+        if (!chatHistories[charId]) {
+          chatHistories[charId] = [];
+        }
+        
+        // 添加陪伴完成卡片消息
+        const cardContent = completed 
+          ? `[陪伴卡片:completed:${task}:${totalMins}]`
+          : `[陪伴卡片:quit:${task}:${actualMins}]`;
+        
+        chatHistories[charId].push({
+          role: 'assistant',
+          content: cardContent,
+          isCompanionCard: true,
+          companionData: {
+            completed: completed,
+            task: task,
+            duration: completed ? totalMins : actualMins,
+            totalDuration: totalMins
+          },
+          time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }),
+          timestamp: Date.now()
+        });
+        
+        await localforage.setItem('chatHistories', chatHistories);
+        
+        // 生成AI的后续对话
+        const settings = chatSettings[charId] || {};
+        const charName = char.note || char.name || 'AI';
+        const persona = settings.systemPrompt || char.description || '';
+        
+        let contextInfo = `刚才你陪伴用户${task}了${completed ? totalMins : actualMins}分钟，用户${completed ? '完成了' : '中途停了'}。`;
+        if (chatSummary) {
+          contextInfo += `\n陪伴中你们聊过：\n${chatSummary}`;
+        }
+        
+        const prompt = completed 
+          ? `用户完成了${task}！用中文简短地夸一下ta，像朋友聊天一样。`
+          : `用户停下了${task}，用中文简短地关心一下ta。`;
+        
+        const systemPrompt = `你是${charName}。
+${persona || ''}
+
+${contextInfo}
+
+要求：用中文回复，像朋友聊天，1-2句话，不要长，不要方括号，代入角色。`;
+
+        try {
+          const apiKey = settings.apiKey || (window.voiceConfig && window.voiceConfig.apiKey) || '';
+          const apiUrl = settings.apiUrl || 'https://api.minimax.chat/v1/text/chatcompletion_v2';
+          const model = settings.model || 'MiniMax-Text-01';
+          
+          if (apiKey) {
+            const response = await fetch(apiUrl, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`
+              },
+              body: JSON.stringify({
+                model: model,
+                messages: [
+                  { role: 'system', content: systemPrompt },
+                  { role: 'user', content: prompt }
+                ]
+              })
+            });
+            
+            const data = await response.json();
+            let reply = data.choices?.[0]?.message?.content || '';
+            reply = reply.replace(/\[.*?\]/g, '').replace(/\*.*?\*/g, '').trim();
+            
+            if (reply) {
+              chatHistories[charId].push({
+                role: 'assistant',
+                content: reply,
+                time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }),
+                timestamp: Date.now()
+              });
+              await localforage.setItem('chatHistories', chatHistories);
+            }
+          }
+        } catch (e) {
+          console.error('陪伴后对话生成失败:', e);
+        }
+        
+        // 更新列表预览
+        const previewMsg = completed ? `🎉 陪伴完成！${task} ${totalMins}分钟` : `陪伴中断 ${task}`;
+        updateCharacterLastMessage(charId, previewMsg);
+        
+        // 如果当前在这个聊天页面，刷新
+        if (currentChatCharId === charId) {
+          renderConversation();
+        }
+      }
+
+      // 打开聊天弹窗
+      function openCompanionChat() {
+        document.getElementById('companionChatModal').classList.add('active');
+        renderCompanionChatMessages();
+      }
+
+      // 关闭聊天弹窗
+      function closeCompanionChat() {
+        document.getElementById('companionChatModal').classList.remove('active');
+      }
+
+      // 渲染聊天消息
+      function renderCompanionChatMessages() {
+        const container = document.getElementById('companionChatMessages');
+        if (companionState.chatMessages.length === 0) {
+          container.innerHTML = '<div style="text-align:center;color:#999;padding:20px;">累了就和我说说话吧~</div>';
+          return;
+        }
+        container.innerHTML = companionState.chatMessages.map(msg => `
+          <div class="companion-chat-msg ${msg.role}">${msg.content}</div>
+        `).join('');
+        container.scrollTop = container.scrollHeight;
+      }
+
+      // 发送聊天消息
+      async function sendCompanionChat() {
+        const input = document.getElementById('companionChatInput');
+        const message = input.value.trim();
+        if (!message) return;
+        
+        input.value = '';
+        
+        // 添加用户消息
+        companionState.chatMessages.push({ role: 'user', content: message });
+        renderCompanionChatMessages();
+        
+        // 生成AI回复
+        const char = characters.find(c => String(c.id) === String(companionState.charId));
+        if (!char) return;
+        
+        const settings = chatSettings[companionState.charId] || {};
+        const charName = char.note || char.name || 'AI';
+        const persona = settings.systemPrompt || char.description || '';
+        const remainMins = Math.floor(companionState.remainingSeconds / 60);
+        const elapsedMins = Math.floor((companionState.totalSeconds - companionState.remainingSeconds) / 60);
+        
+        const systemPrompt = `你是${charName}。${persona || ''}
+陪伴用户${companionState.task}中（${elapsedMins}分钟了，剩${remainMins}分钟）。用户想休息聊聊。
+要求：用中文回复，像朋友聊天，简短自然，不要方括号，代入角色。`;
+
+        try {
+          const apiKey = settings.apiKey || (window.voiceConfig && window.voiceConfig.apiKey) || '';
+          const apiUrl = settings.apiUrl || 'https://api.minimax.chat/v1/text/chatcompletion_v2';
+          const model = settings.model || 'MiniMax-Text-01';
+          
+          if (!apiKey) {
+            companionState.chatMessages.push({ role: 'ai', content: '嗯嗯，我在听~有什么想说的吗？' });
+            renderCompanionChatMessages();
+            return;
+          }
+          
+          const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${apiKey}`
+            },
+            body: JSON.stringify({
+              model: model,
+              messages: [
+                { role: 'system', content: systemPrompt },
+                ...companionState.chatMessages.slice(-10).map(m => ({
+                  role: m.role === 'ai' ? 'assistant' : m.role,
+                  content: m.content
+                }))
+              ]
+            })
+          });
+          
+          const data = await response.json();
+          let reply = data.choices?.[0]?.message?.content || '嗯嗯，我在听~';
+          reply = reply.replace(/\[.*?\]/g, '').trim();
+          
+          companionState.chatMessages.push({ role: 'ai', content: reply });
+          renderCompanionChatMessages();
+          
+        } catch (e) {
+          console.error('陪伴聊天失败:', e);
+          companionState.chatMessages.push({ role: 'ai', content: '嗯嗯，我在呢~' });
+          renderCompanionChatMessages();
+        }
+      }
+
+      // 打开陪伴设置（背景设置等）
+      function openCompanionSettings() {
+        showToast('背景设置功能开发中~');
+      }
+
       // ==================== AI后台活动系统 ====================
       var backgroundActivityTimer = null;
       var backgroundActivityEnabled = false;
@@ -39823,6 +41992,28 @@ ${userName}在你的动态下留言了，你需要回复。
         updateFloatingPanel,
         getCurrentReadingContent,
         advanceReadingProgress,
+        // 陪伴APP
+        openCompanionPage,
+        closeCompanionPage,
+        selectCompanionChar,
+        setCompanionTask,
+        setCompanionDuration,
+        setEncourageFreq,
+        startCompanion,
+        toggleCompanionPause,
+        completeCompanion,
+        quitCompanion,
+        openCompanionChat,
+        closeCompanionChat,
+        sendCompanionChat,
+        openCompanionSettings,
+        toggleCompanionVoice,
+        handleCompanionBgSelect,
+        removeCompanionBg,
+        removeCompanionBgItem,
+        switchCompanionTab,
+        changeCompanionMonth,
+        selectCompanionDate,
         // AI表情包绑定
         openAiBindModal,
         closeAiBindModal,
