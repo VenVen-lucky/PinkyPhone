@@ -268,15 +268,15 @@
                                 backdrop-filter: blur(12px) saturate(150%);
                                 -webkit-backdrop-filter: blur(12px) saturate(150%);
                                 border-radius: 20px;
-                                padding: 10px;
+                                padding: 12px;
                                 position: relative;
                                 border: 1px solid rgba(255, 255, 255, 0.25);
                                 overflow: hidden;
                                 box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
                                 text-align: center;
                                 margin: 0 auto;
-                                width: 150px;
-                                height: 150px;
+                                width: 170px;
+                                height: 170px;
                                 display: flex;
                                 flex-direction: column;
                                 justify-content: center;
@@ -310,14 +310,14 @@
                               }
 
                               .love-days-number {
-                                font-size: 1.6rem;
+                                font-size: 1.8rem;
                                 font-weight: 700;
                                 color: rgba(60, 60, 60, 0.75);
                                 letter-spacing: 1px;
                               }
 
                               .love-days-unit {
-                                font-size: 0.85rem;
+                                font-size: 0.9rem;
                                 color: rgba(60, 60, 60, 0.55);
                                 font-weight: 500;
                               }
@@ -331,8 +331,8 @@
                               }
 
                               .love-avatar {
-                                width: 55px;
-                                height: 55px;
+                                width: 60px;
+                                height: 60px;
                                 border-radius: 50%;
                                 cursor: pointer;
                                 overflow: hidden;
@@ -1256,6 +1256,7 @@
                               .msg-row.ai.group-msg {
                                 padding-left: 40px;
                                 position: relative;
+                                flex-wrap: wrap;
                               }
                               .msg-row.ai.group-msg .msg-sender-avatar {
                                 position: absolute;
@@ -1281,12 +1282,21 @@
                                 color: #f48fb1;
                                 margin-bottom: 4px;
                                 font-weight: 500;
+                                width: 100%;
+                              }
+                              /* AI群消息时间戳在气泡右边 */
+                              .msg-row.ai.group-msg .msg-time {
+                                margin-top: 0;
+                                margin-left: 8px;
+                                align-self: flex-end;
+                                margin-bottom: 4px;
                               }
 
                               /* 群聊用户消息样式 */
                               .msg-row.user.group-msg {
                                 padding-right: 40px;
                                 position: relative;
+                                flex-wrap: wrap;
                               }
                               .msg-row.user.group-msg .msg-user-avatar {
                                 position: absolute;
@@ -1307,6 +1317,17 @@
                                 width: 100%;
                                 height: 100%;
                                 object-fit: cover;
+                              }
+                              /* 用户群消息时间戳在气泡左边 */
+                              .msg-row.user.group-msg .msg-time {
+                                margin-top: 0;
+                                margin-right: 8px;
+                                align-self: flex-end;
+                                margin-bottom: 4px;
+                                order: -1;
+                              }
+                              .msg-row.user.group-msg .msg-bubble {
+                                order: 0;
                               }
 
                               /* 群聊引用样式 */
@@ -1437,11 +1458,18 @@
                                 gap: 8px;
                                 cursor: pointer;
                                 border-bottom: 1px solid rgba(0,0,0,0.05);
-                                margin-top: 60px;
-                                border-radius: 0 0 12px 12px;
-                                margin-left: 12px;
-                                margin-right: 12px;
+                                position: fixed;
+                                top: 70px;
+                                left: 12px;
+                                right: 12px;
+                                border-radius: 12px;
                                 box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+                                z-index: 90;
+                              }
+                              @media (max-width: 500px) {
+                                .group-announcement-bar {
+                                  top: calc(60px + env(safe-area-inset-top));
+                                }
                               }
                               .group-announcement-bar:empty {
                                 display: none;
@@ -14318,9 +14346,9 @@
             /* === 拍立得小组件样式 === */
       .polaroid-widget {
         /* 大小设置：根据你的需求调整 */
-        width: 140px;
+        width: 155px;
         /* 拍立得通常是长方形，高度稍微高一点点 */
-        height: 168px;
+        height: 185px;
 
         background: #fff;
         border-radius: 4px; /* 拍立得的角不需要太圆，稍微一点点就好 */
@@ -14341,7 +14369,7 @@
         /* 放在右下角 - 使用fixed定位 */
         position: fixed;
         bottom: 160px;
-        right: 28px;
+        right: 45px;
         margin: 0;
         z-index: 50;
         transition: transform 0.2s;
@@ -14362,7 +14390,7 @@
       .polaroid-photo-area {
         width: 100%;
         /* 这里的 flex-grow: 1 让图片占据剩余空间 */
-        height: 105px;
+        height: 120px;
         background: #333; /*还没加载出来时显示深色底*/
         overflow: hidden;
         cursor: pointer;
@@ -17474,10 +17502,10 @@
               type="color"
               id="customColorInput"
               style="
-                display: none;
                 position: absolute;
+                width: 1px;
+                height: 1px;
                 opacity: 0;
-                pointer-events: none;
               "
               onchange="applyCustomFontColor(this.value)"
             />
@@ -17645,6 +17673,52 @@
                   class="app-customize-name"
                   id="customName_appearance"
                   value="外观设置"
+                  placeholder="APP名称"
+                />
+              </div>
+              <div class="app-customize-item">
+                <div
+                  class="app-customize-icon"
+                  id="customIcon_couple"
+                  onclick="document.getElementById('iconInput_couple').click()"
+                >
+                  情侣
+                </div>
+                <input
+                  type="file"
+                  id="iconInput_couple"
+                  accept="image/*"
+                  style="display: none"
+                  onchange="previewAppIcon('couple', this)"
+                />
+                <input
+                  type="text"
+                  class="app-customize-name"
+                  id="customName_couple"
+                  value="情侣空间"
+                  placeholder="APP名称"
+                />
+              </div>
+              <div class="app-customize-item">
+                <div
+                  class="app-customize-icon"
+                  id="customIcon_companion"
+                  onclick="document.getElementById('iconInput_companion').click()"
+                >
+                  陪伴
+                </div>
+                <input
+                  type="file"
+                  id="iconInput_companion"
+                  accept="image/*"
+                  style="display: none"
+                  onchange="previewAppIcon('companion', this)"
+                />
+                <input
+                  type="text"
+                  class="app-customize-name"
+                  id="customName_companion"
+                  value="陪伴"
                   placeholder="APP名称"
                 />
               </div>
@@ -23060,8 +23134,9 @@ ${stickerPrompt}${announcementPrompt}
   {"name": "角色C", "content": "@角色A 我同意你说的"}
 ]
 
-注意：
-- 必须生成3-8条消息，让对话活跃起来
+【重要规则】：
+- **每个群成员都必须参与对话**，不能遗漏任何成员
+- 必须生成6-15条消息，确保对话活跃
 - 角色之间要有互动，可以互相回应、调侃、讨论
 - 每条消息要简短自然，像真实群聊一样
 - 只输出JSON数组，不要有任何前缀、后缀文字或markdown代码块标记`;
@@ -34825,19 +34900,21 @@ ${formatRequirement}
         overlay.classList.remove("in-call");
 
         const charName = settings.charNote || char.note || char.name;
+        const charAvatar = settings.otherAvatar || char.avatar;
 
         // 设置新的顶部栏
         const topAvatarImg = document.getElementById("callTopAvatarImg");
         const topAvatarPlaceholder = document.getElementById(
           "callTopAvatarPlaceholder"
         );
-        if (char.avatar) {
-          topAvatarImg.src = char.avatar;
+        if (charAvatar) {
+          topAvatarImg.src = charAvatar;
           topAvatarImg.style.display = "block";
           topAvatarPlaceholder.style.display = "none";
         } else {
           topAvatarImg.style.display = "none";
           topAvatarPlaceholder.style.display = "block";
+          topAvatarPlaceholder.textContent = charName.charAt(0);
         }
         document.getElementById("callTopName").textContent = charName;
         document.getElementById("callTopTimer").textContent = "正在呼叫...";
@@ -34847,13 +34924,14 @@ ${formatRequirement}
         const avatarPlaceholder = document.getElementById(
           "callAvatarPlaceholder"
         );
-        if (char.avatar) {
-          avatarImg.src = char.avatar;
+        if (charAvatar) {
+          avatarImg.src = charAvatar;
           avatarImg.style.display = "block";
           avatarPlaceholder.style.display = "none";
         } else {
           avatarImg.style.display = "none";
           avatarPlaceholder.style.display = "block";
+          avatarPlaceholder.textContent = charName.charAt(0);
         }
 
         document.getElementById("callName").textContent = charName;
@@ -34885,13 +34963,14 @@ ${formatRequirement}
             const mainAvatarPlaceholder = document.getElementById(
               "videoMainAvatarPlaceholder"
             );
-            if (char.avatar) {
-              mainAvatarImg.src = char.avatar;
+            if (charAvatar) {
+              mainAvatarImg.src = charAvatar;
               mainAvatarImg.style.display = "block";
               mainAvatarPlaceholder.style.display = "none";
             } else {
               mainAvatarImg.style.display = "none";
               mainAvatarPlaceholder.style.display = "block";
+              mainAvatarPlaceholder.textContent = charName.charAt(0);
             }
             document.getElementById("videoMainName").textContent = charName;
           }
@@ -36127,18 +36206,20 @@ ${formatRequirement}
         overlay.className = `call-overlay ${callState.type}-call active`;
 
         const charName = settings.charNote || char.note || char.name;
+        const charAvatar = settings.otherAvatar || char.avatar;
 
         const avatarImg = document.getElementById("callAvatarImg");
         const avatarPlaceholder = document.getElementById(
           "callAvatarPlaceholder"
         );
-        if (char.avatar) {
-          avatarImg.src = char.avatar;
+        if (charAvatar) {
+          avatarImg.src = charAvatar;
           avatarImg.style.display = "block";
           avatarPlaceholder.style.display = "none";
         } else {
           avatarImg.style.display = "none";
           avatarPlaceholder.style.display = "block";
+          avatarPlaceholder.textContent = charName.charAt(0);
         }
 
         document.getElementById("callName").textContent = charName;
@@ -36165,10 +36246,12 @@ ${formatRequirement}
             const mainAvatarPlaceholder = document.getElementById(
               "videoMainAvatarPlaceholder"
             );
-            if (char.avatar) {
-              mainAvatarImg.src = char.avatar;
+            if (charAvatar) {
+              mainAvatarImg.src = charAvatar;
               mainAvatarImg.style.display = "block";
               mainAvatarPlaceholder.style.display = "none";
+            } else {
+              mainAvatarPlaceholder.textContent = charName.charAt(0);
             }
             document.getElementById("videoMainName").textContent = charName;
           }
@@ -42876,6 +42959,8 @@ ${userName}在你的动态下留言了，你需要回复。
           api: { name: "API设置", icon: null },
           font: { name: "字体", icon: null },
           appearance: { name: "外观设置", icon: null },
+          couple: { name: "情侣空间", icon: null },
+          companion: { name: "陪伴", icon: null },
         },
       };
 
