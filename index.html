@@ -1256,7 +1256,9 @@
                               .msg-row.ai.group-msg {
                                 padding-left: 40px;
                                 position: relative;
-                                flex-wrap: wrap;
+                                flex-direction: row;
+                                flex-wrap: nowrap;
+                                align-items: flex-end;
                               }
                               .msg-row.ai.group-msg .msg-sender-avatar {
                                 position: absolute;
@@ -1282,21 +1284,28 @@
                                 color: #f48fb1;
                                 margin-bottom: 4px;
                                 font-weight: 500;
-                                width: 100%;
+                                position: absolute;
+                                top: 0;
+                                left: 40px;
                               }
-                              /* AI群消息时间戳在气泡右边 */
+                              /* AI群消息：气泡和时间戳同行 */
+                              .msg-row.ai.group-msg .msg-bubble {
+                                margin-top: 18px;
+                              }
                               .msg-row.ai.group-msg .msg-time {
                                 margin-top: 0;
                                 margin-left: 8px;
-                                align-self: flex-end;
                                 margin-bottom: 4px;
+                                flex-shrink: 0;
                               }
 
                               /* 群聊用户消息样式 */
                               .msg-row.user.group-msg {
                                 padding-right: 40px;
                                 position: relative;
-                                flex-wrap: wrap;
+                                flex-direction: row;
+                                flex-wrap: nowrap;
+                                align-items: flex-end;
                               }
                               .msg-row.user.group-msg .msg-user-avatar {
                                 position: absolute;
@@ -1318,13 +1327,13 @@
                                 height: 100%;
                                 object-fit: cover;
                               }
-                              /* 用户群消息时间戳在气泡左边 */
+                              /* 用户群消息：时间戳在气泡左边同行 */
                               .msg-row.user.group-msg .msg-time {
                                 margin-top: 0;
                                 margin-right: 8px;
-                                align-self: flex-end;
                                 margin-bottom: 4px;
                                 order: -1;
+                                flex-shrink: 0;
                               }
                               .msg-row.user.group-msg .msg-bubble {
                                 order: 0;
@@ -2152,7 +2161,11 @@
                                 margin: 0 -12px; /* 抵消父容器的padding */
                                 width: calc(100% + 24px);
                               }
+                              #momentsTab.active {
+                                position: relative;
+                              }
 
+                              /* 个人名片区域 - QQ空间风格 */
                               /* 个人名片区域 - QQ空间风格 */
                               .moment-profile-card {
                                 position: relative;
@@ -2161,12 +2174,12 @@
                               }
                               .moment-cover {
                                 width: 100%;
-                                height: 200px;
-                                padding-top: env(safe-area-inset-top, 0px);
+                                height: calc(160px + env(safe-area-inset-top, 0px));
+                                padding-top: 0;
                                 background: linear-gradient(135deg, #f8bbd9 0%, #f48fb1 50%, #ec407a 100%);
                                 position: relative;
                                 overflow: hidden;
-                                box-sizing: content-box;
+                                box-sizing: border-box;
                               }
                               .moment-cover img {
                                 width: 100%;
@@ -2225,7 +2238,7 @@
                               }
                               .moment-avatar-wrap {
                                 position: relative;
-                                margin-top: -35px;
+                                margin-top: -40px;
                               }
                               .moment-avatar {
                                 width: 70px;
