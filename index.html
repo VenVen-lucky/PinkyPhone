@@ -42969,7 +42969,22 @@ ${userName}在你的动态下留言了，你需要回复。
         try {
           const saved = await safeLocalforageGet("appearanceSettings");
           if (saved) {
-            window.appearanceSettings = saved;
+            // 合并保存的数据和默认配置，确保新增的应用也能正常显示
+            const defaultApps = {
+              chat: { name: "聊天", icon: null },
+              worldbook: { name: "世界书", icon: null },
+              preset: { name: "预设", icon: null },
+              forum: { name: "论坛", icon: null },
+              api: { name: "API设置", icon: null },
+              font: { name: "字体", icon: null },
+              appearance: { name: "外观设置", icon: null },
+              couple: { name: "情侣空间", icon: null },
+              companion: { name: "陪伴", icon: null },
+            };
+            window.appearanceSettings = {
+              ...saved,
+              apps: { ...defaultApps, ...(saved.apps || {}) }
+            };
             applyAppearanceSettings();
           }
         } catch (e) {
@@ -43020,6 +43035,14 @@ ${userName}在你的动态下留言了，你需要回复。
           forum: {
             iconSelector: ".apps-grid > .app-item:nth-child(5) .app-icon",
             nameSelector: ".apps-grid > .app-item:nth-child(5) .app-name",
+          },
+          couple: {
+            iconSelector: ".apps-grid > .app-item:nth-child(6) .app-icon",
+            nameSelector: ".apps-grid > .app-item:nth-child(6) .app-name",
+          },
+          companion: {
+            iconSelector: ".apps-grid > .app-item:nth-child(7) .app-icon",
+            nameSelector: ".apps-grid > .app-item:nth-child(7) .app-name",
           },
           api: {
             iconSelector: ".dock .dock-item:nth-child(1) .dock-icon",
@@ -43123,6 +43146,10 @@ ${userName}在你的动态下留言了，你需要回复。
           reader.onload = function (e) {
             const iconEl = document.getElementById(`customIcon_${appKey}`);
             iconEl.innerHTML = `<img src="${e.target.result}">`;
+            // 确保apps对象存在
+            if (!window.appearanceSettings.apps[appKey]) {
+              window.appearanceSettings.apps[appKey] = { name: appKey, icon: null };
+            }
             window.appearanceSettings.apps[appKey].icon = e.target.result;
           };
           reader.readAsDataURL(input.files[0]);
