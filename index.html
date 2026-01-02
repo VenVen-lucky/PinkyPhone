@@ -22,6 +22,19 @@
       rel="stylesheet"
     />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js?v=1.4"></script>
+    <script>
+      // 修复iOS添加到主屏幕后的视口高度问题
+      function setViewportHeight() {
+        const vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--real-vh', `${vh}px`);
+        document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
+      }
+      setViewportHeight();
+      window.addEventListener('resize', setViewportHeight);
+      window.addEventListener('orientationchange', function() {
+        setTimeout(setViewportHeight, 100);
+      });
+    </script>
     <style>
                               * {
                                 margin: 0;
@@ -72,17 +85,26 @@
 
                               html {
                                 height: 100%;
+                                height: var(--app-height, 100vh);
                                 -webkit-text-size-adjust: 100%;
                                 background: #fce4ec;
                               }
 
                               body {
                                 margin: 0;
+                                padding: 0;
                                 height: 100%;
+                                height: var(--app-height, 100vh);
                                 overflow: hidden;
                                 font-family: "Noto Sans SC", -apple-system, BlinkMacSystemFont,
                                   sans-serif;
                                 background: var(--bg-pink);
+                                /* 确保全屏填充 */
+                                position: fixed;
+                                top: 0;
+                                left: 0;
+                                right: 0;
+                                bottom: 0;
                               }
 
                               /* Polka dot background */
@@ -144,9 +166,13 @@
 
                               .phone-container {
                                 width: 100%;
-                                height: 100vh;
-                                height: 100dvh; /* 现代浏览器会使用这个 */
-                                position: relative;
+                                height: 100%;
+                                height: var(--app-height, 100vh);
+                                position: absolute;
+                                top: 0;
+                                left: 0;
+                                right: 0;
+                                bottom: 0;
                                 overflow: hidden;
                                 display: flex;
                                 flex-direction: column;
