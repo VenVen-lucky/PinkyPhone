@@ -22,19 +22,6 @@
       rel="stylesheet"
     />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js?v=1.4"></script>
-    <script>
-      // 修复iOS添加到主屏幕后的视口高度问题
-      function setViewportHeight() {
-        const vh = window.innerHeight * 0.01;
-        document.documentElement.style.setProperty('--real-vh', `${vh}px`);
-        document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
-      }
-      setViewportHeight();
-      window.addEventListener('resize', setViewportHeight);
-      window.addEventListener('orientationchange', function() {
-        setTimeout(setViewportHeight, 100);
-      });
-    </script>
     <style>
                               * {
                                 margin: 0;
@@ -85,26 +72,17 @@
 
                               html {
                                 height: 100%;
-                                height: var(--app-height, 100vh);
                                 -webkit-text-size-adjust: 100%;
                                 background: #fce4ec;
                               }
 
                               body {
                                 margin: 0;
-                                padding: 0;
                                 height: 100%;
-                                height: var(--app-height, 100vh);
                                 overflow: hidden;
                                 font-family: "Noto Sans SC", -apple-system, BlinkMacSystemFont,
                                   sans-serif;
                                 background: var(--bg-pink);
-                                /* 确保全屏填充 */
-                                position: fixed;
-                                top: 0;
-                                left: 0;
-                                right: 0;
-                                bottom: 0;
                               }
 
                               /* Polka dot background */
@@ -165,20 +143,18 @@
                               }
 
                               .phone-container {
-                                width: 100%;
-                                height: 100%;
-                                height: var(--app-height, 100vh);
-                                position: absolute;
+                                position: fixed;
                                 top: 0;
                                 left: 0;
                                 right: 0;
                                 bottom: 0;
+                                width: 100%;
+                                height: 100%;
                                 overflow: hidden;
                                 display: flex;
                                 flex-direction: column;
                                 z-index: var(--z-base);
                                 background: var(--bg-pink);
-                                /* 确保没有顶部边框或阴影 */
                                 border: none;
                                 box-shadow: none;
                               }
@@ -187,11 +163,10 @@
                               .main-content {
                                 flex: 1;
                                 padding: 16px;
-                                padding-top: max(16px, env(safe-area-inset-top));
+                                padding-top: calc(16px + env(safe-area-inset-top));
                                 padding-bottom: calc(80px + env(safe-area-inset-bottom));
                                 overflow-y: auto;
                                 overflow-x: hidden;
-                                /* 确保没有顶部边框或阴影 */
                                 border: none;
                                 box-shadow: none;
                               }
@@ -665,12 +640,11 @@
                                 right: 0;
                                 bottom: 0;
                                 background: var(--bg-pink);
-                                z-index: 200;
+                                z-index: var(--z-nav);
                                 padding: 16px;
-                                padding-top: max(16px, env(safe-area-inset-top));
+                                padding-top: calc(16px + env(safe-area-inset-top));
                                 padding-bottom: calc(20px + env(safe-area-inset-bottom));
                                 overflow-y: auto;
-                                /* 确保没有顶部边框或阴影 */
                                 border: none;
                                 box-shadow: none;
                               }
