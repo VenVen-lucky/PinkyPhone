@@ -1,6 +1,6 @@
 {
-  "name": "SillyTavern",
-  "short_name": "ST",
+  "name": "PinkyPhone",
+  "short_name": "PinkyPhone",
   "description": "AI Chat App",
   "start_url": "./index.html",
   "display": "standalone",
