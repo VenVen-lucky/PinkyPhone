@@ -472,11 +472,17 @@
                                 justify-self: stretch;
                               }
                               
-                              /* 拍立得小组件 - 作为grid内的2x2组件 */
+                              /* 小组件占2x1位置 - 右下角拍立得 */
+                              .widget-2x1 {
+                                grid-column: span 2;
+                                justify-self: stretch;
+                              }
+                              
+                              /* 拍立得小组件 - 作为grid内的组件 */
                               .polaroid-widget {
                                 background: #fff;
                                 border-radius: 8px;
-                                padding: 10px 10px 24px 10px;
+                                padding: 8px 8px 16px 8px;
                                 box-shadow: 2px 4px 15px rgba(0,0,0,0.12);
                                 transform: rotate(2deg);
                                 display: flex;
@@ -484,7 +490,8 @@
                                 align-items: center;
                                 transition: transform 0.2s;
                                 cursor: pointer;
-                                justify-self: end;
+                                height: 100%;
+                                min-height: 90px;
                               }
                               
                               .polaroid-widget:active {
@@ -14487,6 +14494,7 @@
         cursor: pointer;
         border: 1px solid #eee;
         border-radius: 2px;
+        min-height: 50px;
       }
 
       .polaroid-photo-area img {
@@ -14497,9 +14505,9 @@
 
       /* 手写文字区域 */
       .polaroid-caption {
-        margin-top: 8px;
+        margin-top: 6px;
         font-family: 'Satisfy', cursive;
-        font-size: 0.9rem;
+        font-size: 0.85rem;
         color: #333;
         cursor: pointer;
         text-align: center;
@@ -14596,7 +14604,7 @@
         <!-- Apps -->
         <div class="apps-section">
           <div class="apps-grid">
-            <!-- 恋爱纪念日小组件 (2x2) -->
+            <!-- 恋爱纪念日小组件 (2x2) - 左上角 -->
             <div
               class="love-widget widget-2x2"
               id="loveWidget"
@@ -14670,8 +14678,36 @@
               </div>
             </div>
             
-            <!-- 拍立得小组件 (2x2) - 放在右边 -->
-            <div class="polaroid-widget widget-2x2" id="polaroidWidget">
+            <!-- 右上角4个App -->
+            <div class="app-item" onclick="openPage('chatPage')">
+              <div class="app-icon gradient-pink">聊天</div>
+              <span class="app-name">聊天</span>
+            </div>
+            <div class="app-item" onclick="openPage('worldbookPage')">
+              <div class="app-icon gradient-green">世界书</div>
+              <span class="app-name">世界书</span>
+            </div>
+            <div class="app-item" onclick="openPage('presetPage')">
+              <div class="app-icon gradient-orange">预设</div>
+              <span class="app-name">预设</span>
+            </div>
+            <div class="app-item" onclick="openPage('forumPage')">
+              <div class="app-icon gradient-purple">论坛</div>
+              <span class="app-name">论坛</span>
+            </div>
+            
+            <!-- 第三行：情侣、陪伴在左边，拍立得在右边 -->
+            <div class="app-item" onclick="openPage('coupleSpacePage')">
+              <div class="app-icon gradient-pink">情侣</div>
+              <span class="app-name">情侣空间</span>
+            </div>
+            <div class="app-item" onclick="openCompanionPage()">
+              <div class="app-icon gradient-blue">陪伴</div>
+              <span class="app-name">陪伴</span>
+            </div>
+            
+            <!-- 拍立得小组件 (2x1) - 右下角 -->
+            <div class="polaroid-widget widget-2x1" id="polaroidWidget">
               <div class="polaroid-photo-area" onclick="triggerPolaroidUpload()">
                 <img
                   id="polaroidImgDisplay"
@@ -14693,32 +14729,6 @@
                 accept="image/*"
                 onchange="handlePolaroidUpload(this)"
               />
-            </div>
-            
-            <!-- App图标 -->
-            <div class="app-item" onclick="openPage('chatPage')">
-              <div class="app-icon gradient-pink">聊天</div>
-              <span class="app-name">聊天</span>
-            </div>
-            <div class="app-item" onclick="openPage('worldbookPage')">
-              <div class="app-icon gradient-green">世界书</div>
-              <span class="app-name">世界书</span>
-            </div>
-            <div class="app-item" onclick="openPage('presetPage')">
-              <div class="app-icon gradient-orange">预设</div>
-              <span class="app-name">预设</span>
-            </div>
-            <div class="app-item" onclick="openPage('forumPage')">
-              <div class="app-icon gradient-purple">论坛</div>
-              <span class="app-name">论坛</span>
-            </div>
-            <div class="app-item" onclick="openPage('coupleSpacePage')">
-              <div class="app-icon gradient-pink">情侣</div>
-              <span class="app-name">情侣空间</span>
-            </div>
-            <div class="app-item" onclick="openCompanionPage()">
-              <div class="app-icon gradient-blue">陪伴</div>
-              <span class="app-name">陪伴</span>
             </div>
           </div>
         </div>
