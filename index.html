@@ -472,19 +472,18 @@
                                 justify-self: stretch;
                               }
                               
-                              /* 小组件占2x1位置 - 右下角拍立得 */
-                              .widget-2x1 {
-                                grid-column: span 2;
-                                justify-self: stretch;
+                              /* 拍立得小组件靠右对齐 */
+                              .polaroid-widget.widget-2x2 {
+                                justify-self: end;
                               }
                               
                               /* 拍立得小组件 - 作为grid内的组件 */
                               .polaroid-widget {
                                 background: #fff;
-                                border-radius: 8px;
-                                padding: 8px 8px 14px 8px;
-                                box-shadow: 2px 4px 15px rgba(0,0,0,0.12);
-                                transform: rotate(2deg);
+                                border-radius: 6px;
+                                padding: 12px 12px 28px 12px;
+                                box-shadow: 3px 5px 18px rgba(0,0,0,0.1);
+                                transform: rotate(3deg);
                                 display: flex;
                                 flex-direction: column;
                                 align-items: center;
@@ -14369,17 +14368,17 @@
                     border-radius: 50%;
                     object-fit: cover;
                   }
-                  /* === 1. 背景图区域：变小 === */
+                  /* === 1. 背景图区域 === */
             .profile-bg-container {
-              /* 高度增加5px到165px */
-              height: 165px;
+              /* 高度设为200px */
+              height: 200px;
               width: 100%;
               position: relative;
               background: #eee;
               cursor: pointer;
-              z-index: 1; /* 保证在底层 */
-              border-radius: 24px 24px 0 0; /* 顶部圆角，与下面卡片一致 */
-              overflow: hidden; /* 防止图片溢出圆角 */
+              z-index: 1;
+              border-radius: 24px 24px 0 0;
+              overflow: hidden;
             }
 
             /* === 2. 信息卡片：变矮、更透、整体变小 === */
@@ -14487,11 +14486,10 @@
       .polaroid-photo-area {
         width: 100%;
         aspect-ratio: 1 / 1;
-        background: #333;
+        background: #f5f5f5;
         overflow: hidden;
         cursor: pointer;
-        border: 1px solid #eee;
-        border-radius: 2px;
+        border-radius: 3px;
       }
 
       .polaroid-photo-area img {
@@ -14502,9 +14500,9 @@
 
       /* 手写文字区域 */
       .polaroid-caption {
-        margin-top: 6px;
+        margin-top: 10px;
         font-family: 'Satisfy', cursive;
-        font-size: 0.8rem;
+        font-size: 1rem;
         color: #333;
         cursor: pointer;
         text-align: center;
@@ -14703,8 +14701,8 @@
               <span class="app-name">陪伴</span>
             </div>
             
-            <!-- 拍立得小组件 (2x1) - 右下角 -->
-            <div class="polaroid-widget widget-2x1" id="polaroidWidget">
+            <!-- 拍立得小组件 (2x2) - 右下角 -->
+            <div class="polaroid-widget widget-2x2" id="polaroidWidget">
               <div class="polaroid-photo-area" onclick="triggerPolaroidUpload()">
                 <img
                   id="polaroidImgDisplay"
