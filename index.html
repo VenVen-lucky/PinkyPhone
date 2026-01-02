@@ -6,14 +6,21 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
     />
+    
+    <!-- PWA 配置 -->
+    <link rel="manifest" href="manifest.json" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta
-      name="apple-mobile-web-app-status-bar-style"
-      content="black-translucent"
-    />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="SillyTavern" />
     <meta name="mobile-web-app-capable" content="yes" />
-    <!-- 设置主题颜色，让状态栏区域与背景一致 -->
     <meta name="theme-color" content="#fce4ec" />
+    
+    <!-- 主屏幕图标 -->
+    <link rel="apple-touch-icon" href="https://i.postimg.cc/Kj8JnRcp/267611-CC01-F8-A3-B4910-A2-C2-FFDE479-DC.jpg" />
+    <link rel="apple-touch-icon" sizes="152x152" href="https://i.postimg.cc/Kj8JnRcp/267611-CC01-F8-A3-B4910-A2-C2-FFDE479-DC.jpg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="https://i.postimg.cc/Kj8JnRcp/267611-CC01-F8-A3-B4910-A2-C2-FFDE479-DC.jpg" />
+    <link rel="icon" type="image/png" href="https://i.postimg.cc/Kj8JnRcp/267611-CC01-F8-A3-B4910-A2-C2-FFDE479-DC.jpg" />
+    
     <title>SillyTavern</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -79,6 +86,8 @@
                               body {
                                 margin: 0;
                                 height: 100%;
+                                min-height: 100vh;
+                                min-height: -webkit-fill-available;
                                 overflow: hidden;
                                 font-family: "Noto Sans SC", -apple-system, BlinkMacSystemFont,
                                   sans-serif;
@@ -143,20 +152,15 @@
                               }
 
                               .phone-container {
-                                position: fixed;
-                                top: 0;
-                                left: 0;
-                                right: 0;
-                                bottom: 0;
                                 width: 100%;
-                                height: 100%;
+                                height: 100vh;
+                                height: -webkit-fill-available;
+                                position: relative;
                                 overflow: hidden;
                                 display: flex;
                                 flex-direction: column;
                                 z-index: var(--z-base);
                                 background: var(--bg-pink);
-                                border: none;
-                                box-shadow: none;
                               }
 
                               /* Main scrollable content */
