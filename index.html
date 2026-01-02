@@ -294,19 +294,17 @@
                                 backdrop-filter: blur(12px) saturate(150%);
                                 -webkit-backdrop-filter: blur(12px) saturate(150%);
                                 border-radius: 20px;
-                                padding: 12px;
+                                padding: 14px;
                                 position: relative;
                                 border: 1px solid rgba(255, 255, 255, 0.25);
                                 overflow: hidden;
                                 box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
                                 text-align: center;
-                                margin: 0 auto;
-                                width: 170px;
-                                height: 170px;
                                 display: flex;
                                 flex-direction: column;
                                 justify-content: center;
                                 align-items: center;
+                                justify-self: start;
                               }
 
                               .love-widget-bg {
@@ -336,14 +334,14 @@
                               }
 
                               .love-days-number {
-                                font-size: 1.8rem;
+                                font-size: 2rem;
                                 font-weight: 700;
                                 color: rgba(60, 60, 60, 0.75);
                                 letter-spacing: 1px;
                               }
 
                               .love-days-unit {
-                                font-size: 0.9rem;
+                                font-size: 1rem;
                                 color: rgba(60, 60, 60, 0.55);
                                 font-weight: 500;
                               }
@@ -357,8 +355,8 @@
                               }
 
                               .love-avatar {
-                                width: 60px;
-                                height: 60px;
+                                width: 65px;
+                                height: 65px;
                                 border-radius: 50%;
                                 cursor: pointer;
                                 overflow: hidden;
@@ -456,30 +454,41 @@
 
                               /* Apps Grid */
                               .apps-section {
-                                margin-top: 24px;
+                                margin-top: 16px;
                               }
 
                               .apps-grid {
                                 display: grid;
                                 grid-template-columns: repeat(4, 1fr);
-                                gap: 20px 12px;
+                                gap: 16px 10px;
                                 align-items: start;
                                 position: relative;
                               }
 
-                              /* 小组件占2x2位置 - 纪念日小组件变小 */
+                              /* 小组件占2x2位置 */
                               .widget-2x2 {
                                 grid-column: span 2;
                                 grid-row: span 2;
-                                justify-self: start;
+                                justify-self: stretch;
                               }
                               
-                              /* 拍立得小组件定位到右下角 */
+                              /* 拍立得小组件 - 作为grid内的2x2组件 */
                               .polaroid-widget {
-                                position: fixed !important;
-                                bottom: 100px;
-                                right: 16px;
-                                z-index: var(--z-content);
+                                background: #fff;
+                                border-radius: 8px;
+                                padding: 10px 10px 24px 10px;
+                                box-shadow: 2px 4px 15px rgba(0,0,0,0.12);
+                                transform: rotate(2deg);
+                                display: flex;
+                                flex-direction: column;
+                                align-items: center;
+                                transition: transform 0.2s;
+                                cursor: pointer;
+                                justify-self: end;
+                              }
+                              
+                              .polaroid-widget:active {
+                                transform: rotate(0deg) scale(0.95);
                               }
 
                               .app-item {
@@ -14318,7 +14327,7 @@
                     position: relative;
                     width: 100%;
                     overflow: hidden; /* 保持圆角防止背景溢出 */
-                    margin-bottom: 24px;
+                    margin-bottom: 12px;
                     border-radius: 24px; /* 整体圆角 */
                     /* 这里不需要背景色，背景色由内部元素决定 */
                   }
@@ -14355,10 +14364,10 @@
                     border-radius: 50%;
                     object-fit: cover;
                   }
-                  /* === 1. 背景图区域：变高 === */
+                  /* === 1. 背景图区域：变小 === */
             .profile-bg-container {
-              /* 高度从 180px 增加到 220px，视觉上更开阔 */
-              height: 220px;
+              /* 高度减小到 160px */
+              height: 160px;
               width: 100%;
               position: relative;
               background: #eee;
@@ -14470,76 +14479,30 @@
               font-weight: 500;
             }
             /* === 拍立得小组件样式 === */
-      .polaroid-widget {
-        /* 大小设置：根据你的需求调整 */
-        width: 120px;
-        /* 拍立得通常是长方形，高度稍微高一点点 */
-        height: 145px;
-
-        background: #fff;
-        border-radius: 4px; /* 拍立得的角不需要太圆，稍微一点点就好 */
-
-        /* 关键布局：Flex 让图片在上，文字在下 */
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-
-        /* 拍立得经典的留白：四周窄，底部宽 */
-        padding: 8px 8px 20px 8px;
-        box-sizing: border-box;
-
-        /* 阴影和一点点旋转，增加真实感 */
-        box-shadow: 2px 4px 12px rgba(0,0,0,0.15);
-        transform: rotate(3deg); /* 微微向右歪一点，如果不想要可以删掉 */
-
-        /* 放在右下角 - 使用fixed定位 */
-        position: fixed;
-        bottom: 100px;
-        right: 16px;
-        margin: 0;
-        z-index: var(--z-content);
-        transition: transform 0.2s;
-      }
-
-      .polaroid-widget:hover {
-        transform: rotate(0deg) scale(1.02); /* 鼠标放上去摆正并放大一点 */
-        z-index: var(--z-dropdown);
-      }
-      
-      /* 当有页面打开时隐藏拍立得小组件 */
-      .page.active ~ .polaroid-widget,
-      body:has(.page.active) .polaroid-widget {
-        display: none;
-      }
-
-      /* 照片区域 */
       .polaroid-photo-area {
         width: 100%;
-        /* 这里的 flex-grow: 1 让图片占据剩余空间 */
-        height: 90px;
-        background: #333; /*还没加载出来时显示深色底*/
+        flex: 1;
+        background: #333;
         overflow: hidden;
         cursor: pointer;
-        border: 1px solid #eee; /* 给照片加个微弱的内边框 */
+        border: 1px solid #eee;
+        border-radius: 2px;
       }
 
       .polaroid-photo-area img {
         width: 100%;
         height: 100%;
-        object-fit: cover; /* 保证填满框框 */
+        object-fit: cover;
       }
 
       /* 手写文字区域 */
       .polaroid-caption {
-        margin-top: 6px;
-        /* 使用你文件中已经引入的 Satisfy 字体，像手写体 */
+        margin-top: 8px;
         font-family: 'Satisfy', cursive;
-        font-size: 0.85rem;
+        font-size: 0.9rem;
         color: #333;
         cursor: pointer;
         text-align: center;
-
-        /* 限制文字不换行，超长显示省略号 */
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -14706,6 +14669,32 @@
                 2024.01.01
               </div>
             </div>
+            
+            <!-- 拍立得小组件 (2x2) - 放在右边 -->
+            <div class="polaroid-widget widget-2x2" id="polaroidWidget">
+              <div class="polaroid-photo-area" onclick="triggerPolaroidUpload()">
+                <img
+                  id="polaroidImgDisplay"
+                  src="https://images.unsplash.com/photo-1516961642265-531546e84af2?auto=format&fit=crop&w=400&q=80"
+                  alt="拍立得"
+                />
+              </div>
+              <div
+                class="polaroid-caption"
+                id="polaroidTextDisplay"
+                onclick="editPolaroidText(event)"
+              >
+                My Moment
+              </div>
+              <input
+                type="file"
+                id="polaroidInput"
+                hidden
+                accept="image/*"
+                onchange="handlePolaroidUpload(this)"
+              />
+            </div>
+            
             <!-- App图标 -->
             <div class="app-item" onclick="openPage('chatPage')">
               <div class="app-icon gradient-pink">聊天</div>
@@ -14733,36 +14722,6 @@
             </div>
           </div>
         </div>
-      </div>
-
-      <!-- 拍立得小组件 - 固定在右下角 -->
-      <div class="polaroid-widget" id="polaroidWidget">
-        <div
-          class="polaroid-photo-area"
-          onclick="triggerPolaroidUpload()"
-        >
-          <img
-            id="polaroidImgDisplay"
-            src="https://images.unsplash.com/photo-1516961642265-531546e84af2?auto=format&fit=crop&w=400&q=80"
-            alt="拍立得"
-          />
-        </div>
-
-        <div
-          class="polaroid-caption"
-          id="polaroidTextDisplay"
-          onclick="editPolaroidText(event)"
-        >
-          My Moment
-        </div>
-
-        <input
-          type="file"
-          id="polaroidInput"
-          hidden
-          accept="image/*"
-          onchange="handlePolaroidChange(this)"
-        />
       </div>
 
       <!-- Pages -->
