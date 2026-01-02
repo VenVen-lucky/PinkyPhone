@@ -58,32 +58,16 @@
                                 --z-tooltip: 900;
                                 --z-toast: 1000;
                                 --z-max: 9999;
-                              }
-                              
-                              /* 动态视口高度支持 - 兼容各种浏览器 */
-                              @supports (height: 100dvh) {
-                                :root {
-                                  --vh-full: 100dvh;
-                                  --vh-90: 90dvh;
-                                  --vh-85: 85dvh;
-                                  --vh-80: 80dvh;
-                                  --vh-70: 70dvh;
-                                  --vh-60: 60dvh;
-                                  --vh-40: 40dvh;
-                                  --vh-35: 35dvh;
-                                }
-                              }
-                              @supports not (height: 100dvh) {
-                                :root {
-                                  --vh-full: 100vh;
-                                  --vh-90: 90vh;
-                                  --vh-85: 85vh;
-                                  --vh-80: 80vh;
-                                  --vh-70: 70vh;
-                                  --vh-60: 60vh;
-                                  --vh-40: 40vh;
-                                  --vh-35: 35vh;
-                                }
+                                
+                                /* 视口高度 - 默认使用vh */
+                                --vh-full: 100vh;
+                                --vh-90: 90vh;
+                                --vh-85: 85vh;
+                                --vh-80: 80vh;
+                                --vh-70: 70vh;
+                                --vh-60: 60vh;
+                                --vh-40: 40vh;
+                                --vh-35: 35vh;
                               }
 
                               html {
@@ -160,7 +144,8 @@
 
                               .phone-container {
                                 width: 100%;
-                                height: var(--vh-full);
+                                height: 100vh;
+                                height: 100dvh; /* 现代浏览器会使用这个 */
                                 position: relative;
                                 overflow: hidden;
                                 display: flex;
@@ -177,7 +162,7 @@
                                 flex: 1;
                                 padding: 16px;
                                 padding-top: max(16px, env(safe-area-inset-top));
-                                padding-bottom: calc(90px + env(safe-area-inset-bottom));
+                                padding-bottom: calc(80px + env(safe-area-inset-bottom));
                                 overflow-y: auto;
                                 overflow-x: hidden;
                                 /* 确保没有顶部边框或阴影 */
@@ -492,9 +477,9 @@
                               /* 拍立得小组件定位到右下角 */
                               .polaroid-widget {
                                 position: fixed !important;
-                                bottom: 120px;
-                                right: 20px;
-                                z-index: 50;
+                                bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+                                right: 16px;
+                                z-index: var(--z-content);
                               }
 
                               .app-item {
@@ -5293,7 +5278,7 @@
                               /* Chat Tab Bar */
                               .chat-tab-bar {
                                 position: fixed;
-                                bottom: 20px;
+                                bottom: calc(12px + env(safe-area-inset-bottom, 0px));
                                 left: 50%;
                                 transform: translateX(-50%);
                                 display: flex;
@@ -5306,7 +5291,7 @@
                                 border-radius: 25px;
                                 border: 1px solid rgba(255, 255, 255, 0.5);
                                 box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-                                z-index: 50;
+                                z-index: var(--z-nav);
                                 width: calc(100% - 40px);
                                 max-width: 400px;
                               }
@@ -14487,9 +14472,9 @@
             /* === 拍立得小组件样式 === */
       .polaroid-widget {
         /* 大小设置：根据你的需求调整 */
-        width: 155px;
+        width: 120px;
         /* 拍立得通常是长方形，高度稍微高一点点 */
-        height: 185px;
+        height: 145px;
 
         background: #fff;
         border-radius: 4px; /* 拍立得的角不需要太圆，稍微一点点就好 */
@@ -14500,7 +14485,7 @@
         align-items: center;
 
         /* 拍立得经典的留白：四周窄，底部宽 */
-        padding: 10px 10px 28px 10px;
+        padding: 8px 8px 20px 8px;
         box-sizing: border-box;
 
         /* 阴影和一点点旋转，增加真实感 */
@@ -14509,16 +14494,16 @@
 
         /* 放在右下角 - 使用fixed定位 */
         position: fixed;
-        bottom: 160px;
-        right: 45px;
+        bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+        right: 16px;
         margin: 0;
-        z-index: 50;
+        z-index: var(--z-content);
         transition: transform 0.2s;
       }
 
       .polaroid-widget:hover {
         transform: rotate(0deg) scale(1.02); /* 鼠标放上去摆正并放大一点 */
-        z-index: 60;
+        z-index: var(--z-dropdown);
       }
       
       /* 当有页面打开时隐藏拍立得小组件 */
@@ -14531,7 +14516,7 @@
       .polaroid-photo-area {
         width: 100%;
         /* 这里的 flex-grow: 1 让图片占据剩余空间 */
-        height: 120px;
+        height: 90px;
         background: #333; /*还没加载出来时显示深色底*/
         overflow: hidden;
         cursor: pointer;
@@ -14546,10 +14531,10 @@
 
       /* 手写文字区域 */
       .polaroid-caption {
-        margin-top: 8px;
+        margin-top: 6px;
         /* 使用你文件中已经引入的 Satisfy 字体，像手写体 */
         font-family: 'Satisfy', cursive;
-        font-size: 1rem;
+        font-size: 0.85rem;
         color: #333;
         cursor: pointer;
         text-align: center;
