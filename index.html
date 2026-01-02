@@ -472,16 +472,11 @@
                                 justify-self: stretch;
                               }
                               
-                              /* 拍立得小组件靠右对齐 */
-                              .polaroid-widget.widget-2x2 {
-                                justify-self: end;
-                              }
-                              
                               /* 拍立得小组件 - 作为grid内的组件 */
                               .polaroid-widget {
                                 background: #fff;
-                                border-radius: 6px;
-                                padding: 12px 12px 28px 12px;
+                                border-radius: 5px;
+                                padding: 8px 8px 20px 8px;
                                 box-shadow: 3px 5px 18px rgba(0,0,0,0.1);
                                 transform: rotate(3deg);
                                 display: flex;
@@ -489,6 +484,8 @@
                                 align-items: center;
                                 transition: transform 0.2s;
                                 cursor: pointer;
+                                max-width: 140px;
+                                justify-self: end;
                               }
                               
                               .polaroid-widget:active {
@@ -14489,7 +14486,7 @@
         background: #f5f5f5;
         overflow: hidden;
         cursor: pointer;
-        border-radius: 3px;
+        border-radius: 2px;
       }
 
       .polaroid-photo-area img {
@@ -14500,9 +14497,9 @@
 
       /* 手写文字区域 */
       .polaroid-caption {
-        margin-top: 10px;
+        margin-top: 8px;
         font-family: 'Satisfy', cursive;
-        font-size: 1rem;
+        font-size: 0.85rem;
         color: #333;
         cursor: pointer;
         text-align: center;
