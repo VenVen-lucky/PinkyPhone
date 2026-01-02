@@ -78,17 +78,16 @@
                               }
 
                               html {
-                                height: 100%;
                                 -webkit-text-size-adjust: 100%;
+                                height: 100%;
                                 background: #fce4ec;
                               }
 
                               body {
                                 margin: 0;
                                 height: 100%;
-                                min-height: 100vh;
-                                min-height: -webkit-fill-available;
                                 overflow: hidden;
+                                position: relative;
                                 font-family: "Noto Sans SC", -apple-system, BlinkMacSystemFont,
                                   sans-serif;
                                 background: var(--bg-pink);
@@ -97,7 +96,7 @@
                               /* Polka dot background */
                               body::before {
                                 content: "";
-                                position: absolute;
+                                position: fixed;
                                 top: 0;
                                 left: 0;
                                 right: 0;
@@ -154,12 +153,10 @@
                               .phone-container {
                                 width: 100%;
                                 height: 100vh;
-                                height: -webkit-fill-available;
                                 position: relative;
                                 overflow: hidden;
                                 display: flex;
                                 flex-direction: column;
-                                z-index: var(--z-base);
                                 background: var(--bg-pink);
                               }
 
@@ -168,11 +165,9 @@
                                 flex: 1;
                                 padding: 16px;
                                 padding-top: calc(16px + env(safe-area-inset-top));
-                                padding-bottom: calc(80px + env(safe-area-inset-bottom));
+                                padding-bottom: 90px;
                                 overflow-y: auto;
                                 overflow-x: hidden;
-                                border: none;
-                                box-shadow: none;
                               }
 
                               /* Top decorative bar - 完全移除 */
@@ -482,7 +477,7 @@
                               /* 拍立得小组件定位到右下角 */
                               .polaroid-widget {
                                 position: fixed !important;
-                                bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+                                bottom: 100px;
                                 right: 16px;
                                 z-index: var(--z-content);
                               }
@@ -5282,7 +5277,7 @@
                               /* Chat Tab Bar */
                               .chat-tab-bar {
                                 position: fixed;
-                                bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+                                bottom: 12px;
                                 left: 50%;
                                 transform: translateX(-50%);
                                 display: flex;
@@ -5292,6 +5287,7 @@
                                 backdrop-filter: blur(25px) saturate(180%);
                                 -webkit-backdrop-filter: blur(25px) saturate(180%);
                                 padding: 8px 16px;
+                                padding-bottom: calc(8px + env(safe-area-inset-bottom));
                                 border-radius: 25px;
                                 border: 1px solid rgba(255, 255, 255, 0.5);
                                 box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
@@ -14498,7 +14494,7 @@
 
         /* 放在右下角 - 使用fixed定位 */
         position: fixed;
-        bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+        bottom: 100px;
         right: 16px;
         margin: 0;
         z-index: var(--z-content);
