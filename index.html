@@ -24481,6 +24481,8 @@ ${memberInfos
           const data = await response.json();
           if (data.choices && data.choices[0]) {
             let reply = data.choices[0].message.content;
+            // 过滤思维链
+            reply = filterThinkingTags(reply);
             // 清理可能的角色名前缀
             reply = reply.replace(/^\[.*?\]:\s*/g, "").trim();
             reply = reply
@@ -26601,6 +26603,43 @@ ${memberInfos
         return div.innerHTML;
       }
 
+      // 过滤AI回复中的思维链标签
+      function filterThinkingTags(text) {
+        if (!text) return text;
+        
+        let result = text
+          // 闭合标签
+          .replace(/<think>[\s\S]*?<\/think>/gi, '')
+          .replace(/<thinking>[\s\S]*?<\/thinking>/gi, '')
+          .replace(/<reasoning>[\s\S]*?<\/reasoning>/gi, '')
+          .replace(/<reflect>[\s\S]*?<\/reflect>/gi, '')
+          .replace(/<inner_thoughts>[\s\S]*?<\/inner_thoughts>/gi, '')
+          .replace(/<analysis>[\s\S]*?<\/analysis>/gi, '')
+          .replace(/<thought>[\s\S]*?<\/thought>/gi, '')
+          .replace(/【思考】[\s\S]*?【\/思考】/gi, '')
+          .replace(/【分析】[\s\S]*?【\/分析】/gi, '')
+          .replace(/\[思考\][\s\S]*?\[\/思考\]/gi, '')
+          .replace(/\[thinking\][\s\S]*?\[\/thinking\]/gi, '');
+        
+        // 处理未闭合的标签
+        const unclosedTags = ['<think>', '<thinking>', '<reasoning>', '<reflect>', '【思考】', '[思考]'];
+        for (const tag of unclosedTags) {
+          const tagIndex = result.toLowerCase().indexOf(tag.toLowerCase());
+          if (tagIndex !== -1) {
+            const afterTag = result.substring(tagIndex);
+            const normalContentMatch = afterTag.match(/\n{2,}([^<\[【][\s\S]+)/);
+            if (normalContentMatch) {
+              result = result.substring(0, tagIndex) + normalContentMatch[1];
+            } else if (tagIndex > 50) {
+              result = result.substring(0, tagIndex);
+            }
+          }
+        }
+        
+        return result.trim();
+      }
+      window.filterThinkingTags = filterThinkingTags;
+
       // Auto resize textarea
       function autoResizeTextarea(el) {
         el.style.height = "auto";
@@ -27204,6 +27243,9 @@ ${m.content}`;
           }
           const data = await response.json();
           let aiReply = data.choices[0]?.message?.content || "";
+
+          // 过滤思维链标签（某些模型如DeepSeek会输出这些）
+          aiReply = filterThinkingTags(aiReply);
 
           // 如果AI没有返回内容，静默处理不显示消息
           if (!aiReply || aiReply.trim() === "") {
@@ -36088,6 +36130,9 @@ ${formatRequirement}
             return `好的～`;
           }
 
+          // 过滤思维链
+          reply = filterThinkingTags(reply);
+          
           // 清理回复中可能的格式问题
           reply = reply.trim();
           // 移除可能的引号包裹
@@ -37119,6 +37164,9 @@ ${formatRequirement}
             }
           }
 
+          // 过滤思维链
+          aiReply = filterThinkingTags(aiReply);
+
           // 检查是否为空
           if (!aiReply || !aiReply.trim() || aiReply.trim().length < 2) {
             console.error("通话: AI回复为空", {
@@ -37988,6 +38036,9 @@ ${formatRequirement}
 
           const data = await response.json();
           let aiReply = data.choices?.[0]?.message?.content?.trim();
+
+          // 过滤思维链
+          aiReply = filterThinkingTags(aiReply);
 
           if (aiReply) {
             // 保存AI回复
