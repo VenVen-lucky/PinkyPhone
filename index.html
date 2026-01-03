@@ -485,7 +485,8 @@
                                 transition: transform 0.2s;
                                 cursor: pointer;
                                 max-width: 140px;
-                                justify-self: end;
+                                justify-self: center;
+                                margin-right: 10px;
                               }
                               
                               .polaroid-widget:active {
@@ -14719,7 +14720,7 @@
                 id="polaroidInput"
                 hidden
                 accept="image/*"
-                onchange="handlePolaroidUpload(this)"
+                onchange="handlePolaroidChange(this)"
               />
             </div>
           </div>
