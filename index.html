@@ -7041,6 +7041,250 @@
                                 width: 20px;
                                 height: 20px;
                               }
+                              
+                              /* 心声按钮 */
+                              .conv-header-btns {
+                                display: flex;
+                                align-items: center;
+                                gap: 8px;
+                              }
+                              
+                              .conv-heart-btn {
+                                width: 36px;
+                                height: 36px;
+                                border: none;
+                                background: rgba(255, 255, 255, 0.4);
+                                backdrop-filter: blur(12px) saturate(180%);
+                                -webkit-backdrop-filter: blur(12px) saturate(180%);
+                                border-radius: 50%;
+                                cursor: pointer;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                padding: 0;
+                                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255,255,255,0.5);
+                                transition: transform 0.15s, background 0.15s;
+                                position: relative;
+                              }
+                              .conv-heart-btn:active {
+                                transform: scale(0.92);
+                                background: rgba(255, 255, 255, 0.5);
+                              }
+                              .conv-heart-btn svg {
+                                stroke: #f48fb1;
+                                fill: rgba(244, 143, 177, 0.2);
+                                width: 18px;
+                                height: 18px;
+                              }
+                              .conv-heart-btn.has-new::after {
+                                content: '';
+                                position: absolute;
+                                top: 6px;
+                                right: 6px;
+                                width: 8px;
+                                height: 8px;
+                                background: #ff4081;
+                                border-radius: 50%;
+                                border: 2px solid white;
+                              }
+                              
+                              /* 心声弹窗 */
+                              .heart-voice-overlay {
+                                display: none;
+                                position: fixed;
+                                top: 0;
+                                left: 0;
+                                right: 0;
+                                bottom: 0;
+                                background: rgba(0, 0, 0, 0.5);
+                                z-index: var(--z-max);
+                                align-items: center;
+                                justify-content: center;
+                                padding: 20px;
+                              }
+                              .heart-voice-overlay.active {
+                                display: flex;
+                              }
+                              .heart-voice-modal {
+                                background: #fff;
+                                border-radius: 20px;
+                                width: 100%;
+                                max-width: 320px;
+                                max-height: 80vh;
+                                display: flex;
+                                flex-direction: column;
+                                overflow: hidden;
+                                animation: heartBounce 0.4s ease-out;
+                              }
+                              @keyframes heartBounce {
+                                0% { transform: scale(0.8); opacity: 0; }
+                                50% { transform: scale(1.05); }
+                                100% { transform: scale(1); opacity: 1; }
+                              }
+                              .heart-voice-header {
+                                padding: 16px 20px;
+                                background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%);
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                              }
+                              .heart-voice-title {
+                                font-size: 1rem;
+                                font-weight: 600;
+                                color: #d81b60;
+                                display: flex;
+                                align-items: center;
+                                gap: 6px;
+                              }
+                              .heart-voice-title svg {
+                                width: 18px;
+                                height: 18px;
+                                fill: #f48fb1;
+                                stroke: #d81b60;
+                              }
+                              .heart-voice-close {
+                                background: rgba(255,255,255,0.6);
+                                border: none;
+                                font-size: 1rem;
+                                color: #999;
+                                cursor: pointer;
+                                padding: 4px 10px;
+                                border-radius: 12px;
+                              }
+                              .heart-voice-tabs {
+                                display: flex;
+                                border-bottom: 1px solid #f0f0f0;
+                              }
+                              .heart-voice-tab {
+                                flex: 1;
+                                padding: 12px;
+                                text-align: center;
+                                font-size: 0.85rem;
+                                color: #999;
+                                background: none;
+                                border: none;
+                                cursor: pointer;
+                                transition: all 0.2s;
+                                position: relative;
+                              }
+                              .heart-voice-tab.active {
+                                color: #f48fb1;
+                                font-weight: 600;
+                              }
+                              .heart-voice-tab.active::after {
+                                content: '';
+                                position: absolute;
+                                bottom: 0;
+                                left: 50%;
+                                transform: translateX(-50%);
+                                width: 30px;
+                                height: 3px;
+                                background: #f48fb1;
+                                border-radius: 3px;
+                              }
+                              .heart-voice-content {
+                                flex: 1;
+                                overflow-y: auto;
+                                padding: 16px;
+                                background: #fafafa;
+                              }
+                              
+                              /* 心声卡片 */
+                              .heart-card {
+                                background: #fff;
+                                border-radius: 16px;
+                                padding: 16px;
+                                box-shadow: 0 2px 12px rgba(244, 143, 177, 0.15);
+                                border: 1px solid rgba(244, 143, 177, 0.2);
+                              }
+                              .heart-card-empty {
+                                text-align: center;
+                                padding: 40px 20px;
+                                color: #999;
+                                font-size: 0.9rem;
+                              }
+                              .heart-card-empty svg {
+                                width: 48px;
+                                height: 48px;
+                                stroke: #ddd;
+                                margin-bottom: 12px;
+                              }
+                              .heart-card-section {
+                                margin-bottom: 14px;
+                              }
+                              .heart-card-section:last-child {
+                                margin-bottom: 0;
+                              }
+                              .heart-card-label {
+                                font-size: 0.7rem;
+                                color: #f48fb1;
+                                font-weight: 600;
+                                margin-bottom: 6px;
+                                display: flex;
+                                align-items: center;
+                                gap: 4px;
+                              }
+                              .heart-card-label::before {
+                                content: '';
+                                width: 4px;
+                                height: 4px;
+                                background: #f48fb1;
+                                border-radius: 50%;
+                              }
+                              .heart-card-value {
+                                font-size: 0.85rem;
+                                color: #333;
+                                line-height: 1.5;
+                                padding: 8px 12px;
+                                background: linear-gradient(135deg, #fce4ec 0%, #fff 100%);
+                                border-radius: 10px;
+                              }
+                              .heart-card-secret {
+                                background: linear-gradient(135deg, #fff0f5 0%, #ffe4ec 100%);
+                                border: 1px dashed #f48fb1;
+                                font-style: italic;
+                                color: #c2185b;
+                              }
+                              .heart-card-time {
+                                font-size: 0.7rem;
+                                color: #ccc;
+                                text-align: right;
+                                margin-top: 12px;
+                              }
+                              
+                              /* 心声历史列表 */
+                              .heart-history-item {
+                                background: #fff;
+                                border-radius: 12px;
+                                padding: 12px;
+                                margin-bottom: 10px;
+                                box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+                                cursor: pointer;
+                                transition: transform 0.2s;
+                              }
+                              .heart-history-item:active {
+                                transform: scale(0.98);
+                              }
+                              .heart-history-preview {
+                                font-size: 0.8rem;
+                                color: #666;
+                                line-height: 1.4;
+                                display: -webkit-box;
+                                -webkit-line-clamp: 2;
+                                -webkit-box-orient: vertical;
+                                overflow: hidden;
+                              }
+                              .heart-history-time {
+                                font-size: 0.7rem;
+                                color: #ccc;
+                                margin-top: 6px;
+                              }
+                              .heart-history-empty {
+                                text-align: center;
+                                padding: 30px;
+                                color: #ccc;
+                                font-size: 0.85rem;
+                              }
 
                               .conv-menu {
                                 display: none;
@@ -18471,12 +18715,19 @@
           <div class="conv-avatar" id="convAvatar">AI</div>
           <span class="conv-name" id="convName">角色名称</span>
         </div>
-        <button class="conv-menu-btn" onclick="openChatSettings()">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="3"></circle>
-            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-          </svg>
-        </button>
+        <div class="conv-header-btns">
+          <button class="conv-heart-btn" id="heartVoiceBtn" onclick="showHeartVoice()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
+          </button>
+          <button class="conv-menu-btn" onclick="openChatSettings()">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </button>
+        </div>
       </div>
 
       <div class="conv-menu" id="convMenu">
@@ -27228,6 +27479,17 @@ ${m.content}`;
             checkAndTriggerSummary(settings);
           }
 
+          // 生成心声（异步执行，不阻塞主流程）
+          if (typeof generateHeartVoice === "function") {
+            // 获取用户最后一条消息
+            const userMessages = chatHistories[savedCharId]?.filter(m => m.role === "user") || [];
+            const lastUserMsg = userMessages[userMessages.length - 1]?.content || "";
+            // 异步生成心声
+            generateHeartVoice(savedCharId, aiReply, lastUserMsg).catch(e => {
+              console.error("心声生成错误:", e);
+            });
+          }
+
           // 自动推进阅读进度（如果开启了一起读书功能）
           advanceReadingProgress();
         } catch (error) {
@@ -33085,6 +33347,306 @@ ${m.content}`;
       localforage.getItem('forwardedMsgData').then(data => {
         if (data) window.forwardedMsgData = data;
       });
+      
+      // ==================== 心声功能 ====================
+      // 心声数据存储
+      window.heartVoiceData = {};
+      
+      // 加载心声数据
+      localforage.getItem('heartVoiceData').then(data => {
+        if (data) window.heartVoiceData = data;
+      });
+      
+      // 显示心声弹窗
+      window.showHeartVoice = function() {
+        const overlay = document.getElementById('heartVoiceOverlay');
+        overlay.classList.add('active');
+        switchHeartTab('current');
+      };
+      
+      // 隐藏心声弹窗
+      window.hideHeartVoice = function() {
+        document.getElementById('heartVoiceOverlay').classList.remove('active');
+      };
+      
+      // 切换心声标签
+      window.switchHeartTab = function(tab) {
+        const tabs = document.querySelectorAll('.heart-voice-tab');
+        tabs.forEach(t => t.classList.remove('active'));
+        event.target.classList.add('active');
+        
+        const content = document.getElementById('heartVoiceContent');
+        const charId = currentChatCharId;
+        
+        if (tab === 'current') {
+          renderCurrentHeartVoice(content, charId);
+        } else {
+          renderHeartHistory(content, charId);
+        }
+      };
+      
+      // 渲染当前心声
+      function renderCurrentHeartVoice(container, charId) {
+        const charData = window.heartVoiceData[charId];
+        const current = charData?.current;
+        
+        if (!current) {
+          container.innerHTML = `
+            <div class="heart-card-empty">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+              </svg>
+              <div>还没有心声哦～</div>
+              <div style="font-size:0.75rem;margin-top:4px;color:#ccc;">发送消息后会自动生成</div>
+            </div>
+          `;
+          return;
+        }
+        
+        const time = new Date(current.timestamp).toLocaleString('zh-CN', {
+          month: 'numeric',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+        
+        container.innerHTML = `
+          <div class="heart-card">
+            <div class="heart-card-section">
+              <div class="heart-card-label">当前行为</div>
+              <div class="heart-card-value">${current.action || '...'}</div>
+            </div>
+            <div class="heart-card-section">
+              <div class="heart-card-label">当前着装</div>
+              <div class="heart-card-value">${current.outfit || '...'}</div>
+            </div>
+            <div class="heart-card-section">
+              <div class="heart-card-label">当前心情</div>
+              <div class="heart-card-value">${current.mood || '...'}</div>
+            </div>
+            <div class="heart-card-section">
+              <div class="heart-card-label">内心秘密</div>
+              <div class="heart-card-value heart-card-secret">${current.secret || '...'}</div>
+            </div>
+            <div class="heart-card-time">${time}</div>
+          </div>
+        `;
+      }
+      
+      // 渲染心声历史
+      function renderHeartHistory(container, charId) {
+        const charData = window.heartVoiceData[charId];
+        const history = charData?.history || [];
+        
+        if (history.length === 0) {
+          container.innerHTML = `
+            <div class="heart-history-empty">暂无历史记录</div>
+          `;
+          return;
+        }
+        
+        container.innerHTML = history.slice().reverse().map((item, idx) => {
+          const time = new Date(item.timestamp).toLocaleString('zh-CN', {
+            month: 'numeric',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+          return `
+            <div class="heart-history-item" onclick="viewHeartDetail(${history.length - 1 - idx})">
+              <div class="heart-history-preview">
+                ${item.mood} · ${item.action}
+              </div>
+              <div class="heart-history-time">${time}</div>
+            </div>
+          `;
+        }).join('');
+      }
+      
+      // 查看历史心声详情
+      window.viewHeartDetail = function(index) {
+        const charId = currentChatCharId;
+        const charData = window.heartVoiceData[charId];
+        const item = charData?.history?.[index];
+        
+        if (!item) return;
+        
+        const content = document.getElementById('heartVoiceContent');
+        const time = new Date(item.timestamp).toLocaleString('zh-CN', {
+          month: 'numeric',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+        
+        content.innerHTML = `
+          <div style="margin-bottom:12px;">
+            <button onclick="switchHeartTab('history')" style="background:none;border:none;color:#f48fb1;font-size:0.85rem;cursor:pointer;">← 返回列表</button>
+          </div>
+          <div class="heart-card">
+            <div class="heart-card-section">
+              <div class="heart-card-label">当前行为</div>
+              <div class="heart-card-value">${item.action || '...'}</div>
+            </div>
+            <div class="heart-card-section">
+              <div class="heart-card-label">当前着装</div>
+              <div class="heart-card-value">${item.outfit || '...'}</div>
+            </div>
+            <div class="heart-card-section">
+              <div class="heart-card-label">当前心情</div>
+              <div class="heart-card-value">${item.mood || '...'}</div>
+            </div>
+            <div class="heart-card-section">
+              <div class="heart-card-label">内心秘密</div>
+              <div class="heart-card-value heart-card-secret">${item.secret || '...'}</div>
+            </div>
+            <div class="heart-card-time">${time}</div>
+          </div>
+        `;
+      };
+      
+      // 生成心声（在AI回复后调用）
+      async function generateHeartVoice(charId, aiResponse, userMessage) {
+        try {
+          const char = characters.find(c => c.id === charId);
+          if (!char) return;
+          
+          const charSettings = chatSettings[charId] || {};
+          const persona = charSettings.persona || char.description || '';
+          const charName = char.note || char.name || 'AI';
+          
+          // 获取API配置
+          let apiConfigToUse = null;
+          if (charSettings.apiPreset) {
+            apiConfigToUse = apiPresets.find(p => p.id === charSettings.apiPreset);
+          }
+          if (!apiConfigToUse) {
+            apiConfigToUse = apiPresets.find(p => p.id === activePresetId);
+          }
+          if (!apiConfigToUse && apiPresets.length > 0) {
+            apiConfigToUse = apiPresets[0];
+          }
+          
+          if (!apiConfigToUse || !apiConfigToUse.key) {
+            console.log('没有可用的API配置，跳过心声生成');
+            return;
+          }
+          
+          const systemPrompt = `你是${charName}的内心世界分析器。根据角色的人设和刚才的对话，生成角色此刻的内心状态。
+
+角色人设：
+${persona || '(无特定人设)'}
+
+请严格按照角色人设来生成，不要脱离角色！
+
+你必须以JSON格式输出，包含以下4个字段：
+{
+  "action": "当前行为（简短描述角色正在做什么，10-20字）",
+  "outfit": "当前着装（简短描述角色的穿着，10-20字）", 
+  "mood": "当前心情（用一个词或短语+emoji描述，如：开心😊、害羞🥰、担心😟）",
+  "secret": "内心秘密（角色想说但没说出口的话，15-30字，要符合角色性格）"
+}
+
+只输出JSON，不要有任何其他内容！`;
+
+          const userPrompt = `用户说："${userMessage}"
+${charName}回复："${aiResponse.substring(0, 200)}${aiResponse.length > 200 ? '...' : ''}"
+
+请生成${charName}此刻的内心状态：`;
+
+          // 确保URL格式正确
+          let apiUrl = apiConfigToUse.url.replace(/\/$/, '');
+          if (!apiUrl.endsWith('/chat/completions')) {
+            if (apiUrl.endsWith('/v1')) {
+              apiUrl += '/chat/completions';
+            } else if (!apiUrl.includes('/chat/completions')) {
+              apiUrl += '/v1/chat/completions';
+            }
+          }
+
+          const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${apiConfigToUse.key}`
+            },
+            body: JSON.stringify({
+              model: apiConfigToUse.model,
+              messages: [
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: userPrompt }
+              ],
+              temperature: 0.7,
+              stream: false
+            })
+          });
+
+          if (!response.ok) {
+            console.error('心声API请求失败:', response.status);
+            return;
+          }
+
+          const data = await response.json();
+          let content = data.choices?.[0]?.message?.content?.trim();
+          
+          if (!content) return;
+          
+          // 清理可能的markdown代码块
+          content = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+          
+          // 解析JSON
+          let heartData;
+          try {
+            heartData = JSON.parse(content);
+          } catch (e) {
+            console.error('心声JSON解析失败:', content);
+            return;
+          }
+          
+          const heartVoice = {
+            action: heartData.action || '',
+            outfit: heartData.outfit || '',
+            mood: heartData.mood || '',
+            secret: heartData.secret || '',
+            timestamp: Date.now()
+          };
+          
+          // 保存心声数据
+          if (!window.heartVoiceData[charId]) {
+            window.heartVoiceData[charId] = { current: null, history: [] };
+          }
+          
+          // 如果有当前心声，移到历史
+          if (window.heartVoiceData[charId].current) {
+            window.heartVoiceData[charId].history.push(window.heartVoiceData[charId].current);
+            // 只保留最近20条历史
+            if (window.heartVoiceData[charId].history.length > 20) {
+              window.heartVoiceData[charId].history.shift();
+            }
+          }
+          
+          window.heartVoiceData[charId].current = heartVoice;
+          
+          // 保存到本地
+          await localforage.setItem('heartVoiceData', window.heartVoiceData);
+          
+          // 显示新心声提示
+          const heartBtn = document.getElementById('heartVoiceBtn');
+          if (heartBtn) {
+            heartBtn.classList.add('has-new');
+            // 3秒后移除提示
+            setTimeout(() => heartBtn.classList.remove('has-new'), 3000);
+          }
+          
+          console.log('心声生成成功:', heartVoice);
+          
+        } catch (error) {
+          console.error('生成心声失败:', error);
+        }
+      }
+      
+      // 导出函数
+      window.generateHeartVoice = generateHeartVoice;
       
       /* ==================== 修复：语音条无法多选的问题 ==================== */
 
@@ -45698,6 +46260,28 @@ ${userName}在你的动态下留言了，你需要回复。
         </div>
         <div class="forward-detail-content" id="forwardDetailContent">
           <!-- 动态生成消息列表 -->
+        </div>
+      </div>
+    </div>
+
+    <!-- 心声弹窗 -->
+    <div class="heart-voice-overlay" id="heartVoiceOverlay" onclick="hideHeartVoice()">
+      <div class="heart-voice-modal" onclick="event.stopPropagation()">
+        <div class="heart-voice-header">
+          <span class="heart-voice-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
+            TA的心声
+          </span>
+          <button class="heart-voice-close" onclick="hideHeartVoice()">✕</button>
+        </div>
+        <div class="heart-voice-tabs">
+          <button class="heart-voice-tab active" onclick="switchHeartTab('current')">当前心声</button>
+          <button class="heart-voice-tab" onclick="switchHeartTab('history')">历史记录</button>
+        </div>
+        <div class="heart-voice-content" id="heartVoiceContent">
+          <!-- 动态生成心声内容 -->
         </div>
       </div>
     </div>
