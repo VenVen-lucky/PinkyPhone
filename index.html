@@ -5294,7 +5294,6 @@
                                 backdrop-filter: blur(25px) saturate(180%);
                                 -webkit-backdrop-filter: blur(25px) saturate(180%);
                                 padding: 8px 16px;
-                                padding-bottom: calc(8px + env(safe-area-inset-bottom));
                                 border-radius: 25px;
                                 border: 1px solid rgba(255, 255, 255, 0.5);
                                 box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
@@ -8710,6 +8709,135 @@
                               .selection-checkbox-container {
                                 display: none !important;
                               }
+                              
+                              /* 转发弹窗样式 */
+                              .forward-modal-overlay {
+                                display: none;
+                                position: fixed;
+                                top: 0;
+                                left: 0;
+                                right: 0;
+                                bottom: 0;
+                                background: rgba(0, 0, 0, 0.5);
+                                z-index: var(--z-max);
+                                align-items: center;
+                                justify-content: center;
+                              }
+                              .forward-modal-overlay.active {
+                                display: flex;
+                              }
+                              .forward-modal {
+                                background: #fff;
+                                border-radius: 16px;
+                                width: 85%;
+                                max-width: 340px;
+                                max-height: 70vh;
+                                display: flex;
+                                flex-direction: column;
+                                overflow: hidden;
+                                animation: modalSlideUp 0.3s ease-out;
+                              }
+                              @keyframes modalSlideUp {
+                                from { transform: translateY(30px); opacity: 0; }
+                                to { transform: translateY(0); opacity: 1; }
+                              }
+                              .forward-modal-header {
+                                padding: 16px;
+                                border-bottom: 1px solid #eee;
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                              }
+                              .forward-modal-title {
+                                font-size: 1rem;
+                                font-weight: 600;
+                                color: #333;
+                              }
+                              .forward-modal-close {
+                                background: none;
+                                border: none;
+                                font-size: 1.2rem;
+                                color: #999;
+                                cursor: pointer;
+                                padding: 4px;
+                              }
+                              .forward-modal-content {
+                                flex: 1;
+                                overflow-y: auto;
+                                padding: 8px 0;
+                              }
+                              .forward-chat-item {
+                                display: flex;
+                                align-items: center;
+                                gap: 12px;
+                                padding: 12px 16px;
+                                cursor: pointer;
+                                transition: background 0.2s;
+                              }
+                              .forward-chat-item:active {
+                                background: #f5f5f5;
+                              }
+                              .forward-chat-avatar {
+                                width: 44px;
+                                height: 44px;
+                                border-radius: 12px;
+                                object-fit: cover;
+                                background: linear-gradient(135deg, #fce4ec, #f8bbd9);
+                              }
+                              .forward-chat-info {
+                                flex: 1;
+                              }
+                              .forward-chat-name {
+                                font-size: 0.95rem;
+                                font-weight: 500;
+                                color: #333;
+                              }
+                              .forward-chat-type {
+                                font-size: 0.75rem;
+                                color: #999;
+                                margin-top: 2px;
+                              }
+                              
+                              /* 转发的消息合并卡片样式 */
+                              .forwarded-msg-card {
+                                background: rgba(255,255,255,0.9);
+                                border-radius: 12px;
+                                padding: 10px 12px;
+                                margin: 4px 0;
+                                border-left: 3px solid #f48fb1;
+                                box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+                              }
+                              .forwarded-msg-header {
+                                font-size: 0.75rem;
+                                color: #f48fb1;
+                                font-weight: 600;
+                                margin-bottom: 6px;
+                                display: flex;
+                                align-items: center;
+                                gap: 4px;
+                              }
+                              .forwarded-msg-content {
+                                font-size: 0.85rem;
+                                color: #555;
+                                line-height: 1.5;
+                              }
+                              .forwarded-msg-item {
+                                padding: 4px 0;
+                                border-bottom: 1px dashed #eee;
+                              }
+                              .forwarded-msg-item:last-child {
+                                border-bottom: none;
+                              }
+                              .forwarded-msg-sender {
+                                font-size: 0.75rem;
+                                color: #888;
+                                margin-bottom: 2px;
+                              }
+                              .forwarded-msg-text {
+                                font-size: 0.85rem;
+                                color: #333;
+                              }
+                              
                               .msg-wrapper.selecting {
                                 transform: none !important;
                               }
@@ -21315,6 +21443,11 @@
           if (pageId === "presetPage") {
             cancelPresetBatch();
           }
+          
+          // 聊天页面关闭时退出多选模式
+          if (pageId === "chatPage" && typeof exitSelectionMode === 'function') {
+            exitSelectionMode();
+          }
         }
       }
 
@@ -31562,6 +31695,149 @@ ${m.content}`;
         openFavoriteGroupModal();
       }
 
+      // ==================== 转发功能 ====================
+      function showForwardModal() {
+        if (selectedIndices.size === 0) {
+          showToast("请先选择消息");
+          return;
+        }
+        
+        const overlay = document.getElementById("forwardModalOverlay");
+        const content = document.getElementById("forwardModalContent");
+        
+        // 生成可转发的聊天列表
+        let html = '';
+        
+        // 添加私聊角色
+        characters.forEach(char => {
+          // 排除当前聊天的角色
+          if (char.id === currentChatCharId) return;
+          
+          html += `
+            <div class="forward-chat-item" onclick="forwardToChat('${char.id}', 'private')">
+              <img class="forward-chat-avatar" src="${char.avatar || 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐰</text></svg>'}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐰</text></svg>'">
+              <div class="forward-chat-info">
+                <div class="forward-chat-name">${char.note || char.name || '未命名角色'}</div>
+                <div class="forward-chat-type">私聊</div>
+              </div>
+            </div>
+          `;
+        });
+        
+        // 添加群聊
+        if (window.groupChats && window.groupChats.length > 0) {
+          window.groupChats.forEach(group => {
+            html += `
+              <div class="forward-chat-item" onclick="forwardToChat('${group.id}', 'group')">
+                <img class="forward-chat-avatar" src="${group.avatar || 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👥</text></svg>'}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👥</text></svg>'">
+                <div class="forward-chat-info">
+                  <div class="forward-chat-name">${group.name || '未命名群聊'}</div>
+                  <div class="forward-chat-type">群聊 · ${group.members?.length || 0}人</div>
+                </div>
+              </div>
+            `;
+          });
+        }
+        
+        if (!html) {
+          html = '<div style="padding: 40px; text-align: center; color: #999;">暂无可转发的聊天</div>';
+        }
+        
+        content.innerHTML = html;
+        overlay.classList.add("active");
+      }
+      
+      function hideForwardModal() {
+        document.getElementById("forwardModalOverlay").classList.remove("active");
+      }
+      
+      function forwardToChat(targetId, chatType) {
+        const currentChar = characters.find((c) => c.id === currentChatCharId);
+        const sortedIndices = Array.from(selectedIndices).sort((a, b) => a - b);
+        
+        // 构建转发消息内容
+        let forwardedMessages = [];
+        sortedIndices.forEach((idx) => {
+          const msg = chatHistories[currentChatCharId][idx];
+          if (msg) {
+            forwardedMessages.push({
+              senderName: msg.role === "user" 
+                ? (window.momentsData?.userProfile?.name || "我")
+                : (currentChar?.note || currentChar?.name || "AI"),
+              content: msg.content
+            });
+          }
+        });
+        
+        // 生成转发卡片HTML
+        const sourceName = currentChar?.note || currentChar?.name || "未知";
+        const forwardCardContent = `[转发的聊天记录]
+来自与 ${sourceName} 的聊天，共${forwardedMessages.length}条消息：
+
+${forwardedMessages.map(m => `${m.senderName}：${m.content.substring(0, 50)}${m.content.length > 50 ? '...' : ''}`).join('\n')}`;
+
+        // 创建转发消息的HTML格式
+        const forwardHtml = `<div class="forwarded-msg-card">
+          <div class="forwarded-msg-header">📨 转发的聊天记录</div>
+          <div class="forwarded-msg-content">
+            ${forwardedMessages.map(m => `
+              <div class="forwarded-msg-item">
+                <div class="forwarded-msg-sender">${m.senderName}</div>
+                <div class="forwarded-msg-text">${m.content.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>`;
+        
+        if (chatType === 'private') {
+          // 转发到私聊
+          if (!chatHistories[targetId]) {
+            chatHistories[targetId] = [];
+          }
+          
+          // 添加转发消息（作为用户发送）
+          chatHistories[targetId].push({
+            role: "user",
+            content: forwardHtml,
+            isForwarded: true,
+            forwardSource: sourceName,
+            timestamp: Date.now()
+          });
+          
+          // 保存聊天记录
+          localforage.setItem("chatHistories", chatHistories);
+          
+          const targetChar = characters.find(c => c.id === targetId);
+          showToast(`已转发到 ${targetChar?.note || targetChar?.name || '聊天'}`);
+          
+        } else if (chatType === 'group') {
+          // 转发到群聊
+          const group = window.groupChats?.find(g => g.id === targetId);
+          if (group) {
+            if (!group.messages) group.messages = [];
+            
+            group.messages.push({
+              id: Date.now(),
+              senderId: "user",
+              senderName: window.momentsData?.userProfile?.name || "我",
+              senderAvatar: window.momentsData?.userProfile?.avatarImg,
+              content: forwardHtml,
+              isForwarded: true,
+              forwardSource: sourceName,
+              timestamp: Date.now()
+            });
+            
+            // 保存群聊数据
+            localforage.setItem("groupChats", window.groupChats);
+            
+            showToast(`已转发到群聊 ${group.name || '未命名群聊'}`);
+          }
+        }
+        
+        hideForwardModal();
+        exitSelectionMode();
+      }
+
       // 收藏动态
       function favoritePost(postId) {
         const post = window.momentsData?.posts?.find(
@@ -32674,6 +32950,12 @@ ${m.content}`;
 
         renderConversation();
       };
+      
+      // 导出转发功能到全局
+      window.showForwardModal = showForwardModal;
+      window.hideForwardModal = hideForwardModal;
+      window.forwardToChat = forwardToChat;
+      
       /* ==================== 修复：语音条无法多选的问题 ==================== */
 
       // 1. 覆盖原有的 playVoiceMessage 函数
@@ -45202,16 +45484,32 @@ ${userName}在你的动态下留言了，你需要回复。
         取消
       </button>
       <span
-        style="font-size: 1rem; font-weight: 600; color: #333"
+        style="font-size: 0.9rem; font-weight: 600; color: #333"
         id="selectionCount"
         >已选 0 条</span
       >
+      <button
+        class="selection-btn forward"
+        onclick="showForwardModal()"
+        style="
+          background: linear-gradient(135deg, #81d4fa, #4fc3f7);
+          color: #fff;
+          padding: 8px 12px;
+          border-radius: 8px;
+          font-size: 0.85rem;
+        "
+      >
+        ➤ 转发
+      </button>
       <button
         class="selection-btn favorite"
         onclick="favoriteSelectedMessages()"
         style="
           background: linear-gradient(135deg, #f48fb1, #ec407a);
           color: #fff;
+          padding: 8px 12px;
+          border-radius: 8px;
+          font-size: 0.85rem;
         "
       >
         ★ 收藏
@@ -45220,9 +45518,26 @@ ${userName}在你的动态下留言了，你需要回复。
         class="selection-btn delete"
         id="multiDeleteBtn"
         onclick="deleteSelectedMessages()"
+        style="
+          padding: 8px 12px;
+          font-size: 0.85rem;
+        "
       >
         ✕ 删除
       </button>
+    </div>
+
+    <!-- 转发弹窗 -->
+    <div class="forward-modal-overlay" id="forwardModalOverlay" onclick="hideForwardModal()">
+      <div class="forward-modal" onclick="event.stopPropagation()">
+        <div class="forward-modal-header">
+          <span class="forward-modal-title">选择转发对象</span>
+          <button class="forward-modal-close" onclick="hideForwardModal()">✕</button>
+        </div>
+        <div class="forward-modal-content" id="forwardModalContent">
+          <!-- 动态生成聊天列表 -->
+        </div>
+      </div>
     </div>
 
     <!-- 收藏页面 -->
