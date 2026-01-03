@@ -8800,42 +8800,122 @@
                               
                               /* 转发的消息合并卡片样式 */
                               .forwarded-msg-card {
-                                background: rgba(255,255,255,0.9);
+                                background: rgba(255,255,255,0.95);
                                 border-radius: 12px;
-                                padding: 10px 12px;
+                                padding: 12px;
                                 margin: 4px 0;
                                 border-left: 3px solid #f48fb1;
-                                box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+                                box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+                                max-width: 260px;
+                                cursor: pointer;
                               }
                               .forwarded-msg-header {
-                                font-size: 0.75rem;
+                                font-size: 0.8rem;
                                 color: #f48fb1;
                                 font-weight: 600;
-                                margin-bottom: 6px;
+                                margin-bottom: 8px;
                                 display: flex;
                                 align-items: center;
                                 gap: 4px;
                               }
-                              .forwarded-msg-content {
-                                font-size: 0.85rem;
-                                color: #555;
-                                line-height: 1.5;
+                              .forwarded-msg-preview {
+                                font-size: 0.8rem;
+                                color: #666;
+                                line-height: 1.6;
                               }
-                              .forwarded-msg-item {
-                                padding: 4px 0;
-                                border-bottom: 1px dashed #eee;
+                              .forwarded-msg-preview-item {
+                                padding: 2px 0;
+                                white-space: nowrap;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
                               }
-                              .forwarded-msg-item:last-child {
+                              .forwarded-msg-preview-item .sender {
+                                color: #999;
+                                margin-right: 4px;
+                              }
+                              .forwarded-msg-more {
+                                font-size: 0.75rem;
+                                color: #f48fb1;
+                                margin-top: 8px;
+                                text-align: center;
+                                padding-top: 8px;
+                                border-top: 1px dashed #eee;
+                              }
+                              
+                              /* 转发详情弹窗 */
+                              .forward-detail-overlay {
+                                display: none;
+                                position: fixed;
+                                top: 0;
+                                left: 0;
+                                right: 0;
+                                bottom: 0;
+                                background: rgba(0, 0, 0, 0.6);
+                                z-index: var(--z-max);
+                                align-items: center;
+                                justify-content: center;
+                                padding: 20px;
+                              }
+                              .forward-detail-overlay.active {
+                                display: flex;
+                              }
+                              .forward-detail-modal {
+                                background: #fff;
+                                border-radius: 16px;
+                                width: 100%;
+                                max-width: 340px;
+                                max-height: 70vh;
+                                display: flex;
+                                flex-direction: column;
+                                overflow: hidden;
+                                animation: modalSlideUp 0.3s ease-out;
+                              }
+                              .forward-detail-header {
+                                padding: 16px;
+                                border-bottom: 1px solid #eee;
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                                background: linear-gradient(135deg, #fce4ec, #f8bbd9);
+                              }
+                              .forward-detail-title {
+                                font-size: 0.95rem;
+                                font-weight: 600;
+                                color: #333;
+                              }
+                              .forward-detail-close {
+                                background: rgba(255,255,255,0.8);
+                                border: none;
+                                font-size: 1rem;
+                                color: #666;
+                                cursor: pointer;
+                                padding: 4px 10px;
+                                border-radius: 12px;
+                              }
+                              .forward-detail-content {
+                                flex: 1;
+                                overflow-y: auto;
+                                padding: 12px 16px;
+                                background: #fafafa;
+                              }
+                              .forward-detail-item {
+                                padding: 10px 0;
+                                border-bottom: 1px solid #eee;
+                              }
+                              .forward-detail-item:last-child {
                                 border-bottom: none;
                               }
-                              .forwarded-msg-sender {
+                              .forward-detail-sender {
                                 font-size: 0.75rem;
-                                color: #888;
-                                margin-bottom: 2px;
+                                color: #f48fb1;
+                                font-weight: 500;
+                                margin-bottom: 4px;
                               }
-                              .forwarded-msg-text {
-                                font-size: 0.85rem;
+                              .forward-detail-text {
+                                font-size: 0.9rem;
                                 color: #333;
+                                line-height: 1.5;
+                                word-break: break-word;
                               }
                               
                               .msg-wrapper.selecting {
@@ -31769,24 +31849,37 @@ ${m.content}`;
           }
         });
         
-        // 生成转发卡片HTML
+        // 生成转发卡片HTML - 只显示前3条预览
         const sourceName = currentChar?.note || currentChar?.name || "未知";
-        const forwardCardContent = `[转发的聊天记录]
-来自与 ${sourceName} 的聊天，共${forwardedMessages.length}条消息：
-
-${forwardedMessages.map(m => `${m.senderName}：${m.content.substring(0, 50)}${m.content.length > 50 ? '...' : ''}`).join('\n')}`;
-
+        const previewCount = Math.min(3, forwardedMessages.length);
+        const hasMore = forwardedMessages.length > 3;
+        
+        // 生成唯一ID用于存储完整消息
+        const forwardId = 'fwd_' + Date.now();
+        
+        // 预览HTML - 只显示前3条
+        const previewHtml = forwardedMessages.slice(0, previewCount).map(m => {
+          const shortContent = m.content.length > 20 ? m.content.substring(0, 20) + '...' : m.content;
+          return `<div class="forwarded-msg-preview-item"><span class="sender">${m.senderName}:</span>${shortContent.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>`;
+        }).join('');
+        
+        // 完整消息数据（存到全局变量）
+        if (!window.forwardedMsgData) window.forwardedMsgData = {};
+        window.forwardedMsgData[forwardId] = {
+          source: sourceName,
+          messages: forwardedMessages
+        };
+        
+        // 保存到localforage
+        localforage.setItem('forwardedMsgData', window.forwardedMsgData);
+        
         // 创建转发消息的HTML格式
-        const forwardHtml = `<div class="forwarded-msg-card">
+        const forwardHtml = `<div class="forwarded-msg-card" onclick="showForwardDetail('${forwardId}')">
           <div class="forwarded-msg-header">📨 转发的聊天记录</div>
-          <div class="forwarded-msg-content">
-            ${forwardedMessages.map(m => `
-              <div class="forwarded-msg-item">
-                <div class="forwarded-msg-sender">${m.senderName}</div>
-                <div class="forwarded-msg-text">${m.content.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
-              </div>
-            `).join('')}
+          <div class="forwarded-msg-preview">
+            ${previewHtml}
           </div>
+          ${hasMore ? `<div class="forwarded-msg-more">查看${forwardedMessages.length}条消息 ›</div>` : ''}
         </div>`;
         
         if (chatType === 'private') {
@@ -32957,6 +33050,41 @@ ${forwardedMessages.map(m => `${m.senderName}：${m.content.substring(0, 50)}${m
       window.showForwardModal = showForwardModal;
       window.hideForwardModal = hideForwardModal;
       window.forwardToChat = forwardToChat;
+      
+      // 显示转发详情弹窗
+      window.showForwardDetail = function(forwardId) {
+        event && event.stopPropagation();
+        
+        const data = window.forwardedMsgData?.[forwardId];
+        if (!data) {
+          showToast('消息数据不存在');
+          return;
+        }
+        
+        const overlay = document.getElementById('forwardDetailOverlay');
+        const title = document.getElementById('forwardDetailTitle');
+        const content = document.getElementById('forwardDetailContent');
+        
+        title.textContent = `来自与 ${data.source} 的聊天`;
+        
+        content.innerHTML = data.messages.map(m => `
+          <div class="forward-detail-item">
+            <div class="forward-detail-sender">${m.senderName}</div>
+            <div class="forward-detail-text">${m.content.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
+          </div>
+        `).join('');
+        
+        overlay.classList.add('active');
+      };
+      
+      window.hideForwardDetail = function() {
+        document.getElementById('forwardDetailOverlay').classList.remove('active');
+      };
+      
+      // 加载已保存的转发消息数据
+      localforage.getItem('forwardedMsgData').then(data => {
+        if (data) window.forwardedMsgData = data;
+      });
       
       /* ==================== 修复：语音条无法多选的问题 ==================== */
 
@@ -45538,6 +45666,19 @@ ${userName}在你的动态下留言了，你需要回复。
         </div>
         <div class="forward-modal-content" id="forwardModalContent">
           <!-- 动态生成聊天列表 -->
+        </div>
+      </div>
+    </div>
+
+    <!-- 转发详情弹窗 -->
+    <div class="forward-detail-overlay" id="forwardDetailOverlay" onclick="hideForwardDetail()">
+      <div class="forward-detail-modal" onclick="event.stopPropagation()">
+        <div class="forward-detail-header">
+          <span class="forward-detail-title" id="forwardDetailTitle">聊天记录</span>
+          <button class="forward-detail-close" onclick="hideForwardDetail()">✕</button>
+        </div>
+        <div class="forward-detail-content" id="forwardDetailContent">
+          <!-- 动态生成消息列表 -->
         </div>
       </div>
     </div>
