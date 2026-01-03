@@ -2515,9 +2515,9 @@
                               .ig-post-images.single-img img {
                                 width: 100%;
                                 height: auto;
-                                max-height: 220px;
-                                object-fit: contain;
-                                background: #f5f5f5;
+                                max-height: 400px;
+                                object-fit: cover;
+                                border-radius: 0;
                               }
                               .ig-post-images img {
                                 width: 100%;
@@ -40585,9 +40585,9 @@ ${formatRequirement}
             post.textImage
           }"`;
         }
-        if (post.image) {
-          postDescription += `${postDescription ? "\n" : ""}(动态包含一张图片)`;
-        }
+        
+        // 检查是否有真实图片
+        const hasRealImage = post.image && post.image.startsWith('data:image');
 
         const userName = window.momentsData.userProfile.name || "用户";
 
@@ -40607,9 +40607,28 @@ ${persona ? `你的人设: ${persona}` : ""}
 2. 要符合你的人设和说话风格
 3. 要针对动态的具体内容进行评论，不要泛泛而谈
 4. 可以适当使用表情符号
-5. 直接输出评论内容，不要有任何前缀或解释`;
+5. 直接输出评论内容，不要有任何前缀或解释
+${hasRealImage ? '6. 动态中包含一张图片，请根据图片内容来评论' : ''}`;
 
-        const userPrompt = `${userName}发布了一条动态:\n${postDescription}\n\n请写一条评论:`;
+        // 构建消息内容
+        let userContent;
+        if (hasRealImage) {
+          // 如果有真实图片，使用多模态格式
+          userContent = [
+            {
+              type: "text",
+              text: `${userName}发布了一条动态:\n${postDescription || '(纯图片动态)'}\n\n请根据图片内容写一条评论:`
+            },
+            {
+              type: "image_url",
+              image_url: {
+                url: post.image
+              }
+            }
+          ];
+        } else {
+          userContent = `${userName}发布了一条动态:\n${postDescription}\n\n请写一条评论:`;
+        }
 
         try {
           // 确保URL格式正确 - 以/chat/completions结尾
@@ -40626,7 +40645,7 @@ ${persona ? `你的人设: ${persona}` : ""}
             }
           }
 
-          console.log("AI评论API调用:", apiUrl, apiConfigToUse.model);
+          console.log("AI评论API调用:", apiUrl, apiConfigToUse.model, hasRealImage ? "(含图片)" : "");
 
           const response = await fetch(apiUrl, {
             method: "POST",
@@ -40638,7 +40657,7 @@ ${persona ? `你的人设: ${persona}` : ""}
               model: apiConfigToUse.model,
               messages: [
                 { role: "system", content: systemPrompt },
-                { role: "user", content: userPrompt },
+                { role: "user", content: userContent },
               ],
               temperature: 0.8,
               stream: false,
