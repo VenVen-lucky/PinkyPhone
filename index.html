@@ -31799,6 +31799,7 @@ ${forwardedMessages.map(m => `${m.senderName}：${m.content.substring(0, 50)}${m
           chatHistories[targetId].push({
             role: "user",
             content: forwardHtml,
+            isHtml: true,
             isForwarded: true,
             forwardSource: sourceName,
             timestamp: Date.now()
@@ -31822,6 +31823,7 @@ ${forwardedMessages.map(m => `${m.senderName}：${m.content.substring(0, 50)}${m
               senderName: window.momentsData?.userProfile?.name || "我",
               senderAvatar: window.momentsData?.userProfile?.avatarImg,
               content: forwardHtml,
+              isHtml: true,
               isForwarded: true,
               forwardSource: sourceName,
               timestamp: Date.now()
