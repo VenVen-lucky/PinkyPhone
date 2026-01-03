@@ -23952,6 +23952,9 @@ ${stickerPrompt}${announcementPrompt}
           if (data.choices && data.choices[0]) {
             let replyText = data.choices[0].message.content.trim();
 
+            // 首先过滤思维链（必须在JSON解析之前）
+            replyText = filterThinkingTags(replyText);
+
             // 移除markdown代码块标记
             replyText = replyText.replace(/```json\s*/gi, '').replace(/```\s*/g, '');
             
