@@ -7191,11 +7191,11 @@
                               
                               /* 心声卡片 */
                               .heart-card {
-                                background: #fff;
+                                background: linear-gradient(180deg, #fffbfc 0%, #fff 100%);
                                 border-radius: 16px;
-                                padding: 16px;
-                                box-shadow: 0 2px 12px rgba(244, 143, 177, 0.15);
-                                border: 1px solid rgba(244, 143, 177, 0.2);
+                                padding: 20px;
+                                box-shadow: 0 4px 20px rgba(244, 143, 177, 0.12);
+                                border: 1px solid rgba(244, 143, 177, 0.15);
                               }
                               .heart-card-empty {
                                 text-align: center;
@@ -7210,65 +7210,81 @@
                                 margin-bottom: 12px;
                               }
                               .heart-card-section {
-                                margin-bottom: 14px;
+                                margin-bottom: 18px;
                               }
                               .heart-card-section:last-child {
                                 margin-bottom: 0;
                               }
                               .heart-card-label {
                                 font-size: 0.7rem;
-                                color: #f48fb1;
-                                font-weight: 600;
-                                margin-bottom: 6px;
+                                color: #e91e63;
+                                font-weight: 500;
+                                margin-bottom: 8px;
+                                letter-spacing: 1px;
                                 display: flex;
                                 align-items: center;
-                                gap: 4px;
+                                gap: 6px;
                               }
                               .heart-card-label::before {
-                                content: '';
-                                width: 4px;
-                                height: 4px;
-                                background: #f48fb1;
-                                border-radius: 50%;
+                                content: '·';
+                                font-size: 1rem;
+                                color: #f48fb1;
                               }
                               .heart-card-value {
-                                font-size: 0.85rem;
-                                color: #333;
-                                line-height: 1.5;
-                                padding: 8px 12px;
-                                background: linear-gradient(135deg, #fce4ec 0%, #fff 100%);
-                                border-radius: 10px;
+                                font-size: 0.88rem;
+                                color: #4a4a4a;
+                                line-height: 1.8;
+                                padding: 12px 14px;
+                                background: rgba(252, 228, 236, 0.3);
+                                border-radius: 12px;
+                                border-left: 2px solid rgba(244, 143, 177, 0.4);
+                                font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
                               }
                               .heart-card-secret {
-                                background: linear-gradient(135deg, #fff0f5 0%, #ffe4ec 100%);
-                                border: 1px dashed #f48fb1;
-                                font-style: italic;
-                                color: #c2185b;
+                                background: linear-gradient(135deg, rgba(255, 240, 245, 0.8) 0%, rgba(255, 228, 236, 0.6) 100%);
+                                border-left: 2px solid #f48fb1;
+                                color: #ad1457;
+                                position: relative;
+                              }
+                              .heart-card-secret::before {
+                                content: '"';
+                                position: absolute;
+                                top: 6px;
+                                left: 8px;
+                                font-size: 1.5rem;
+                                color: rgba(244, 143, 177, 0.3);
+                                font-family: Georgia, serif;
                               }
                               .heart-card-time {
                                 font-size: 0.7rem;
                                 color: #ccc;
                                 text-align: right;
-                                margin-top: 12px;
+                                margin-top: 16px;
+                                font-style: italic;
                               }
                               
                               /* 心声历史列表 */
                               .heart-history-item {
                                 background: #fff;
                                 border-radius: 12px;
-                                padding: 12px;
+                                padding: 14px;
                                 margin-bottom: 10px;
-                                box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+                                box-shadow: 0 2px 8px rgba(0,0,0,0.04);
                                 cursor: pointer;
-                                transition: transform 0.2s;
+                                transition: transform 0.2s, box-shadow 0.2s;
+                                border-left: 3px solid transparent;
                               }
                               .heart-history-item:active {
                                 transform: scale(0.98);
                               }
+                              .heart-history-item:hover {
+                                border-left-color: #f48fb1;
+                                box-shadow: 0 4px 12px rgba(244, 143, 177, 0.15);
+                              }
                               .heart-history-preview {
-                                font-size: 0.8rem;
-                                color: #666;
-                                line-height: 1.4;
+                                font-size: 0.82rem;
+                                color: #555;
+                                line-height: 1.6;
                                 display: -webkit-box;
                                 -webkit-line-clamp: 2;
                                 -webkit-box-orient: vertical;
@@ -7276,8 +7292,9 @@
                               }
                               .heart-history-time {
                                 font-size: 0.7rem;
-                                color: #ccc;
-                                margin-top: 6px;
+                                color: #bbb;
+                                margin-top: 8px;
+                                font-style: italic;
                               }
                               .heart-history-empty {
                                 text-align: center;
@@ -33396,8 +33413,8 @@ ${m.content}`;
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
               </svg>
-              <div>还没有心声哦～</div>
-              <div style="font-size:0.75rem;margin-top:4px;color:#ccc;">发送消息后会自动生成</div>
+              <div style="color:#999;font-style:italic;">心事尚未落笔</div>
+              <div style="font-size:0.75rem;margin-top:6px;color:#ccc;">待你们的故事展开，便会有了</div>
             </div>
           `;
           return;
@@ -33413,19 +33430,19 @@ ${m.content}`;
         container.innerHTML = `
           <div class="heart-card">
             <div class="heart-card-section">
-              <div class="heart-card-label">当前行为</div>
+              <div class="heart-card-label">此刻的姿态</div>
               <div class="heart-card-value">${current.action || '...'}</div>
             </div>
             <div class="heart-card-section">
-              <div class="heart-card-label">当前着装</div>
+              <div class="heart-card-label">今日的装扮</div>
               <div class="heart-card-value">${current.outfit || '...'}</div>
             </div>
             <div class="heart-card-section">
-              <div class="heart-card-label">当前心情</div>
+              <div class="heart-card-label">心绪的涟漪</div>
               <div class="heart-card-value">${current.mood || '...'}</div>
             </div>
             <div class="heart-card-section">
-              <div class="heart-card-label">内心秘密</div>
+              <div class="heart-card-label">未说出口的话</div>
               <div class="heart-card-value heart-card-secret">${current.secret || '...'}</div>
             </div>
             <div class="heart-card-time">${time}</div>
@@ -33440,7 +33457,7 @@ ${m.content}`;
         
         if (history.length === 0) {
           container.innerHTML = `
-            <div class="heart-history-empty">暂无历史记录</div>
+            <div class="heart-history-empty" style="font-style:italic;color:#bbb;">往昔的心绪，尚无痕迹</div>
           `;
           return;
         }
@@ -33452,10 +33469,12 @@ ${m.content}`;
             hour: '2-digit',
             minute: '2-digit'
           });
+          // 显示秘密的前40个字作为预览
+          const preview = item.secret ? (item.secret.length > 40 ? item.secret.substring(0, 40) + '...' : item.secret) : item.mood;
           return `
             <div class="heart-history-item" onclick="viewHeartDetail(${history.length - 1 - idx})">
               <div class="heart-history-preview">
-                ${item.mood} · ${item.action}
+                "${preview}"
               </div>
               <div class="heart-history-time">${time}</div>
             </div>
@@ -33485,19 +33504,19 @@ ${m.content}`;
           </div>
           <div class="heart-card">
             <div class="heart-card-section">
-              <div class="heart-card-label">当前行为</div>
+              <div class="heart-card-label">此刻的姿态</div>
               <div class="heart-card-value">${item.action || '...'}</div>
             </div>
             <div class="heart-card-section">
-              <div class="heart-card-label">当前着装</div>
+              <div class="heart-card-label">今日的装扮</div>
               <div class="heart-card-value">${item.outfit || '...'}</div>
             </div>
             <div class="heart-card-section">
-              <div class="heart-card-label">当前心情</div>
+              <div class="heart-card-label">心绪的涟漪</div>
               <div class="heart-card-value">${item.mood || '...'}</div>
             </div>
             <div class="heart-card-section">
-              <div class="heart-card-label">内心秘密</div>
+              <div class="heart-card-label">未说出口的话</div>
               <div class="heart-card-value heart-card-secret">${item.secret || '...'}</div>
             </div>
             <div class="heart-card-time">${time}</div>
@@ -33532,27 +33551,35 @@ ${m.content}`;
             return;
           }
           
-          const systemPrompt = `你是${charName}的内心世界分析器。根据角色的人设和刚才的对话，生成角色此刻的内心状态。
+          const systemPrompt = `你是一位细腻的文学作家，专门书写${charName}内心独白。你的任务是用散文般的笔触，描绘角色此刻最真实、最隐秘的内心世界。
 
-角色人设：
+【角色人设】
 ${persona || '(无特定人设)'}
 
-请严格按照角色人设来生成，不要脱离角色！
+【创作要求】
+1. 必须完全代入角色，以角色的视角和心理来写作，绝不能脱离人设
+2. 文字要细腻、有质感，像小说中的心理描写一样耐人寻味
+3. 禁止使用任何emoji或颜文字
+4. 每一段都要有画面感，让读者能够想象出场景
+5. 语言风格要符合角色的性格和背景
 
-你必须以JSON格式输出，包含以下4个字段：
+【输出格式】
+必须以JSON格式输出，包含以下4个字段：
 {
-  "action": "当前行为（简短描述角色正在做什么，10-20字）",
-  "outfit": "当前着装（简短描述角色的穿着，10-20字）", 
-  "mood": "当前心情（用一个词或短语+emoji描述，如：开心😊、害羞🥰、担心😟）",
-  "secret": "内心秘密（角色想说但没说出口的话，15-30字，要符合角色性格）"
+  "action": "此刻的姿态（30-50字，用细腻的文字描绘角色此刻的动作、姿态、小习惯，要有画面感）",
+  "outfit": "今日的装扮（30-50字，描写角色的穿着打扮，包括衣物的材质、颜色、细节，以及整体给人的感觉）",
+  "mood": "心绪的涟漪（40-60字，用文学性的语言描写角色此刻的情绪，可以用比喻、通感等修辞，写出情绪的层次和微妙变化）",
+  "secret": "未说出口的话（50-80字，写出角色内心最想说却没有说出口的话，要符合角色性格，有情感张力，像是日记里的私语）"
 }
 
-只输出JSON，不要有任何其他内容！`;
+只输出JSON，不要有任何其他内容。`;
 
-          const userPrompt = `用户说："${userMessage}"
-${charName}回复："${aiResponse.substring(0, 200)}${aiResponse.length > 200 ? '...' : ''}"
+          const userPrompt = `【对话场景】
+用户对${charName}说："${userMessage}"
 
-请生成${charName}此刻的内心状态：`;
+${charName}的回应："${aiResponse.substring(0, 300)}${aiResponse.length > 300 ? '...' : ''}"
+
+请以${charName}的视角，用散文般的笔触，写出此刻的内心世界：`;
 
           // 确保URL格式正确
           let apiUrl = apiConfigToUse.url.replace(/\/$/, '');
@@ -46272,13 +46299,13 @@ ${userName}在你的动态下留言了，你需要回复。
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
             </svg>
-            TA的心声
+            内心独白
           </span>
           <button class="heart-voice-close" onclick="hideHeartVoice()">✕</button>
         </div>
         <div class="heart-voice-tabs">
-          <button class="heart-voice-tab active" onclick="switchHeartTab('current')">当前心声</button>
-          <button class="heart-voice-tab" onclick="switchHeartTab('history')">历史记录</button>
+          <button class="heart-voice-tab active" onclick="switchHeartTab('current')">此刻</button>
+          <button class="heart-voice-tab" onclick="switchHeartTab('history')">往昔</button>
         </div>
         <div class="heart-voice-content" id="heartVoiceContent">
           <!-- 动态生成心声内容 -->
