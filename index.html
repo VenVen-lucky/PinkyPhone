@@ -7267,12 +7267,14 @@
                               .heart-history-item {
                                 background: #fff;
                                 border-radius: 12px;
-                                padding: 14px;
+                                padding: 0;
                                 margin-bottom: 10px;
                                 box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-                                cursor: pointer;
                                 transition: transform 0.2s, box-shadow 0.2s;
                                 border-left: 3px solid transparent;
+                                display: flex;
+                                align-items: center;
+                                overflow: hidden;
                               }
                               .heart-history-item:active {
                                 transform: scale(0.98);
@@ -7280,6 +7282,33 @@
                               .heart-history-item:hover {
                                 border-left-color: #f48fb1;
                                 box-shadow: 0 4px 12px rgba(244, 143, 177, 0.15);
+                              }
+                              .heart-history-main {
+                                flex: 1;
+                                padding: 14px;
+                                cursor: pointer;
+                              }
+                              .heart-history-delete {
+                                width: 36px;
+                                height: 100%;
+                                min-height: 60px;
+                                background: none;
+                                border: none;
+                                border-left: 1px solid #f5f5f5;
+                                color: #ccc;
+                                font-size: 0.9rem;
+                                cursor: pointer;
+                                transition: all 0.2s;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                              }
+                              .heart-history-delete:hover {
+                                background: #fff5f8;
+                                color: #f48fb1;
+                              }
+                              .heart-history-delete:active {
+                                background: #fce4ec;
                               }
                               .heart-history-preview {
                                 font-size: 0.82rem;
@@ -26905,11 +26934,13 @@ ${memberInfos
               }
             }
 
-            systemContent += `\n【⚠️ 重要：当前真实时间】\n`;
-            systemContent += `现在是：${currentTimeStr}\n`;
+            systemContent += `\n【⚠️ 重要：时间感知】\n`;
+            systemContent += `当前真实时间：${currentTimeStr}\n`;
+            systemContent += `【时间标记说明】聊天记录中每条消息前面都有时间标记，格式如 [今天 14:30]、[昨天 09:15]、[1月3日 20:00] 等。\n`;
+            systemContent += `【重要】你必须正确理解这些时间标记！标记为[昨天]的消息是昨天发生的事，不是今天的事。请根据时间标记来正确回应，不要把昨天的事当成今天的事来说。\n`;
             if (timeSinceLastChat) {
-              systemContent += `【时间流逝提醒】${timeSinceLastChat}！用户刚刚回来找你聊天。\n`;
-              systemContent += `你必须在回复中体现出时间的流逝！比如说"你终于来找我了"、"好久不见啊"、"这么久没理我"、"想你了"等。这很重要！\n`;
+              systemContent += `【时间流逝】${timeSinceLastChat}！用户刚刚回来找你聊天。\n`;
+              systemContent += `你可以在回复中体现出时间的流逝，但要注意区分"之前聊过的内容"和"现在正在聊的内容"。\n`;
             }
             systemContent += `\n`;
           }
@@ -27042,10 +27073,35 @@ ${memberInfos
             }
           }
 
+          // 辅助函数：格式化消息时间
+          function formatMsgTime(timestamp) {
+            if (!timestamp) return '';
+            const msgDate = new Date(timestamp);
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
+            const msgDay = new Date(msgDate.getFullYear(), msgDate.getMonth(), msgDate.getDate());
+            
+            const timeStr = msgDate.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+            
+            if (msgDay.getTime() === today.getTime()) {
+              return `[今天 ${timeStr}]`;
+            } else if (msgDay.getTime() === yesterday.getTime()) {
+              return `[昨天 ${timeStr}]`;
+            } else {
+              const month = msgDate.getMonth() + 1;
+              const day = msgDate.getDate();
+              return `[${month}月${day}日 ${timeStr}]`;
+            }
+          }
+
           const messages = [
             { role: "system", content: systemContent },
             ...shortTermMemory
               .map((m) => {
+                // 获取消息时间标记
+                const timeTag = formatMsgTime(m.timestamp);
+                
                 // 处理隐藏的系统消息（如通话记录）
                 if (m.role === "system" && m.isHidden) {
                   return { role: "system", content: m.content };
@@ -27063,9 +27119,8 @@ ${memberInfos
                     content: [
                       {
                         type: "text",
-                        text:
-                          m.content ||
-                          "用户发送了一张图片，请描述或回应这张图片。",
+                        text: timeTag + ' ' + (m.content ||
+                          "用户发送了一张图片，请描述或回应这张图片。"),
                       },
                       {
                         type: "image_url",
@@ -27092,10 +27147,10 @@ ${memberInfos
 ${m.content}`;
                 }
 
-                // 普通消息
+                // 普通消息 - 添加时间标记
                 return {
                   role: m.role === "user" ? "user" : "assistant",
-                  content: msgContent,
+                  content: timeTag ? `${timeTag} ${msgContent}` : msgContent,
                 };
               })
               .filter((m) => m.content), // 过滤空消息
@@ -33438,7 +33493,7 @@ ${m.content}`;
               <div class="heart-card-value">${current.outfit || '...'}</div>
             </div>
             <div class="heart-card-section">
-              <div class="heart-card-label">心绪的涟漪</div>
+              <div class="heart-card-label">当前心绪</div>
               <div class="heart-card-value">${current.mood || '...'}</div>
             </div>
             <div class="heart-card-section">
@@ -33471,16 +33526,38 @@ ${m.content}`;
           });
           // 显示秘密的前40个字作为预览
           const preview = item.secret ? (item.secret.length > 40 ? item.secret.substring(0, 40) + '...' : item.secret) : item.mood;
+          const realIndex = history.length - 1 - idx;
           return `
-            <div class="heart-history-item" onclick="viewHeartDetail(${history.length - 1 - idx})">
-              <div class="heart-history-preview">
-                "${preview}"
+            <div class="heart-history-item">
+              <div class="heart-history-main" onclick="viewHeartDetail(${realIndex})">
+                <div class="heart-history-preview">
+                  "${preview}"
+                </div>
+                <div class="heart-history-time">${time}</div>
               </div>
-              <div class="heart-history-time">${time}</div>
+              <button class="heart-history-delete" onclick="event.stopPropagation();deleteHeartVoice(${realIndex})">✕</button>
             </div>
           `;
         }).join('');
       }
+      
+      // 删除心声历史
+      window.deleteHeartVoice = async function(index) {
+        const charId = currentChatCharId;
+        if (!window.heartVoiceData[charId]?.history) return;
+        
+        // 删除指定索引的心声
+        window.heartVoiceData[charId].history.splice(index, 1);
+        
+        // 保存到本地
+        await localforage.setItem('heartVoiceData', window.heartVoiceData);
+        
+        // 重新渲染历史列表
+        const content = document.getElementById('heartVoiceContent');
+        renderHeartHistory(content, charId);
+        
+        showToast('已删除');
+      };
       
       // 查看历史心声详情
       window.viewHeartDetail = function(index) {
@@ -33512,7 +33589,7 @@ ${m.content}`;
               <div class="heart-card-value">${item.outfit || '...'}</div>
             </div>
             <div class="heart-card-section">
-              <div class="heart-card-label">心绪的涟漪</div>
+              <div class="heart-card-label">当前心绪</div>
               <div class="heart-card-value">${item.mood || '...'}</div>
             </div>
             <div class="heart-card-section">
@@ -33568,7 +33645,7 @@ ${persona || '(无特定人设)'}
 {
   "action": "此刻的姿态（30-50字，用细腻的文字描绘角色此刻的动作、姿态、小习惯，要有画面感）",
   "outfit": "今日的装扮（30-50字，描写角色的穿着打扮，包括衣物的材质、颜色、细节，以及整体给人的感觉）",
-  "mood": "心绪的涟漪（40-60字，用文学性的语言描写角色此刻的情绪，可以用比喻、通感等修辞，写出情绪的层次和微妙变化）",
+  "mood": "当前心绪（用2-4个简洁的词语描述情绪，如：欣喜、害羞、忐忑、心动、失落、期待、紧张、安心、甜蜜、担忧等。不要写长句，不要用emoji）",
   "secret": "未说出口的话（50-80字，写出角色内心最想说却没有说出口的话，要符合角色性格，有情感张力，像是日记里的私语）"
 }
 
