@@ -2058,13 +2058,14 @@ body::before {
 .chat-content {
   flex: 1;
   overflow-y: auto;
-  padding-bottom: calc(70px + env(safe-area-inset-bottom));
+  padding-bottom: 0;
 }
 
 .chat-tab-content {
   display: none;
   min-height: 100%;
   padding: 0 12px;
+  padding-bottom: calc(80px + env(safe-area-inset-bottom));
 }
 
 .chat-tab-content.active {
@@ -4803,6 +4804,7 @@ body::before {
   width: 100%;
   box-sizing: border-box;
   padding: 0;
+  padding-bottom: calc(80px + env(safe-area-inset-bottom));
 }
 
 .profile-header-card {
