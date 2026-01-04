@@ -14599,3 +14599,91 @@ input[type="range"]::-webkit-slider-thumb {
         text-overflow: ellipsis;
         max-width: 100%;
       }
+/* =============================================== */
+/* iOS 全屏适配修复补丁 - 最小化修改版 */
+/* 只修复：1.底部空白 2.横向滑动 */
+/* 不改变原有视觉设计 */
+/* =============================================== */
+
+/* === 修复1: 底部粉红色空白 === */
+/* 问题：body的padding-bottom导致粉色背景露出 */
+/* 解决：移除body的底部padding，让各页面自己处理safe-area */
+body {
+  padding-bottom: 0 !important;
+}
+
+/* === 修复2: 防止横向滑动 === */
+/* 只添加必要的overflow限制，不改变其他属性 */
+
+/* Tab内容区域 - 禁止横向滚动 */
+.chat-tab-content {
+  overflow-x: hidden !important;
+  overscroll-behavior-x: none !important;
+}
+
+/* Moment页面 */
+#momentsTab,
+#momentsTab .moment-profile-card,
+#momentsTab .ig-feed {
+  overflow-x: hidden !important;
+  overscroll-behavior-x: none !important;
+}
+
+/* To Do页面 */
+#todoTab {
+  overflow-x: hidden !important;
+  overscroll-behavior-x: none !important;
+}
+
+/* Profile/Me页面 */
+#profileTab,
+#profileTab .profile-header-card,
+#profileTab .profile-menu {
+  overflow-x: hidden !important;
+  overscroll-behavior-x: none !important;
+}
+
+/* 页面容器 */
+.page {
+  overflow-x: hidden !important;
+  overscroll-behavior-x: none !important;
+}
+
+/* === 修复3: 层级问题 - dock被其他页面覆盖 === */
+/* 确保打开页面时dock被正确覆盖 */
+.chat-app {
+  z-index: var(--z-nav) !important; /* 使用原有变量，值为200 */
+}
+
+.chat-app.active {
+  z-index: var(--z-nav) !important;
+}
+
+/* page使用原有的z-index: var(--z-nav)，不需要修改 */
+
+/* === 修复4: 防止子元素溢出导致横向滚动 === */
+.chat-tab-content > * {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* 图片防溢出 */
+.chat-tab-content img {
+  max-width: 100%;
+}
+
+/* 输入框防溢出 */
+.chat-tab-content input,
+.chat-tab-content textarea {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* === 修复5: 触摸行为限制 === */
+/* 只允许纵向滑动，禁止横向 */
+.chat-tab-content,
+#momentsTab,
+#todoTab,
+#profileTab {
+  touch-action: pan-y pinch-zoom;
+}
