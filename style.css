@@ -14601,31 +14601,37 @@ input[type="range"]::-webkit-slider-thumb {
       }
 /* =============================================== */
 /* iOS 全屏适配修复补丁 */
+/* 完全参照 EPhone 参考代码实现 */
 /* =============================================== */
 
-/* === 核心修复: body 不要任何 padding === */
-html, body {
+/* === 1. html 和 body 基础设置 === */
+html {
+  height: 100% !important;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
   margin: 0 !important;
   padding: 0 !important;
   height: 100% !important;
   overflow: hidden !important;
 }
 
-/* === 核心修复: chat-app 必须覆盖整个屏幕 === */
+/* === 2. chat-app 主容器 - 完全参照 #phone-screen === */
 .chat-app {
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
   width: 100% !important;
-  height: 100% !important;
   height: 100vh !important;
-  height: 100dvh !important;
-  z-index: var(--z-nav);
+  position: relative !important;
+  overflow: hidden !important;
+  display: flex;
+  flex-direction: column;
 }
 
-/* === 防止横向滑动 === */
+.chat-app.active {
+  display: flex !important;
+}
+
+/* === 3. 防止横向滑动 === */
 .chat-tab-content,
 #momentsTab,
 #todoTab,
@@ -14636,7 +14642,7 @@ html, body {
   touch-action: pan-y pinch-zoom;
 }
 
-/* === 防止子元素溢出 === */
+/* === 4. 防止子元素溢出 === */
 .chat-tab-content > *,
 .chat-tab-content img,
 .chat-tab-content input,
