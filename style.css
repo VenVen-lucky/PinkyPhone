@@ -12,8 +12,17 @@
 /* 防止整个应用水平滚动 */
 html, body, .phone-container, .page {
   max-width: 100vw;
+  overflow-x: hidden !important;
   overscroll-behavior-x: none;
   touch-action: pan-y pinch-zoom;
+}
+
+/* 额外增强：防止所有子元素横向溢出 */
+.phone-container > *, 
+.page > *, 
+.main-content > * {
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 :root {
@@ -56,15 +65,23 @@ html, body, .phone-container, .page {
 html {
   -webkit-text-size-adjust: 100%;
   height: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
   background: #fce4ec;
   overflow: hidden;
   position: fixed;
   width: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 body {
   margin: 0;
   height: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
   width: 100%;
   overflow: hidden;
   position: fixed;
@@ -77,6 +94,8 @@ body {
   background: var(--bg-pink);
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
+  /* 确保底部完全填充 */
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 /* Polka dot background */
@@ -150,6 +169,7 @@ body::before {
   flex-direction: column;
   background: var(--bg-pink);
   overscroll-behavior: none;
+  max-width: 100vw;
 }
 
 /* Main scrollable content */
@@ -157,9 +177,11 @@ body::before {
   flex: 1;
   padding: 16px;
   padding-top: calc(16px + env(safe-area-inset-top));
-  padding-bottom: 90px;
+  padding-bottom: calc(90px + env(safe-area-inset-bottom));
   overflow-y: auto;
-  overflow-x: hidden;
+  overflow-x: hidden !important;
+  max-width: 100vw;
+  width: 100%;
 }
 
 /* Top decorative bar - 完全移除 */
@@ -642,14 +664,14 @@ body::before {
   right: 0;
   bottom: 0;
   width: 100%;
+  max-width: 100vw;
   background: var(--bg-pink);
   z-index: var(--z-nav);
   padding: 16px;
   padding-top: calc(16px + env(safe-area-inset-top));
   padding-bottom: calc(20px + env(safe-area-inset-bottom));
   overflow-y: auto;
-  overflow-x: hidden;
-  overflow-x: clip;
+  overflow-x: hidden !important;
   border: none;
   box-shadow: none;
   -webkit-overflow-scrolling: touch;
@@ -4856,7 +4878,7 @@ body::before {
 /* Chat Tab Bar */
 .chat-tab-bar {
   position: fixed;
-  bottom: 12px;
+  bottom: calc(12px + env(safe-area-inset-bottom));
   left: 50%;
   transform: translateX(-50%);
   display: flex;
