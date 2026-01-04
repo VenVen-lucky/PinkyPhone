@@ -14687,3 +14687,25 @@ body {
 #profileTab {
   touch-action: pan-y pinch-zoom;
 }
+
+/* === 修复6: 底部safe-area空白填充 === */
+/* 问题：chat-tab-bar悬浮在底部上方，下面的safe-area区域露出body的深粉色背景 */
+/* 解决：用伪元素在底部创建一个与chat-app背景一致的填充层 */
+.chat-app {
+  position: relative; /* 为伪元素创建定位上下文 */
+}
+
+.chat-app::after {
+  content: '';
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: calc(env(safe-area-inset-bottom) + 50px); /* 覆盖safe-area加足够余量 */
+  /* 使用与chat-app相同的背景 */
+  background: #fdf5f7;
+  background-image: radial-gradient(circle, rgba(244,143,177,0.15) 2px, transparent 2px);
+  background-size: 20px 20px;
+  z-index: 199; /* 在tab-bar(200)下面，但覆盖住底部空白 */
+  pointer-events: none;
+}
