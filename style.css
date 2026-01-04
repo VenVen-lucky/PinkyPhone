@@ -14600,112 +14600,47 @@ input[type="range"]::-webkit-slider-thumb {
         max-width: 100%;
       }
 /* =============================================== */
-/* iOS 全屏适配修复补丁 - 最小化修改版 */
-/* 只修复：1.底部空白 2.横向滑动 */
-/* 不改变原有视觉设计 */
+/* iOS 全屏适配修复补丁 */
 /* =============================================== */
 
-/* === 修复1: 底部粉红色空白 === */
-/* 问题：body的padding-bottom导致粉色背景露出 */
-/* 解决：移除body的底部padding，让各页面自己处理safe-area */
-body {
-  padding-bottom: 0 !important;
+/* === 核心修复: body 不要任何 padding === */
+html, body {
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 100% !important;
+  overflow: hidden !important;
 }
 
-/* === 修复2: 防止横向滑动 === */
-/* 只添加必要的overflow限制，不改变其他属性 */
-
-/* Tab内容区域 - 禁止横向滚动 */
-.chat-tab-content {
-  overflow-x: hidden !important;
-  overscroll-behavior-x: none !important;
+/* === 核心修复: chat-app 必须覆盖整个屏幕 === */
+.chat-app {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  z-index: var(--z-nav);
 }
 
-/* Moment页面 */
+/* === 防止横向滑动 === */
+.chat-tab-content,
 #momentsTab,
-#momentsTab .moment-profile-card,
-#momentsTab .ig-feed {
-  overflow-x: hidden !important;
-  overscroll-behavior-x: none !important;
-}
-
-/* To Do页面 */
-#todoTab {
-  overflow-x: hidden !important;
-  overscroll-behavior-x: none !important;
-}
-
-/* Profile/Me页面 */
+#todoTab,
 #profileTab,
-#profileTab .profile-header-card,
-#profileTab .profile-menu {
-  overflow-x: hidden !important;
-  overscroll-behavior-x: none !important;
-}
-
-/* 页面容器 */
 .page {
   overflow-x: hidden !important;
   overscroll-behavior-x: none !important;
+  touch-action: pan-y pinch-zoom;
 }
 
-/* === 修复3: 层级问题 - dock被其他页面覆盖 === */
-/* 确保打开页面时dock被正确覆盖 */
-.chat-app {
-  z-index: var(--z-nav) !important; /* 使用原有变量，值为200 */
-}
-
-.chat-app.active {
-  z-index: var(--z-nav) !important;
-}
-
-/* page使用原有的z-index: var(--z-nav)，不需要修改 */
-
-/* === 修复4: 防止子元素溢出导致横向滚动 === */
-.chat-tab-content > * {
-  max-width: 100%;
-  box-sizing: border-box;
-}
-
-/* 图片防溢出 */
-.chat-tab-content img {
-  max-width: 100%;
-}
-
-/* 输入框防溢出 */
+/* === 防止子元素溢出 === */
+.chat-tab-content > *,
+.chat-tab-content img,
 .chat-tab-content input,
 .chat-tab-content textarea {
   max-width: 100%;
   box-sizing: border-box;
-}
-
-/* === 修复5: 触摸行为限制 === */
-/* 只允许纵向滑动，禁止横向 */
-.chat-tab-content,
-#momentsTab,
-#todoTab,
-#profileTab {
-  touch-action: pan-y pinch-zoom;
-}
-
-/* === 修复6: 底部safe-area空白填充 === */
-/* 问题：chat-tab-bar悬浮在底部上方，下面的safe-area区域露出body的深粉色背景 */
-/* 解决：用伪元素在底部创建一个与chat-app背景一致的填充层 */
-.chat-app {
-  position: relative; /* 为伪元素创建定位上下文 */
-}
-
-.chat-app::after {
-  content: '';
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: calc(env(safe-area-inset-bottom) + 50px); /* 覆盖safe-area加足够余量 */
-  /* 使用与chat-app相同的背景 */
-  background: #fdf5f7;
-  background-image: radial-gradient(circle, rgba(244,143,177,0.15) 2px, transparent 2px);
-  background-size: 20px 20px;
-  z-index: 199; /* 在tab-bar(200)下面，但覆盖住底部空白 */
-  pointer-events: none;
 }
