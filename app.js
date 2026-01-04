@@ -2911,23 +2911,23 @@ ${membersList}
 ${userNickname}: ${userPersona || "群主"}
 ${stickerPrompt}${announcementPrompt}
 
-# 【【【输出格式铁律】】】
-直接输出JSON数组，以[开头以]结尾，格式：
-[{"name":"角色名","content":"内容"},{"name":"角色名","content":"内容"}]
+# 输出格式（非常重要！）
+只输出JSON数组，格式必须严格如下：
+[{"name":"角色名","content":"说的话"},{"name":"角色名","content":"说的话"}]
 
-【必须遵守】：
-- content写在一行内，不要换行
-- 引号用中文「」不用英文双引号
-- 每条消息简短自然
-- 确保JSON完整，必须以]结尾
+注意：
+- content中不要有换行，一句话写完
+- content中如果有引号，用中文引号「」而不是英文引号
+- 不要在JSON前后添加任何其他文字或解释
 
 # 语音消息
-{"name":"角色名","content":"[voice:语音内容]"}
+可以发语音：{"name":"角色名","content":"[voice:语音内容]"}
 
 # 要求
 - 每个角色都要发言至少1次
 - 生成6-12条消息
-- 角色之间要互动，回复顺序可以交叉`;
+- 每条消息简短自然（不超过50字）
+- 角色之间要互动`;
 
 
     // 获取群聊历史消息作为上下文
@@ -3098,6 +3098,7 @@ ${stickerPrompt}${announcementPrompt}
       body: JSON.stringify({
         model: preset.model || "gpt-3.5-turbo",
         messages: messages,
+        max_tokens: 1500,
         temperature:
           preset.temperature !== undefined
             ? Number(preset.temperature)
@@ -3143,49 +3144,131 @@ ${stickerPrompt}${announcementPrompt}
       // 移除markdown代码块标记
       replyText = replyText.replace(/```json\s*/gi, '').replace(/```\s*/g, '');
       
-      // 尝试提取JSON数组部分
-      let jsonMatch = replyText.match(/\[[\s\S]*$/);
+      // 尝试提取JSON数组
+      let jsonMatch = replyText.match(/\[[\s\S]*\]/);
       if (jsonMatch) {
         replyText = jsonMatch[0];
       }
       
-      // 【核心修复】彻底清理所有换行和多余空白
-      replyText = replyText.replace(/[\r\n]+/g, ' ').replace(/\s+/g, ' ');
+      // 清理JSON中的换行（但保留\n转义）
+      replyText = replyText.replace(/\r/g, '');
+      // 将content内的实际换行替换为空格（不影响\n）
+      replyText = replyText.replace(/"content"\s*:\s*"([^"]*)"/g, (match, content) => {
+        return '"content":"' + content.replace(/\n/g, ' ') + '"';
+      });
+      // 清理JSON结构间的换行
+      replyText = replyText.replace(/\n/g, ' ');
       
       // 修复常见的JSON问题
+      // 1. 将中文语音标签转换为英文格式
       replyText = replyText.replace(/\[语音[：:]\s*/g, '[voice:');
       
+      // 2. 修复content值中未转义的引号
+      // 使用更安全的方式解析
       let repliesArray = [];
-      
-      // 尝试直接解析
       try {
         repliesArray = JSON.parse(replyText);
-        console.log("JSON直接解析成功");
       } catch (firstError) {
-        console.log("JSON需要修复:", firstError.message);
+        console.warn("第一次JSON解析失败，尝试修复:", firstError.message);
         
-        // 【统一方案】直接用正则提取所有消息，不管JSON是否完整
-        // 匹配所有 name-content 对（支持完整和不完整的）
-        const allMessagesPattern = /"name"\s*:\s*"([^"]+)"\s*,\s*"content"\s*:\s*"([^"]*)/g;
+        // 方法1: 使用更激进的正则提取
+        // 匹配 "name":"xxx" 和 "content":"xxx" 的组合（包括空content）
+        const messagePattern = /\{\s*"name"\s*:\s*"([^"]+)"\s*,\s*"content"\s*:\s*"((?:[^"\\]|\\.)*)"\s*\}/g;
         let match;
-        const seen = new Set();
+        while ((match = messagePattern.exec(replyText)) !== null) {
+          repliesArray.push({
+            name: match[1],
+            content: match[2].replace(/\\"/g, '"').replace(/\\n/g, '\n').replace(/\\\\/g, '\\')
+          });
+        }
         
-        while ((match = allMessagesPattern.exec(replyText)) !== null) {
-          const name = match[1];
-          let content = match[2];
-          
-          // 清理content末尾可能的残留字符
-          content = content.replace(/"\s*\}?\s*,?\s*$/, '').replace(/\s*$/, '');
-          
-          // 去重
-          const key = `${name}:${content}`;
-          if (!seen.has(key) && name && content) {
-            seen.add(key);
-            repliesArray.push({ name, content });
+        // 方法1.5: 如果上面没有提取到，尝试更宽松的匹配（处理不完整的JSON）
+        if (repliesArray.length === 0) {
+          // 匹配可能不完整的对象
+          const loosePattern = /"name"\s*:\s*"([^"]+)"\s*,\s*"content"\s*:\s*"([^"]*)(?:"|$)/g;
+          while ((match = loosePattern.exec(replyText)) !== null) {
+            if (match[1] && match[2] !== undefined) {
+              repliesArray.push({
+                name: match[1],
+                content: match[2].replace(/\\"/g, '"').replace(/\\n/g, '\n').replace(/\\\\/g, '\\')
+              });
+            }
           }
         }
         
-        console.log("正则提取结果:", repliesArray.length, "条消息");
+        // 方法2: 如果上面的方法没提取出来，尝试逐个提取JSON对象
+        if (repliesArray.length === 0) {
+          let depth = 0;
+          let inString = false;
+          let escape = false;
+          let objStart = -1;
+          
+          for (let i = 0; i < replyText.length; i++) {
+            const char = replyText[i];
+            
+            if (escape) {
+              escape = false;
+              continue;
+            }
+            
+            if (char === '\\' && inString) {
+              escape = true;
+              continue;
+            }
+            
+            if (char === '"' && !escape) {
+              inString = !inString;
+              continue;
+            }
+            
+            if (!inString) {
+              if (char === '{') {
+                if (depth === 0) objStart = i;
+                depth++;
+              } else if (char === '}') {
+                depth--;
+                if (depth === 0 && objStart !== -1) {
+                  const objStr = replyText.substring(objStart, i + 1);
+                  try {
+                    const obj = JSON.parse(objStr);
+                    if (obj.name && obj.content) {
+                      repliesArray.push(obj);
+                    }
+                  } catch (e) {
+                    // 单个对象解析失败，尝试手动提取
+                    const nameMatch = objStr.match(/"name"\s*:\s*"([^"]+)"/);
+                    const contentMatch = objStr.match(/"content"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+                    if (nameMatch && contentMatch) {
+                      repliesArray.push({
+                        name: nameMatch[1],
+                        content: contentMatch[1].replace(/\\"/g, '"').replace(/\\n/g, '\n')
+                      });
+                    }
+                  }
+                  objStart = -1;
+                }
+              }
+            }
+          }
+        }
+        
+        // 方法3: 最后的备选 - 用简单的分割
+        if (repliesArray.length === 0) {
+          const parts = replyText.split(/\},\s*\{/);
+          for (let part of parts) {
+            part = part.replace(/^\[?\s*\{?/, '{').replace(/\}?\s*\]?$/, '}');
+            const nameMatch = part.match(/"name"\s*:\s*"([^"]+)"/);
+            const contentMatch = part.match(/"content"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+            if (nameMatch && contentMatch) {
+              repliesArray.push({
+                name: nameMatch[1],
+                content: contentMatch[1].replace(/\\"/g, '"').replace(/\\n/g, '\n')
+              });
+            }
+          }
+        }
+        
+        console.log("手动解析结果:", repliesArray.length, "条消息");
       }
 
       if (Array.isArray(repliesArray) && repliesArray.length > 0) {

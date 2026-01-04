@@ -6,23 +6,6 @@
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* 防止整个应用水平滚动 */
-html, body, .phone-container, .page {
-  max-width: 100vw;
-  overflow-x: hidden !important;
-  overscroll-behavior-x: none;
-  touch-action: pan-y pinch-zoom;
-}
-
-/* 额外增强：防止所有子元素横向溢出 */
-.phone-container > *, 
-.page > *, 
-.main-content > * {
-  max-width: 100%;
-  overflow-x: hidden;
 }
 
 :root {
@@ -65,37 +48,17 @@ html, body, .phone-container, .page {
 html {
   -webkit-text-size-adjust: 100%;
   height: 100%;
-  min-height: 100vh;
-  min-height: 100dvh;
   background: #fce4ec;
-  overflow: hidden;
-  position: fixed;
-  width: 100%;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
 }
 
 body {
   margin: 0;
   height: 100%;
-  min-height: 100vh;
-  min-height: 100dvh;
-  width: 100%;
   overflow: hidden;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  position: relative;
   font-family: "Noto Sans SC", -apple-system, BlinkMacSystemFont,
     sans-serif;
   background: var(--bg-pink);
-  overscroll-behavior: none;
-  -webkit-overflow-scrolling: touch;
-  /* 确保底部完全填充 */
-  padding-bottom: env(safe-area-inset-bottom);
 }
 
 /* Polka dot background */
@@ -158,18 +121,11 @@ body::before {
 .phone-container {
   width: 100%;
   height: 100vh;
-  height: 100dvh;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  position: relative;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   background: var(--bg-pink);
-  overscroll-behavior: none;
-  max-width: 100vw;
 }
 
 /* Main scrollable content */
@@ -177,11 +133,9 @@ body::before {
   flex: 1;
   padding: 16px;
   padding-top: calc(16px + env(safe-area-inset-top));
-  padding-bottom: calc(90px + env(safe-area-inset-bottom));
+  padding-bottom: 90px;
   overflow-y: auto;
-  overflow-x: hidden !important;
-  max-width: 100vw;
-  width: 100%;
+  overflow-x: hidden;
 }
 
 /* Top decorative bar - 完全移除 */
@@ -663,21 +617,14 @@ body::before {
   left: 0;
   right: 0;
   bottom: 0;
-  width: 100%;
-  max-width: 100vw;
   background: var(--bg-pink);
   z-index: var(--z-nav);
   padding: 16px;
   padding-top: calc(16px + env(safe-area-inset-top));
   padding-bottom: calc(20px + env(safe-area-inset-bottom));
   overflow-y: auto;
-  overflow-x: hidden !important;
   border: none;
   box-shadow: none;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
-  overscroll-behavior-x: none;
-  touch-action: pan-y;
 }
 
 .page::before {
@@ -947,9 +894,10 @@ body::before {
   position: sticky;
   top: 0;
   z-index: var(--z-content);
-  margin-left: -16px;
-  margin-right: -16px;
-  width: calc(100% + 32px);
+  margin: 0 -12px; /* 抵消父容器的padding铺满两边 */
+  padding-left: 28px; /* 补偿负margin */
+  padding-right: 28px;
+  width: calc(100% + 24px);
   box-sizing: border-box;
 }
 .tab-header-back {
@@ -2300,15 +2248,8 @@ body::before {
   background: #fff;
   min-height: 100%;
   padding-bottom: 80px;
-  margin-top: calc(-16px - env(safe-area-inset-top, 0px));
-  margin-left: -16px;
-  margin-right: -16px;
-  margin-bottom: calc(-20px - env(safe-area-inset-bottom, 0px));
-  width: calc(100% + 32px);
-  max-width: none;
-  box-sizing: border-box;
-  overflow-x: hidden;
-  overscroll-behavior-x: none;
+  margin: 0 -12px; /* 抵消父容器的padding */
+  width: calc(100% + 24px);
 }
 #momentsTab.active {
   position: relative;
@@ -4001,18 +3942,10 @@ body::before {
   background: linear-gradient(180deg, #fefbfc 0%, #fdf5f7 100%);
   min-height: 100%;
   padding: 0;
-  padding-top: calc(16px + env(safe-area-inset-top, 0px));
-  margin-top: calc(-16px - env(safe-area-inset-top, 0px));
-  margin-left: -16px;
-  margin-right: -16px;
-  margin-bottom: calc(-20px - env(safe-area-inset-bottom, 0px));
-  width: calc(100% + 32px);
-  max-width: none;
-  box-sizing: border-box;
+  margin: 0 -12px;
+  width: calc(100% + 24px);
   overflow-y: auto;
-  overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
-  overscroll-behavior-x: none;
 }
 
 .todo-container {
@@ -4761,16 +4694,9 @@ body::before {
 #profileTab {
   background: #f5f5f5;
   min-height: 100%;
-  margin-top: calc(-16px - env(safe-area-inset-top, 0px));
-  margin-left: -16px;
-  margin-right: -16px;
-  margin-bottom: calc(-20px - env(safe-area-inset-bottom, 0px));
-  padding-top: calc(16px + env(safe-area-inset-top, 0px));
-  width: calc(100% + 32px);
-  max-width: none;
-  box-sizing: border-box;
-  overflow-x: hidden;
-  overscroll-behavior-x: none;
+  overflow: hidden;
+  margin: 0 -12px; /* 抵消父容器的padding */
+  width: calc(100% + 24px);
 }
 
 .profile-header-card {
@@ -4878,7 +4804,7 @@ body::before {
 /* Chat Tab Bar */
 .chat-tab-bar {
   position: fixed;
-  bottom: calc(12px + env(safe-area-inset-bottom));
+  bottom: 12px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -9274,13 +9200,9 @@ input[type="range"]::-webkit-slider-thumb {
   top: 0;
   z-index: var(--z-header);
   background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%);
-  margin-left: -16px;
-  margin-right: -16px;
-  margin-bottom: 16px;
+  margin: 0 -16px 16px -16px;
   padding: 16px;
   padding-top: max(16px, env(safe-area-inset-top));
-  width: calc(100% + 32px);
-  box-sizing: border-box;
 }
 
 #appearancePage .page-title {
@@ -14599,59 +14521,3 @@ input[type="range"]::-webkit-slider-thumb {
         text-overflow: ellipsis;
         max-width: 100%;
       }
-/* =============================================== */
-/* iOS 全屏适配修复补丁 */
-/* 完全参照 EPhone 参考代码实现 */
-/* =============================================== */
-
-/* === 1. html 和 body 基础设置 === */
-html {
-  height: 100% !important;
-  -webkit-text-size-adjust: 100%;
-}
-
-body {
-  margin: 0 !important;
-  padding: 0 !important;
-  height: 100% !important;
-  overflow: hidden !important;
-}
-
-/* === 2. chat-app 主容器 - 完全覆盖屏幕 === */
-.chat-app {
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  width: 100% !important;
-  height: 100vh !important;
-  overflow: hidden !important;
-  display: flex;
-  flex-direction: column;
-  z-index: 200 !important; /* 确保覆盖dock */
-}
-
-.chat-app.active {
-  display: flex !important;
-}
-
-/* === 3. 防止横向滑动 === */
-.chat-tab-content,
-#momentsTab,
-#todoTab,
-#profileTab,
-.page {
-  overflow-x: hidden !important;
-  overscroll-behavior-x: none !important;
-  touch-action: pan-y pinch-zoom;
-}
-
-/* === 4. 防止子元素溢出 === */
-.chat-tab-content > *,
-.chat-tab-content img,
-.chat-tab-content input,
-.chat-tab-content textarea {
-  max-width: 100%;
-  box-sizing: border-box;
-}
