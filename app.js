@@ -967,6 +967,7 @@ function closePage(pageId) {
 var isSelectionMode = false;
 var activeMsgIndex = -1;
 var selectedIndices = new Set();
+var forwardMode = "merge"; // 转发模式：merge(合并) 或 single(逐条)
 var longPressTimer = null;
 var touchStartX = 0;
 var touchStartY = 0;
@@ -2206,7 +2207,7 @@ async function loadGroupMessages(groupId) {
 
           // 处理@提醒
           contentHtml = processAtMentions(contentHtml);
-          
+
           // 处理位置标签 [位置:地点名] 或 [位置:地点名:详细地址]
           contentHtml = contentHtml.replace(
             /\[(位置|location)[:：]([^\]:：]+)(?:[:：]([^\]]*))?\]/gi,
@@ -2248,7 +2249,7 @@ async function loadGroupMessages(groupId) {
               </div>`;
             }
           );
-          
+
           // 处理红包标签 [红包:金额]
           contentHtml = contentHtml.replace(
             /\[(红包|redpacket)[:：](\d+(?:\.\d+)?)\]/gi,
@@ -2882,7 +2883,24 @@ function showGroupForwardModal() {
   const overlay = document.getElementById("forwardModalOverlay");
   const content = document.getElementById("forwardModalContent");
 
-  let html = "";
+  // 转发方式选择器
+  let html = `
+    <div class="forward-mode-selector">
+      <div class="forward-mode-option ${
+        forwardMode === "merge" ? "active" : ""
+      }" onclick="setForwardMode('merge')">
+        <div class="forward-mode-icon">📦</div>
+        <div class="forward-mode-text">合并转发</div>
+      </div>
+      <div class="forward-mode-option ${
+        forwardMode === "single" ? "active" : ""
+      }" onclick="setForwardMode('single')">
+        <div class="forward-mode-icon">📝</div>
+        <div class="forward-mode-text">逐条转发</div>
+      </div>
+    </div>
+    <div class="forward-chat-list">
+  `;
 
   // 添加私聊角色
   characters.forEach((char) => {
@@ -2923,7 +2941,9 @@ function showGroupForwardModal() {
     `;
   });
 
-  if (!html) {
+  html += "</div>";
+
+  if (!html.includes("forward-chat-item")) {
     html =
       '<div style="padding:20px;text-align:center;color:#999;">暂无可转发的对象</div>';
   }
@@ -2937,9 +2957,10 @@ async function forwardGroupMsgToChat(targetId, type) {
   const messagesKey = `group_messages_${currentGroupId}`;
   const allMessages = (await localforage.getItem(messagesKey)) || [];
   const group = groupChats.find((g) => g.id === currentGroupId);
+  const sourceName = group?.name || "群聊";
 
   const sortedIndices = Array.from(groupSelectedIndices).sort((a, b) => a - b);
-  
+
   // 构建转发消息
   let forwardedMessages = [];
   sortedIndices.forEach((idx) => {
@@ -2952,7 +2973,8 @@ async function forwardGroupMsgToChat(targetId, type) {
           : char?.note || char?.name || "成员";
       forwardedMessages.push({
         senderName: senderName,
-        content: msg.content?.replace(/<[^>]+>/g, "") || ""
+        content: msg.content?.replace(/<[^>]+>/g, "") || "",
+        isHtml: msg.isHtml,
       });
     }
   });
@@ -2962,33 +2984,69 @@ async function forwardGroupMsgToChat(targetId, type) {
     return;
   }
 
-  // 生成唯一ID
-  const forwardId = 'fwd_' + Date.now();
-  const sourceName = group?.name || "群聊";
-  
-  // 预览HTML - 只显示前3条
+  if (forwardMode === "single") {
+    // 逐条转发
+    await forwardGroupSingleMessages(
+      targetId,
+      type,
+      forwardedMessages,
+      sourceName
+    );
+  } else {
+    // 合并转发
+    await forwardGroupMergedMessages(
+      targetId,
+      type,
+      forwardedMessages,
+      sourceName
+    );
+  }
+
+  hideForwardModal();
+  exitGroupSelectionMode();
+}
+
+// 群聊合并转发
+async function forwardGroupMergedMessages(
+  targetId,
+  type,
+  forwardedMessages,
+  sourceName
+) {
+  const forwardId = "fwd_" + Date.now();
   const previewCount = Math.min(3, forwardedMessages.length);
   const hasMore = forwardedMessages.length > 3;
-  const previewHtml = forwardedMessages.slice(0, previewCount).map(m => {
-    const shortContent = m.content.length > 20 ? m.content.substring(0, 20) + '...' : m.content;
-    return `<div class="forwarded-msg-preview-item"><span class="sender">${m.senderName}:</span>${shortContent.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>`;
-  }).join('');
-  
-  // 保存完整消息数据
+
+  const previewHtml = forwardedMessages
+    .slice(0, previewCount)
+    .map((m) => {
+      const shortContent =
+        m.content.length > 20 ? m.content.substring(0, 20) + "..." : m.content;
+      return `<div class="forwarded-msg-preview-item"><span class="sender">${
+        m.senderName
+      }:</span>${shortContent
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")}</div>`;
+    })
+    .join("");
+
   if (!window.forwardedMsgData) window.forwardedMsgData = {};
   window.forwardedMsgData[forwardId] = {
     source: sourceName,
-    messages: forwardedMessages
+    messages: forwardedMessages,
   };
-  localforage.setItem('forwardedMsgData', window.forwardedMsgData);
-  
-  // 创建转发卡片HTML
+  localforage.setItem("forwardedMsgData", window.forwardedMsgData);
+
   const forwardHtml = `<div class="forwarded-msg-card" onclick="showForwardDetail('${forwardId}')">
     <div class="forwarded-msg-header">📨 转发的聊天记录</div>
     <div class="forwarded-msg-preview">
       ${previewHtml}
     </div>
-    ${hasMore ? `<div class="forwarded-msg-more">查看${forwardedMessages.length}条消息 ›</div>` : ''}
+    ${
+      hasMore
+        ? `<div class="forwarded-msg-more">查看${forwardedMessages.length}条消息 ›</div>`
+        : ""
+    }
   </div>`;
 
   const msgObj = {
@@ -3009,7 +3067,7 @@ async function forwardGroupMsgToChat(targetId, type) {
     await localforage.setItem("chatHistories", chatHistories);
     const char = characters.find((c) => c.id == targetId);
     updateCharacterLastMessage(targetId, "[转发消息]");
-    showToast(`已转发到 ${char?.note || char?.name || '聊天'}`);
+    showToast(`已转发到 ${char?.note || char?.name || "聊天"}`);
   } else {
     const targetMsgKey = `group_messages_${targetId}`;
     const targetMessages = (await localforage.getItem(targetMsgKey)) || [];
@@ -3021,11 +3079,68 @@ async function forwardGroupMsgToChat(targetId, type) {
       targetGroup.lastTime = "刚刚";
       await localforage.setItem("groupChats", groupChats);
     }
-    showToast(`已转发到群聊 ${targetGroup?.name || ''}`);
+    showToast(`已转发到群聊 ${targetGroup?.name || ""}`);
   }
+}
 
-  hideForwardModal();
-  exitGroupSelectionMode();
+// 群聊逐条转发
+async function forwardGroupSingleMessages(
+  targetId,
+  type,
+  forwardedMessages,
+  sourceName
+) {
+  const timestamp = Date.now();
+  const time = new Date().toLocaleTimeString("zh-CN", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  if (type === "private") {
+    if (!chatHistories[targetId]) chatHistories[targetId] = [];
+
+    forwardedMessages.forEach((msg, index) => {
+      const displayContent = msg.content;
+      chatHistories[targetId].push({
+        role: "user",
+        content: displayContent,
+        isForwarded: true,
+        forwardSource: sourceName,
+        timestamp: timestamp + index,
+        time: time,
+      });
+    });
+
+    await localforage.setItem("chatHistories", chatHistories);
+    const char = characters.find((c) => c.id == targetId);
+    updateCharacterLastMessage(targetId, "[转发消息]");
+    showToast(`已逐条转发 ${forwardedMessages.length} 条消息`);
+  } else {
+    const targetMsgKey = `group_messages_${targetId}`;
+    const targetMessages = (await localforage.getItem(targetMsgKey)) || [];
+
+    forwardedMessages.forEach((msg, index) => {
+      const displayContent = msg.content;
+      targetMessages.push({
+        role: "user",
+        content: displayContent,
+        isForwarded: true,
+        forwardSource: sourceName,
+        timestamp: timestamp + index,
+        time: time,
+      });
+    });
+
+    await localforage.setItem(targetMsgKey, targetMessages);
+
+    const targetGroup = groupChats.find((g) => g.id == targetId);
+    if (targetGroup) {
+      targetGroup.lastMessage = "[转发消息]";
+      targetGroup.lastTime = "刚刚";
+      await localforage.setItem("groupChats", groupChats);
+    }
+    showToast(`已逐条转发 ${forwardedMessages.length} 条消息`);
+  }
 }
 // 群聊发送消息
 async function sendGroupMessage(content, autoReply = false) {
@@ -3308,10 +3423,18 @@ ${stickerPrompt}${announcementPrompt}
       if (msg.role === "user") {
         // 检查是否是转账消息
         if (msg.transferId && msg.transferTargetId) {
-          const targetChar = characters.find((c) => c.id === msg.transferTargetId);
-          const targetName = targetChar ? targetChar.note || targetChar.name : "成员";
-          const status = msg.transferStatus === "pending" ? "待确认" : 
-                        msg.transferStatus === "accepted" ? "已收款" : "已退回";
+          const targetChar = characters.find(
+            (c) => c.id === msg.transferTargetId
+          );
+          const targetName = targetChar
+            ? targetChar.note || targetChar.name
+            : "成员";
+          const status =
+            msg.transferStatus === "pending"
+              ? "待确认"
+              : msg.transferStatus === "accepted"
+              ? "已收款"
+              : "已退回";
           historyText += `[${userNickname}]: [转账:${msg.transferAmount}元给${targetName}，${status}]\n`;
         } else if (!msg.isHtml) {
           historyText += `[${userNickname}]: ${msg.content}\n`;
@@ -3549,7 +3672,7 @@ ${stickerPrompt}${announcementPrompt}
       }
 
       if (Array.isArray(repliesArray) && repliesArray.length > 0) {
-        const currentMessages = (await localforage.getItem(messagesKey)) || [];
+        let currentMessages = (await localforage.getItem(messagesKey)) || [];
         let lastCharName = "";
         let lastContent = "";
         let hasValidMessage = false;
@@ -3611,17 +3734,19 @@ ${stickerPrompt}${announcementPrompt}
           // 检查是否是收款标签
           const isAcceptTag = /^\[收款\]$/i.test(replyContent.trim());
           if (isAcceptTag) {
-            // 更新最近一条用户发给该角色的待处理转账
             await updateGroupUserTransferStatus(matchedMember.id, true);
-            continue; // 不保存收款标签本身
+            // 重新读取消息，因为 updateGroupUserTransferStatus 修改了数据
+            currentMessages = (await localforage.getItem(messagesKey)) || [];
+            continue;
           }
 
           // 检查是否是退款标签
           const isRejectTag = /^\[退款\]$/i.test(replyContent.trim());
           if (isRejectTag) {
-            // 退款给用户
             await updateGroupUserTransferStatus(matchedMember.id, false);
-            continue; // 不保存退款标签本身
+            // 重新读取消息
+            currentMessages = (await localforage.getItem(messagesKey)) || [];
+            continue;
           }
 
           // 添加消息
@@ -11426,12 +11551,27 @@ function showForwardModal() {
   const overlay = document.getElementById("forwardModalOverlay");
   const content = document.getElementById("forwardModalContent");
 
-  // 生成可转发的聊天列表
-  let html = "";
+  // 转发方式选择器
+  let html = `
+    <div class="forward-mode-selector">
+      <div class="forward-mode-option ${
+        forwardMode === "merge" ? "active" : ""
+      }" onclick="setForwardMode('merge')">
+        <div class="forward-mode-icon">📦</div>
+        <div class="forward-mode-text">合并转发</div>
+      </div>
+      <div class="forward-mode-option ${
+        forwardMode === "single" ? "active" : ""
+      }" onclick="setForwardMode('single')">
+        <div class="forward-mode-icon">📝</div>
+        <div class="forward-mode-text">逐条转发</div>
+      </div>
+    </div>
+    <div class="forward-chat-list">
+  `;
 
   // 添加私聊角色
   characters.forEach((char) => {
-    // 排除当前聊天的角色
     if (char.id === currentChatCharId) return;
 
     html += `
@@ -11474,13 +11614,25 @@ function showForwardModal() {
     });
   }
 
-  if (!html) {
+  html += "</div>";
+
+  if (
+    characters.length <= 1 &&
+    (!window.groupChats || window.groupChats.length === 0)
+  ) {
     html =
       '<div style="padding: 40px; text-align: center; color: #999;">暂无可转发的聊天</div>';
   }
 
   content.innerHTML = html;
   overlay.classList.add("active");
+}
+
+function setForwardMode(mode) {
+  forwardMode = mode;
+  document.querySelectorAll(".forward-mode-option").forEach((el) => {
+    el.classList.toggle("active", el.onclick.toString().includes(`'${mode}'`));
+  });
 }
 
 function hideForwardModal() {
@@ -11490,6 +11642,7 @@ function hideForwardModal() {
 function forwardToChat(targetId, chatType) {
   const currentChar = characters.find((c) => c.id === currentChatCharId);
   const sortedIndices = Array.from(selectedIndices).sort((a, b) => a - b);
+  const sourceName = currentChar?.note || currentChar?.name || "未知";
 
   // 构建转发消息内容
   let forwardedMessages = [];
@@ -11502,24 +11655,42 @@ function forwardToChat(targetId, chatType) {
             ? window.momentsData?.userProfile?.name || "我"
             : currentChar?.note || currentChar?.name || "AI",
         content: msg.content,
+        isHtml: msg.isHtml,
       });
     }
   });
 
-  // 生成转发卡片HTML - 只显示前3条预览
-  const sourceName = currentChar?.note || currentChar?.name || "未知";
+  if (forwardMode === "single") {
+    // 逐条转发
+    forwardSingleMessages(targetId, chatType, forwardedMessages, sourceName);
+  } else {
+    // 合并转发
+    forwardMergedMessages(targetId, chatType, forwardedMessages, sourceName);
+  }
+
+  hideForwardModal();
+  exitSelectionMode();
+}
+
+// 合并转发
+function forwardMergedMessages(
+  targetId,
+  chatType,
+  forwardedMessages,
+  sourceName
+) {
   const previewCount = Math.min(3, forwardedMessages.length);
   const hasMore = forwardedMessages.length > 3;
-
-  // 生成唯一ID用于存储完整消息
   const forwardId = "fwd_" + Date.now();
 
-  // 预览HTML - 只显示前3条
   const previewHtml = forwardedMessages
     .slice(0, previewCount)
     .map((m) => {
+      const plainContent = m.content.replace(/<[^>]+>/g, "");
       const shortContent =
-        m.content.length > 20 ? m.content.substring(0, 20) + "..." : m.content;
+        plainContent.length > 20
+          ? plainContent.substring(0, 20) + "..."
+          : plainContent;
       return `<div class="forwarded-msg-preview-item"><span class="sender">${
         m.senderName
       }:</span>${shortContent
@@ -11528,17 +11699,13 @@ function forwardToChat(targetId, chatType) {
     })
     .join("");
 
-  // 完整消息数据（存到全局变量）
   if (!window.forwardedMsgData) window.forwardedMsgData = {};
   window.forwardedMsgData[forwardId] = {
     source: sourceName,
     messages: forwardedMessages,
   };
-
-  // 保存到localforage
   localforage.setItem("forwardedMsgData", window.forwardedMsgData);
 
-  // 创建转发消息的HTML格式
   const forwardHtml = `<div class="forwarded-msg-card" onclick="showForwardDetail('${forwardId}')">
     <div class="forwarded-msg-header">📨 转发的聊天记录</div>
     <div class="forwarded-msg-preview">
@@ -11552,12 +11719,7 @@ function forwardToChat(targetId, chatType) {
   </div>`;
 
   if (chatType === "private") {
-    // 转发到私聊
-    if (!chatHistories[targetId]) {
-      chatHistories[targetId] = [];
-    }
-
-    // 添加转发消息（作为用户发送）
+    if (!chatHistories[targetId]) chatHistories[targetId] = [];
     chatHistories[targetId].push({
       role: "user",
       content: forwardHtml,
@@ -11566,18 +11728,13 @@ function forwardToChat(targetId, chatType) {
       forwardSource: sourceName,
       timestamp: Date.now(),
     });
-
-    // 保存聊天记录
     localforage.setItem("chatHistories", chatHistories);
-
     const targetChar = characters.find((c) => c.id === targetId);
     showToast(`已转发到 ${targetChar?.note || targetChar?.name || "聊天"}`);
   } else if (chatType === "group") {
-    // 转发到群聊
     const group = window.groupChats?.find((g) => g.id === targetId);
     if (group) {
       if (!group.messages) group.messages = [];
-
       group.messages.push({
         id: Date.now(),
         senderId: "user",
@@ -11589,16 +11746,80 @@ function forwardToChat(targetId, chatType) {
         forwardSource: sourceName,
         timestamp: Date.now(),
       });
-
-      // 保存群聊数据
       localforage.setItem("groupChats", window.groupChats);
-
       showToast(`已转发到群聊 ${group.name || "未命名群聊"}`);
     }
   }
+}
 
-  hideForwardModal();
-  exitSelectionMode();
+// 逐条转发
+async function forwardSingleMessages(
+  targetId,
+  chatType,
+  forwardedMessages,
+  sourceName
+) {
+  const timestamp = Date.now();
+
+  if (chatType === "private") {
+    if (!chatHistories[targetId]) chatHistories[targetId] = [];
+
+    forwardedMessages.forEach((msg, index) => {
+      // 提取纯文本内容
+      const plainContent = msg.isHtml
+        ? msg.content.replace(/<[^>]+>/g, "")
+        : msg.content;
+      const displayContent = msg.content;
+
+      chatHistories[targetId].push({
+        role: "user",
+        content: displayContent,
+        isForwarded: true,
+        forwardSource: sourceName,
+        timestamp: timestamp + index,
+        time: new Date().toLocaleTimeString("zh-CN", {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      });
+    });
+
+    await localforage.setItem("chatHistories", chatHistories);
+    const targetChar = characters.find((c) => c.id === targetId);
+    showToast(`已逐条转发 ${forwardedMessages.length} 条消息`);
+  } else if (chatType === "group") {
+    const messagesKey = `group_messages_${targetId}`;
+    const groupMessages = (await localforage.getItem(messagesKey)) || [];
+
+    forwardedMessages.forEach((msg, index) => {
+      const plainContent = msg.isHtml
+        ? msg.content.replace(/<[^>]+>/g, "")
+        : msg.content;
+      const displayContent = msg.content;
+
+      groupMessages.push({
+        role: "user",
+        content: displayContent,
+        isForwarded: true,
+        forwardSource: sourceName,
+        timestamp: timestamp + index,
+        time: new Date().toLocaleTimeString("zh-CN", {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      });
+    });
+
+    await localforage.setItem(messagesKey, groupMessages);
+
+    const group = window.groupChats?.find((g) => g.id === targetId);
+    if (group) {
+      group.lastMessage = `[转发消息]`;
+      group.lastTime = "刚刚";
+      await localforage.setItem("groupChats", window.groupChats);
+    }
+    showToast(`已逐条转发 ${forwardedMessages.length} 条消息`);
+  }
 }
 
 // 收藏动态
@@ -12701,6 +12922,14 @@ window.exitSelectionMode = function () {
 window.showForwardModal = showForwardModal;
 window.hideForwardModal = hideForwardModal;
 window.forwardToChat = forwardToChat;
+window.setForwardMode = setForwardMode;
+window.forwardMergedMessages = forwardMergedMessages;
+window.forwardSingleMessages = forwardSingleMessages;
+window.forwardGroupMergedMessages = forwardGroupMergedMessages;
+window.forwardGroupSingleMessages = forwardGroupSingleMessages;
+window.setForwardMode = setForwardMode;
+window.forwardMergedMessages = forwardMergedMessages;
+window.forwardSingleMessages = forwardSingleMessages;
 
 // 显示转发详情弹窗
 window.showForwardDetail = function (forwardId) {
@@ -17930,23 +18159,55 @@ function updateUserTransferStatus(transferId, accepted) {
 
 // 群聊版本：更新用户发送的转账状态
 async function updateGroupUserTransferStatus(targetCharId, accepted) {
+  console.log(
+    "updateGroupUserTransferStatus 被调用:",
+    targetCharId,
+    accepted,
+    "currentGroupId:",
+    currentGroupId
+  );
+
   if (!currentGroupId) return;
-  
+
   const messagesKey = `group_messages_${currentGroupId}`;
   const messages = (await localforage.getItem(messagesKey)) || [];
-  
+
+  console.log("消息总数:", messages.length);
+
   // 从后往前查找最近一条用户发给该角色的待处理转账
   for (let i = messages.length - 1; i >= 0; i--) {
     const msg = messages[i];
+
+    // 打印每条用户消息的转账信息
+    if (msg.role === "user" && msg.transferId) {
+      console.log(
+        "找到转账消息:",
+        i,
+        "transferTargetId:",
+        msg.transferTargetId,
+        "targetCharId:",
+        targetCharId,
+        "status:",
+        msg.transferStatus
+      );
+      console.log(
+        "类型比较:",
+        typeof msg.transferTargetId,
+        typeof targetCharId,
+        msg.transferTargetId == targetCharId
+      );
+    }
+
     if (
       msg.role === "user" &&
       msg.transferId &&
       msg.transferStatus === "pending" &&
-      msg.transferTargetId === targetCharId
+      msg.transferTargetId == targetCharId // 注意这里改成 == 而不是 ===
     ) {
+      console.log("匹配成功！更新状态");
       // 更新状态
       msg.transferStatus = accepted ? "accepted" : "rejected";
-      
+      console.log("替换前HTML:", msg.content.substring(0, 200));
       // 更新HTML内容
       msg.content = msg.content
         .replace(
@@ -17954,12 +18215,16 @@ async function updateGroupUserTransferStatus(targetCharId, accepted) {
           `data-status="${accepted ? "accepted" : "rejected"}"`
         )
         .replace(
-          'class="transfer-card-status pending">待确认',
+          /class="transfer-card-status pending">\s*待确认/,
           `class="transfer-card-status ${accepted ? "accepted" : "rejected"}">${
             accepted ? "已收款" : "已退回"
           }`
         );
-
+      console.log(
+        "footer部分:",
+        msg.content.match(/transfer-card-footer[\s\S]*?<\/div>/)?.[0]
+      );
+      console.log("替换后HTML:", msg.content.substring(0, 200));
       if (!accepted) {
         // 退款给用户
         window.walletData.balance += msg.transferAmount;
@@ -17978,10 +18243,13 @@ async function updateGroupUserTransferStatus(targetCharId, accepted) {
         saveWalletData();
         updateWalletDisplay();
       }
-      
+
       // 保存并刷新
+      console.log("准备保存到localforage...");
       await localforage.setItem(messagesKey, messages);
+      console.log("保存成功，准备刷新界面...");
       loadGroupMessages(currentGroupId);
+      console.log("刷新完成");
       break;
     }
   }
