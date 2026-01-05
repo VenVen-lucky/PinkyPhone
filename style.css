@@ -14750,3 +14750,49 @@ input[type="range"]::-webkit-slider-thumb {
   text-overflow: ellipsis;
   max-width: 100%;
 }
+.wallet-history-item {
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.wallet-history-item:active {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.wallet-history-delete {
+  display: flex;
+  align-items: center;
+  margin-left: 8px;
+}
+/* 群聊多选模式 */
+.msg-row.group-msg[data-index] {
+  cursor: pointer;
+}
+
+.msg-row.group-msg[data-index]:active {
+  background: rgba(244, 143, 177, 0.08);
+}
+
+/* AI消息的选择框在气泡右边 */
+.msg-row.ai.group-msg .bubble-with-selector {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.msg-row.ai.group-msg .bubble-with-selector .bubble-selector {
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+/* 用户消息的选择框在气泡左边 */
+.msg-row.user.group-msg .bubble-with-selector {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.msg-row.user.group-msg .bubble-with-selector .bubble-selector {
+  flex-shrink: 0;
+  margin-top: 4px;
+}
