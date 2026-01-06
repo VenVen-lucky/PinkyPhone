@@ -6569,6 +6569,7 @@ async function requestAIReply() {
         systemContent += `【时间流逝】${timeSinceLastChat}！用户刚刚回来找你聊天。\n`;
         systemContent += `你可以在回复中体现出时间的流逝，但要注意区分"之前聊过的内容"和"现在正在聊的内容"。\n`;
       }
+      systemContent += `【指令】回复时请【禁止】在开头输出时间标记（如 [今天 xx:xx]），直接输出回复内容即可。\n`;
       systemContent += `\n`;
     }
 
