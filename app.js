@@ -6587,7 +6587,7 @@ async function requestAIReply() {
       systemContent += `当前页内容：\n---\n${bookContent}\n---\n`;
       systemContent += `请基于以上书籍内容与用户互动讨论，但回复时不要复述整段内容，自然地聊天即可。\n\n`;
     }
-
+    const musicContext = getMusicContextForAI();
     if (settings.onlineDating) {
       // 线下模式基础提示词
       systemContent += `\n【模式：沉浸式角色扮演】\n1. 以小说笔触回复。\n2. **必须严格遵守以下格式规范**：\n   - **环境/动作/神态描写**：直接书写，不加任何符号。\n   - **心理活动/内心独白**：必须用一对星号包裹，例如 *她看起来真可爱*。\n   - **语言对话**：必须用直角引号包裹，例如 「早安，亲爱的。」\n3. **禁止**拆分消息，请输出一段完整流畅的文本。\n4. **禁止**发送表情包（[sticker:xxx]格式）。\n5. **禁止**发送语音消息（[语音:xxx]格式）。\n`;
@@ -6696,7 +6696,13 @@ async function requestAIReply() {
         systemContent += momentsPrompt;
       }
     }
-
+    // 一起听歌功能 - 将当前歌词注入到系统提示词
+    if (typeof getMusicContextForAI === "function") {
+      const musicContext = getMusicContextForAI();
+      if (musicContext) {
+        systemContent += musicContext;
+      }
+    }
     // 辅助函数：格式化消息时间
     function formatMsgTime(timestamp) {
       if (!timestamp) return "";
