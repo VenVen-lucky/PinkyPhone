@@ -1944,8 +1944,10 @@ async function loadGroupMessages(groupId) {
   const userAvatar = groupSettings.myAvatar || globalUserAvatar || "";
 
   container.innerHTML = messages
+    .map((msg, originalIndex) => ({ ...msg, _originalIndex: originalIndex })) // 保存原始索引
     .filter((msg) => !msg.isHidden) // 过滤掉隐藏消息
-    .map((msg, index) => {
+    .map((msg) => {
+      const index = msg._originalIndex; // 使用原始索引
       if (msg.role === "user") {
         // 检查是否是语音消息
         if (msg.isVoice) {
@@ -2009,6 +2011,26 @@ async function loadGroupMessages(groupId) {
                 </div>
                 <div class="msg-image-placeholder-text">点击查看图片描述</div>
               </div>
+            </div>
+            <div class="msg-time">${msg.time || ""}</div>
+            <div class="msg-user-avatar">
+              ${userAvatar ? `<img src="${userAvatar}">` : "我"}
+            </div>
+          </div>
+          `;
+        }
+        // 检查是否是真实图片消息
+        if (msg.type === "image" && msg.imageType === "real" && msg.imageData) {
+          return `
+          <div class="msg-row user group-msg" 
+               data-index="${index}"
+               ontouchstart="handleGroupTouchStart(event, ${index})"
+               ontouchmove="handleGroupTouchMove(event)"
+               ontouchend="handleGroupTouchEnd(event)"
+               onmousedown="handleGroupMouseDown(event, ${index})"
+               onmouseup="handleGroupMouseUp(event)">
+            <div class="msg-bubble" style="padding:4px;">
+              <img src="${msg.imageData}" class="msg-img" onclick="showFullImage(this.src)" style="max-width:200px;border-radius:8px;cursor:pointer;">
             </div>
             <div class="msg-time">${msg.time || ""}</div>
             <div class="msg-user-avatar">
@@ -2625,8 +2647,10 @@ async function renderGroupSelectionMode() {
   const scrollTop = container.scrollTop;
 
   container.innerHTML = messages
+    .map((msg, originalIndex) => ({ ...msg, _originalIndex: originalIndex })) // 保存原始索引
     .filter((msg) => !msg.isHidden)
-    .map((msg, index) => {
+    .map((msg) => {
+      const index = msg._originalIndex; // 使用原始索引
       if (msg.role === "system") {
         return `
         <div class="msg-row system" style="text-align:center;margin:8px 0;">
@@ -2774,7 +2798,7 @@ function showGroupSelectionToolbar() {
     <button class="selection-btn favorite" onclick="favoriteGroupSelectedMessages()" style="background:linear-gradient(135deg,#f48fb1,#ec407a);color:#fff;padding:8px 12px;border-radius:8px;font-size:0.85rem;">
       ★ 收藏
     </button>
-    <button class="selection-btn delete" onclick="deleteGroupSelectedMessages()" style="padding:8px 12px;font-size:0.85rem;">
+    <button class="selection-btn delete active" onclick="deleteGroupSelectedMessages()" style="padding:8px 12px;font-size:0.85rem;">
       ✕ 删除
     </button>
   `;
@@ -8749,7 +8773,6 @@ function renderManageMembersList(group) {
   container.innerHTML = members
     .map((char) => {
       const displayName = char.note || char.name;
-      const canRemove = members.length > 2; // 至少保留2人
       return `
       <div class="create-group-member-item" style="cursor: default;">
         <div class="create-group-member-avatar">
@@ -8758,20 +8781,14 @@ function renderManageMembersList(group) {
         <div class="create-group-member-info" style="flex: 1;">
           <div class="create-group-member-name">${displayName}</div>
         </div>
-        ${
-          canRemove
-            ? `
-          <button class="group-member-remove-btn" onclick="event.stopPropagation();removeGroupMemberFromManager(${char.id})" 
-            style="background: linear-gradient(135deg, #ff6b6b, #ee5a5a); color: white; border: none; 
-              border-radius: 16px; padding: 6px 14px; font-size: 12px; cursor: pointer;
-              box-shadow: 0 2px 8px rgba(255,107,107,0.3);">
-            移出
-          </button>
-        `
-            : `
-          <span style="font-size: 11px; color: #999; padding: 6px 10px;">群主</span>
-        `
-        }
+        <button class="group-member-remove-btn" onclick="event.stopPropagation();removeGroupMemberFromManager(${
+          char.id
+        })" 
+          style="background: linear-gradient(135deg, #ff6b6b, #ee5a5a); color: white; border: none; 
+            border-radius: 16px; padding: 6px 14px; font-size: 12px; cursor: pointer;
+            box-shadow: 0 2px 8px rgba(255,107,107,0.3);">
+          移出
+        </button>
       </div>
     `;
     })
@@ -8784,8 +8801,9 @@ async function removeGroupMemberFromManager(charId) {
   const group = groupChats.find((g) => g.id === currentGroupId);
   if (!group) return;
 
+  // 至少保留2个AI成员（加上用户共3人）
   if (group.members.length <= 2) {
-    showToast("群聊至少需要2个成员");
+    showToast("群聊至少需要3个人哦");
     return;
   }
 
@@ -14535,7 +14553,46 @@ async function handleRealImageSelect(input) {
 }
 
 // 发送真实图片
-function sendRealImage(dataUrl) {
+async function sendRealImage(dataUrl) {
+  // 检查是否在群聊中
+  if (currentGroupId) {
+    // 群聊发送真实图片
+    const group = groupChats.find((g) => g.id === currentGroupId);
+    if (!group) {
+      showToast("群聊不存在");
+      return;
+    }
+
+    const messagesKey = `group_messages_${currentGroupId}`;
+    const messages = (await localforage.getItem(messagesKey)) || [];
+
+    const msgObj = {
+      role: "user",
+      type: "image",
+      imageType: "real",
+      imageData: dataUrl,
+      content: "[用户发送了一张图片]",
+      time: new Date().toLocaleTimeString("zh-CN", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    };
+
+    messages.push(msgObj);
+    await localforage.setItem(messagesKey, messages);
+
+    // 更新群聊最后消息
+    group.lastMessage = "[图片]";
+    group.lastTime = "刚刚";
+    await localforage.setItem("groupChats", groupChats);
+
+    loadGroupMessages(currentGroupId);
+    renderCharacters();
+    showToast("图片已发送");
+    return;
+  }
+
+  // 单聊发送真实图片（原有逻辑）
   if (!currentChatCharId) {
     showToast("请先打开一个对话");
     return;
@@ -20135,19 +20192,72 @@ function renderFeed() {
   const posts = window.momentsData.posts.sort(
     (a, b) => b.timestamp - a.timestamp
   );
+  const profile = window.momentsData.userProfile;
+
+  // 检查谁发过动态
+  const userHasPost = posts.some(p => p.isUser);
+  const charIdsWithPosts = new Set(posts.filter(p => !p.isUser).map(p => p.authorId));
+
+  // ins风格导航栏 - 只有加号按钮，无框
+  const navbarHtml = `
+    <div class="ig-navbar">
+      <div class="ig-navbar-left">
+        <button class="ig-navbar-btn" onclick="switchChatTab('messages')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+      </div>
+      <div class="ig-navbar-logo">Instagram</div>
+      <div class="ig-navbar-right">
+        <button class="ig-navbar-btn" onclick="openPostModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  `;
+
+  // 构建Stories - 用户自己 + 角色们，谁发了动态谁有圈
+  const characters = window.characters || [];
+  const storiesHtml = `
+    <div class="ig-stories">
+      <div class="ig-story-item" onclick="openPostModal()">
+        <div class="ig-story-avatar ${userHasPost ? 'has-story' : 'no-story'}">
+          ${profile.avatarImg ? `<img src="${profile.avatarImg}">` : '<img src="data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23ccc\'%3E%3Ccircle cx=\'12\' cy=\'8\' r=\'4\'/%3E%3Cpath d=\'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2\'/%3E%3C/svg%3E">'}
+          <div class="ig-story-add">+</div>
+        </div>
+        <div class="ig-story-name">你的动态</div>
+      </div>
+      ${characters.slice(0, 10).map(char => {
+        const hasPost = charIdsWithPosts.has(String(char.id));
+        return `
+        <div class="ig-story-item">
+          <div class="ig-story-avatar ${hasPost ? 'has-story' : ''}">
+            ${char.avatar ? `<img src="${char.avatar}">` : `<img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23666'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'/%3E%3C/svg%3E">`}
+          </div>
+          <div class="ig-story-name">${char.note || char.name || '角色'}</div>
+        </div>
+      `}).join('')}
+    </div>
+  `;
 
   if (posts.length === 0) {
     container.innerHTML = `
+      ${navbarHtml}
+      ${storiesHtml}
       <div class="ig-empty-state" id="igEmptyState">
-        <div class="ig-empty-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div>
-        <div class="ig-empty-title">分享你的精彩瞬间</div>
-        <div class="ig-empty-text">点击右下角按钮发布第一条动态吧~</div>
+        <div class="ig-empty-icon"><svg width="62" height="62" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div>
+        <div class="ig-empty-title">分享照片</div>
+        <div class="ig-empty-text">当你分享照片时，它们会出现在你的主页上。</div>
       </div>
     `;
     return;
   }
 
-  container.innerHTML = posts.map((post) => renderPostCard(post)).join("");
+  container.innerHTML = navbarHtml + storiesHtml + posts.map((post) => renderPostCard(post)).join("");
 }
 
 // 渲染单条动态卡片

@@ -1,0 +1,701 @@
+/* ========================================
+   Instagram 真实风格 Moment 页面
+======================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Grand+Hotel&display=swap');
+
+/* === 基础字体 === */
+.moment-profile-card,
+.ig-feed,
+.ig-post {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* === 隐藏原有的个人资料卡片 === */
+.moment-profile-card {
+  display: none;
+}
+
+/* === 动态列表 === */
+.ig-feed {
+  padding: 0;
+  padding-top: 0;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* === 单条动态 === */
+.ig-post {
+  background: #fff;
+  border-radius: 0;
+  box-shadow: none;
+  border-bottom: 1px solid #efefef;
+  overflow: visible;
+}
+
+/* 帖子头部 */
+.ig-post-header {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  gap: 10px;
+}
+
+/* 头像 - 淡粉色边框 */
+.ig-post-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #fce4ec, #f8bbd9, #f48fb1, #f06292);
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.ig-post-avatar::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  background: #fff;
+  border-radius: 50%;
+}
+
+.ig-post-avatar img {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  object-fit: cover;
+  position: relative;
+  z-index: 1;
+}
+
+.ig-post-user-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ig-post-username {
+  font-size: 14px;
+  font-weight: 600;
+  color: #262626;
+  line-height: 1.2;
+}
+
+.ig-post-time-header {
+  font-size: 12px;
+  color: #8e8e8e;
+  line-height: 1.2;
+}
+
+/* 三点菜单按钮 */
+.ig-post-delete {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  color: #262626;
+  font-size: 0;
+  line-height: 1;
+}
+
+.ig-post-delete::before {
+  content: '···';
+  font-size: 20px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+/* === 正文内容 === */
+.ig-post-content {
+  padding: 0 12px 10px;
+  font-size: 14px;
+  color: #262626;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* === 图片区域 === */
+.ig-post-images {
+  width: 100%;
+  background: #000;
+}
+
+.ig-post-images.single-img {
+  background: #efefef;
+}
+
+.ig-post-images.single-img img {
+  width: 100%;
+  height: auto;
+  display: block;
+  max-height: 600px;
+  object-fit: contain;
+}
+
+.ig-post-images img {
+  width: 100%;
+  display: block;
+}
+
+/* 描述图占位符 */
+.ig-post-text-img {
+  width: 100%;
+  padding: 24px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fafafa !important;
+}
+
+.ig-post-text-img .moment-img-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: none;
+  border: none;
+  max-width: none;
+  width: 100%;
+  border-radius: 0;
+  box-shadow: none;
+  min-height: auto;
+  padding: 0;
+}
+
+.ig-post-text-img .placeholder-icon {
+  width: 44px;
+  height: 44px;
+  border: 2px solid #c7c7c7;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+  background: none;
+  box-shadow: none;
+}
+
+.ig-post-text-img .placeholder-icon svg {
+  stroke: #c7c7c7;
+  width: 22px;
+  height: 22px;
+}
+
+.ig-post-text-img .placeholder-text {
+  font-size: 13px;
+  color: #262626;
+  font-weight: 600;
+}
+
+.ig-post-text-img .placeholder-desc {
+  font-size: 12px;
+  color: #8e8e8e;
+  margin-top: 4px;
+  max-width: 260px;
+  text-align: center;
+  white-space: normal;
+  overflow: visible;
+}
+
+/* === 互动区域 === */
+.ig-post-footer {
+  padding: 0;
+  border-top: none;
+}
+
+/* 操作按钮 - 变小 */
+.ig-post-actions {
+  display: flex;
+  align-items: center;
+  padding: 6px 12px 0;
+  gap: 14px;
+}
+
+.ig-action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px 0;
+  display: flex;
+  align-items: center;
+  color: #262626;
+  flex: 0;
+}
+
+.ig-action-btn span {
+  display: none;
+}
+
+.ig-action-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.ig-action-btn:active {
+  opacity: 0.5;
+}
+
+/* 点赞动画 */
+.ig-action-btn.liked svg {
+  fill: #ff3040;
+  stroke: #ff3040;
+  animation: likeAnim 0.3s ease;
+}
+
+@keyframes likeAnim {
+  0% { transform: scale(1); }
+  25% { transform: scale(1.2); }
+  50% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+/* 收藏状态 */
+.ig-action-btn.bookmarked svg {
+  fill: #262626;
+}
+
+/* 收藏按钮靠右 */
+.ig-action-btn:last-child {
+  margin-left: auto;
+}
+
+/* 隐藏分隔线 */
+.ig-action-divider {
+  display: none;
+}
+
+/* 点赞数 */
+.ig-post-likes {
+  padding: 0 12px;
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #262626;
+  border: none;
+}
+
+.ig-post-likes-avatars {
+  display: none;
+}
+
+/* 评论区 */
+.ig-post-comments {
+  padding: 6px 12px 0;
+}
+
+.ig-comment {
+  font-size: 14px;
+  color: #262626;
+  margin-bottom: 4px;
+  line-height: 1.4;
+  padding: 0;
+  background: none;
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.ig-comment:active {
+  opacity: 0.5;
+  background: none;
+}
+
+.ig-comment .username {
+  font-weight: 600;
+  color: #262626;
+  margin-right: 4px;
+}
+
+.ig-comment .reply-to {
+  color: #8e8e8e;
+}
+
+.ig-comment .reply-to .reply-name {
+  color: #00376b;
+}
+
+/* 内联评论框 */
+.ig-inline-reply {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  gap: 12px;
+  border-top: none;
+  margin-top: 6px;
+}
+
+.ig-inline-reply input {
+  flex: 1;
+  border: none;
+  background: none;
+  font-size: 14px;
+  padding: 0;
+  color: #262626;
+  outline: none;
+}
+
+.ig-inline-reply input::placeholder {
+  color: #8e8e8e;
+}
+
+.ig-inline-reply button {
+  background: none;
+  border: none;
+  color: #0095f6;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+
+.ig-inline-reply input:not(:placeholder-shown) + button {
+  opacity: 1;
+}
+
+/* === 发布弹窗 === */
+.ig-post-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.ig-post-modal.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.ig-post-modal-content {
+  background: #fff;
+  width: calc(100% - 64px);
+  max-width: 400px;
+  border-radius: 12px;
+  overflow: hidden;
+  transform: scale(0.95);
+  opacity: 0;
+  transition: all 0.2s ease;
+}
+
+.ig-post-modal.active .ig-post-modal-content {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.ig-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid #dbdbdb;
+  position: relative;
+}
+
+.ig-modal-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-weight: 600;
+  font-size: 16px;
+  color: #262626;
+}
+
+.ig-modal-close {
+  background: none;
+  border: none;
+  font-size: 28px;
+  font-weight: 300;
+  color: #262626;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.ig-modal-submit {
+  background: none;
+  border: none;
+  color: #0095f6;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.ig-modal-submit:disabled {
+  opacity: 0.3;
+}
+
+.ig-post-textarea {
+  width: 100%;
+  min-height: 200px;
+  border: none;
+  padding: 16px;
+  font-size: 16px;
+  line-height: 1.5;
+  resize: none;
+  outline: none;
+  color: #262626;
+}
+
+.ig-post-textarea::placeholder {
+  color: #8e8e8e;
+}
+
+/* === 菜单弹窗 === */
+.ig-post-menu {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.ig-post-menu.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.ig-post-menu-content {
+  background: #fff;
+  width: calc(100% - 64px);
+  max-width: 400px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.ig-post-menu-item {
+  padding: 14px 16px;
+  font-size: 14px;
+  color: #262626;
+  text-align: center;
+  cursor: pointer;
+  border-bottom: 1px solid #efefef;
+}
+
+.ig-post-menu-item:last-child {
+  border-bottom: none;
+}
+
+.ig-post-menu-item:active {
+  background: #fafafa;
+}
+
+.ig-post-menu-item.danger {
+  color: #ed4956;
+  font-weight: 600;
+}
+
+.ig-post-menu-icon {
+  display: none;
+}
+
+.ig-post-menu-cancel {
+  padding: 14px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #262626;
+  text-align: center;
+  cursor: pointer;
+  border-top: 6px solid #efefef;
+}
+
+/* === 发布按钮 - 隐藏因为导航栏已有 === */
+.ig-fab {
+  display: none;
+}
+
+/* === 空状态 === */
+.ig-empty-state {
+  padding: 80px 40px;
+  text-align: center;
+}
+
+.ig-empty-icon {
+  margin-bottom: 20px;
+}
+
+.ig-empty-icon svg {
+  width: 62px;
+  height: 62px;
+  stroke: #262626;
+  stroke-width: 1;
+}
+
+.ig-empty-title {
+  font-size: 22px;
+  font-weight: 300;
+  color: #262626;
+  margin-bottom: 10px;
+}
+
+.ig-empty-text {
+  font-size: 14px;
+  color: #8e8e8e;
+  line-height: 1.5;
+}
+
+/* === 顶部固定导航栏 === */
+.ig-navbar {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 44px;
+  padding-top: env(safe-area-inset-top, 0px);
+  background: #fff;
+  border-bottom: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 16px;
+  padding-right: 16px;
+  z-index: 100;
+  box-sizing: content-box;
+}
+
+.ig-navbar-logo {
+  font-family: 'Grand Hotel', 'Billabong', -apple-system, cursive;
+  font-size: 28px;
+  color: #262626;
+  font-weight: 400;
+}
+
+.ig-navbar-left,
+.ig-navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.ig-navbar-btn {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: #262626;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ig-navbar-btn svg {
+  width: 24px;
+  height: 24px;
+}
+
+/* 通知红点 */
+.ig-navbar-btn.has-notification::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 8px;
+  height: 8px;
+  background: #ff3040;
+  border-radius: 50%;
+}
+
+/* === Stories 条 === */
+.ig-stories {
+  display: flex;
+  gap: 12px;
+  padding: 12px 12px;
+  overflow-x: auto;
+  border-bottom: 1px solid #efefef;
+  background: #fff;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.ig-stories::-webkit-scrollbar {
+  display: none;
+}
+
+.ig-story-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+/* 默认无圈 */
+.ig-story-avatar {
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  background: #e0e0e0;
+  padding: 3px;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.ig-story-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #fff;
+  box-sizing: border-box;
+}
+
+/* 有动态的头像 - 淡粉色圈 */
+.ig-story-avatar.has-story {
+  background: linear-gradient(45deg, #fce4ec, #f8bbd9, #f48fb1, #f06292);
+}
+
+/* 自己的头像 - 灰色边框 */
+.ig-story-avatar.no-story {
+  background: #dbdbdb;
+}
+
+.ig-story-add {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 20px;
+  height: 20px;
+  background: #0095f6;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1;
+}
+
+.ig-story-name {
+  font-size: 12px;
+  color: #262626;
+  max-width: 66px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
+}

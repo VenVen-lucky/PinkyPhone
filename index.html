@@ -50,8 +50,11 @@
 
     <!-- 外部样式表 -->
     <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="moment-instagram.css" />
     <link rel="stylesheet" href="music_together.css" />
     <link rel="stylesheet" href="phone_peek.css" />
+    <link rel="stylesheet" href="continue_chat.css" />
+    <link rel="stylesheet" href="forum_app.css" />
   </head>
   <body>
     <!-- Decorative stars -->
@@ -1900,8 +1903,15 @@
         <div class="page-header">
           <button class="back-btn" onclick="closePage('forumPage')">←</button>
           <h1 class="page-title">论坛</h1>
+          <div class="forum-header-right">
+            <button class="forum-header-btn" onclick="openForumSettings()">
+              ⚙️
+            </button>
+          </div>
         </div>
-        <div class="page-content">论坛功能开发中...</div>
+        <div class="page-content" id="forumPageContent" style="padding: 0">
+          <!-- 由JS动态渲染 -->
+        </div>
       </div>
 
       <div id="coupleSpacePage" class="page">
@@ -3934,6 +3944,22 @@
             accept="image/*"
             onchange="handleChatImageUpload(this)"
           />
+          <div class="panel-item" onclick="continueChat()">
+            <div class="panel-icon-box bg-continue">
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M5 12h14"></path>
+                <path d="M12 5l7 7-7 7"></path>
+              </svg>
+            </div>
+            <span class="panel-label">续写</span>
+          </div>
         </div>
 
         <div class="chat-panel" id="emojiPanel">
@@ -7377,6 +7403,80 @@
     </div>
     <script src="phone_peek.js"></script>
     <script src="music_together.js"></script>
+    <!-- 论坛帖子详情 -->
+    <div class="forum-detail-overlay" id="forumDetailOverlay">
+      <div class="forum-detail-header">
+        <button class="forum-detail-back" onclick="closeForumPostDetail()">
+          ←
+        </button>
+        <div class="forum-detail-title">帖子详情</div>
+        <div style="width: 36px"></div>
+      </div>
+      <div class="forum-detail-content" id="forumDetailContent"></div>
+      <div
+        class="forum-reply-indicator"
+        id="forumReplyIndicator"
+        style="display: none"
+      ></div>
+      <div class="forum-comment-bar">
+        <input
+          type="text"
+          class="forum-comment-input"
+          id="forumCommentInput"
+          placeholder="写评论..."
+        />
+        <button
+          class="forum-comment-refresh"
+          onclick="generateMoreComments()"
+          title="生成更多互动"
+        >
+          💬
+        </button>
+        <button class="forum-comment-send" onclick="submitForumComment()">
+          发送
+        </button>
+      </div>
+    </div>
+
+    <!-- 论坛设置 -->
+    <div class="forum-settings-overlay" id="forumSettingsOverlay">
+      <div class="forum-settings-header">
+        <button class="forum-settings-back" onclick="closeForumSettings()">
+          ←
+        </button>
+        <div class="forum-settings-title">论坛设置</div>
+        <div style="width: 36px"></div>
+      </div>
+      <div class="forum-settings-content" id="forumSettingsContent"></div>
+    </div>
+
+    <!-- 论坛发帖 -->
+    <div class="forum-compose-overlay" id="forumComposeOverlay">
+      <div class="forum-compose-header">
+        <button class="forum-compose-cancel" onclick="closeForumCompose()">
+          取消
+        </button>
+        <div class="forum-compose-title">发帖</div>
+        <button class="forum-compose-submit" onclick="submitForumPost()">
+          发布
+        </button>
+      </div>
+      <div class="forum-compose-body">
+        <div
+          class="forum-compose-author"
+          id="forumComposeAuthor"
+          onclick="showForumAuthorPicker()"
+        ></div>
+        <textarea
+          class="forum-compose-textarea"
+          id="forumComposeTextarea"
+          placeholder="分享你的想法..."
+        ></textarea>
+      </div>
+    </div>
+
+    <script src="continue_chat.js"></script>
+    <script src="forum_app.js"></script>
     <!-- 查手机页面 -->
     <div class="phone-peek-page" id="phonePeekPage">
       <button class="phone-peek-close" onclick="closePhonePeek()">✕</button>
