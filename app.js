@@ -2030,7 +2030,9 @@ async function loadGroupMessages(groupId) {
                onmousedown="handleGroupMouseDown(event, ${index})"
                onmouseup="handleGroupMouseUp(event)">
             <div class="msg-bubble" style="padding:4px;">
-              <img src="${msg.imageData}" class="msg-img" onclick="showFullImage(this.src)" style="max-width:200px;border-radius:8px;cursor:pointer;">
+              <img src="${
+                msg.imageData
+              }" class="msg-img" onclick="showFullImage(this.src)" style="max-width:200px;border-radius:8px;cursor:pointer;">
             </div>
             <div class="msg-time">${msg.time || ""}</div>
             <div class="msg-user-avatar">
@@ -7155,6 +7157,29 @@ ${m.content}`;
         saveAndRenderForChar(savedCharId);
         // 【新增】更新列表预览 (每次循环都更新，这样可以看到对方正在一句句发)
         updateCharacterLastMessage(savedCharId, actualContent);
+        // ==================== 插入开始：后台弹窗通知 ====================
+        // 只有当页面不可见（在后台）时才弹窗
+        if (document.visibilityState === "hidden") {
+          console.log("App在后台，尝试发送通知...");
+          if (
+            "serviceWorker" in navigator &&
+            navigator.serviceWorker.controller
+          ) {
+            navigator.serviceWorker.ready
+              .then((registration) => {
+                registration.showNotification(char.name || "AI伴侣", {
+                  body: actualContent, // 显示消息内容
+                  icon:
+                    char.avatar || "https://i.postimg.cc/8kmQwCr0/IMG-2897.jpg",
+                  tag: "chat-msg-" + Date.now(), // 确保每条消息都能弹窗
+                  renotify: true,
+                  vibrate: [200, 100, 200],
+                });
+              })
+              .catch((e) => console.error("通知发送失败:", e));
+          }
+        }
+        // ==================== 插入结束 ====================
 
         // 【修复】检查聊天对话页面是否打开，如果没打开则增加未读数（每条消息都增加）
         const convPage = document.getElementById("chatConversationPage");
@@ -20195,8 +20220,10 @@ function renderFeed() {
   const profile = window.momentsData.userProfile;
 
   // 检查谁发过动态
-  const userHasPost = posts.some(p => p.isUser);
-  const charIdsWithPosts = new Set(posts.filter(p => !p.isUser).map(p => p.authorId));
+  const userHasPost = posts.some((p) => p.isUser);
+  const charIdsWithPosts = new Set(
+    posts.filter((p) => !p.isUser).map((p) => p.authorId)
+  );
 
   // ins风格导航栏 - 只有加号按钮，无框
   const navbarHtml = `
@@ -20225,22 +20252,34 @@ function renderFeed() {
   const storiesHtml = `
     <div class="ig-stories">
       <div class="ig-story-item" onclick="openPostModal()">
-        <div class="ig-story-avatar ${userHasPost ? 'has-story' : 'no-story'}">
-          ${profile.avatarImg ? `<img src="${profile.avatarImg}">` : '<img src="data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23ccc\'%3E%3Ccircle cx=\'12\' cy=\'8\' r=\'4\'/%3E%3Cpath d=\'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2\'/%3E%3C/svg%3E">'}
+        <div class="ig-story-avatar ${userHasPost ? "has-story" : "no-story"}">
+          ${
+            profile.avatarImg
+              ? `<img src="${profile.avatarImg}">`
+              : "<img src=\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ccc'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'/%3E%3C/svg%3E\">"
+          }
           <div class="ig-story-add">+</div>
         </div>
         <div class="ig-story-name">你的动态</div>
       </div>
-      ${characters.slice(0, 10).map(char => {
-        const hasPost = charIdsWithPosts.has(String(char.id));
-        return `
+      ${characters
+        .slice(0, 10)
+        .map((char) => {
+          const hasPost = charIdsWithPosts.has(String(char.id));
+          return `
         <div class="ig-story-item">
-          <div class="ig-story-avatar ${hasPost ? 'has-story' : ''}">
-            ${char.avatar ? `<img src="${char.avatar}">` : `<img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23666'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'/%3E%3C/svg%3E">`}
+          <div class="ig-story-avatar ${hasPost ? "has-story" : ""}">
+            ${
+              char.avatar
+                ? `<img src="${char.avatar}">`
+                : `<img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23666'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2'/%3E%3C/svg%3E">`
+            }
           </div>
-          <div class="ig-story-name">${char.note || char.name || '角色'}</div>
+          <div class="ig-story-name">${char.note || char.name || "角色"}</div>
         </div>
-      `}).join('')}
+      `;
+        })
+        .join("")}
     </div>
   `;
 
@@ -20257,7 +20296,10 @@ function renderFeed() {
     return;
   }
 
-  container.innerHTML = navbarHtml + storiesHtml + posts.map((post) => renderPostCard(post)).join("");
+  container.innerHTML =
+    navbarHtml +
+    storiesHtml +
+    posts.map((post) => renderPostCard(post)).join("");
 }
 
 // 渲染单条动态卡片
