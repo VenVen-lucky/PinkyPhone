@@ -7569,5 +7569,37 @@
         </div>
       </div>
     </div>
+    <script>
+      // 注册 Service Worker
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("./sw.js")
+            .then((registration) => {
+              console.log("Service Worker 注册成功，范围:", registration.scope);
+            })
+            .catch((err) => {
+              console.log("Service Worker 注册失败:", err);
+            });
+        });
+      }
+
+      // 请求通知权限（必须点“允许”才能弹窗）
+      function requestNotificationPermission() {
+        if ("Notification" in window) {
+          Notification.requestPermission().then((permission) => {
+            if (permission === "granted") {
+              console.log("通知权限已获取");
+              if (window.showToast) window.showToast("通知权限已开启");
+            }
+          });
+        }
+      }
+
+      // 可以在用户首次点击页面任意位置时触发申请权限，或者做一个专门的按钮
+      document.body.addEventListener("click", requestNotificationPermission, {
+        once: true,
+      });
+    </script>
   </body>
 </html>
