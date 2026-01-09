@@ -919,3 +919,29 @@ Object.assign(window, {
   saveEditedLyrics,
   getMusicContextForAI,
 });
+// ==================== 新增：首次点击自动启动保活 ====================
+document.addEventListener(
+  "click",
+  function autoStartKeepAlive() {
+    // 1. 如果已经在播放了，就不管
+    if (window.musicPlayer && !window.musicPlayer.paused) return;
+
+    // 2. 找到保活轨道
+    const keepAliveIndex = window.musicLibrary.findIndex(
+      (m) => m.id === "keep-alive-track"
+    );
+
+    // 3. 如果找到了，就静默启动
+    if (keepAliveIndex !== -1) {
+      console.log("检测到用户交互，自动启动后台保活...");
+      selectMusic(keepAliveIndex);
+
+      // 如果你不想让播放器界面弹出来挡视线，可以把下面这行注释取消掉：
+      // document.getElementById('currentMusicSection').style.display = 'none';
+    }
+
+    // 4. 移除监听，只执行一次，后面就不烦用户了
+    document.removeEventListener("click", autoStartKeepAlive);
+  },
+  { once: true, capture: true }
+);

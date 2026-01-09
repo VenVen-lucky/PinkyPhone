@@ -7157,21 +7157,26 @@ ${m.content}`;
         saveAndRenderForChar(savedCharId);
         // 【新增】更新列表预览 (每次循环都更新，这样可以看到对方正在一句句发)
         updateCharacterLastMessage(savedCharId, actualContent);
-        // ==================== 插入开始：后台弹窗通知 ====================
-        // 只有当页面不可见（在后台）时才弹窗
+        // ==================== 插入开始：后台弹窗通知 (最终版) ====================
         if (document.visibilityState === "hidden") {
           console.log("App在后台，尝试发送通知...");
+
+          // --- 获取名字：优先用备注 (note)，没有则用原名 ---
+          // char 对象在 requestAIReply 函数开头通常已经获取了
+          let notifyName = char.note || char.name || "AI伴侣";
+          // ----------------------------------------
+
           if (
             "serviceWorker" in navigator &&
             navigator.serviceWorker.controller
           ) {
             navigator.serviceWorker.ready
               .then((registration) => {
-                registration.showNotification(char.name || "AI伴侣", {
-                  body: actualContent, // 显示消息内容
+                registration.showNotification(notifyName, {
+                  body: actualContent,
                   icon:
                     char.avatar || "https://i.postimg.cc/8kmQwCr0/IMG-2897.jpg",
-                  tag: "chat-msg-" + Date.now(), // 确保每条消息都能弹窗
+                  tag: "chat-msg-" + Date.now(),
                   renotify: true,
                   vibrate: [200, 100, 200],
                 });
@@ -7180,7 +7185,6 @@ ${m.content}`;
           }
         }
         // ==================== 插入结束 ====================
-
         // 【修复】检查聊天对话页面是否打开，如果没打开则增加未读数（每条消息都增加）
         const convPage = document.getElementById("chatConversationPage");
         const isConvPageActive =
