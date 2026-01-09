@@ -94,7 +94,7 @@
   line-height: 1.2;
 }
 
-/* 三点菜单按钮 - 用SVG */
+/* 三点菜单按钮 - 用CSS画圆点 */
 .ig-post-delete {
   background: none;
   border: none;
@@ -106,20 +106,11 @@
   justify-content: center;
   min-width: 32px;
   min-height: 32px;
-  gap: 3px;
-}
-
-.ig-post-delete::before,
-.ig-post-delete::after,
-.ig-post-delete span {
-  display: none;
+  font-size: 0;
+  overflow: hidden;
 }
 
 /* 用三个小圆点 */
-.ig-post-delete {
-  position: relative;
-}
-
 .ig-post-delete::before {
   content: '';
   display: block;
