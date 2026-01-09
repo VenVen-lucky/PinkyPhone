@@ -45,10 +45,10 @@
   gap: 10px;
 }
 
-/* 头像 - 淡粉色边框 */
+/* 头像 - 淡粉色边框，稍大 */
 .ig-post-avatar {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background: linear-gradient(45deg, #fce4ec, #f8bbd9, #f48fb1, #f06292);
   padding: 2px;
@@ -68,8 +68,8 @@
 }
 
 .ig-post-avatar img {
-  width: 26px;
-  height: 26px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   object-fit: cover;
   position: relative;
@@ -103,13 +103,19 @@
   color: #262626;
   font-size: 0;
   line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  min-height: 32px;
 }
 
 .ig-post-delete::before {
   content: '···';
-  font-size: 20px;
+  font-size: 24px;
   font-weight: bold;
   letter-spacing: 1px;
+  line-height: 0.5;
 }
 
 /* === 正文内容 === */
@@ -421,12 +427,12 @@
 .ig-modal-close {
   background: none;
   border: none;
-  font-size: 28px;
-  font-weight: 300;
+  font-size: 16px;
+  font-weight: 400;
   color: #262626;
   cursor: pointer;
   padding: 0;
-  line-height: 1;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 .ig-modal-submit {
@@ -434,8 +440,9 @@
   border: none;
   color: #0095f6;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 16px;
   cursor: pointer;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 .ig-modal-submit:disabled {
@@ -577,9 +584,9 @@
 
 .ig-navbar-logo {
   font-family: 'Grand Hotel', 'Billabong', -apple-system, cursive;
-  font-size: 28px;
+  font-size: 32px;
   color: #262626;
-  font-weight: 400;
+  font-weight: 500;
 }
 
 .ig-navbar-left,
