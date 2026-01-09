@@ -94,28 +94,40 @@
   line-height: 1.2;
 }
 
-/* 三点菜单按钮 */
+/* 三点菜单按钮 - 用SVG */
 .ig-post-delete {
   background: none;
   border: none;
   cursor: pointer;
   padding: 8px;
   color: #262626;
-  font-size: 0;
-  line-height: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   min-width: 32px;
   min-height: 32px;
+  gap: 3px;
+}
+
+.ig-post-delete::before,
+.ig-post-delete::after,
+.ig-post-delete span {
+  display: none;
+}
+
+/* 用三个小圆点 */
+.ig-post-delete {
+  position: relative;
 }
 
 .ig-post-delete::before {
-  content: '···';
-  font-size: 24px;
-  font-weight: bold;
-  letter-spacing: 1px;
-  line-height: 0.5;
+  content: '';
+  display: block;
+  width: 4px;
+  height: 4px;
+  background: #262626;
+  border-radius: 50%;
+  box-shadow: 7px 0 0 #262626, 14px 0 0 #262626;
 }
 
 /* === 正文内容 === */
