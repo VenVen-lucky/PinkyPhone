@@ -21,6 +21,70 @@ window.editingWorldbookId = null; // 正在编辑的世界书ID
 window.editingEntryIndex = null; // 正在编辑的条目索引
 window.tempWorldbookEntries = []; // 临时条目列表
 
+// 转发卡片渲染函数（备份，如果forum_app.js未加载则使用此函数）
+window.renderRetweetCard = window.renderRetweetCard || function(cardData) {
+  if (!cardData) return '';
+  
+  const avatarHtml = cardData.authorAvatar 
+    ? `<img src="${cardData.authorAvatar}" alt="">`
+    : (cardData.authorName ? cardData.authorName.charAt(0) : '📝');
+  
+  // 转义HTML
+  const escapeHtml = (text) => {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  };
+  
+  return `
+    <div class="retweet-card" onclick="if(typeof openForumPostFromCard==='function')openForumPostFromCard(${cardData.postId})">
+      <div class="retweet-card-label">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 1l4 4-4 4"></path>
+          <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+          <path d="M7 23l-4-4 4-4"></path>
+          <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+        </svg>
+        转发的帖子
+      </div>
+      <div class="retweet-card-body">
+        <div class="retweet-card-header">
+          <div class="retweet-card-avatar">${avatarHtml}</div>
+          <div class="retweet-card-author-info">
+            <span class="retweet-card-author">${escapeHtml(cardData.authorName)}</span>
+            <span class="retweet-card-handle">@${cardData.handle || ''}</span>
+          </div>
+        </div>
+        <div class="retweet-card-content">${escapeHtml(cardData.content)}</div>
+        <div class="retweet-card-stats">
+          <span class="retweet-stat">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+            </svg>
+            ${cardData.comments || 0}
+          </span>
+          <span class="retweet-stat">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 1l4 4-4 4"></path>
+              <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+              <path d="M7 23l-4-4 4-4"></path>
+              <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+            </svg>
+            ${cardData.retweets || 0}
+          </span>
+          <span class="retweet-stat">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
+            ${cardData.likes || 0}
+          </span>
+        </div>
+      </div>
+    </div>
+  `;
+};
+
 // 全局安全读取函数，处理数据损坏情况
 async function safeLocalforageGet(key) {
   try {
@@ -2046,6 +2110,20 @@ async function loadGroupMessages(groupId) {
         let contentHtml = isHtmlMsg
           ? msg.content
           : processAtMentions(escapeHtml(msg.content));
+        
+        // 检测是否有转发卡片数据
+        if (msg.retweetCard && typeof renderRetweetCard === 'function') {
+          // 如果是纯转发消息或内容为空，只显示卡片
+          if (msg.isRetweetOnly || !msg.content || msg.content.trim() === '' || /^\[转发帖子\]/.test((msg.content || '').trim())) {
+            contentHtml = renderRetweetCard(msg.retweetCard);
+          } else {
+            contentHtml += renderRetweetCard(msg.retweetCard);
+          }
+        }
+        
+        // 检测是否只有转发卡片
+        const isRetweetOnly = msg.retweetCard && (msg.isRetweetOnly || !msg.content || msg.content.trim() === '' || /^\[转发帖子\]/.test((msg.content || '').trim()));
+        
         // 检测是否是表情包消息
         const isSticker =
           isHtmlMsg &&
@@ -2071,6 +2149,11 @@ async function loadGroupMessages(groupId) {
           `;
         }
 
+        // 转发卡片特殊样式
+        const retweetStyle = isRetweetOnly 
+          ? 'style="background:transparent!important;box-shadow:none!important;padding:0!important;"' 
+          : '';
+
         return `
         <div class="msg-row user group-msg" 
              data-index="${index}"
@@ -2081,7 +2164,7 @@ async function loadGroupMessages(groupId) {
              onmouseup="handleGroupMouseUp(event)">
           <div class="msg-bubble${
             isSticker ? " sticker-bubble" : ""
-          }">${quoteHtml}${contentHtml}</div>
+          }" ${retweetStyle}>${quoteHtml}${contentHtml}</div>
           <div class="msg-time">${msg.time || ""}</div>
           <div class="msg-user-avatar">
             ${userAvatar ? `<img src="${userAvatar}">` : "我"}
@@ -2297,6 +2380,19 @@ async function loadGroupMessages(groupId) {
           );
         }
 
+        // 检测是否有转发卡片数据
+        if (msg.retweetCard && typeof renderRetweetCard === 'function') {
+          // 如果是纯转发消息或内容为空，只显示卡片
+          if (msg.isRetweetOnly || !msg.content || msg.content.trim() === '' || /^\[转发帖子\]/.test((msg.content || '').trim())) {
+            contentHtml = renderRetweetCard(msg.retweetCard);
+          } else {
+            contentHtml += renderRetweetCard(msg.retweetCard);
+          }
+        }
+
+        // 检测是否只有转发卡片
+        const isRetweetOnly = msg.retweetCard && (msg.isRetweetOnly || !msg.content || msg.content.trim() === '' || /^\[转发帖子\]/.test((msg.content || '').trim()));
+
         // 检测是否是表情包消息
         const isSticker =
           /^\[(sticker|表情|表情包)[：:][^\]]+\]$/i.test(msg.content.trim()) ||
@@ -2304,7 +2400,9 @@ async function loadGroupMessages(groupId) {
         // 检测是否为特殊卡片消息
         const isSpecialCard =
           contentHtml.includes("transfer-card") ||
-          contentHtml.includes("location-card");
+          contentHtml.includes("location-card") ||
+          contentHtml.includes("retweet-card") ||
+          isRetweetOnly;
         const specialBubbleStyle = isSpecialCard
           ? 'style="background:transparent!important;box-shadow:none!important;padding:0!important;"'
           : "";
@@ -6090,11 +6188,25 @@ window.renderMessageGroup = function (
         }
       }
 
+      // 检测是否有转发卡片数据
+      if (m.retweetCard && typeof renderRetweetCard === 'function') {
+        // 如果是纯转发消息或内容为空，只显示卡片
+        if (m.isRetweetOnly || !rawContent || rawContent.trim() === '' || /^\[转发帖子\]/.test(rawContent.trim())) {
+          contentHtml = renderRetweetCard(m.retweetCard);
+        } else {
+          contentHtml += renderRetweetCard(m.retweetCard);
+        }
+      }
+
       // 检测是否为特殊卡片消息，决定气泡样式
       const isSpecialCard =
         contentHtml.includes("transfer-card") ||
-        contentHtml.includes("location-card");
-      const specialBubbleStyle = isSpecialCard
+        contentHtml.includes("location-card") ||
+        contentHtml.includes("retweet-card");
+      
+      // 如果只有转发卡片，不需要气泡背景
+      const isRetweetOnly = m.retweetCard && (m.isRetweetOnly || !rawContent || rawContent.trim() === '' || /^\[转发帖子\]/.test(rawContent.trim()));
+      const specialBubbleStyle = (isSpecialCard || isRetweetOnly)
         ? 'style="background:transparent!important;box-shadow:none!important;padding:0!important;"'
         : "";
 
