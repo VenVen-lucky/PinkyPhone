@@ -520,16 +520,18 @@ function openAddForumParticipant() {
   const html = availableChars
     .map(
       (c) => `
-    <div style="display:flex;align-items:center;gap:12px;padding:12px;border-bottom:1px solid rgba(255,255,255,0.1);cursor:pointer;" 
-         onclick="selectForumParticipant(${c.id})">
-      <div style="width:40px;height:40px;border-radius:50%;background:#333;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+    <div class="forum-char-select-item" onclick="selectForumParticipant('${c.id}')">
+      <div class="forum-char-select-avatar">
         ${
           c.avatar
-            ? `<img src="${c.avatar}" style="width:100%;height:100%;object-fit:cover;">`
-            : "🤖"
+            ? `<img src="${c.avatar}" alt="">`
+            : (c.name ? c.name.charAt(0) : "🤖")
         }
       </div>
-      <div style="flex:1;color:white;">${escapeForumHtml(c.name)}</div>
+      <div class="forum-char-select-name">${escapeForumHtml(c.name)}</div>
+      <svg class="forum-char-select-arrow" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg>
     </div>
   `
     )
@@ -537,15 +539,19 @@ function openAddForumParticipant() {
 
   const modal = document.createElement("div");
   modal.id = "forumAddParticipantModal";
-  modal.style.cssText =
-    "position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);z-index:9999;display:flex;align-items:center;justify-content:center;";
+  modal.className = "forum-modal-overlay";
   modal.innerHTML = `
-    <div style="background:#1a1a1f;border-radius:16px;width:90%;max-width:360px;max-height:70vh;overflow:hidden;">
-      <div style="padding:16px;border-bottom:1px solid rgba(255,255,255,0.1);display:flex;justify-content:space-between;align-items:center;">
-        <span style="color:white;font-size:17px;font-weight:600;">选择角色</span>
-        <span style="color:rgba(255,255,255,0.5);cursor:pointer;font-size:20px;" onclick="closeForumParticipantModal()">✕</span>
+    <div class="forum-modal-content">
+      <div class="forum-modal-header">
+        <span class="forum-modal-title">选择角色</span>
+        <button class="forum-modal-close" onclick="closeForumParticipantModal()">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
       </div>
-      <div style="max-height:50vh;overflow-y:auto;">
+      <div class="forum-modal-body">
         ${html}
       </div>
     </div>
@@ -564,22 +570,71 @@ function closeForumParticipantModal() {
 async function selectForumParticipant(charId) {
   closeForumParticipantModal();
 
-  const char = characters.find((c) => c.id === charId);
-  const identity = prompt(
-    `请输入 ${char?.name || "该角色"} 在论坛的身份设定：`
-  );
-  const nickname = prompt(
-    `请输入 ${char?.name || "该角色"} 在论坛的昵称（留空使用原名）：`
-  );
+  const char = characters.find((c) => String(c.id) === String(charId));
+  if (!char) return;
+  
+  // 创建设置身份的弹窗
+  const modal = document.createElement("div");
+  modal.id = "forumSetIdentityModal";
+  modal.className = "forum-modal-overlay";
+  modal.innerHTML = `
+    <div class="forum-modal-content">
+      <div class="forum-modal-header">
+        <span class="forum-modal-title">设置角色身份</span>
+        <button class="forum-modal-close" onclick="document.getElementById('forumSetIdentityModal').remove()">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="forum-modal-body" style="padding:16px;">
+        <div class="forum-identity-char">
+          <div class="forum-identity-avatar">
+            ${char.avatar ? `<img src="${char.avatar}" alt="">` : (char.name ? char.name.charAt(0) : '🤖')}
+          </div>
+          <div class="forum-identity-name">${escapeForumHtml(char.name)}</div>
+        </div>
+        
+        <div class="forum-item" style="padding:0;border:none;margin-bottom:16px;">
+          <div class="forum-label">论坛昵称</div>
+          <input type="text" class="forum-input" id="forumParticipantNickname" 
+            placeholder="留空则使用角色原名">
+        </div>
+        
+        <div class="forum-item" style="padding:0;border:none;margin-bottom:16px;">
+          <div class="forum-label">身份设定</div>
+          <textarea class="forum-input" id="forumParticipantIdentity" rows="3"
+            placeholder="该角色在论坛的身份，如：资深摸鱼达人、某领域专家..."></textarea>
+        </div>
+        
+        <button class="forum-identity-submit" onclick="confirmAddParticipant('${charId}')">
+          添加角色
+        </button>
+      </div>
+    </div>
+  `;
+  modal.onclick = (e) => {
+    if (e.target === modal) modal.remove();
+  };
+  document.body.appendChild(modal);
+}
 
+async function confirmAddParticipant(charId) {
+  const nickname = document.getElementById('forumParticipantNickname')?.value || '';
+  const identity = document.getElementById('forumParticipantIdentity')?.value || '';
+  
+  document.getElementById('forumSetIdentityModal')?.remove();
+  
   forumSettings.aiParticipants.push({
     charId,
-    identity: identity || "",
-    nickname: nickname || "",
+    identity: identity,
+    nickname: nickname,
   });
 
   await localforage.setItem("forumSettings", forumSettings);
   renderForumSettings();
+  showToast('角色已添加');
 }
 
 async function removeForumParticipant(index) {
@@ -1674,6 +1729,7 @@ window.saveForumSetting = saveForumSetting;
 window.openAddForumParticipant = openAddForumParticipant;
 window.closeForumParticipantModal = closeForumParticipantModal;
 window.selectForumParticipant = selectForumParticipant;
+window.confirmAddParticipant = confirmAddParticipant;
 window.removeForumParticipant = removeForumParticipant;
 window.openForumCompose = openForumCompose;
 window.closeForumCompose = closeForumCompose;
