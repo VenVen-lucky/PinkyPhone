@@ -105,7 +105,9 @@
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding-bottom: 130px; /* 留出底部导航和悬浮按钮的空间 */
+  padding-bottom: calc(130px + env(safe-area-inset-bottom, 0)); /* 留出底部导航和悬浮按钮的空间 */
+  display: flex;
+  flex-direction: column;
 }
 
 /* 单个帖子卡片 */
@@ -241,8 +243,8 @@
 
 /* 悬浮发帖按钮 (改为浅粉色) */
 .forum-fab {
-  position: absolute;
-  bottom: 20px;
+  position: fixed;
+  bottom: calc(70px + env(safe-area-inset-bottom, 0));
   right: 20px;
   width: 56px;
   height: 56px;
@@ -256,7 +258,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  z-index: 50;
+  z-index: 99;
   transition: transform 0.1s;
 }
 
@@ -267,6 +269,11 @@
 
 /* 空状态 */
 .forum-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   padding: 40px;
   text-align: center;
   color: #536471;
@@ -301,11 +308,14 @@
   align-items: center;
   justify-content: space-around;
   height: 50px;
+  padding-bottom: env(safe-area-inset-bottom, 0);
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-top: 1px solid #eff3f4;
-  position: sticky;
+  position: fixed;
+  left: 0;
+  right: 0;
   bottom: 0;
   z-index: 100;
 }
@@ -334,11 +344,6 @@
 .forum-nav-item.active svg {
   fill: #f48fb1;
   stroke: #f48fb1;
-}
-
-/* 调整悬浮按钮位置，避免被底部导航遮挡 */
-.forum-fab {
-  bottom: 70px;
 }
 
 /* ==================== 图片占位符 ==================== */
