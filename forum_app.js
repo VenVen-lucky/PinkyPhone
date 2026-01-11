@@ -128,6 +128,10 @@ function renderForumFeed() {
   if (tabs) tabs.style.display = 'flex';
   if (fab) fab.style.display = 'flex';
   
+  // 恢复safe area padding（从个人主页返回时）
+  const forumContainer = document.querySelector('.forum-container');
+  if (forumContainer) forumContainer.style.paddingTop = '';
+  
   // 显示主页的返回按钮、tab和设置按钮，隐藏热点标题
   const backBtn = document.querySelector('.forum-back-btn');
   const homeTabs = document.querySelectorAll('.forum-home-tab');
@@ -2920,6 +2924,10 @@ function renderForumHot() {
   if (tabs) tabs.style.display = 'flex';
   if (fab) fab.style.display = 'flex';
   
+  // 恢复safe area padding（从个人主页返回时）
+  const forumContainer = document.querySelector('.forum-container');
+  if (forumContainer) forumContainer.style.paddingTop = '';
+  
   // 隐藏主页的返回按钮、tab和设置按钮，显示热点标题
   const backBtn = document.querySelector('.forum-back-btn');
   const homeTabs = document.querySelectorAll('.forum-home-tab');
@@ -3048,6 +3056,10 @@ async function searchForumTopic(topic) {
   // 隐藏顶栏（搜索结果页有自己的header）
   const tabs = document.querySelector('.forum-tabs');
   if (tabs) tabs.style.display = 'none';
+  
+  // 移除safe area padding（搜索结果header有自己的safe area处理）
+  const forumContainer = document.querySelector('.forum-container');
+  if (forumContainer) forumContainer.style.paddingTop = '0';
   
   // 显示搜索结果页面（带loading）
   feed.innerHTML = `
@@ -3576,6 +3588,10 @@ function renderForumProfile(tab = 'posts') {
   const fab = document.querySelector('.forum-fab');
   if (tabs) tabs.style.display = 'none';
   if (fab) fab.style.display = 'none';
+  
+  // 移除safe area padding，让背景图延伸到顶部
+  const forumContainer = document.querySelector('.forum-container');
+  if (forumContainer) forumContainer.style.paddingTop = '0';
 }
 
 // 渲染回复过的帖子（显示用户的回复）

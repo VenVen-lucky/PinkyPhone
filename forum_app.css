@@ -2657,21 +2657,41 @@ textarea.forum-input {
 
 /* 全屏背景图 - 覆盖到顶端 */
 .forum-profile-banner-full {
-  height: 200px;
+  height: calc(200px + env(safe-area-inset-top, 0));
   background: linear-gradient(135deg, #cfd9de 0%, #adb5bd 100%);
   position: relative;
   cursor: pointer;
   overflow: hidden;
-  /* 让背景图延伸到safe area */
-  margin-top: calc(-1 * env(safe-area-inset-top, 0));
-  padding-top: env(safe-area-inset-top, 0);
-  height: calc(200px + env(safe-area-inset-top, 0));
 }
 
 .forum-profile-banner-full img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.forum-profile-banner-full .forum-profile-banner-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #e8e8e8 0%, #d0d0d0 100%);
+}
+
+.forum-profile-banner-full .forum-profile-banner-hint {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: rgba(0,0,0,0.5);
+  color: white;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.forum-profile-banner-full:hover .forum-profile-banner-hint,
+.forum-profile-banner-full:active .forum-profile-banner-hint {
+  opacity: 1;
 }
 
 .forum-profile-immersive .forum-profile-avatar-row {
@@ -2916,6 +2936,7 @@ textarea.forum-input {
   align-items: center;
   gap: 12px;
   padding: 12px 16px;
+  padding-top: calc(12px + env(safe-area-inset-top, 0));
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
