@@ -7462,16 +7462,31 @@
         </button>
       </div>
       <div class="forum-compose-body">
-        <div
-          class="forum-compose-author"
-          id="forumComposeAuthor"
-          onclick="showForumAuthorPicker()"
-        ></div>
+        <div class="forum-compose-user-info" id="forumComposeUserInfo"></div>
         <textarea
           class="forum-compose-textarea"
           id="forumComposeTextarea"
-          placeholder="分享你的想法..."
+          placeholder="分享你的想法...&#10;&#10;💡 图片提示：&#10;• 点击下方📷添加真实图片&#10;• 或输入 [图片:描述] 添加描述图"
         ></textarea>
+        <div class="forum-compose-images" id="forumComposeImages"></div>
+        <div class="forum-compose-toolbar">
+          <button class="forum-compose-tool-btn" onclick="document.getElementById('forumComposeImageInput').click()" title="添加图片">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+              <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+          </button>
+          <button class="forum-compose-tool-btn" onclick="insertImagePlaceholder()" title="添加图片描述">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="12" y1="18" x2="12" y2="12"></line>
+              <line x1="9" y1="15" x2="15" y2="15"></line>
+            </svg>
+          </button>
+        </div>
+        <input type="file" id="forumComposeImageInput" accept="image/*" multiple style="display:none" onchange="handleComposeImageUpload(this)">
       </div>
     </div>
 

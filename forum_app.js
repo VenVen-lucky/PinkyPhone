@@ -6,8 +6,28 @@ let forumSettings = {
   forumName: "广场", // 论坛名称
   userIdentity: "", // 用户在论坛的身份
   userNickname: "", // 用户在论坛的昵称
-  aiParticipants: [], // AI参与者列表 [{ charId, identity, nickname }]
+  userHandle: "", // 用户的@ID
+  userBio: "", // 个人介绍
+  userBanner: "", // 背景图
+  userFollowing: 0, // 关注数
+  userFollowers: 0, // 粉丝数
+  userJoinDate: "", // 加入时间
+  aiParticipants: [], // AI参与者列表 [{ charId, identity, nickname, avatar, handle }]
+  npcs: [], // NPC列表 [{ id, name, handle, avatar, identity, persona }]
+  relationships: [], // 关系列表 [{ id, person1Type, person1Id, person2Type, person2Id, relationship, description }]
 };
+
+// 默认头像SVG（灰色背景+白色人形）
+const DEFAULT_AVATAR_SVG = `<svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="48" height="48" fill="#CFD9DE"/>
+  <circle cx="24" cy="18" r="8" fill="white"/>
+  <ellipse cx="24" cy="42" rx="14" ry="12" fill="white"/>
+</svg>`;
+
+// 获取默认头像的Data URL
+function getDefaultAvatarDataUrl() {
+  return 'data:image/svg+xml,' + encodeURIComponent(DEFAULT_AVATAR_SVG);
+}
 
 let forumPosts = []; // 帖子列表
 let currentForumPostId = null; // 当前查看的帖子ID
@@ -54,17 +74,19 @@ function renderForumPage() {
   container.innerHTML = `
     <div class="forum-container">
       <div class="forum-tabs">
-        <button class="forum-nav-back" onclick="closePage('forumPage')">
+        <button class="forum-nav-back forum-back-btn" onclick="closePage('forumPage')">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
         </button>
         
-        <div class="forum-tab active" onclick="switchForumTab('recommend')">推荐</div>
-        <div class="forum-tab" onclick="switchForumTab('following')">关注</div>
+        <div class="forum-tab forum-home-tab active" onclick="switchForumTab('recommend')">推荐</div>
+        <div class="forum-tab forum-home-tab" onclick="switchForumTab('following')">关注</div>
         
-        <button class="forum-nav-back forum-refresh-btn" onclick="generateForumPosts()" style="margin-left:auto;" title="刷新内容">
+        <div class="forum-hot-title" style="display:none;">热点</div>
+        
+        <button class="forum-nav-back forum-refresh-btn" onclick="handleForumRefresh()" style="margin-left:auto;" title="刷新内容">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
         </button>
-        <button class="forum-nav-back" onclick="openForumSettings()" style="margin-right:0;" title="设置">
+        <button class="forum-nav-back forum-settings-btn" onclick="openForumSettings()" style="margin-right:0;" title="设置">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><circle cx="12" cy="5" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="12" cy="19" r="2"></circle></svg>
         </button>
       </div>
@@ -100,6 +122,25 @@ function renderForumFeed() {
   const container = document.getElementById("forumFeed");
   if (!container) return;
 
+  // 确保顶栏和FAB显示（从个人主页返回时可能被隐藏）
+  const tabs = document.querySelector('.forum-tabs');
+  const fab = document.querySelector('.forum-fab');
+  if (tabs) tabs.style.display = 'flex';
+  if (fab) fab.style.display = 'flex';
+  
+  // 显示主页的返回按钮、tab和设置按钮，隐藏热点标题
+  const backBtn = document.querySelector('.forum-back-btn');
+  const homeTabs = document.querySelectorAll('.forum-home-tab');
+  const hotTitle = document.querySelector('.forum-hot-title');
+  const settingsBtn = document.querySelector('.forum-settings-btn');
+  if (backBtn) backBtn.style.display = 'flex';
+  homeTabs.forEach(tab => tab.style.display = 'flex');
+  if (hotTitle) hotTitle.style.display = 'none';
+  if (settingsBtn) settingsBtn.style.display = 'flex';
+  
+  // 更新当前section状态
+  window.currentForumSection = 'home';
+
   // 检查是否已设置世界观
   if (!forumSettings.worldview) {
     container.innerHTML = `
@@ -112,11 +153,13 @@ function renderForumFeed() {
     return;
   }
 
-  // 根据当前tab过滤帖子
-  let filteredPosts = forumPosts;
+  // 过滤掉搜索结果帖子，只显示主页帖子
+  let filteredPosts = forumPosts.filter(p => !p.isSearchResult);
+  
+  // 根据当前tab进一步过滤
   if (currentForumTab === 'following') {
     // 关注页只显示AI角色的帖子
-    filteredPosts = forumPosts.filter(p => p.authorType === 'ai');
+    filteredPosts = filteredPosts.filter(p => p.authorType === 'ai');
   }
 
   // 没有帖子时显示生成按钮
@@ -165,6 +208,62 @@ function renderForumPostItem(post) {
   
   // 处理内容中的图片占位符
   const contentHtml = formatForumContent(post.content);
+  
+  // 渲染真实图片
+  let imagesHtml = '';
+  if (post.images && post.images.length > 0) {
+    const imageCount = post.images.length;
+    const gridClass = imageCount === 1 ? 'single' : imageCount === 2 ? 'double' : imageCount === 3 ? 'triple' : 'quad';
+    imagesHtml = `
+      <div class="forum-post-images ${gridClass}" onclick="event.stopPropagation();">
+        ${post.images.map((img, idx) => `
+          <div class="forum-post-image-item" onclick="showForumFullImage('${img.replace(/'/g, "\\'")}')">
+            <img src="${img}" alt="">
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+  
+  // 如果是转发的帖子，显示原帖内容（不再显示转发标签）
+  let originalPostHtml = '';
+  if (post.isRetweet && post.originalPost) {
+    // 渲染原帖卡片
+    const orig = post.originalPost;
+    const origAvatarContent = orig.authorAvatar
+      ? `<img src="${orig.authorAvatar}" alt="">`
+      : getAvatarEmoji(orig.authorName);
+    const origHandle = orig.handle || generateEnglishHandle(orig.authorName);
+    const origContentHtml = formatForumContent(orig.content);
+    
+    // 原帖图片
+    let origImagesHtml = '';
+    if (orig.images && orig.images.length > 0) {
+      const origImageCount = orig.images.length;
+      const origGridClass = origImageCount === 1 ? 'single' : origImageCount === 2 ? 'double' : 'quad';
+      origImagesHtml = `
+        <div class="forum-post-images ${origGridClass}" onclick="event.stopPropagation();">
+          ${orig.images.slice(0, 4).map((img, idx) => `
+            <div class="forum-post-image-item" onclick="showForumFullImage('${img.replace(/'/g, "\\'")}')">
+              <img src="${img}" alt="">
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+    
+    originalPostHtml = `
+      <div class="forum-quote-card" onclick="event.stopPropagation(); openForumPostDetail(${orig.id})">
+        <div class="forum-quote-header">
+          <div class="forum-quote-avatar">${origAvatarContent}</div>
+          <span class="forum-quote-name">${escapeForumHtml(orig.authorName)}</span>
+          <span class="forum-quote-handle">@${origHandle}</span>
+        </div>
+        <div class="forum-quote-content">${origContentHtml}</div>
+        ${origImagesHtml}
+      </div>
+    `;
+  }
 
   return `
     <div class="forum-post" onclick="openForumPostDetail(${post.id})">
@@ -185,7 +284,9 @@ function renderForumPostItem(post) {
           </div>
         </div>
         
-        <div class="forum-post-content">${contentHtml}</div>
+        ${post.content ? `<div class="forum-post-content">${contentHtml}</div>` : ''}
+        ${imagesHtml}
+        ${originalPostHtml}
 
         <div class="forum-post-actions">
           <div class="forum-action">
@@ -195,7 +296,7 @@ function renderForumPostItem(post) {
             <span>${commentCount || ""}</span>
           </div>
           
-          <div class="forum-action" onclick="event.stopPropagation(); showRetweetMenu(${post.id})">
+          <div class="forum-action" onclick="event.stopPropagation(); openQuoteRetweet(${post.id})">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
               <path d="M17 1l4 4-4 4"></path>
               <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
@@ -228,6 +329,22 @@ function renderForumPostItem(post) {
       </div>
     </div>
   `;
+}
+
+// 显示全屏图片
+function showForumFullImage(imgSrc) {
+  const modal = document.createElement('div');
+  modal.className = 'forum-fullimage-modal';
+  modal.innerHTML = `
+    <div class="forum-fullimage-content">
+      <img src="${imgSrc}" alt="">
+    </div>
+    <button class="forum-fullimage-close" onclick="this.parentElement.remove()">×</button>
+  `;
+  modal.onclick = (e) => {
+    if (e.target === modal) modal.remove();
+  };
+  document.body.appendChild(modal);
 }
 // ==================== 帖子详情 ====================
 
@@ -328,6 +445,45 @@ function renderForumPostDetail() {
     minute: '2-digit'
   });
 
+  // 处理转发帖子的原帖卡片
+  let originalPostHtml = '';
+  if (post.isRetweet && post.originalPost) {
+    const orig = post.originalPost;
+    const origAvatarContent = orig.authorAvatar
+      ? `<img src="${orig.authorAvatar}" alt="">`
+      : getAvatarEmoji(orig.authorName);
+    const origHandle = orig.handle || generateEnglishHandle(orig.authorName);
+    const origContentHtml = formatForumContent(orig.content);
+    
+    // 原帖图片
+    let origImagesHtml = '';
+    if (orig.images && orig.images.length > 0) {
+      const origImageCount = orig.images.length;
+      const origGridClass = origImageCount === 1 ? 'single' : origImageCount === 2 ? 'double' : 'quad';
+      origImagesHtml = `
+        <div class="forum-post-images ${origGridClass}">
+          ${orig.images.slice(0, 4).map((img, idx) => `
+            <div class="forum-post-image-item" onclick="showForumFullImage('${img.replace(/'/g, "\\'")}')">
+              <img src="${img}" alt="">
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+    
+    originalPostHtml = `
+      <div class="forum-quote-card" onclick="openForumPostDetail(${orig.id})" style="margin: 12px 0;">
+        <div class="forum-quote-header">
+          <div class="forum-quote-avatar">${origAvatarContent}</div>
+          <span class="forum-quote-name">${escapeForumHtml(orig.authorName)}</span>
+          <span class="forum-quote-handle">@${origHandle}</span>
+        </div>
+        <div class="forum-quote-content">${origContentHtml}</div>
+        ${origImagesHtml}
+      </div>
+    `;
+  }
+
   container.innerHTML = `
     <div class="forum-detail-post">
       <div class="forum-detail-author">
@@ -339,6 +495,7 @@ function renderForumPostDetail() {
       </div>
       
       <div class="forum-detail-text">${formatForumContent(post.content)}</div>
+      ${originalPostHtml}
       
       <div class="forum-detail-time">${fullTime}</div>
       
@@ -354,7 +511,7 @@ function renderForumPostDetail() {
             <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
           </svg>
         </div>
-        <div class="forum-detail-action" onclick="showRetweetMenu(${post.id})">
+        <div class="forum-detail-action" onclick="openQuoteRetweet(${post.id})">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5">
             <path d="M17 1l4 4-4 4"></path>
             <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
@@ -367,7 +524,7 @@ function renderForumPostDetail() {
             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
           </svg>
         </div>
-        <div class="forum-detail-action">
+        <div class="forum-detail-action" onclick="retweetToChat(${post.id})">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5">
             <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
             <polyline points="16 6 12 2 8 6"></polyline>
@@ -431,22 +588,69 @@ function renderForumSettings() {
   // AI参与者列表
   const participantsHtml = forumSettings.aiParticipants
     .map((p, index) => {
-      const char = characters.find((c) => c.id === p.charId);
-      const avatarContent = char?.avatar
-        ? `<img src="${char.avatar}" alt="">`
-        : "🤖";
-      const name = p.nickname || char?.name || "未知角色";
+      const char = characters.find((c) => String(c.id) === String(p.charId));
+      // 优先使用自定义头像，否则用角色头像
+      const avatarContent = p.avatar 
+        ? `<img src="${p.avatar}" alt="">`
+        : (char?.avatar ? `<img src="${char.avatar}" alt="">` : "🤖");
+      // 修复：优先使用nickname，否则用角色本名
+      const displayName = p.nickname || char?.name || "未知角色";
+      const handleText = p.handle || generateEnglishHandle(displayName);
 
       return `
-      <div class="forum-participant">
+      <div class="forum-participant" onclick="editForumParticipant(${index})">
         <div class="forum-participant-avatar">${avatarContent}</div>
         <div class="forum-participant-info">
-          <div class="forum-participant-name">${escapeForumHtml(name)}</div>
+          <div class="forum-participant-name">${escapeForumHtml(displayName)}</div>
+          <div class="forum-participant-handle">@${escapeForumHtml(handleText)}</div>
           <div class="forum-participant-identity">${escapeForumHtml(
             p.identity || "未设置身份"
           )}</div>
         </div>
-        <button class="forum-participant-remove" onclick="removeForumParticipant(${index})">×</button>
+        <button class="forum-participant-remove" onclick="event.stopPropagation();removeForumParticipant(${index})">×</button>
+      </div>
+    `;
+    })
+    .join("");
+
+  // NPC列表
+  const npcsHtml = (forumSettings.npcs || [])
+    .map((npc, index) => {
+      const avatarContent = npc.avatar 
+        ? `<img src="${npc.avatar}" alt="">`
+        : (npc.name ? npc.name.charAt(0) : "👤");
+      
+      return `
+      <div class="forum-participant" onclick="editForumNpc(${index})">
+        <div class="forum-participant-avatar forum-npc-avatar">${avatarContent}</div>
+        <div class="forum-participant-info">
+          <div class="forum-participant-name">${escapeForumHtml(npc.name)}</div>
+          <div class="forum-participant-handle">@${escapeForumHtml(npc.handle || '')}</div>
+          <div class="forum-participant-identity">${escapeForumHtml(
+            npc.identity || "未设置身份"
+          )}</div>
+        </div>
+        <button class="forum-participant-remove" onclick="event.stopPropagation();removeForumNpc(${index})">×</button>
+      </div>
+    `;
+    })
+    .join("");
+
+  // 关系列表
+  const relationshipsHtml = (forumSettings.relationships || [])
+    .map((rel, index) => {
+      const person1Name = getForumPersonName(rel.person1Type, rel.person1Id);
+      const person2Name = getForumPersonName(rel.person2Type, rel.person2Id);
+      
+      return `
+      <div class="forum-relationship-item" onclick="editForumRelationship(${index})">
+        <div class="forum-relationship-people">
+          <span class="forum-relationship-person">${escapeForumHtml(person1Name)}</span>
+          <span class="forum-relationship-arrow">↔</span>
+          <span class="forum-relationship-person">${escapeForumHtml(person2Name)}</span>
+        </div>
+        <div class="forum-relationship-type">${escapeForumHtml(rel.relationship || '未设置')}</div>
+        <button class="forum-participant-remove" onclick="event.stopPropagation();removeForumRelationship(${index})">×</button>
       </div>
     `;
     })
@@ -496,13 +700,46 @@ function renderForumSettings() {
     </div>
     
     <div class="forum-section">
-      <div class="forum-section-title">AI参与者</div>
-      ${participantsHtml}
+      <div class="forum-section-title">AI角色 <span class="forum-section-hint">点击可编辑</span></div>
+      ${participantsHtml || '<div class="forum-empty-hint">还没有添加AI角色</div>'}
       <button class="forum-add-btn" onclick="openAddForumParticipant()">
         + 添加AI角色
       </button>
     </div>
+    
+    <div class="forum-section">
+      <div class="forum-section-title">NPC角色 <span class="forum-section-hint">论坛中的路人网友</span></div>
+      ${npcsHtml || '<div class="forum-empty-hint">还没有添加NPC</div>'}
+      <button class="forum-add-btn" onclick="openAddForumNpc()">
+        + 添加NPC
+      </button>
+    </div>
+    
+    <div class="forum-section">
+      <div class="forum-section-title">人物关系 <span class="forum-section-hint">会在帖子互动中体现</span></div>
+      ${relationshipsHtml || '<div class="forum-empty-hint">还没有设置关系</div>'}
+      <button class="forum-add-btn" onclick="openAddForumRelationship()">
+        + 添加关系
+      </button>
+    </div>
   `;
+}
+
+// 获取人物名称
+function getForumPersonName(type, id) {
+  if (type === 'ai') {
+    const participant = forumSettings.aiParticipants.find(p => String(p.charId) === String(id));
+    if (participant) {
+      const char = characters.find(c => String(c.id) === String(id));
+      return participant.nickname || char?.name || '未知AI';
+    }
+  } else if (type === 'npc') {
+    const npc = (forumSettings.npcs || []).find(n => String(n.id) === String(id));
+    return npc?.name || '未知NPC';
+  } else if (type === 'user') {
+    return forumSettings.userNickname || '用户';
+  }
+  return '未知';
 }
 
 async function saveForumSetting(key, value) {
@@ -579,14 +816,37 @@ async function selectForumParticipant(charId) {
   const char = characters.find((c) => String(c.id) === String(charId));
   if (!char) return;
   
-  // 创建设置身份的弹窗
+  showParticipantEditModal(charId, char, null); // null表示新增
+}
+
+// 编辑已有的AI参与者
+function editForumParticipant(index) {
+  const participant = forumSettings.aiParticipants[index];
+  if (!participant) return;
+  
+  const char = characters.find((c) => String(c.id) === String(participant.charId));
+  showParticipantEditModal(participant.charId, char, index);
+}
+
+// 显示AI参与者编辑弹窗
+function showParticipantEditModal(charId, char, editIndex) {
+  const isEdit = editIndex !== null;
+  const participant = isEdit ? forumSettings.aiParticipants[editIndex] : {};
+  const defaultHandle = generateEnglishHandle(participant.nickname || char?.name || '');
+  
+  // 当前头像：优先自定义头像，否则角色头像
+  const currentAvatar = participant.avatar || char?.avatar || '';
+  const avatarPreview = currentAvatar 
+    ? `<img src="${currentAvatar}" alt="">` 
+    : (char?.name ? char.name.charAt(0) : '🤖');
+  
   const modal = document.createElement("div");
   modal.id = "forumSetIdentityModal";
   modal.className = "forum-modal-overlay";
   modal.innerHTML = `
-    <div class="forum-modal-content">
+    <div class="forum-modal-content forum-modal-large">
       <div class="forum-modal-header">
-        <span class="forum-modal-title">设置角色身份</span>
+        <span class="forum-modal-title">${isEdit ? '编辑' : '设置'}角色信息</span>
         <button class="forum-modal-close" onclick="document.getElementById('forumSetIdentityModal').remove()">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -594,28 +854,43 @@ async function selectForumParticipant(charId) {
           </svg>
         </button>
       </div>
-      <div class="forum-modal-body" style="padding:16px;">
+      <div class="forum-modal-body" style="padding:16px;max-height:70vh;overflow-y:auto;">
         <div class="forum-identity-char">
-          <div class="forum-identity-avatar">
-            ${char.avatar ? `<img src="${char.avatar}" alt="">` : (char.name ? char.name.charAt(0) : '🤖')}
+          <div class="forum-identity-avatar" id="forumParticipantAvatarPreview" onclick="document.getElementById('forumParticipantAvatarInput').click()">
+            ${avatarPreview}
+            <div class="forum-avatar-edit-hint">点击更换</div>
           </div>
-          <div class="forum-identity-name">${escapeForumHtml(char.name)}</div>
+          <input type="file" id="forumParticipantAvatarInput" accept="image/*" style="display:none" onchange="previewForumParticipantAvatar(this)">
+          <input type="hidden" id="forumParticipantAvatarData" value="${currentAvatar}">
+          <div class="forum-identity-name">${escapeForumHtml(char?.name || '角色')}</div>
+          <div class="forum-identity-hint">原角色名（论坛中可使用不同昵称）</div>
         </div>
         
         <div class="forum-item" style="padding:0;border:none;margin-bottom:16px;">
           <div class="forum-label">论坛昵称</div>
           <input type="text" class="forum-input" id="forumParticipantNickname" 
-            placeholder="留空则使用角色原名">
+            value="${escapeForumHtml(participant.nickname || '')}"
+            placeholder="留空则使用角色原名：${char?.name || ''}">
+        </div>
+        
+        <div class="forum-item" style="padding:0;border:none;margin-bottom:16px;">
+          <div class="forum-label">用户名 (Handle)</div>
+          <div class="forum-input-with-prefix">
+            <span class="forum-input-prefix">@</span>
+            <input type="text" class="forum-input forum-input-handle" id="forumParticipantHandle" 
+              value="${escapeForumHtml(participant.handle || '')}"
+              placeholder="${defaultHandle}">
+          </div>
         </div>
         
         <div class="forum-item" style="padding:0;border:none;margin-bottom:16px;">
           <div class="forum-label">身份设定</div>
           <textarea class="forum-input" id="forumParticipantIdentity" rows="3"
-            placeholder="该角色在论坛的身份，如：资深摸鱼达人、某领域专家..."></textarea>
+            placeholder="该角色在论坛的身份，如：资深摸鱼达人、某领域专家...">${escapeForumHtml(participant.identity || '')}</textarea>
         </div>
         
-        <button class="forum-identity-submit" onclick="confirmAddParticipant('${charId}')">
-          添加角色
+        <button class="forum-identity-submit" onclick="confirmAddParticipant('${charId}', ${editIndex})">
+          ${isEdit ? '保存修改' : '添加角色'}
         </button>
       </div>
     </div>
@@ -626,21 +901,52 @@ async function selectForumParticipant(charId) {
   document.body.appendChild(modal);
 }
 
-async function confirmAddParticipant(charId) {
+// 预览头像
+function previewForumParticipantAvatar(input) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const preview = document.getElementById('forumParticipantAvatarPreview');
+      if (preview) {
+        preview.innerHTML = `<img src="${e.target.result}" alt=""><div class="forum-avatar-edit-hint">点击更换</div>`;
+      }
+      const dataInput = document.getElementById('forumParticipantAvatarData');
+      if (dataInput) {
+        dataInput.value = e.target.result;
+      }
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+async function confirmAddParticipant(charId, editIndex) {
   const nickname = document.getElementById('forumParticipantNickname')?.value || '';
+  const handle = document.getElementById('forumParticipantHandle')?.value || '';
   const identity = document.getElementById('forumParticipantIdentity')?.value || '';
+  const avatar = document.getElementById('forumParticipantAvatarData')?.value || '';
   
   document.getElementById('forumSetIdentityModal')?.remove();
   
-  forumSettings.aiParticipants.push({
+  const participantData = {
     charId,
-    identity: identity,
     nickname: nickname,
-  });
+    handle: handle,
+    identity: identity,
+    avatar: avatar,
+  };
+  
+  if (editIndex !== null && editIndex >= 0) {
+    // 编辑模式
+    forumSettings.aiParticipants[editIndex] = participantData;
+    showToast('已保存修改');
+  } else {
+    // 新增模式
+    forumSettings.aiParticipants.push(participantData);
+    showToast('角色已添加');
+  }
 
   await localforage.setItem("forumSettings", forumSettings);
   renderForumSettings();
-  showToast('角色已添加');
 }
 
 async function removeForumParticipant(index) {
@@ -649,16 +955,353 @@ async function removeForumParticipant(index) {
   renderForumSettings();
 }
 
+// ==================== NPC管理 ====================
+
+function openAddForumNpc() {
+  showNpcEditModal(null);
+}
+
+function editForumNpc(index) {
+  showNpcEditModal(index);
+}
+
+function showNpcEditModal(editIndex) {
+  const isEdit = editIndex !== null;
+  const npc = isEdit ? (forumSettings.npcs || [])[editIndex] : {};
+  
+  const avatarPreview = npc.avatar 
+    ? `<img src="${npc.avatar}" alt="">` 
+    : (npc.name ? npc.name.charAt(0) : '👤');
+  
+  const modal = document.createElement("div");
+  modal.id = "forumNpcModal";
+  modal.className = "forum-modal-overlay";
+  modal.innerHTML = `
+    <div class="forum-modal-content forum-modal-large">
+      <div class="forum-modal-header">
+        <span class="forum-modal-title">${isEdit ? '编辑' : '添加'}NPC</span>
+        <button class="forum-modal-close" onclick="document.getElementById('forumNpcModal').remove()">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="forum-modal-body" style="padding:16px;max-height:70vh;overflow-y:auto;">
+        <div class="forum-identity-char">
+          <div class="forum-identity-avatar forum-npc-avatar" id="forumNpcAvatarPreview" onclick="document.getElementById('forumNpcAvatarInput').click()">
+            ${avatarPreview}
+            <div class="forum-avatar-edit-hint">点击上传</div>
+          </div>
+          <input type="file" id="forumNpcAvatarInput" accept="image/*" style="display:none" onchange="previewForumNpcAvatar(this)">
+          <input type="hidden" id="forumNpcAvatarData" value="${npc.avatar || ''}">
+        </div>
+        
+        <div class="forum-item" style="padding:0;border:none;margin-bottom:16px;">
+          <div class="forum-label">NPC昵称 <span class="forum-required">*</span></div>
+          <input type="text" class="forum-input" id="forumNpcName" 
+            value="${escapeForumHtml(npc.name || '')}"
+            placeholder="如：路人甲、热心市民、吃瓜群众...">
+        </div>
+        
+        <div class="forum-item" style="padding:0;border:none;margin-bottom:16px;">
+          <div class="forum-label">用户名 (Handle)</div>
+          <div class="forum-input-with-prefix">
+            <span class="forum-input-prefix">@</span>
+            <input type="text" class="forum-input forum-input-handle" id="forumNpcHandle" 
+              value="${escapeForumHtml(npc.handle || '')}"
+              placeholder="英文用户名，如 CuriousCat_99">
+          </div>
+        </div>
+        
+        <div class="forum-item" style="padding:0;border:none;margin-bottom:16px;">
+          <div class="forum-label">身份设定</div>
+          <textarea class="forum-input" id="forumNpcIdentity" rows="2"
+            placeholder="这个NPC的背景身份">${escapeForumHtml(npc.identity || '')}</textarea>
+        </div>
+        
+        <div class="forum-item" style="padding:0;border:none;margin-bottom:16px;">
+          <div class="forum-label">性格特点</div>
+          <textarea class="forum-input" id="forumNpcPersona" rows="2"
+            placeholder="这个NPC的性格和说话风格">${escapeForumHtml(npc.persona || '')}</textarea>
+        </div>
+        
+        <button class="forum-identity-submit" onclick="confirmSaveNpc(${editIndex})">
+          ${isEdit ? '保存修改' : '添加NPC'}
+        </button>
+      </div>
+    </div>
+  `;
+  modal.onclick = (e) => {
+    if (e.target === modal) modal.remove();
+  };
+  document.body.appendChild(modal);
+}
+
+function previewForumNpcAvatar(input) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const preview = document.getElementById('forumNpcAvatarPreview');
+      if (preview) {
+        preview.innerHTML = `<img src="${e.target.result}" alt=""><div class="forum-avatar-edit-hint">点击更换</div>`;
+      }
+      const dataInput = document.getElementById('forumNpcAvatarData');
+      if (dataInput) {
+        dataInput.value = e.target.result;
+      }
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+async function confirmSaveNpc(editIndex) {
+  const name = document.getElementById('forumNpcName')?.value?.trim() || '';
+  const handle = document.getElementById('forumNpcHandle')?.value?.trim() || '';
+  const identity = document.getElementById('forumNpcIdentity')?.value || '';
+  const persona = document.getElementById('forumNpcPersona')?.value || '';
+  const avatar = document.getElementById('forumNpcAvatarData')?.value || '';
+  
+  if (!name) {
+    showToast('请输入NPC昵称');
+    return;
+  }
+  
+  document.getElementById('forumNpcModal')?.remove();
+  
+  if (!forumSettings.npcs) forumSettings.npcs = [];
+  
+  const npcData = {
+    id: editIndex !== null ? forumSettings.npcs[editIndex].id : Date.now(),
+    name,
+    handle: handle || generateEnglishHandle(name),
+    identity,
+    persona,
+    avatar,
+  };
+  
+  if (editIndex !== null && editIndex >= 0) {
+    forumSettings.npcs[editIndex] = npcData;
+    showToast('已保存修改');
+  } else {
+    forumSettings.npcs.push(npcData);
+    showToast('NPC已添加');
+  }
+
+  await localforage.setItem("forumSettings", forumSettings);
+  renderForumSettings();
+}
+
+async function removeForumNpc(index) {
+  if (!forumSettings.npcs) return;
+  forumSettings.npcs.splice(index, 1);
+  await localforage.setItem("forumSettings", forumSettings);
+  renderForumSettings();
+}
+
+// ==================== 关系管理 ====================
+
+function openAddForumRelationship() {
+  showRelationshipEditModal(null);
+}
+
+function editForumRelationship(index) {
+  showRelationshipEditModal(index);
+}
+
+function showRelationshipEditModal(editIndex) {
+  const isEdit = editIndex !== null;
+  const rel = isEdit ? (forumSettings.relationships || [])[editIndex] : {};
+  
+  // 构建人物选项
+  const personOptions = getForumPersonOptions();
+  
+  const person1Value = isEdit ? `${rel.person1Type}:${rel.person1Id}` : '';
+  const person2Value = isEdit ? `${rel.person2Type}:${rel.person2Id}` : '';
+  
+  const modal = document.createElement("div");
+  modal.id = "forumRelationshipModal";
+  modal.className = "forum-modal-overlay";
+  modal.innerHTML = `
+    <div class="forum-modal-content">
+      <div class="forum-modal-header">
+        <span class="forum-modal-title">${isEdit ? '编辑' : '添加'}关系</span>
+        <button class="forum-modal-close" onclick="document.getElementById('forumRelationshipModal').remove()">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="forum-modal-body" style="padding:16px;">
+        <div class="forum-relationship-form">
+          <div class="forum-item" style="padding:0;border:none;margin-bottom:16px;">
+            <div class="forum-label">人物1</div>
+            <select class="forum-input forum-select" id="forumRelPerson1">
+              <option value="">请选择...</option>
+              ${personOptions}
+            </select>
+          </div>
+          
+          <div class="forum-relationship-connector">
+            <div class="forum-relationship-line"></div>
+            <div class="forum-relationship-icon">↔</div>
+            <div class="forum-relationship-line"></div>
+          </div>
+          
+          <div class="forum-item" style="padding:0;border:none;margin-bottom:16px;">
+            <div class="forum-label">人物2</div>
+            <select class="forum-input forum-select" id="forumRelPerson2">
+              <option value="">请选择...</option>
+              ${personOptions}
+            </select>
+          </div>
+        </div>
+        
+        <div class="forum-item" style="padding:0;border:none;margin-bottom:16px;">
+          <div class="forum-label">关系类型</div>
+          <input type="text" class="forum-input" id="forumRelType" 
+            value="${escapeForumHtml(rel.relationship || '')}"
+            placeholder="如：好友、情侣、死对头、师徒、暗恋...">
+        </div>
+        
+        <div class="forum-item" style="padding:0;border:none;margin-bottom:16px;">
+          <div class="forum-label">关系描述</div>
+          <textarea class="forum-input" id="forumRelDesc" rows="3"
+            placeholder="详细描述这段关系，会影响他们在论坛中的互动方式...">${escapeForumHtml(rel.description || '')}</textarea>
+        </div>
+        
+        <button class="forum-identity-submit" onclick="confirmSaveRelationship(${editIndex})">
+          ${isEdit ? '保存修改' : '添加关系'}
+        </button>
+      </div>
+    </div>
+  `;
+  modal.onclick = (e) => {
+    if (e.target === modal) modal.remove();
+  };
+  document.body.appendChild(modal);
+  
+  // 设置默认值
+  if (isEdit) {
+    setTimeout(() => {
+      const select1 = document.getElementById('forumRelPerson1');
+      const select2 = document.getElementById('forumRelPerson2');
+      if (select1) select1.value = person1Value;
+      if (select2) select2.value = person2Value;
+    }, 0);
+  }
+}
+
+function getForumPersonOptions() {
+  let options = '';
+  
+  // 用户
+  const userName = forumSettings.userNickname || '用户(我)';
+  options += `<option value="user:user">👤 ${escapeForumHtml(userName)}</option>`;
+  
+  // AI角色
+  if (forumSettings.aiParticipants.length > 0) {
+    options += '<optgroup label="AI角色">';
+    forumSettings.aiParticipants.forEach(p => {
+      const char = characters.find(c => String(c.id) === String(p.charId));
+      const name = p.nickname || char?.name || '未知';
+      options += `<option value="ai:${p.charId}">🤖 ${escapeForumHtml(name)}</option>`;
+    });
+    options += '</optgroup>';
+  }
+  
+  // NPC
+  if (forumSettings.npcs && forumSettings.npcs.length > 0) {
+    options += '<optgroup label="NPC">';
+    forumSettings.npcs.forEach(npc => {
+      options += `<option value="npc:${npc.id}">👥 ${escapeForumHtml(npc.name)}</option>`;
+    });
+    options += '</optgroup>';
+  }
+  
+  return options;
+}
+
+async function confirmSaveRelationship(editIndex) {
+  const person1 = document.getElementById('forumRelPerson1')?.value || '';
+  const person2 = document.getElementById('forumRelPerson2')?.value || '';
+  const relType = document.getElementById('forumRelType')?.value?.trim() || '';
+  const relDesc = document.getElementById('forumRelDesc')?.value || '';
+  
+  if (!person1 || !person2) {
+    showToast('请选择两个人物');
+    return;
+  }
+  
+  if (person1 === person2) {
+    showToast('不能选择同一个人物');
+    return;
+  }
+  
+  if (!relType) {
+    showToast('请输入关系类型');
+    return;
+  }
+  
+  document.getElementById('forumRelationshipModal')?.remove();
+  
+  const [type1, id1] = person1.split(':');
+  const [type2, id2] = person2.split(':');
+  
+  if (!forumSettings.relationships) forumSettings.relationships = [];
+  
+  const relData = {
+    id: editIndex !== null ? forumSettings.relationships[editIndex].id : Date.now(),
+    person1Type: type1,
+    person1Id: id1,
+    person2Type: type2,
+    person2Id: id2,
+    relationship: relType,
+    description: relDesc,
+  };
+  
+  if (editIndex !== null && editIndex >= 0) {
+    forumSettings.relationships[editIndex] = relData;
+    showToast('已保存修改');
+  } else {
+    forumSettings.relationships.push(relData);
+    showToast('关系已添加');
+  }
+
+  await localforage.setItem("forumSettings", forumSettings);
+  renderForumSettings();
+}
+
+async function removeForumRelationship(index) {
+  if (!forumSettings.relationships) return;
+  forumSettings.relationships.splice(index, 1);
+  await localforage.setItem("forumSettings", forumSettings);
+  renderForumSettings();
+}
+
 // ==================== 发帖 ====================
 
+// 发帖时的图片数据
+let forumComposeImages = [];
+
 function openForumCompose() {
-  forumComposeAuthor = { type: "user" };
+  forumComposeImages = []; // 重置图片
   const overlay = document.getElementById("forumComposeOverlay");
   if (overlay) {
     overlay.classList.add("active");
-    renderForumComposeAuthor();
-    document.getElementById("forumComposeTextarea").value = "";
-    document.getElementById("forumComposeTextarea").focus();
+    // 兼容旧版HTML（有forumComposeAuthor元素）和新版HTML（有forumComposeUserInfo元素）
+    if (document.getElementById("forumComposeAuthor")) {
+      renderForumComposeAuthor();
+    } else if (document.getElementById("forumComposeUserInfo")) {
+      renderForumComposeUserInfo();
+    }
+    renderComposeImages();
+    const textarea = document.getElementById("forumComposeTextarea");
+    if (textarea) {
+      textarea.value = "";
+      textarea.focus();
+    }
   }
 }
 
@@ -667,58 +1310,148 @@ function closeForumCompose() {
   if (overlay) {
     overlay.classList.remove("active");
   }
+  forumComposeImages = [];
 }
 
+// 旧版：渲染发帖作者选择器（兼容旧HTML）
 function renderForumComposeAuthor() {
   const container = document.getElementById("forumComposeAuthor");
   if (!container) return;
 
-  let avatarHtml, nameHtml;
-
-  if (forumComposeAuthor.type === "user") {
-    const globalAvatar = localStorage.getItem("avatarImg");
-    avatarHtml = globalAvatar ? `<img src="${globalAvatar}" alt="">` : "👤";
-    nameHtml = forumSettings.userNickname || "我";
-  } else {
-    const char = characters.find((c) => c.id === forumComposeAuthor.charId);
-    const participant = forumSettings.aiParticipants.find(
-      (p) => p.charId === forumComposeAuthor.charId
-    );
-    avatarHtml = char?.avatar ? `<img src="${char.avatar}" alt="">` : "🤖";
-    nameHtml = participant?.nickname || char?.name || "角色";
-  }
+  const globalAvatar = localStorage.getItem("avatarImg");
+  const avatarHtml = globalAvatar ? `<img src="${globalAvatar}" alt="">` : getDefaultAvatar();
+  const userName = forumSettings.userNickname || "我";
 
   container.innerHTML = `
     <div class="forum-compose-avatar">${avatarHtml}</div>
-    <div class="forum-compose-name">${nameHtml}</div>
-    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#536471" stroke-width="2">
-      <polyline points="6 9 12 15 18 9"></polyline>
-    </svg>
+    <div class="forum-compose-name">${escapeForumHtml(userName)}</div>
+  `;
+  // 移除点击事件（不再支持选择发帖人）
+  container.onclick = null;
+  container.style.cursor = 'default';
+}
+
+// 新版：渲染用户信息（不可点击）
+function renderForumComposeUserInfo() {
+  const container = document.getElementById("forumComposeUserInfo");
+  if (!container) return;
+
+  const globalAvatar = localStorage.getItem("avatarImg");
+  const avatarHtml = globalAvatar ? `<img src="${globalAvatar}" alt="">` : getDefaultAvatar();
+  const userName = forumSettings.userNickname || "我";
+  const userHandle = forumSettings.userHandle || generateEnglishHandle(userName);
+
+  container.innerHTML = `
+    <div class="forum-compose-avatar">${avatarHtml}</div>
+    <div class="forum-compose-user-text">
+      <div class="forum-compose-name">${escapeForumHtml(userName)}</div>
+      <div class="forum-compose-handle">@${escapeForumHtml(userHandle)}</div>
+    </div>
   `;
 }
 
+// 处理图片上传
+function handleComposeImageUpload(input) {
+  if (!input || !input.files || input.files.length === 0) return;
+  
+  Array.from(input.files).forEach(file => {
+    if (forumComposeImages.length >= 4) {
+      showToast('最多只能添加4张图片');
+      return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      forumComposeImages.push({
+        type: 'real',
+        data: e.target.result
+      });
+      renderComposeImages();
+    };
+    reader.readAsDataURL(file);
+  });
+  
+  input.value = ''; // 重置input
+}
+
+// 插入图片描述占位符
+function insertImagePlaceholder() {
+  const textarea = document.getElementById("forumComposeTextarea");
+  if (!textarea) return;
+  
+  const placeholder = "[图片:在这里描述图片内容]";
+  const start = textarea.selectionStart;
+  const end = textarea.selectionEnd;
+  const text = textarea.value;
+  
+  textarea.value = text.substring(0, start) + placeholder + text.substring(end);
+  textarea.focus();
+  // 选中描述部分方便用户修改
+  textarea.setSelectionRange(start + 4, start + placeholder.length - 1);
+}
+
+// 渲染已添加的图片
+function renderComposeImages() {
+  const container = document.getElementById("forumComposeImages");
+  if (!container) return;
+  
+  if (forumComposeImages.length === 0) {
+    container.innerHTML = '';
+    return;
+  }
+  
+  container.innerHTML = forumComposeImages.map((img, idx) => `
+    <div class="forum-compose-image-item">
+      <img src="${img.data}" alt="">
+      <button class="forum-compose-image-remove" onclick="removeComposeImage(${idx})">×</button>
+    </div>
+  `).join('');
+}
+
+// 移除图片
+function removeComposeImage(index) {
+  forumComposeImages.splice(index, 1);
+  renderComposeImages();
+}
+
 function showForumAuthorPicker() {
-  const options = [{ type: "user", name: forumSettings.userNickname || "我" }];
+  const globalAvatar = localStorage.getItem("avatarImg");
+  const options = [{ 
+    type: "user", 
+    name: forumSettings.userNickname || "我",
+    avatar: globalAvatar || null
+  }];
 
   forumSettings.aiParticipants.forEach((p) => {
-    const char = characters.find((c) => c.id === p.charId);
+    const char = characters.find((c) => String(c.id) === String(p.charId));
     options.push({
       type: "ai",
       charId: p.charId,
       name: p.nickname || char?.name || "角色",
+      avatar: p.avatar || char?.avatar || null
     });
   });
 
   const html = options
     .map(
-      (opt, i) => `
+      (opt, i) => {
+        const avatarHtml = opt.avatar 
+          ? `<img src="${opt.avatar}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">` 
+          : (opt.type === 'user' ? '👤' : '🤖');
+        const isSelected = forumComposeAuthor.type === opt.type && 
+          (opt.type === 'user' || String(forumComposeAuthor.charId) === String(opt.charId));
+        return `
     <div class="forum-author-option" onclick="selectForumComposeAuthor(${i})">
-      <span>${opt.name}</span>
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#f48fb1" stroke-width="2" style="opacity:${forumComposeAuthor.type === opt.type && (opt.type === 'user' || forumComposeAuthor.charId === opt.charId) ? '1' : '0'}">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:32px;height:32px;border-radius:50%;background:#f0f0f0;display:flex;align-items:center;justify-content:center;overflow:hidden;">${avatarHtml}</div>
+        <span>${escapeForumHtml(opt.name)}</span>
+      </div>
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#f48fb1" stroke-width="2" style="opacity:${isSelected ? '1' : '0'}">
         <polyline points="20 6 9 17 4 12"></polyline>
       </svg>
     </div>
-  `
+  `;
+      }
     )
     .join("");
 
@@ -758,52 +1491,46 @@ function selectForumComposeAuthor(index) {
   const opt = window.forumAuthorOptions[index];
   forumComposeAuthor = opt;
   closeForumAuthorPicker();
-  renderForumComposeAuthor();
+  // 旧函数已移除，这里不再需要调用
 }
 
 async function submitForumPost() {
   const textarea = document.getElementById("forumComposeTextarea");
   const content = textarea?.value?.trim();
 
-  if (!content) {
-    showToast("请输入内容");
+  if (!content && forumComposeImages.length === 0) {
+    showToast("请输入内容或添加图片");
     return;
   }
 
-  let authorName, authorAvatar, authorIdentity, authorType, authorId;
+  // 用户发帖
+  const authorType = "user";
+  const authorName = forumSettings.userNickname || "我";
+  const authorAvatar = localStorage.getItem("avatarImg") || "";
+  const authorIdentity = forumSettings.userIdentity || "";
+  const userHandle = forumSettings.userHandle || generateEnglishHandle(authorName);
 
-  if (forumComposeAuthor.type === "user") {
-    authorType = "user";
-    authorName = forumSettings.userNickname || "我";
-    authorAvatar = localStorage.getItem("avatarImg") || "";
-    authorIdentity = forumSettings.userIdentity || "";
-    authorId = null;
-  } else {
-    const char = characters.find((c) => c.id === forumComposeAuthor.charId);
-    const participant = forumSettings.aiParticipants.find(
-      (p) => p.charId === forumComposeAuthor.charId
-    );
-    authorType = "ai";
-    authorName = participant?.nickname || char?.name || "角色";
-    authorAvatar = char?.avatar || "";
-    authorIdentity = participant?.identity || "";
-    authorId = forumComposeAuthor.charId;
-  }
+  // 构建帖子内容（包含图片）
+  let fullContent = content || "";
+  
+  // 添加真实图片数据
+  const images = forumComposeImages.map(img => img.data);
 
   const newPost = {
     id: Date.now(),
     authorType,
-    authorId,
+    authorId: null,
     authorName,
     authorAvatar,
     authorIdentity,
-    handle: generateEnglishHandle(authorName),
-    content,
+    handle: userHandle,
+    content: fullContent,
+    images: images, // 真实图片数组
     timestamp: Date.now(),
     likes: 0,
     liked: false,
     retweets: 0,
-    views: Math.floor(Math.random() * 100) + 10,
+    views: 0,
     comments: [],
   };
 
@@ -813,6 +1540,229 @@ async function submitForumPost() {
   closeForumCompose();
   renderForumFeed();
   showToast("发布成功");
+  
+  // 自动生成评论和互动数据
+  generateInteractionsForNewPost(newPost.id);
+}
+
+// 为新帖子生成互动数据（评论、点赞、转发、浏览量）
+async function generateInteractionsForNewPost(postId) {
+  const post = forumPosts.find((p) => p.id === postId);
+  if (!post) return;
+
+  const apiConfig = getActiveApiConfig();
+  if (!apiConfig || !apiConfig.url || !apiConfig.key) {
+    // 没有API配置，使用默认随机数据
+    post.views = Math.floor(Math.random() * 500) + 50;
+    post.likes = Math.floor(Math.random() * 30) + 5;
+    post.retweets = Math.floor(Math.random() * 10);
+    await localforage.setItem("forumPosts", forumPosts);
+    renderForumFeed();
+    return;
+  }
+
+  try {
+    // 收集AI参与者
+    const participants = forumSettings.aiParticipants.map((p) => {
+      const char = characters.find((c) => String(c.id) === String(p.charId));
+      const settings = chatSettings[p.charId] || {};
+      return {
+        name: p.nickname || settings.charName || char?.name || "角色",
+        handle: p.handle || generateEnglishHandle(p.nickname || char?.name || ''),
+        identity: p.identity || "",
+        persona: settings.persona || char?.persona || "",
+      };
+    });
+
+    // 收集NPC信息
+    const npcs = (forumSettings.npcs || []).map(npc => ({
+      name: npc.name,
+      handle: npc.handle || generateEnglishHandle(npc.name),
+      identity: npc.identity || "",
+      persona: npc.persona || "",
+    }));
+
+    // 收集关系信息
+    const relationships = (forumSettings.relationships || []).map(rel => {
+      const person1 = getForumPersonName(rel.person1Type, rel.person1Id);
+      const person2 = getForumPersonName(rel.person2Type, rel.person2Id);
+      return `${person1} 和 ${person2} 的关系：${rel.relationship}${rel.description ? '（' + rel.description + '）' : ''}`;
+    });
+
+    // 构建图片描述（如果有真实图片）
+    let imageDesc = "";
+    if (post.images && post.images.length > 0) {
+      imageDesc = `\n【帖子包含${post.images.length}张图片】`;
+    }
+
+    let systemPrompt = `你是一个论坛互动生成器。请根据以下设定为帖子生成评论和互动数据。
+
+【世界观】
+${forumSettings.worldview}
+
+【用户信息】
+- 昵称：${post.authorName}
+- 身份：${forumSettings.userIdentity || "普通用户"}
+
+【帖子内容】${post.content}${imageDesc}
+
+【AI角色】可以使用这些角色评论
+${participants.length > 0 
+  ? participants.map((p, i) => 
+      `${i + 1}. ${p.name}（@${p.handle}）：${p.identity || '未设置身份'}${p.persona ? '，性格：' + p.persona.substring(0, 50) : ''}`
+    ).join("\n")
+  : "无"}`;
+
+    if (npcs.length > 0) {
+      systemPrompt += `
+
+【固定NPC】可以使用这些NPC评论
+${npcs.map((n, i) => 
+  `${i + 1}. ${n.name}（@${n.handle}）：${n.identity || '普通网友'}`
+).join("\n")}`;
+    }
+
+    if (relationships.length > 0) {
+      systemPrompt += `
+
+【人物关系】评论时体现这些关系
+${relationships.join("\n")}`;
+    }
+
+    // 构建消息数组，支持识图
+    const messages = [{ role: "system", content: systemPrompt }];
+    
+    // 构建用户消息内容
+    let userContent = [];
+    
+    // 如果有图片且模型支持识图，添加图片
+    if (post.images && post.images.length > 0) {
+      post.images.forEach(imgData => {
+        userContent.push({
+          type: "image_url",
+          image_url: { url: imgData }
+        });
+      });
+    }
+    
+    userContent.push({
+      type: "text",
+      text: `请为这条帖子生成互动数据，返回纯JSON对象：
+{
+  "views": 浏览量(根据用户身份和帖子内容，范围100-5000),
+  "likes": 点赞数(范围10-200),
+  "retweets": 转发数(范围0-50),
+  "comments": [
+    {"authorType":"ai或npc","authorName":"昵称","handle":"英文用户名","content":"评论内容","likes":点赞数0-20},
+    {"authorType":"npc","authorName":"昵称","handle":"英文用户名","content":"回复评论","likes":0,"replyTo":1,"replyToName":"被回复者昵称"}
+  ]
+}
+
+要求：
+1. 根据用户的身份地位合理生成互动数据（身份越高，互动越多）
+2. 如果帖子有图片，评论者应该能看到并评论图片内容
+3. 生成5-10条评论
+4. authorType只能是"ai"或"npc"
+5. 评论要自然、符合世界观和角色性格
+6. AI角色和NPC的昵称要与设定一致`
+    });
+
+    messages.push({ role: "user", content: userContent });
+
+    const response = await fetch(`${apiConfig.url}/chat/completions`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiConfig.key}`,
+      },
+      body: JSON.stringify({
+        model: apiConfig.model || "gpt-3.5-turbo",
+        messages: messages,
+        temperature: 0.9,
+      }),
+    });
+
+    if (!response.ok) throw new Error("API请求失败");
+
+    const data = await response.json();
+    let content = data.choices[0]?.message?.content || "";
+
+    // 解析JSON
+    content = content
+      .replace(/```json\n?/g, "")
+      .replace(/```\n?/g, "")
+      .trim();
+    
+    // 尝试匹配JSON对象
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
+
+    if (jsonMatch) {
+      const result = JSON.parse(jsonMatch[0]);
+      
+      // 更新互动数据
+      post.views = result.views || Math.floor(Math.random() * 500) + 50;
+      post.likes = result.likes || Math.floor(Math.random() * 30) + 5;
+      post.retweets = result.retweets || Math.floor(Math.random() * 10);
+      
+      // 处理评论
+      if (result.comments && Array.isArray(result.comments)) {
+        result.comments.forEach((c, idx) => {
+          if (c.authorType === "user") return;
+          
+          let commentAvatar = "";
+          const commentName = c.authorName || "网友";
+          
+          for (const participant of forumSettings.aiParticipants) {
+            const char = characters.find(ch => String(ch.id) === String(participant.charId));
+            const participantName = participant.nickname || char?.name || '';
+            if (participantName && commentName.includes(participantName)) {
+              commentAvatar = participant.avatar || char?.avatar || '';
+              break;
+            }
+          }
+          
+          if (!commentAvatar && forumSettings.npcs) {
+            for (const npc of forumSettings.npcs) {
+              if (npc.name && commentName.includes(npc.name)) {
+                commentAvatar = npc.avatar || '';
+                break;
+              }
+            }
+          }
+          
+          post.comments.push({
+            id: idx + 1,
+            authorType: c.authorType || "npc",
+            authorName: commentName,
+            authorAvatar: commentAvatar,
+            handle: c.handle || generateEnglishHandle(commentName),
+            content: c.content || "",
+            replyTo: c.replyTo || null,
+            replyToName: c.replyToName || null,
+            timestamp: Date.now() + idx * 1000,
+            likes: c.likes || Math.floor(Math.random() * 10),
+            liked: false,
+          });
+        });
+      }
+
+      await localforage.setItem("forumPosts", forumPosts);
+      renderForumFeed();
+    }
+  } catch (e) {
+    console.error("[论坛] 生成互动失败:", e);
+    // 失败时使用默认数据
+    post.views = Math.floor(Math.random() * 500) + 50;
+    post.likes = Math.floor(Math.random() * 30) + 5;
+    post.retweets = Math.floor(Math.random() * 10);
+    await localforage.setItem("forumPosts", forumPosts);
+    renderForumFeed();
+  }
+}
+
+// 保留旧函数名兼容
+async function generateCommentsForNewPost(postId) {
+  return generateInteractionsForNewPost(postId);
 }
 
 // ==================== 评论 ====================
@@ -923,18 +1873,35 @@ async function generateForumPosts() {
   if (refreshBtn) refreshBtn.classList.add("spinning");
 
   try {
-    // 构建参与者信息
+    // 构建AI参与者信息
     const participants = forumSettings.aiParticipants.map((p) => {
-      const char = characters.find((c) => c.id === p.charId);
+      const char = characters.find((c) => String(c.id) === String(p.charId));
       const settings = chatSettings[p.charId] || {};
       return {
         name: p.nickname || settings.charName || char?.name || "角色",
+        handle: p.handle || generateEnglishHandle(p.nickname || char?.name || ''),
         identity: p.identity || "",
         persona: settings.persona || char?.persona || "",
       };
     });
 
-    const systemPrompt = `你是一个论坛内容生成器。请根据以下设定生成论坛帖子。
+    // 构建NPC信息
+    const npcs = (forumSettings.npcs || []).map(npc => ({
+      name: npc.name,
+      handle: npc.handle || generateEnglishHandle(npc.name),
+      identity: npc.identity || "",
+      persona: npc.persona || "",
+    }));
+
+    // 构建关系信息
+    const relationships = (forumSettings.relationships || []).map(rel => {
+      const person1 = getForumPersonName(rel.person1Type, rel.person1Id);
+      const person2 = getForumPersonName(rel.person2Type, rel.person2Id);
+      return `${person1} 和 ${person2} 的关系：${rel.relationship}${rel.description ? '（' + rel.description + '）' : ''}`;
+    });
+
+    // 构建system prompt
+    let systemPrompt = `你是一个论坛内容生成器。请根据以下设定生成论坛帖子。
 
 【世界观】
 ${forumSettings.worldview}
@@ -946,26 +1913,49 @@ ${forumSettings.forumName}
 - 昵称：${forumSettings.userNickname || "用户"}
 - 身份：${forumSettings.userIdentity || "普通成员"}
 
-【AI参与者】
+【AI角色】必须使用这些角色发帖和评论！
 ${
-  participants
-    .map(
-      (p, i) =>
-        `${i + 1}. ${p.name}：${p.identity}${
-          p.persona ? "，性格：" + p.persona.substring(0, 100) : ""
-        }`
-    )
-    .join("\n") || "无"
-}
+  participants.length > 0 
+    ? participants.map((p, i) => 
+        `${i + 1}. ${p.name}（@${p.handle}）：${p.identity || '未设置身份'}${p.persona ? '，性格：' + p.persona.substring(0, 100) : ''}`
+      ).join("\n")
+    : "无"
+}`;
+
+    // 添加NPC信息
+    if (npcs.length > 0) {
+      systemPrompt += `
+
+【固定NPC】必须使用这些NPC发帖和评论！
+${npcs.map((n, i) => 
+  `${i + 1}. ${n.name}（@${n.handle}）：${n.identity || '普通网友'}${n.persona ? '，性格：' + n.persona : ''}`
+).join("\n")}`;
+    }
+
+    // 添加关系信息
+    if (relationships.length > 0) {
+      systemPrompt += `
+
+【人物关系】非常重要！必须在帖子互动中体现这些关系！
+${relationships.join("\n")}
+
+注意：有关系的人物之间应该有符合关系设定的互动，比如：
+- 情侣/暗恋：会互相关注对方的帖子，评论时有暧昧/关心的语气
+- 好友：会互相调侃、支持
+- 死对头：会互相怼、抬杠
+- 师徒：会有尊敬/教导的互动`;
+    }
+
+    systemPrompt += `
 
 【要求】
 1. 生成10-15条论坛帖子
-2. 帖子作者只能是AI参与者或随机网友(NPC)，绝对不要生成用户的帖子
-3. NPC网友要有符合世界观的随机昵称
+2. 帖子作者只能是AI角色、固定NPC或随机路人，绝对不要生成用户的帖子
+3. ${npcs.length > 0 ? '优先使用固定NPC，也可以生成一些随机路人' : '随机路人要有符合世界观的昵称'}
 4. 内容要符合世界观设定，有趣且有互动感
-5. 每条帖子必须有10-15条评论，评论者也只能是AI或NPC，不能是用户
-6. 评论之间可以互相回复，形成楼中楼（用replyTo字段指定回复哪条评论）
-7. 部分帖子可以包含图片，用[图片:图片描述]格式，描述要详细有趣
+5. 每条帖子必须有10-15条评论，评论者也只能是AI/NPC/路人，不能是用户
+6. ${relationships.length > 0 ? '【重要】有关系的人物之间必须有符合关系设定的互动！' : '评论之间可以互相回复'}
+7. 部分帖子可以包含图片，用[图片:图片描述]格式
 8. 返回JSON数组格式`;
 
     const userPrompt = `请生成论坛帖子，返回纯JSON数组（不要markdown代码块）：
@@ -973,23 +1963,24 @@ ${
   {
     "authorType": "ai或npc",
     "authorName": "中文昵称",
-    "handle": "英文用户名(不含@符号，如VivianFan123、CityBird_99)",
+    "handle": "英文用户名(不含@符号)",
     "content": "帖子内容，如果要发图片用[图片:图片描述]格式",
     "likes": 点赞数,
     "retweets": 转发数(0-50),
     "views": 浏览量(100-5000的随机数),
     "comments": [
-      {"id":1,"authorType":"npc","authorName":"昵称","content":"评论","likes":0},
-      {"id":2,"authorType":"ai","authorName":"昵称","content":"回复评论","likes":0,"replyTo":1,"replyToName":"被回复者昵称"}
+      {"id":1,"authorType":"npc","authorName":"昵称","handle":"英文用户名","content":"评论","likes":0},
+      {"id":2,"authorType":"ai","authorName":"昵称","handle":"英文用户名","content":"回复评论","likes":0,"replyTo":1,"replyToName":"被回复者昵称"}
     ]
   }
 ]
 注意：
 1. authorType只能是"ai"或"npc"，不要生成"user"
-2. handle必须是英文，可以包含数字和下划线，要有个性，不要直接翻译中文名
-3. 评论的id从1开始递增
-4. 每个帖子必须有10-15条评论！这很重要！
-5. 如果是回复某条评论，用replyTo指定被回复评论的id，replyToName是被回复者的昵称`;
+2. AI角色的昵称和handle必须与上面设定的一致！
+3. ${npcs.length > 0 ? '固定NPC的昵称和handle也必须与设定一致！' : ''}
+4. ${relationships.length > 0 ? '【最重要】有关系的人物必须互动！比如A发帖B评论，或者A评论B的评论等' : ''}
+5. 每个帖子必须有10-15条评论！
+6. 如果是回复某条评论，用replyTo指定被回复评论的id`;
 
     const response = await fetch(`${apiConfig.url}/chat/completions`, {
       method: "POST",
@@ -1021,32 +2012,82 @@ ${
 
     if (jsonMatch) {
       const posts = JSON.parse(jsonMatch[0]);
-      const newPosts = posts.map((p, idx) => ({
-        id: Math.floor(Date.now() + idx * 1000 + Math.random() * 100),
-        authorType: p.authorType === "user" ? "npc" : p.authorType || "npc", // 强制不允许user
-        authorId: null,
-        authorName: p.authorName || "匿名",
-        authorAvatar: "",
-        handle: p.handle || generateEnglishHandle(p.authorName),
-        content: p.content || "",
-        timestamp: Date.now() - Math.random() * 7200000,
-        likes: p.likes || Math.floor(Math.random() * 50),
-        liked: false,
-        retweets: p.retweets || Math.floor(Math.random() * 30),
-        views: p.views || Math.floor(Math.random() * 4900) + 100,
-        comments: (p.comments || []).map((c, cidx) => ({
-          id: c.id || cidx + 1,
-          authorType: c.authorType === "user" ? "npc" : c.authorType || "npc", // 强制不允许user
-          authorName: c.authorName || "网友",
-          authorAvatar: "",
-          content: c.content || "",
-          replyTo: c.replyTo || null,
-          replyToName: c.replyToName || null,
-          timestamp: Date.now() - Math.random() * 3600000,
-          likes: c.likes || Math.floor(Math.random() * 10),
+      const newPosts = posts.map((p, idx) => {
+        // 尝试匹配AI参与者或NPC的头像
+        let authorAvatar = "";
+        const authorName = p.authorName || "匿名";
+        
+        // 检查是否是AI参与者
+        for (const participant of forumSettings.aiParticipants) {
+          const char = characters.find(c => String(c.id) === String(participant.charId));
+          const participantName = participant.nickname || char?.name || '';
+          if (participantName && authorName.includes(participantName)) {
+            authorAvatar = participant.avatar || char?.avatar || '';
+            break;
+          }
+        }
+        
+        // 如果没有匹配到AI，检查NPC
+        if (!authorAvatar && forumSettings.npcs) {
+          for (const npc of forumSettings.npcs) {
+            if (npc.name && authorName.includes(npc.name)) {
+              authorAvatar = npc.avatar || '';
+              break;
+            }
+          }
+        }
+        
+        return {
+          id: Math.floor(Date.now() + idx * 1000 + Math.random() * 100),
+          authorType: p.authorType === "user" ? "npc" : p.authorType || "npc", // 强制不允许user
+          authorId: null,
+          authorName: authorName,
+          authorAvatar: authorAvatar,
+          handle: p.handle || generateEnglishHandle(p.authorName),
+          content: p.content || "",
+          timestamp: Date.now() - Math.random() * 7200000,
+          likes: p.likes || Math.floor(Math.random() * 50),
           liked: false,
-        })),
-      }));
+          retweets: p.retweets || Math.floor(Math.random() * 30),
+          views: p.views || Math.floor(Math.random() * 4900) + 100,
+          comments: (p.comments || []).map((c, cidx) => {
+            // 评论也尝试匹配头像
+            let commentAvatar = "";
+            const commentName = c.authorName || "网友";
+            
+            for (const participant of forumSettings.aiParticipants) {
+              const char = characters.find(ch => String(ch.id) === String(participant.charId));
+              const participantName = participant.nickname || char?.name || '';
+              if (participantName && commentName.includes(participantName)) {
+                commentAvatar = participant.avatar || char?.avatar || '';
+                break;
+              }
+            }
+            
+            if (!commentAvatar && forumSettings.npcs) {
+              for (const npc of forumSettings.npcs) {
+                if (npc.name && commentName.includes(npc.name)) {
+                  commentAvatar = npc.avatar || '';
+                  break;
+                }
+              }
+            }
+            
+            return {
+              id: c.id || cidx + 1,
+              authorType: c.authorType === "user" ? "npc" : c.authorType || "npc",
+              authorName: commentName,
+              authorAvatar: commentAvatar,
+              content: c.content || "",
+              replyTo: c.replyTo || null,
+              replyToName: c.replyToName || null,
+              timestamp: Date.now() - Math.random() * 3600000,
+              likes: c.likes || Math.floor(Math.random() * 10),
+              liked: false,
+            };
+          }),
+        };
+      });
 
       // 替换旧帖子而不是追加
       forumPosts = newPosts;
@@ -1405,10 +2446,14 @@ function escapeForumHtml(text) {
   return div.innerHTML;
 }
 
+// 获取默认头像（灰色背景+白色人形轮廓的SVG）
+function getDefaultAvatar() {
+  return `<img src="${getDefaultAvatarDataUrl()}" alt="" class="default-avatar">`;
+}
+
+// 保留旧函数名兼容，但改为返回默认头像
 function getAvatarEmoji(name) {
-  const emojis = ["😀", "😎", "🤓", "🥳", "😊", "🤗", "😄", "🙂", "😏", "🤩"];
-  const hash = (name || "").split("").reduce((a, c) => a + c.charCodeAt(0), 0);
-  return emojis[hash % emojis.length];
+  return getDefaultAvatar();
 }
 
 function switchForumTab(tab) {
@@ -1420,37 +2465,145 @@ function switchForumTab(tab) {
   renderForumFeed();
 }
 
-// 显示转发菜单
-function showRetweetMenu(postId) {
-  const post = forumPosts.find(p => p.id === postId);
+// 打开引用转发界面（推特风格）
+function openQuoteRetweet(postId) {
+  const post = forumPosts.find(p => Number(p.id) === Number(postId));
   if (!post) return;
   
+  // 获取用户信息
+  const globalAvatar = localStorage.getItem("avatarImg");
+  const userAvatar = globalAvatar || getDefaultAvatarDataUrl();
+  const userName = forumSettings.userNickname || "我";
+  const userHandle = forumSettings.userHandle || generateEnglishHandle(userName);
+  
+  // 获取原帖信息
+  const origAvatar = post.authorAvatar || getDefaultAvatarDataUrl();
+  const origName = post.authorName || "用户";
+  const origHandle = post.handle || generateEnglishHandle(origName);
+  const origContent = post.content || "";
+  
+  // 原帖图片预览
+  let origImagesHtml = '';
+  if (post.images && post.images.length > 0) {
+    origImagesHtml = `
+      <div class="forum-quote-preview-images">
+        ${post.images.slice(0, 2).map(img => `<img src="${img}" alt="">`).join('')}
+        ${post.images.length > 2 ? `<span class="forum-quote-more-images">+${post.images.length - 2}</span>` : ''}
+      </div>
+    `;
+  }
+  
   const modal = document.createElement('div');
-  modal.className = 'forum-retweet-modal';
+  modal.id = 'forumQuoteRetweetModal';
+  modal.className = 'forum-compose-overlay active';
   modal.innerHTML = `
-    <div class="forum-retweet-menu">
-      <div class="forum-retweet-option" onclick="retweetToChat(${postId}); this.closest('.forum-retweet-modal').remove();">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-        </svg>
-        <span>转发到聊天框</span>
+    <div class="forum-compose-header">
+      <button class="forum-compose-cancel" onclick="closeQuoteRetweet()">取消</button>
+      <div class="forum-compose-title">引用</div>
+      <button class="forum-compose-submit" onclick="submitQuoteRetweet(${postId})">发布</button>
+    </div>
+    <div class="forum-compose-body forum-quote-body">
+      <div class="forum-compose-user-info">
+        <div class="forum-compose-avatar"><img src="${userAvatar}" alt=""></div>
+        <div class="forum-compose-user-text">
+          <div class="forum-compose-name">${escapeForumHtml(userName)}</div>
+          <div class="forum-compose-handle">@${escapeForumHtml(userHandle)}</div>
+        </div>
       </div>
-      <div class="forum-retweet-option" onclick="retweetToProfile(${postId}); this.closest('.forum-retweet-modal').remove();">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-          <circle cx="12" cy="7" r="4"></circle>
-        </svg>
-        <span>转发到我的主页</span>
-      </div>
-      <div class="forum-retweet-cancel" onclick="this.closest('.forum-retweet-modal').remove();">
-        取消
+      <textarea 
+        class="forum-compose-textarea forum-quote-textarea" 
+        id="forumQuoteTextarea" 
+        placeholder="添加评论..."
+      ></textarea>
+      
+      <!-- 引用的原帖卡片 -->
+      <div class="forum-quote-preview">
+        <div class="forum-quote-preview-header">
+          <img class="forum-quote-preview-avatar" src="${origAvatar}" alt="">
+          <span class="forum-quote-preview-name">${escapeForumHtml(origName)}</span>
+          <span class="forum-quote-preview-handle">@${origHandle}</span>
+        </div>
+        <div class="forum-quote-preview-content">${escapeForumHtml(origContent)}</div>
+        ${origImagesHtml}
       </div>
     </div>
   `;
-  modal.onclick = (e) => {
-    if (e.target === modal) modal.remove();
-  };
+  
   document.body.appendChild(modal);
+  
+  // 自动聚焦输入框
+  setTimeout(() => {
+    document.getElementById('forumQuoteTextarea')?.focus();
+  }, 100);
+}
+
+// 关闭引用转发界面
+function closeQuoteRetweet() {
+  document.getElementById('forumQuoteRetweetModal')?.remove();
+}
+
+// 提交引用转发
+async function submitQuoteRetweet(postId) {
+  const originalPost = forumPosts.find(p => Number(p.id) === Number(postId));
+  if (!originalPost) {
+    showToast('帖子不存在');
+    return;
+  }
+  
+  const content = document.getElementById('forumQuoteTextarea')?.value?.trim() || '';
+  
+  // 获取用户信息
+  const userName = forumSettings.userNickname || "我";
+  const userAvatar = localStorage.getItem("avatarImg") || "";
+  const userHandle = forumSettings.userHandle || generateEnglishHandle(userName);
+  
+  // 创建引用转发帖子
+  const retweetPost = {
+    id: Date.now(),
+    authorType: "user",
+    authorId: null,
+    authorName: userName,
+    authorAvatar: userAvatar,
+    handle: userHandle,
+    content: content, // 用户的评论
+    timestamp: Date.now(),
+    likes: 0,
+    liked: false,
+    retweets: 0,
+    views: 0,
+    comments: [],
+    isRetweet: true,
+    originalPostId: originalPost.id,
+    originalPost: {
+      id: originalPost.id,
+      authorName: originalPost.authorName,
+      authorAvatar: originalPost.authorAvatar,
+      handle: originalPost.handle || generateEnglishHandle(originalPost.authorName),
+      content: originalPost.content,
+      images: originalPost.images,
+      timestamp: originalPost.timestamp,
+    }
+  };
+  
+  // 增加原帖的转发数
+  originalPost.retweets = (originalPost.retweets || 0) + 1;
+  
+  // 添加到帖子列表
+  forumPosts.unshift(retweetPost);
+  await localforage.setItem("forumPosts", forumPosts);
+  
+  closeQuoteRetweet();
+  closeForumPostDetail();
+  showToast('转发成功');
+  renderForumFeed();
+  
+  // 自动生成互动数据
+  generateInteractionsForNewPost(retweetPost.id);
+}
+
+// 保留旧函数名兼容（不再使用选择菜单）
+function showRetweetMenu(postId) {
+  openQuoteRetweet(postId);
 }
 
 // 转发到聊天框 - 弹出角色/群聊选择器
@@ -1630,9 +2783,9 @@ async function sendRetweetToChar(targetId, postId, type) {
   }
 }
 
-// 转发到个人主页
+// 转发到个人主页（旧函数名兼容，重定向到引用转发）
 function retweetToProfile(postId) {
-  showToast('个人主页功能开发中...');
+  openQuoteRetweet(postId);
 }
 
 // 渲染转发卡片HTML（供聊天页面调用）
@@ -1712,13 +2865,1046 @@ function switchForumSection(section) {
   });
   event.currentTarget.classList.add("active");
   
-  // TODO: 实现不同页面的切换逻辑
+  // 记录当前section
+  window.currentForumSection = section;
+  
   if (section === 'home') {
     renderForumFeed();
   } else if (section === 'hot') {
-    showToast("热点功能开发中...");
+    renderForumHot();
   } else if (section === 'profile') {
-    showToast("个人主页开发中...");
+    renderForumProfile();
+  }
+}
+
+// 统一的刷新处理函数
+function handleForumRefresh() {
+  const currentSection = window.currentForumSection || 'home';
+  
+  if (currentSection === 'hot') {
+    // 如果在搜索结果页面，刷新搜索结果
+    if (currentHotView === 'search_results' && currentSearchQuery) {
+      refreshSearchResults(currentSearchQuery);
+    } else {
+      // 刷新热点主页（重新渲染即可，因为热门帖子会根据主页数据更新）
+      const refreshBtn = document.querySelector(".forum-refresh-btn");
+      if (refreshBtn) refreshBtn.classList.add("spinning");
+      
+      // 先生成新的主页帖子
+      generateForumPosts().then(() => {
+        // 完成后重新渲染热点页面
+        renderForumHot();
+      });
+    }
+  } else {
+    // 主页或其他页面，正常生成帖子
+    generateForumPosts();
+  }
+}
+
+// ==================== 热点页面 ====================
+
+// 当前热点页面状态
+let currentHotView = 'main'; // 'main' 或 'search_results'
+let currentSearchQuery = ''; // 当前搜索词
+
+function renderForumHot() {
+  const feed = document.getElementById("forumFeed");
+  if (!feed) return;
+  
+  currentHotView = 'main';
+  
+  // 显示顶栏和FAB
+  const tabs = document.querySelector('.forum-tabs');
+  const fab = document.querySelector('.forum-fab');
+  if (tabs) tabs.style.display = 'flex';
+  if (fab) fab.style.display = 'flex';
+  
+  // 隐藏主页的返回按钮、tab和设置按钮，显示热点标题
+  const backBtn = document.querySelector('.forum-back-btn');
+  const homeTabs = document.querySelectorAll('.forum-home-tab');
+  const hotTitle = document.querySelector('.forum-hot-title');
+  const settingsBtn = document.querySelector('.forum-settings-btn');
+  if (backBtn) backBtn.style.display = 'none';
+  homeTabs.forEach(tab => tab.style.display = 'none');
+  if (hotTitle) hotTitle.style.display = 'block';
+  if (settingsBtn) settingsBtn.style.display = 'none';
+  
+  // 生成热点话题数据
+  const hotTopics = generateHotTopics();
+  const trendingPosts = getTrendingPosts();
+  
+  // 获取世界观相关的热搜关键词
+  const worldviewKeywords = extractWorldviewKeywords();
+  
+  feed.innerHTML = `
+    <div class="forum-hot-container">
+      <!-- 搜索栏 -->
+      <div class="forum-hot-search">
+        <div class="forum-hot-search-box" onclick="focusHotSearch()">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#536471" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="forumHotSearchInput" placeholder="搜索" 
+            onkeydown="handleHotSearchKeydown(event)"
+            oninput="handleHotSearchInput(event)">
+          <button class="forum-hot-search-btn" onclick="executeHotSearch()" style="display:none;">
+            搜索
+          </button>
+        </div>
+      </div>
+      
+      <!-- 热门话题区域 -->
+      <div class="forum-hot-section">
+        <div class="forum-hot-section-header">
+          <span class="forum-hot-section-title">热门话题</span>
+        </div>
+        <div class="forum-hot-topics">
+          ${hotTopics.map((topic, idx) => `
+            <div class="forum-hot-topic-item" onclick="searchForumTopic('${escapeForumHtml(topic.tag)}')">
+              <div class="forum-hot-topic-rank">${idx + 1}</div>
+              <div class="forum-hot-topic-content">
+                <div class="forum-hot-topic-category">${escapeForumHtml(topic.category)}</div>
+                <div class="forum-hot-topic-tag">#${escapeForumHtml(topic.tag)}</div>
+                <div class="forum-hot-topic-count">${topic.count} 条帖子</div>
+              </div>
+              <div class="forum-hot-topic-trend ${topic.trend}">
+                ${topic.trend === 'up' ? '↑' : topic.trend === 'down' ? '↓' : '—'}
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      
+      <!-- 热门帖子区域 -->
+      <div class="forum-hot-section">
+        <div class="forum-hot-section-header">
+          <span class="forum-hot-section-title">热门帖子</span>
+        </div>
+        <div class="forum-hot-posts">
+          ${trendingPosts.length > 0 
+            ? trendingPosts.map(post => renderForumPostItem(post)).join('')
+            : '<div class="forum-hot-empty">暂无热门帖子<br><span style="font-size:13px;color:#9ca3af;">点击上方刷新按钮生成内容</span></div>'
+          }
+        </div>
+      </div>
+      
+      <!-- 猜你想搜 -->
+      <div class="forum-hot-section">
+        <div class="forum-hot-section-header">
+          <span class="forum-hot-section-title">猜你想搜</span>
+        </div>
+        <div class="forum-hot-keywords">
+          ${worldviewKeywords.map(kw => `
+            <span class="forum-hot-keyword" onclick="searchForumTopic('${escapeForumHtml(kw)}')">${escapeForumHtml(kw)}</span>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// 聚焦搜索框
+function focusHotSearch() {
+  const input = document.getElementById('forumHotSearchInput');
+  if (input) input.focus();
+}
+
+// 处理搜索输入
+function handleHotSearchInput(event) {
+  const btn = document.querySelector('.forum-hot-search-btn');
+  if (btn) {
+    btn.style.display = event.target.value.trim() ? 'block' : 'none';
+  }
+}
+
+// 处理搜索键盘事件
+function handleHotSearchKeydown(event) {
+  if (event.key === 'Enter') {
+    executeHotSearch();
+  }
+}
+
+// 执行搜索
+function executeHotSearch() {
+  const input = document.getElementById('forumHotSearchInput');
+  const query = input?.value?.trim();
+  if (query) {
+    searchForumTopic(query);
+  }
+}
+
+// 搜索/点击话题 - 生成相关帖子
+async function searchForumTopic(topic) {
+  if (!topic) return;
+  
+  currentSearchQuery = topic;
+  currentHotView = 'search_results';
+  
+  const feed = document.getElementById("forumFeed");
+  if (!feed) return;
+  
+  // 隐藏顶栏（搜索结果页有自己的header）
+  const tabs = document.querySelector('.forum-tabs');
+  if (tabs) tabs.style.display = 'none';
+  
+  // 显示搜索结果页面（带loading）
+  feed.innerHTML = `
+    <div class="forum-hot-container">
+      <!-- 搜索结果头部 -->
+      <div class="forum-search-header">
+        <button class="forum-search-back" onclick="renderForumHot()">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+        </button>
+        <div class="forum-search-title">#${escapeForumHtml(topic)}</div>
+        <button class="forum-search-refresh" onclick="refreshSearchResults('${escapeForumHtml(topic)}')" title="刷新">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <polyline points="1 20 1 14 7 14"></polyline>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+          </svg>
+        </button>
+      </div>
+      
+      <!-- Loading状态 -->
+      <div class="forum-search-loading" id="forumSearchLoading">
+        <div class="forum-search-spinner"></div>
+        <div class="forum-search-loading-text">正在搜索「${escapeForumHtml(topic)}」相关内容...</div>
+      </div>
+      
+      <!-- 搜索结果 -->
+      <div class="forum-search-results" id="forumSearchResults"></div>
+    </div>
+  `;
+  
+  // 调用API生成相关帖子
+  await generateTopicPosts(topic);
+}
+
+// 刷新搜索结果
+async function refreshSearchResults(topic) {
+  const refreshBtn = document.querySelector('.forum-search-refresh');
+  if (refreshBtn) refreshBtn.classList.add('spinning');
+  
+  // 显示loading
+  const loading = document.getElementById('forumSearchLoading');
+  const results = document.getElementById('forumSearchResults');
+  if (loading) loading.style.display = 'flex';
+  if (results) results.innerHTML = '';
+  
+  await generateTopicPosts(topic);
+  
+  if (refreshBtn) refreshBtn.classList.remove('spinning');
+}
+
+// 生成话题相关帖子
+async function generateTopicPosts(topic) {
+  const apiConfig = getActiveApiConfig();
+  if (!apiConfig || !apiConfig.url || !apiConfig.key) {
+    showSearchError("请先配置API");
+    return;
+  }
+  
+  try {
+    // 构建AI参与者信息
+    const participants = forumSettings.aiParticipants.map((p) => {
+      const char = characters.find((c) => String(c.id) === String(p.charId));
+      const settings = chatSettings[p.charId] || {};
+      return {
+        name: p.nickname || settings.charName || char?.name || "角色",
+        handle: p.handle || generateEnglishHandle(p.nickname || char?.name || ''),
+        identity: p.identity || "",
+        persona: settings.persona || char?.persona || "",
+      };
+    });
+
+    // 构建NPC信息
+    const npcs = (forumSettings.npcs || []).map(npc => ({
+      name: npc.name,
+      handle: npc.handle || generateEnglishHandle(npc.name),
+      identity: npc.identity || "",
+      persona: npc.persona || "",
+    }));
+
+    // 构建关系信息
+    const relationships = (forumSettings.relationships || []).map(rel => {
+      const person1 = getForumPersonName(rel.person1Type, rel.person1Id);
+      const person2 = getForumPersonName(rel.person2Type, rel.person2Id);
+      return `${person1} 和 ${person2} 的关系：${rel.relationship}${rel.description ? '（' + rel.description + '）' : ''}`;
+    });
+
+    // 构建system prompt
+    let systemPrompt = `你是一个论坛内容生成器。请根据以下设定生成与「${topic}」相关的论坛帖子。
+
+【世界观】
+${forumSettings.worldview || '现代都市'}
+
+【论坛名称】
+${forumSettings.forumName || '广场'}
+
+【搜索话题】
+${topic}
+
+【用户信息（仅供参考，不要生成用户的帖子或评论）】
+- 昵称：${forumSettings.userNickname || "用户"}
+- 身份：${forumSettings.userIdentity || "普通成员"}
+
+【AI角色】可以使用这些角色发帖和评论
+${participants.length > 0 
+  ? participants.map((p, i) => 
+      `${i + 1}. ${p.name}（@${p.handle}）：${p.identity || '未设置身份'}${p.persona ? '，性格：' + p.persona.substring(0, 100) : ''}`
+    ).join("\n")
+  : "无"}`;
+
+    if (npcs.length > 0) {
+      systemPrompt += `
+
+【固定NPC】可以使用这些NPC发帖和评论
+${npcs.map((n, i) => 
+  `${i + 1}. ${n.name}（@${n.handle}）：${n.identity || '普通网友'}${n.persona ? '，性格：' + n.persona : ''}`
+).join("\n")}`;
+    }
+
+    if (relationships.length > 0) {
+      systemPrompt += `
+
+【人物关系】在帖子互动中体现这些关系
+${relationships.join("\n")}`;
+    }
+
+    systemPrompt += `
+
+【要求】
+1. 生成10-15条与「${topic}」话题相关的论坛帖子
+2. 帖子内容必须围绕「${topic}」展开，可以是讨论、分享、吐槽、求助等
+3. 帖子作者只能是AI角色、固定NPC或随机路人，绝对不要生成用户的帖子
+4. 内容要符合世界观设定，有趣且有互动感
+5. 每条帖子必须有10-15条评论
+6. 部分帖子可以包含图片，用[图片:图片描述]格式
+7. 返回JSON数组格式`;
+
+    const userPrompt = `请生成与「${topic}」相关的论坛帖子，返回纯JSON数组（不要markdown代码块）：
+[
+  {
+    "authorType": "ai或npc",
+    "authorName": "中文昵称",
+    "handle": "英文用户名(不含@符号)",
+    "content": "与${topic}相关的帖子内容",
+    "likes": 点赞数,
+    "retweets": 转发数(0-50),
+    "views": 浏览量(100-5000),
+    "comments": [
+      {"id":1,"authorType":"npc","authorName":"昵称","handle":"英文用户名","content":"评论","likes":0},
+      {"id":2,"authorType":"ai","authorName":"昵称","handle":"英文用户名","content":"回复评论","likes":0,"replyTo":1,"replyToName":"被回复者昵称"}
+    ]
+  }
+]
+注意：
+1. 所有帖子都必须与「${topic}」话题相关！
+2. authorType只能是"ai"或"npc"，不要生成"user"
+3. 每个帖子必须有10-15条评论！`;
+
+    const response = await fetch(`${apiConfig.url}/chat/completions`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiConfig.key}`,
+      },
+      body: JSON.stringify({
+        model: apiConfig.model || "gpt-3.5-turbo",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
+        ],
+        temperature: 0.9,
+      }),
+    });
+
+    if (!response.ok) throw new Error("API请求失败");
+
+    const data = await response.json();
+    let content = data.choices[0]?.message?.content || "";
+
+    // 解析JSON
+    content = content
+      .replace(/```json\n?/g, "")
+      .replace(/```\n?/g, "")
+      .trim();
+    const jsonMatch = content.match(/\[[\s\S]*\]/);
+
+    if (jsonMatch) {
+      const posts = JSON.parse(jsonMatch[0]);
+      const searchPosts = posts.map((p, idx) => {
+        // 尝试匹配AI参与者或NPC的头像
+        let authorAvatar = "";
+        const authorName = p.authorName || "匿名";
+        
+        for (const participant of forumSettings.aiParticipants) {
+          const char = characters.find(c => String(c.id) === String(participant.charId));
+          const participantName = participant.nickname || char?.name || '';
+          if (participantName && authorName.includes(participantName)) {
+            authorAvatar = participant.avatar || char?.avatar || '';
+            break;
+          }
+        }
+        
+        if (!authorAvatar && forumSettings.npcs) {
+          for (const npc of forumSettings.npcs) {
+            if (npc.name && authorName.includes(npc.name)) {
+              authorAvatar = npc.avatar || '';
+              break;
+            }
+          }
+        }
+        
+        return {
+          id: Math.floor(Date.now() + idx * 1000 + Math.random() * 100),
+          authorType: p.authorType === "user" ? "npc" : p.authorType || "npc",
+          authorId: null,
+          authorName: authorName,
+          authorAvatar: authorAvatar,
+          handle: p.handle || generateEnglishHandle(p.authorName),
+          content: p.content || "",
+          timestamp: Date.now() - Math.random() * 7200000,
+          likes: p.likes || Math.floor(Math.random() * 50),
+          liked: false,
+          retweets: p.retweets || Math.floor(Math.random() * 30),
+          views: p.views || Math.floor(Math.random() * 4900) + 100,
+          isSearchResult: true, // 标记为搜索结果
+          searchTopic: topic,
+          comments: (p.comments || []).map((c, cidx) => {
+            let commentAvatar = "";
+            const commentName = c.authorName || "网友";
+            
+            for (const participant of forumSettings.aiParticipants) {
+              const char = characters.find(ch => String(ch.id) === String(participant.charId));
+              const participantName = participant.nickname || char?.name || '';
+              if (participantName && commentName.includes(participantName)) {
+                commentAvatar = participant.avatar || char?.avatar || '';
+                break;
+              }
+            }
+            
+            if (!commentAvatar && forumSettings.npcs) {
+              for (const npc of forumSettings.npcs) {
+                if (npc.name && commentName.includes(npc.name)) {
+                  commentAvatar = npc.avatar || '';
+                  break;
+                }
+              }
+            }
+            
+            return {
+              id: c.id || cidx + 1,
+              authorType: c.authorType === "user" ? "npc" : c.authorType || "npc",
+              authorName: commentName,
+              authorAvatar: commentAvatar,
+              content: c.content || "",
+              replyTo: c.replyTo || null,
+              replyToName: c.replyToName || null,
+              timestamp: Date.now() - Math.random() * 3600000,
+              likes: c.likes || Math.floor(Math.random() * 10),
+              liked: false,
+            };
+          }),
+        };
+      });
+
+      // 将搜索结果添加到帖子列表（保留原有帖子）
+      // 先移除之前的同话题搜索结果
+      forumPosts = forumPosts.filter(p => !(p.isSearchResult && p.searchTopic === topic));
+      // 添加新的搜索结果
+      forumPosts = [...searchPosts, ...forumPosts];
+      await localforage.setItem("forumPosts", forumPosts);
+      
+      // 显示搜索结果
+      showSearchResults(searchPosts, topic);
+    } else {
+      showSearchError("生成内容解析失败");
+    }
+  } catch (e) {
+    console.error("[论坛] 搜索生成失败:", e);
+    showSearchError("生成失败: " + e.message);
+  }
+}
+
+// 显示搜索结果
+function showSearchResults(posts, topic) {
+  const loading = document.getElementById('forumSearchLoading');
+  const results = document.getElementById('forumSearchResults');
+  
+  if (loading) loading.style.display = 'none';
+  
+  if (results) {
+    if (posts.length > 0) {
+      results.innerHTML = `
+        <div class="forum-search-stats">
+          找到 ${posts.length} 条与「${escapeForumHtml(topic)}」相关的帖子
+        </div>
+        ${posts.map(post => renderForumPostItem(post)).join('')}
+      `;
+    } else {
+      results.innerHTML = `
+        <div class="forum-search-empty">
+          <div class="forum-search-empty-icon">🔍</div>
+          <div class="forum-search-empty-text">没有找到与「${escapeForumHtml(topic)}」相关的内容</div>
+          <button class="forum-empty-btn" onclick="refreshSearchResults('${escapeForumHtml(topic)}')">重新搜索</button>
+        </div>
+      `;
+    }
+  }
+}
+
+// 显示搜索错误
+function showSearchError(message) {
+  const loading = document.getElementById('forumSearchLoading');
+  const results = document.getElementById('forumSearchResults');
+  
+  if (loading) loading.style.display = 'none';
+  
+  if (results) {
+    results.innerHTML = `
+      <div class="forum-search-empty">
+        <div class="forum-search-empty-icon">😅</div>
+        <div class="forum-search-empty-text">${escapeForumHtml(message)}</div>
+        <button class="forum-empty-btn" onclick="renderForumHot()">返回热点</button>
+      </div>
+    `;
+  }
+}
+
+// 生成热门话题
+function generateHotTopics() {
+  const worldview = forumSettings.worldview || '';
+  const forumName = forumSettings.forumName || '广场';
+  
+  // 基础话题模板
+  const baseTopics = [
+    { category: '热搜', tag: '今日讨论', count: Math.floor(Math.random() * 500) + 100, trend: 'up' },
+    { category: '热搜', tag: '新鲜事', count: Math.floor(Math.random() * 300) + 80, trend: 'up' },
+    { category: '娱乐', tag: '日常分享', count: Math.floor(Math.random() * 200) + 50, trend: 'stable' },
+  ];
+  
+  // 根据世界观生成相关话题
+  if (worldview) {
+    // 提取世界观中的关键词
+    const keywords = worldview.match(/[\u4e00-\u9fa5]{2,4}/g) || [];
+    const uniqueKeywords = [...new Set(keywords)].slice(0, 5);
+    
+    uniqueKeywords.forEach((kw, idx) => {
+      baseTopics.push({
+        category: forumName,
+        tag: kw,
+        count: Math.floor(Math.random() * 400) + 50,
+        trend: ['up', 'stable', 'down'][Math.floor(Math.random() * 3)]
+      });
+    });
+  }
+  
+  // 根据AI角色生成话题
+  forumSettings.aiParticipants.forEach(p => {
+    const char = characters?.find(c => String(c.id) === String(p.charId));
+    const name = p.nickname || char?.name;
+    if (name) {
+      baseTopics.push({
+        category: '角色',
+        tag: name + '相关',
+        count: Math.floor(Math.random() * 150) + 30,
+        trend: 'up'
+      });
+    }
+  });
+  
+  // 排序并返回前10个
+  return baseTopics
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 10);
+}
+
+// 获取热门帖子（按互动量排序）
+function getTrendingPosts() {
+  if (forumPosts.length === 0) return [];
+  
+  // 过滤掉搜索结果帖子，只显示主页帖子
+  const mainPosts = forumPosts.filter(p => !p.isSearchResult);
+  
+  // 计算每个帖子的热度分数
+  const postsWithScore = mainPosts.map(post => {
+    const commentCount = post.comments?.length || 0;
+    const likes = post.likes || 0;
+    const retweets = post.retweets || 0;
+    const views = post.views || 0;
+    
+    // 热度公式：评论*10 + 点赞*5 + 转发*8 + 浏览*0.1
+    const score = commentCount * 10 + likes * 5 + retweets * 8 + views * 0.1;
+    
+    return { ...post, hotScore: score };
+  });
+  
+  // 按热度排序，取前5条
+  return postsWithScore
+    .sort((a, b) => b.hotScore - a.hotScore)
+    .slice(0, 5);
+}
+
+// 提取世界观关键词
+function extractWorldviewKeywords() {
+  const worldview = forumSettings.worldview || '';
+  const userIdentity = forumSettings.userIdentity || '';
+  const combined = worldview + ' ' + userIdentity;
+  
+  // 提取2-4字的中文词汇
+  const keywords = combined.match(/[\u4e00-\u9fa5]{2,4}/g) || [];
+  const uniqueKeywords = [...new Set(keywords)];
+  
+  // 添加一些通用关键词
+  const defaultKeywords = ['日常', '分享', '讨论', '求助', '推荐'];
+  
+  return [...uniqueKeywords.slice(0, 6), ...defaultKeywords].slice(0, 8);
+}
+
+// ==================== 个人主页 ====================
+
+// 当前个人主页选中的tab
+let currentProfileTab = 'posts';
+
+function renderForumProfile(tab = 'posts') {
+  currentProfileTab = tab;
+  const feed = document.getElementById("forumFeed");
+  if (!feed) return;
+  
+  // 获取用户数据
+  const globalAvatar = localStorage.getItem("avatarImg");
+  const userAvatar = globalAvatar || getDefaultAvatarDataUrl();
+  const userName = forumSettings.userNickname || "用户";
+  const userHandle = forumSettings.userHandle || generateEnglishHandle(userName);
+  const userBio = forumSettings.userBio || "";
+  const userBanner = forumSettings.userBanner || "";
+  const followingStr = forumSettings.userFollowingStr || formatFollowCount(forumSettings.userFollowing || 0);
+  const followersStr = forumSettings.userFollowersStr || formatFollowCount(forumSettings.userFollowers || 0);
+  const joinDate = forumSettings.userJoinDate || formatJoinDate(Date.now());
+  
+  // 获取用户发布的帖子（包括转发）
+  const userPosts = forumPosts.filter(p => p.authorType === 'user');
+  
+  // 获取用户点赞的帖子
+  const likedPosts = forumPosts.filter(p => p.liked);
+  
+  // 获取用户评论过的帖子
+  const repliedPosts = forumPosts.filter(p => 
+    p.comments && p.comments.some(c => c.authorType === 'user')
+  );
+  
+  // 根据当前tab渲染内容
+  let contentHtml = '';
+  if (tab === 'posts') {
+    contentHtml = userPosts.length > 0 
+      ? userPosts.map(post => renderForumPostItem(post)).join("")
+      : '<div class="forum-profile-no-posts">还没有发布任何帖子</div>';
+  } else if (tab === 'replies') {
+    contentHtml = repliedPosts.length > 0 
+      ? repliedPosts.map(post => renderProfileReplyItem(post)).join("")
+      : '<div class="forum-profile-no-posts">还没有回复任何帖子</div>';
+  } else if (tab === 'likes') {
+    contentHtml = likedPosts.length > 0 
+      ? likedPosts.map(post => renderForumPostItem(post)).join("")
+      : '<div class="forum-profile-no-posts">还没有喜欢任何帖子</div>';
+  }
+  
+  feed.innerHTML = `
+    <div class="forum-profile forum-profile-immersive">
+      <!-- 背景图直接覆盖到顶端 -->
+      <div class="forum-profile-banner-full" onclick="changeProfileBanner()">
+        ${userBanner 
+          ? `<img src="${userBanner}" alt="">` 
+          : '<div class="forum-profile-banner-placeholder"></div>'}
+        <div class="forum-profile-banner-hint">点击更换背景</div>
+      </div>
+      
+      <!-- 头像和编辑按钮 -->
+      <div class="forum-profile-avatar-row">
+        <div class="forum-profile-avatar" onclick="changeProfileAvatar()">
+          <img src="${userAvatar}" alt="">
+          <div class="forum-profile-avatar-hint">更换</div>
+        </div>
+        <button class="forum-profile-edit-btn" onclick="openProfileEditor()">编辑个人资料</button>
+      </div>
+      
+      <!-- 用户信息 -->
+      <div class="forum-profile-info">
+        <div class="forum-profile-name">${escapeForumHtml(userName)}</div>
+        <div class="forum-profile-handle">@${escapeForumHtml(userHandle)}</div>
+        ${userBio ? `<div class="forum-profile-bio">${escapeForumHtml(userBio)}</div>` : ''}
+        <div class="forum-profile-meta">
+          <span class="forum-profile-join">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+              <path d="M7 4V3h2v1h6V3h2v1h1.5C19.89 4 21 5.12 21 6.5v12c0 1.38-1.11 2.5-2.5 2.5h-13C4.12 21 3 19.88 3 18.5v-12C3 5.12 4.12 4 5.5 4H7zm0 2H5.5c-.27 0-.5.22-.5.5v12c0 .28.23.5.5.5h13c.28 0 .5-.22.5-.5v-12c0-.28-.22-.5-.5-.5H17v1h-2V6H9v1H7V6zm0 6h2v-2H7v2zm0 4h2v-2H7v2zm4-4h2v-2h-2v2zm0 4h2v-2h-2v2zm4-4h2v-2h-2v2z"/>
+            </svg>
+            ${joinDate} 加入
+          </span>
+        </div>
+        <div class="forum-profile-stats">
+          <span class="forum-profile-stat">
+            <strong>${followingStr}</strong> 正在关注
+          </span>
+          <span class="forum-profile-stat">
+            <strong>${followersStr}</strong> 关注者
+          </span>
+        </div>
+      </div>
+      
+      <!-- 标签页 -->
+      <div class="forum-profile-tabs">
+        <div class="forum-profile-tab ${tab === 'posts' ? 'active' : ''}" onclick="renderForumProfile('posts')">帖子</div>
+        <div class="forum-profile-tab ${tab === 'replies' ? 'active' : ''}" onclick="renderForumProfile('replies')">回复</div>
+        <div class="forum-profile-tab ${tab === 'likes' ? 'active' : ''}" onclick="renderForumProfile('likes')">喜欢</div>
+      </div>
+      
+      <!-- 内容列表 -->
+      <div class="forum-profile-posts">
+        ${contentHtml}
+      </div>
+    </div>
+  `;
+  
+  // 隐藏顶栏和FAB
+  const tabs = document.querySelector('.forum-tabs');
+  const fab = document.querySelector('.forum-fab');
+  if (tabs) tabs.style.display = 'none';
+  if (fab) fab.style.display = 'none';
+}
+
+// 渲染回复过的帖子（显示用户的回复）
+function renderProfileReplyItem(post) {
+  // 找到用户的评论
+  const userComments = post.comments.filter(c => c.authorType === 'user');
+  if (userComments.length === 0) return '';
+  
+  const lastComment = userComments[userComments.length - 1];
+  
+  // 获取用户头像
+  const globalAvatar = localStorage.getItem("avatarImg");
+  const userAvatar = globalAvatar || getDefaultAvatarDataUrl();
+  const userName = forumSettings.userNickname || "我";
+  const userHandle = forumSettings.userHandle || generateEnglishHandle(userName);
+  
+  // 原帖信息
+  const originalAvatar = post.authorAvatar
+    ? `<img src="${post.authorAvatar}" alt="">`
+    : getAvatarEmoji(post.authorName);
+  
+  return `
+    <div class="forum-reply-item" onclick="openForumPostDetail(${post.id})">
+      <div class="forum-reply-context">
+        <span class="forum-reply-context-icon">↩</span>
+        回复 @${escapeForumHtml(post.authorName)} 的帖子
+      </div>
+      <div class="forum-post">
+        <div class="forum-post-left">
+          <div class="forum-post-avatar">
+            <img src="${userAvatar}" alt="">
+          </div>
+        </div>
+        <div class="forum-post-right">
+          <div class="forum-post-header">
+            <span class="forum-post-name">${escapeForumHtml(userName)}</span>
+            <span class="forum-author-tag user">我</span>
+            <div class="forum-post-meta">
+              <span>@${userHandle}</span>
+              <span>·</span>
+              <span>${formatForumTime(lastComment.timestamp)}</span>
+            </div>
+          </div>
+          <div class="forum-post-content">${escapeForumHtml(lastComment.content)}</div>
+        </div>
+      </div>
+      <div class="forum-reply-original">
+        <div class="forum-reply-original-avatar">${originalAvatar}</div>
+        <div class="forum-reply-original-content">
+          <span class="forum-reply-original-name">${escapeForumHtml(post.authorName)}</span>
+          <span class="forum-reply-original-text">${escapeForumHtml(post.content?.substring(0, 50))}${post.content?.length > 50 ? '...' : ''}</span>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function switchToHome() {
+  // 显示顶栏和FAB
+  const tabs = document.querySelector('.forum-tabs');
+  const fab = document.querySelector('.forum-fab');
+  if (tabs) tabs.style.display = 'flex';
+  if (fab) fab.style.display = 'flex';
+  
+  // 更新底部导航
+  document.querySelectorAll(".forum-nav-item").forEach((item, index) => {
+    item.classList.toggle("active", index === 0);
+  });
+  
+  renderForumFeed();
+}
+
+function formatJoinDate(timestamp) {
+  const date = new Date(timestamp);
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+  return `${year}年${month}月`;
+}
+
+// 更换头像
+function changeProfileAvatar() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.onchange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = async (ev) => {
+        localStorage.setItem("avatarImg", ev.target.result);
+        renderForumProfile();
+        showToast('头像已更新');
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  input.click();
+}
+
+// 更换背景图
+function changeProfileBanner() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.onchange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = async (ev) => {
+        forumSettings.userBanner = ev.target.result;
+        await localforage.setItem("forumSettings", forumSettings);
+        renderForumProfile();
+        showToast('背景已更新');
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  input.click();
+}
+
+// 打开编辑个人资料弹窗
+function openProfileEditor() {
+  const globalAvatar = localStorage.getItem("avatarImg");
+  const userAvatar = globalAvatar || getDefaultAvatarDataUrl();
+  const userName = forumSettings.userNickname || "";
+  const userHandle = forumSettings.userHandle || "";
+  const userBio = forumSettings.userBio || "";
+  const userBanner = forumSettings.userBanner || "";
+  const userFollowing = forumSettings.userFollowing || 0;
+  const userFollowers = forumSettings.userFollowers || 0;
+  
+  const modal = document.createElement('div');
+  modal.id = 'forumProfileEditorModal';
+  modal.className = 'forum-modal-overlay';
+  modal.innerHTML = `
+    <div class="forum-profile-editor">
+      <div class="forum-profile-editor-header">
+        <button class="forum-profile-editor-close" onclick="closeProfileEditor()">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <path d="M10.59 12L4.54 5.96l1.42-1.42L12 10.59l6.04-6.05 1.42 1.42L13.41 12l6.05 6.04-1.42 1.42L12 13.41l-6.04 6.05-1.42-1.42L10.59 12z"/>
+          </svg>
+        </button>
+        <span class="forum-profile-editor-title">编辑个人资料</span>
+        <button class="forum-profile-editor-save" onclick="saveProfileChanges()">保存</button>
+      </div>
+      
+      <div class="forum-profile-editor-content">
+        <!-- 背景图 -->
+        <div class="forum-profile-editor-banner" onclick="document.getElementById('profileBannerInput').click()">
+          ${userBanner 
+            ? `<img src="${userBanner}" alt="">` 
+            : '<div class="forum-profile-banner-placeholder"></div>'}
+          <div class="forum-profile-editor-banner-overlay">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="white">
+              <path d="M9.697 3H11v2h-.697l-2 2H5c-.276 0-.5.224-.5.5v11c0 .276.224.5.5.5h14c.276 0 .5-.224.5-.5V10h2v8.5c0 1.381-1.119 2.5-2.5 2.5H5c-1.381 0-2.5-1.119-2.5-2.5v-11C2.5 6.119 3.619 5 5 5h1.697l2-2zM12 10.5c-1.38 0-2.5 1.12-2.5 2.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5-1.12-2.5-2.5-2.5zm0-2c2.485 0 4.5 2.015 4.5 4.5s-2.015 4.5-4.5 4.5-4.5-2.015-4.5-4.5 2.015-4.5 4.5-4.5zM17 2c0 1.657-1.343 3-3 3v1c1.657 0 3 1.343 3 3h1c0-1.657 1.343-3 3-3V5c-1.657 0-3-1.343-3-3h-1z"/>
+            </svg>
+          </div>
+          <input type="file" id="profileBannerInput" accept="image/*" style="display:none" onchange="previewProfileBanner(this)">
+        </div>
+        
+        <!-- 头像 -->
+        <div class="forum-profile-editor-avatar" onclick="document.getElementById('profileAvatarInput').click()">
+          <img src="${userAvatar}" alt="" id="profileAvatarPreview">
+          <div class="forum-profile-editor-avatar-overlay">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="white">
+              <path d="M9.697 3H11v2h-.697l-2 2H5c-.276 0-.5.224-.5.5v11c0 .276.224.5.5.5h14c.276 0 .5-.224.5-.5V10h2v8.5c0 1.381-1.119 2.5-2.5 2.5H5c-1.381 0-2.5-1.119-2.5-2.5v-11C2.5 6.119 3.619 5 5 5h1.697l2-2zM12 10.5c-1.38 0-2.5 1.12-2.5 2.5s1.12 2.5 2.5 2.5 2.5-1.12 2.5-2.5-1.12-2.5-2.5-2.5zm0-2c2.485 0 4.5 2.015 4.5 4.5s-2.015 4.5-4.5 4.5-4.5-2.015-4.5-4.5 2.015-4.5 4.5-4.5z"/>
+            </svg>
+          </div>
+          <input type="file" id="profileAvatarInput" accept="image/*" style="display:none" onchange="previewProfileAvatar(this)">
+        </div>
+        
+        <!-- 表单 -->
+        <div class="forum-profile-editor-form">
+          <div class="forum-profile-editor-field">
+            <label>昵称</label>
+            <input type="text" id="profileNameInput" value="${escapeForumHtml(userName)}" placeholder="你的昵称" maxlength="30">
+          </div>
+          
+          <div class="forum-profile-editor-field">
+            <label>用户名</label>
+            <div class="forum-input-with-prefix" style="background:#fff;border:1px solid #cfd9de;">
+              <span class="forum-input-prefix">@</span>
+              <input type="text" id="profileHandleInput" value="${escapeForumHtml(userHandle)}" placeholder="your_handle" class="forum-input-handle" style="background:transparent;">
+            </div>
+          </div>
+          
+          <div class="forum-profile-editor-field">
+            <label>个人简介</label>
+            <textarea id="profileBioInput" placeholder="介绍一下你自己" maxlength="160" rows="3">${escapeForumHtml(userBio)}</textarea>
+          </div>
+          
+          <div class="forum-profile-editor-field-row">
+            <div class="forum-profile-editor-field forum-profile-editor-field-half">
+              <label>正在关注</label>
+              <input type="text" id="profileFollowingInput" value="${formatFollowCount(userFollowing)}" placeholder="如: 32, 1.2K, 5M">
+            </div>
+            <div class="forum-profile-editor-field forum-profile-editor-field-half">
+              <label>关注者</label>
+              <input type="text" id="profileFollowersInput" value="${formatFollowCount(userFollowers)}" placeholder="如: 96, 10K, 1M">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  modal.onclick = (e) => {
+    if (e.target === modal) closeProfileEditor();
+  };
+  document.body.appendChild(modal);
+}
+
+function closeProfileEditor() {
+  const modal = document.getElementById('forumProfileEditorModal');
+  if (modal) modal.remove();
+}
+
+function previewProfileAvatar(input) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const preview = document.getElementById('profileAvatarPreview');
+      if (preview) preview.src = e.target.result;
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+function previewProfileBanner(input) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const container = input.closest('.forum-profile-editor-banner');
+      if (container) {
+        const img = container.querySelector('img') || document.createElement('img');
+        img.src = e.target.result;
+        if (!container.querySelector('img')) {
+          container.insertBefore(img, container.firstChild);
+          const placeholder = container.querySelector('.forum-profile-banner-placeholder');
+          if (placeholder) placeholder.remove();
+        }
+      }
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+async function saveProfileChanges() {
+  const name = document.getElementById('profileNameInput')?.value?.trim() || '';
+  const handle = document.getElementById('profileHandleInput')?.value?.trim() || '';
+  const bio = document.getElementById('profileBioInput')?.value || '';
+  const avatarPreview = document.getElementById('profileAvatarPreview')?.src || '';
+  const bannerContainer = document.querySelector('.forum-profile-editor-banner img');
+  const banner = bannerContainer?.src || '';
+  const followingStr = document.getElementById('profileFollowingInput')?.value?.trim() || '0';
+  const followersStr = document.getElementById('profileFollowersInput')?.value?.trim() || '0';
+  
+  // 解析关注数（支持K、M单位）
+  const following = parseFollowCount(followingStr);
+  const followers = parseFollowCount(followersStr);
+  
+  // 保存头像到localStorage
+  if (avatarPreview && !avatarPreview.includes('data:image/svg+xml')) {
+    localStorage.setItem("avatarImg", avatarPreview);
+  }
+  
+  // 保存其他信息到forumSettings
+  forumSettings.userNickname = name;
+  forumSettings.userHandle = handle;
+  forumSettings.userBio = bio;
+  forumSettings.userFollowing = following;
+  forumSettings.userFollowers = followers;
+  forumSettings.userFollowingStr = followingStr; // 保存原始字符串用于显示
+  forumSettings.userFollowersStr = followersStr;
+  if (banner && !banner.includes('forum-profile-banner-placeholder')) {
+    forumSettings.userBanner = banner;
+  }
+  
+  // 如果是第一次设置，记录加入时间
+  if (!forumSettings.userJoinDate) {
+    forumSettings.userJoinDate = formatJoinDate(Date.now());
+  }
+  
+  await localforage.setItem("forumSettings", forumSettings);
+  
+  closeProfileEditor();
+  renderForumProfile();
+  showToast('个人资料已更新');
+}
+
+// 解析关注数（支持K、M、B单位）
+function parseFollowCount(str) {
+  if (!str) return 0;
+  str = str.toString().trim().toUpperCase();
+  
+  // 如果是纯数字
+  if (/^\d+$/.test(str)) {
+    return parseInt(str);
+  }
+  
+  // 匹配带单位的数字，如 1.2K, 5M, 1B
+  const match = str.match(/^([\d.]+)\s*([KMB])?$/i);
+  if (match) {
+    let num = parseFloat(match[1]);
+    const unit = match[2]?.toUpperCase();
+    
+    if (unit === 'K') num *= 1000;
+    else if (unit === 'M') num *= 1000000;
+    else if (unit === 'B') num *= 1000000000;
+    
+    return Math.round(num);
+  }
+  
+  return 0;
+}
+
+// 格式化关注数为带单位的字符串
+function formatFollowCount(num) {
+  if (!num || num === 0) return '0';
+  num = parseInt(num);
+  
+  if (num >= 1000000000) {
+    return (num / 1000000000).toFixed(1).replace(/\.0$/, '') + 'B';
+  } else if (num >= 1000000) {
+    return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+  } else if (num >= 10000) {
+    return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+  } else {
+    return num.toString();
   }
 }
 
@@ -1736,12 +3922,20 @@ window.openAddForumParticipant = openAddForumParticipant;
 window.closeForumParticipantModal = closeForumParticipantModal;
 window.selectForumParticipant = selectForumParticipant;
 window.confirmAddParticipant = confirmAddParticipant;
+window.editForumParticipant = editForumParticipant;
+window.previewForumParticipantAvatar = previewForumParticipantAvatar;
 window.removeForumParticipant = removeForumParticipant;
+window.openAddForumNpc = openAddForumNpc;
+window.editForumNpc = editForumNpc;
+window.previewForumNpcAvatar = previewForumNpcAvatar;
+window.confirmSaveNpc = confirmSaveNpc;
+window.removeForumNpc = removeForumNpc;
+window.openAddForumRelationship = openAddForumRelationship;
+window.editForumRelationship = editForumRelationship;
+window.confirmSaveRelationship = confirmSaveRelationship;
+window.removeForumRelationship = removeForumRelationship;
 window.openForumCompose = openForumCompose;
 window.closeForumCompose = closeForumCompose;
-window.showForumAuthorPicker = showForumAuthorPicker;
-window.closeForumAuthorPicker = closeForumAuthorPicker;
-window.selectForumComposeAuthor = selectForumComposeAuthor;
 window.submitForumPost = submitForumPost;
 window.submitForumComment = submitForumComment;
 window.replyToForumComment = replyToForumComment;
@@ -1751,15 +3945,49 @@ window.toggleForumPostLike = toggleForumPostLike;
 window.toggleForumCommentLike = toggleForumCommentLike;
 window.generateForumPosts = generateForumPosts;
 window.generateMoreComments = generateMoreComments;
+window.generateCommentsForNewPost = generateCommentsForNewPost;
+window.generateInteractionsForNewPost = generateInteractionsForNewPost;
 window.switchForumTab = switchForumTab;
 window.switchForumSection = switchForumSection;
+window.switchToHome = switchToHome;
+window.renderForumProfile = renderForumProfile;
+window.renderProfileReplyItem = renderProfileReplyItem;
+window.changeProfileAvatar = changeProfileAvatar;
+window.changeProfileBanner = changeProfileBanner;
+window.openProfileEditor = openProfileEditor;
+window.closeProfileEditor = closeProfileEditor;
+window.previewProfileAvatar = previewProfileAvatar;
+window.previewProfileBanner = previewProfileBanner;
+window.saveProfileChanges = saveProfileChanges;
 window.showRetweetMenu = showRetweetMenu;
+window.openQuoteRetweet = openQuoteRetweet;
+window.closeQuoteRetweet = closeQuoteRetweet;
+window.submitQuoteRetweet = submitQuoteRetweet;
 window.retweetToChat = retweetToChat;
 window.retweetToProfile = retweetToProfile;
 window.showForumImageDesc = showForumImageDesc;
+window.showForumFullImage = showForumFullImage;
 window.sendRetweetToChar = sendRetweetToChar;
 window.renderRetweetCard = renderRetweetCard;
 window.openForumPostFromCard = openForumPostFromCard;
+window.handleComposeImageUpload = handleComposeImageUpload;
+window.insertImagePlaceholder = insertImagePlaceholder;
+window.renderComposeImages = renderComposeImages;
+window.removeComposeImage = removeComposeImage;
+window.renderForumComposeUserInfo = renderForumComposeUserInfo;
+window.parseFollowCount = parseFollowCount;
+window.formatFollowCount = formatFollowCount;
+window.renderForumHot = renderForumHot;
+window.searchForumTopic = searchForumTopic;
+window.focusHotSearch = focusHotSearch;
+window.handleHotSearchInput = handleHotSearchInput;
+window.handleHotSearchKeydown = handleHotSearchKeydown;
+window.executeHotSearch = executeHotSearch;
+window.refreshSearchResults = refreshSearchResults;
+window.generateTopicPosts = generateTopicPosts;
+window.showSearchResults = showSearchResults;
+window.showSearchError = showSearchError;
+window.handleForumRefresh = handleForumRefresh;
 
 // 页面加载时初始化
 if (document.readyState === "loading") {
