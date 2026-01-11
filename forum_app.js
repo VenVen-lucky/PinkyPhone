@@ -18,6 +18,12 @@ let currentForumTab = 'recommend'; // 当前tab: 'recommend' 或 'following'
 // ==================== 初始化 ====================
 
 async function initForumApp() {
+  // 强制移除forumPage的padding（覆盖style.css的.page样式）
+  const forumPage = document.getElementById('forumPage');
+  if (forumPage) {
+    forumPage.style.cssText = 'padding: 0 !important; margin: 0 !important;';
+  }
+  
   // 加载保存的数据
   const savedSettings = await localforage.getItem("forumSettings");
   if (savedSettings) {

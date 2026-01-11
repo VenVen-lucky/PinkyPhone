@@ -1,10 +1,26 @@
 /* ==================== 沉浸式全屏修正 (必须放在最前面) ==================== */
 
 /* 1. 强制覆盖默认页面样式，背景改为纯白 */
+/* 使用多种选择器组合确保覆盖 */
+html body .page#forumPage,
+body .page#forumPage,
+.page#forumPage,
+#forumPage.page,
+div#forumPage,
 #forumPage {
   background-color: #ffffff !important; /* 纯白背景 */
   padding: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  margin: 0 !important;
   overflow: hidden !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  left: 0 !important;
+  right: 0 !important;
+  box-sizing: border-box !important;
 }
 
 /* 2. 隐藏系统默认标题栏 */
@@ -12,10 +28,12 @@
   display: none !important;
 }
 
-/* 3. 让内容区域填满高度 */
+/* 3. 让内容区域填满高度和宽度 */
 #forumPage .page-content {
   height: 100% !important;
+  width: 100% !important;
   padding: 0 !important;
+  margin: 0 !important;
   display: flex;
   flex-direction: column;
 }
@@ -27,11 +45,13 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+  width: 100%;
   background: #ffffff; /* 白底 */
   color: #0f1419; /* 推特黑字 */
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
     Arial, sans-serif;
   overflow: hidden; /* 防止子元素溢出 */
+  padding-top: env(safe-area-inset-top, 0); /* safe area放在container上 */
 }
 
 /* 顶部导航栏 (毛玻璃白底) */
@@ -45,10 +65,23 @@
   position: relative;
   z-index: 100;
   height: 53px;
+  width: 100%;
   padding: 0 4px;
-  padding-top: env(safe-area-inset-top, 0);
   flex-shrink: 0; /* 防止被压缩 */
-  box-sizing: content-box; /* 确保padding-top不影响内部高度 */
+  box-sizing: border-box;
+}
+
+/* 让顶栏背景延伸到safe area */
+.forum-tabs::before {
+  content: '';
+  position: absolute;
+  top: calc(-1 * env(safe-area-inset-top, 0));
+  left: 0;
+  right: 0;
+  height: env(safe-area-inset-top, 0);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 /* 嵌入式返回按钮 */
