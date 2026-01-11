@@ -31,6 +31,7 @@
   color: #0f1419; /* 推特黑字 */
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
     Arial, sans-serif;
+  overflow: hidden; /* 防止子元素溢出 */
 }
 
 /* 顶部导航栏 (毛玻璃白底) */
@@ -41,12 +42,13 @@
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid #eff3f4; /* 极浅灰分割线 */
-  position: sticky;
-  top: 0;
+  position: relative;
   z-index: 100;
-  min-height: 53px;
+  height: 53px;
   padding: 0 4px;
   padding-top: env(safe-area-inset-top, 0);
+  flex-shrink: 0; /* 防止被压缩 */
+  box-sizing: content-box; /* 确保padding-top不影响内部高度 */
 }
 
 /* 嵌入式返回按钮 */
@@ -64,6 +66,7 @@
   border-radius: 50%;
   margin-right: 4px;
   transition: background 0.2s;
+  flex-shrink: 0; /* 防止被压缩 */
 }
 
 .forum-nav-back:active {
@@ -76,7 +79,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100%;
+  height: 53px; /* 固定高度与顶栏一致 */
   font-size: 15px;
   font-weight: 700;
   color: #536471; /* 未选中灰色 */
@@ -106,8 +109,46 @@
   overflow-y: auto;
   overflow-x: hidden;
   padding-bottom: calc(130px + env(safe-area-inset-bottom, 0)); /* 留出底部导航和悬浮按钮的空间 */
+}
+
+/* 空状态 - 居中显示 */
+.forum-empty {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 53px - env(safe-area-inset-top, 0) - 130px - env(safe-area-inset-bottom, 0));
+  padding: 40px;
+  text-align: center;
+  color: #536471;
+}
+
+.forum-empty-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.forum-empty-text {
+  font-size: 15px;
+  line-height: 1.5;
+  color: #536471;
+}
+
+.forum-empty-btn {
+  background: #f48fb1;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 20px;
+  margin-top: 16px;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(244, 143, 177, 0.4);
+  cursor: pointer;
+}
+
+.forum-empty-btn:active {
+  background: #f06292;
+  transform: scale(0.98);
 }
 
 /* 单个帖子卡片 */
@@ -267,29 +308,6 @@
   background: #f06292; /* 按下稍微变深 */
 }
 
-/* 空状态 */
-.forum-empty {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 40px;
-  text-align: center;
-  color: #536471;
-}
-
-.forum-empty-btn {
-  background: #f48fb1;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 20px;
-  margin-top: 16px;
-  font-weight: 700;
-  box-shadow: 0 2px 8px rgba(244, 143, 177, 0.4);
-}
-
 /* ==================== 刷新按钮旋转动画 ==================== */
 
 @keyframes spin {
@@ -318,6 +336,7 @@
   right: 0;
   bottom: 0;
   z-index: 100;
+  box-sizing: content-box; /* 确保height不包含padding */
 }
 
 .forum-nav-item {
@@ -325,12 +344,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100%;
+  height: 50px; /* 固定高度确保图标居中 */
   background: transparent;
   border: none;
   color: #536471;
   cursor: pointer;
   transition: color 0.2s;
+}
+
+.forum-nav-item svg {
+  width: 24px;
+  height: 24px;
 }
 
 .forum-nav-item:active {
