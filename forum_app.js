@@ -15,6 +15,7 @@ let forumSettings = {
   aiParticipants: [], // AI参与者列表 [{ charId, identity, nickname, avatar, handle }]
   npcs: [], // NPC列表 [{ id, name, handle, avatar, identity, persona }]
   relationships: [], // 关系列表 [{ id, person1Type, person1Id, person2Type, person2Id, relationship, description }]
+  worldbookIds: [], // 绑定的世界书ID列表
 };
 
 // 默认头像SVG（灰色背景+白色人形）
@@ -687,6 +688,15 @@ function renderForumSettings() {
               forumSettings.worldview
             )}</textarea>
         </div>
+        <div class="forum-item">
+          <div class="forum-label">绑定世界书 <span class="forum-section-hint">可选，提供更丰富的世界设定</span></div>
+          <div class="forum-worldbook-list" id="forumWorldbookList">
+            ${renderForumWorldbookBindings()}
+          </div>
+          <button class="forum-add-btn forum-add-worldbook-btn" onclick="openForumWorldbookSelector()">
+            + 绑定世界书
+          </button>
+        </div>
       </div>
     </div>
     
@@ -758,6 +768,209 @@ async function saveForumSetting(key, value) {
   forumSettings[key] = value;
   await localforage.setItem("forumSettings", forumSettings);
   console.log("[论坛] 设置已保存:", key);
+}
+
+// ==================== 世界书绑定管理 ====================
+
+// 渲染已绑定的世界书列表
+function renderForumWorldbookBindings() {
+  const worldbookIds = forumSettings.worldbookIds || [];
+  if (worldbookIds.length === 0) {
+    return '<div class="forum-empty-hint">未绑定任何世界书</div>';
+  }
+  
+  return worldbookIds.map(wbId => {
+    const wb = (window.worldbooks || []).find(w => w.id === wbId);
+    if (!wb) return '';
+    
+    const entryCount = wb.entries?.length || 0;
+    return `
+      <div class="forum-worldbook-item">
+        <div class="forum-worldbook-icon">📚</div>
+        <div class="forum-worldbook-info">
+          <div class="forum-worldbook-name">${escapeForumHtml(wb.name)}</div>
+          <div class="forum-worldbook-count">${entryCount} 个条目</div>
+        </div>
+        <button class="forum-worldbook-remove" onclick="removeForumWorldbook('${wbId}')">×</button>
+      </div>
+    `;
+  }).filter(Boolean).join('');
+}
+
+// 打开世界书选择器
+function openForumWorldbookSelector() {
+  const worldbooks = window.worldbooks || [];
+  const boundIds = forumSettings.worldbookIds || [];
+  
+  // 过滤出未绑定的世界书
+  const availableWorldbooks = worldbooks.filter(wb => !boundIds.includes(wb.id) && wb.enabled !== false);
+  
+  if (availableWorldbooks.length === 0) {
+    if (worldbooks.length === 0) {
+      showToast('还没有创建世界书，请先在世界书App中创建');
+    } else {
+      showToast('所有世界书都已绑定');
+    }
+    return;
+  }
+  
+  const html = availableWorldbooks.map(wb => {
+    const entryCount = wb.entries?.length || 0;
+    return `
+      <div class="forum-char-select-item" onclick="addForumWorldbook('${wb.id}')">
+        <div class="forum-char-select-avatar forum-worldbook-select-icon">📚</div>
+        <div class="forum-char-select-name">
+          ${escapeForumHtml(wb.name)}
+          <span style="font-size:12px;color:#536471;margin-left:8px;">${entryCount}条目</span>
+        </div>
+        <svg class="forum-char-select-arrow" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </div>
+    `;
+  }).join('');
+  
+  const modal = document.createElement('div');
+  modal.id = 'forumWorldbookSelectorModal';
+  modal.className = 'forum-modal-overlay';
+  modal.innerHTML = `
+    <div class="forum-modal-content">
+      <div class="forum-modal-header">
+        <span class="forum-modal-title">选择世界书</span>
+        <button class="forum-modal-close" onclick="closeForumWorldbookSelector()">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="forum-modal-body">
+        ${html}
+      </div>
+    </div>
+  `;
+  modal.onclick = (e) => {
+    if (e.target === modal) closeForumWorldbookSelector();
+  };
+  document.body.appendChild(modal);
+}
+
+// 关闭世界书选择器
+function closeForumWorldbookSelector() {
+  const modal = document.getElementById('forumWorldbookSelectorModal');
+  if (modal) modal.remove();
+}
+
+// 添加世界书绑定
+async function addForumWorldbook(worldbookId) {
+  closeForumWorldbookSelector();
+  
+  if (!forumSettings.worldbookIds) {
+    forumSettings.worldbookIds = [];
+  }
+  
+  if (!forumSettings.worldbookIds.includes(worldbookId)) {
+    forumSettings.worldbookIds.push(worldbookId);
+    await localforage.setItem('forumSettings', forumSettings);
+    
+    // 刷新显示
+    const listEl = document.getElementById('forumWorldbookList');
+    if (listEl) {
+      listEl.innerHTML = renderForumWorldbookBindings();
+    }
+    
+    showToast('世界书已绑定');
+  }
+}
+
+// 移除世界书绑定
+async function removeForumWorldbook(worldbookId) {
+  if (!forumSettings.worldbookIds) return;
+  
+  forumSettings.worldbookIds = forumSettings.worldbookIds.filter(id => id !== worldbookId);
+  await localforage.setItem('forumSettings', forumSettings);
+  
+  // 刷新显示
+  const listEl = document.getElementById('forumWorldbookList');
+  if (listEl) {
+    listEl.innerHTML = renderForumWorldbookBindings();
+  }
+  
+  showToast('已移除世界书绑定');
+}
+
+// 获取论坛绑定的世界书内容
+function getForumWorldbookContent(contextText = '') {
+  const worldbookIds = forumSettings.worldbookIds || [];
+  if (worldbookIds.length === 0) return '';
+  
+  // 使用全局的getWorldbookContentForAI函数（如果存在）
+  if (typeof window.getWorldbookContentForAI === 'function') {
+    return window.getWorldbookContentForAI(worldbookIds, contextText);
+  }
+  
+  // 备用实现
+  const contentParts = [];
+  worldbookIds.forEach(wbId => {
+    const wb = (window.worldbooks || []).find(w => w.id === wbId && w.enabled !== false);
+    if (!wb || !wb.entries) return;
+    
+    wb.entries.forEach(entry => {
+      if (entry.enabled === false) return;
+      
+      // 检查关键词匹配
+      if (entry.keywords && entry.keywords.trim() && contextText) {
+        const keywords = entry.keywords.split(',').map(k => k.trim().toLowerCase()).filter(k => k);
+        const contextLower = contextText.toLowerCase();
+        const matched = keywords.some(kw => contextLower.includes(kw));
+        if (!matched) return;
+      }
+      
+      if (entry.content) {
+        contentParts.push(entry.content);
+      }
+    });
+  });
+  
+  if (contentParts.length === 0) return '';
+  return `\n[世界书/背景设定]:\n${contentParts.join('\n\n')}\n`;
+}
+
+// 获取角色的完整人设（聊天人设 + 论坛自定义设定）
+function getCharacterFullPersona(participant) {
+  const charId = participant.charId;
+  const char = characters.find(c => String(c.id) === String(charId));
+  if (!char) return participant.identity || '';
+  
+  // 获取聊天设置中的人设
+  const settings = chatSettings[charId] || {};
+  
+  // 合并人设：聊天人设 + 角色描述 + 论坛自定义身份
+  const parts = [];
+  
+  // 1. 角色原始描述/人设
+  const originalPersona = settings.persona || char.description || char.persona || '';
+  if (originalPersona) {
+    parts.push(`【角色基础人设】${originalPersona}`);
+  }
+  
+  // 2. 角色的系统提示词（如果有）
+  const systemPrompt = settings.systemPrompt || char.systemPrompt || '';
+  if (systemPrompt && systemPrompt !== originalPersona) {
+    parts.push(`【角色性格特点】${systemPrompt.substring(0, 200)}`);
+  }
+  
+  // 3. 论坛自定义身份设定
+  if (participant.identity) {
+    parts.push(`【在论坛中的身份】${participant.identity}`);
+  }
+  
+  // 4. 论坛自定义简介
+  if (participant.bio) {
+    parts.push(`【个人简介】${participant.bio}`);
+  }
+  
+  return parts.join('\n');
 }
 
 // ==================== AI参与者管理 ====================
@@ -2051,7 +2264,10 @@ async function generateForumPosts() {
   if (refreshBtn) refreshBtn.classList.add("spinning");
 
   try {
-    // 构建AI参与者信息
+    // 获取世界书内容
+    const worldbookContent = getForumWorldbookContent(forumSettings.worldview);
+    
+    // 构建AI参与者信息（使用完整人设）
     const participants = forumSettings.aiParticipants.map((p) => {
       const char = characters.find((c) => String(c.id) === String(p.charId));
       const settings = chatSettings[p.charId] || {};
@@ -2059,7 +2275,8 @@ async function generateForumPosts() {
         name: p.nickname || settings.charName || char?.name || "角色",
         handle: p.handle || generateEnglishHandle(p.nickname || char?.name || ''),
         identity: p.identity || "",
-        persona: settings.persona || char?.persona || "",
+        // 使用完整人设：原始人设 + 论坛自定义设定
+        fullPersona: getCharacterFullPersona(p),
       };
     });
 
@@ -2083,6 +2300,7 @@ async function generateForumPosts() {
 
 【世界观】
 ${forumSettings.worldview}
+${worldbookContent ? '\n【世界书/详细设定】\n' + worldbookContent : ''}
 
 【论坛名称】
 ${forumSettings.forumName}
@@ -2091,12 +2309,12 @@ ${forumSettings.forumName}
 - 昵称：${forumSettings.userNickname || "用户"}
 - 身份：${forumSettings.userIdentity || "普通成员"}
 
-【AI角色】必须使用这些角色发帖和评论！
+【AI角色】必须使用这些角色发帖和评论！角色说话要符合他们的人设！
 ${
   participants.length > 0 
     ? participants.map((p, i) => 
-        `${i + 1}. ${p.name}（@${p.handle}）：${p.identity || '未设置身份'}${p.persona ? '，性格：' + p.persona.substring(0, 100) : ''}`
-      ).join("\n")
+        `${i + 1}. ${p.name}（@${p.handle}）\n${p.fullPersona || p.identity || '未设置人设'}`
+      ).join("\n\n")
     : "无"
 }`;
 
@@ -2337,15 +2555,37 @@ async function generateForumCommentReply(postId, userComment) {
     )
     .join("\n");
 
+  // 获取世界书内容
+  const contextText = `${forumSettings.worldview}\n${post.content}\n${commentsContext}\n${userComment.content}`;
+  const worldbookContent = getForumWorldbookContent(contextText);
+  
+  // 决定由谁来回复（AI角色或路人）
+  let replier = null;
+  let replierPersona = '';
+  
+  // 40%概率由AI角色回复
+  if (forumSettings.aiParticipants.length > 0 && Math.random() < 0.4) {
+    const randomParticipant = forumSettings.aiParticipants[Math.floor(Math.random() * forumSettings.aiParticipants.length)];
+    const char = characters.find(c => String(c.id) === String(randomParticipant.charId));
+    replier = {
+      name: randomParticipant.nickname || char?.name || '角色',
+      avatar: randomParticipant.avatar || char?.avatar || '',
+      type: 'ai'
+    };
+    replierPersona = getCharacterFullPersona(randomParticipant);
+  }
+
   try {
     const prompt = `世界观：${forumSettings.worldview}
+${worldbookContent ? '\n世界书设定：\n' + worldbookContent : ''}
 帖子：${post.content}
 已有评论：
 ${commentsContext}
 
 用户 "${userComment.authorName}" 刚发了评论：${userComment.content}
 
-请你扮演一个网友回复这条评论。要求：
+${replier ? `请你扮演「${replier.name}」回复这条评论。\n角色人设：${replierPersona}\n要求：符合角色人设和性格特点` : '请你扮演一个网友回复这条评论'}
+要求：
 1. 符合世界观设定
 2. 一句简短的话
 3. 只输出回复内容，不要其他
@@ -2386,9 +2626,9 @@ ${commentsContext}
 
       post.comments.push({
         id: maxId + 1,
-        authorType: "npc",
-        authorName: npcNames[Math.floor(Math.random() * npcNames.length)],
-        authorAvatar: "",
+        authorType: replier ? replier.type : "npc",
+        authorName: replier ? replier.name : npcNames[Math.floor(Math.random() * npcNames.length)],
+        authorAvatar: replier ? replier.avatar : "",
         content: reply,
         replyTo: userComment.id, // 回复用户的评论
         replyToName: userComment.authorName,
@@ -2441,11 +2681,18 @@ async function generateMoreComments() {
   // 找出用户的评论，AI可能会回复这些
   const userComments = existingComments.filter((c) => c.authorType === "user");
 
-  // 收集AI参与者
-  const participants = forumSettings.aiParticipants.map((p) => {
-    const char = characters.find((c) => c.id === p.charId);
-    return p.nickname || char?.name || "角色";
+  // 收集AI参与者（带完整人设）
+  const participantsInfo = forumSettings.aiParticipants.map((p) => {
+    const char = characters.find((c) => String(c.id) === String(p.charId));
+    return {
+      name: p.nickname || char?.name || "角色",
+      fullPersona: getCharacterFullPersona(p)
+    };
   });
+  
+  // 获取世界书内容
+  const contextText = `${forumSettings.worldview}\n${post.content}\n${existingComments.map(c => c.content).join('\n')}`;
+  const worldbookContent = getForumWorldbookContent(contextText);
 
   try {
     // 处理转发帖子
@@ -2459,6 +2706,7 @@ async function generateMoreComments() {
     const prompt = `你是一个论坛评论生成器。
 
 【世界观】${forumSettings.worldview}
+${worldbookContent ? '\n【世界书/详细设定】\n' + worldbookContent : ''}
 
 【帖子内容】${post.content}${retweetInfo}
 
@@ -2476,17 +2724,21 @@ ${
 
 【用户信息】昵称：${forumSettings.userNickname || "用户"}
 
-【AI参与者】${participants.join("、") || "无"}
+【AI角色（请按人设说话）】
+${participantsInfo.length > 0 
+  ? participantsInfo.map((p, i) => `${i + 1}. ${p.name}\n人设：${p.fullPersona || '未设置'}`).join('\n\n')
+  : "无"}
 
 请生成2-4条新评论，要求：
 1. 只生成NPC或AI参与者的评论，绝对不要生成用户的评论
-2. 可以回复用户的评论（楼中楼互动）
-3. 可以回复其他NPC的评论
-4. 也可以是对帖子的新评论
-5. NPC要有符合世界观的随机昵称
-6. 返回纯JSON数组格式
-7. 禁止使用[爱心][笑哭]等方括号表情，必须用emoji❤️😂😊
-8. 如果是转发帖，评论要针对原帖内容或转发评论
+2. AI角色的评论必须符合其人设和性格特点！
+3. 可以回复用户的评论（楼中楼互动）
+4. 可以回复其他NPC的评论
+5. 也可以是对帖子的新评论
+6. NPC要有符合世界观的随机昵称
+7. 返回纯JSON数组格式
+8. 禁止使用[爱心][笑哭]等方括号表情，必须用emoji❤️😂😊
+9. 如果是转发帖，评论要针对原帖内容或转发评论
 
 JSON格式：
 [
@@ -3360,7 +3612,10 @@ async function generateTopicPosts(topic) {
   }
   
   try {
-    // 构建AI参与者信息
+    // 获取世界书内容
+    const worldbookContent = getForumWorldbookContent(`${forumSettings.worldview}\n${topic}`);
+    
+    // 构建AI参与者信息（使用完整人设）
     const participants = forumSettings.aiParticipants.map((p) => {
       const char = characters.find((c) => String(c.id) === String(p.charId));
       const settings = chatSettings[p.charId] || {};
@@ -3368,7 +3623,7 @@ async function generateTopicPosts(topic) {
         name: p.nickname || settings.charName || char?.name || "角色",
         handle: p.handle || generateEnglishHandle(p.nickname || char?.name || ''),
         identity: p.identity || "",
-        persona: settings.persona || char?.persona || "",
+        fullPersona: getCharacterFullPersona(p),
       };
     });
 
@@ -3392,6 +3647,7 @@ async function generateTopicPosts(topic) {
 
 【世界观】
 ${forumSettings.worldview || '现代都市'}
+${worldbookContent ? '\n【世界书/详细设定】\n' + worldbookContent : ''}
 
 【论坛名称】
 ${forumSettings.forumName || '广场'}
@@ -3403,11 +3659,11 @@ ${topic}
 - 昵称：${forumSettings.userNickname || "用户"}
 - 身份：${forumSettings.userIdentity || "普通成员"}
 
-【AI角色】可以使用这些角色发帖和评论
+【AI角色】可以使用这些角色发帖和评论，必须符合人设！
 ${participants.length > 0 
   ? participants.map((p, i) => 
-      `${i + 1}. ${p.name}（@${p.handle}）：${p.identity || '未设置身份'}${p.persona ? '，性格：' + p.persona.substring(0, 100) : ''}`
-    ).join("\n")
+      `${i + 1}. ${p.name}（@${p.handle}）\n${p.fullPersona || p.identity || '未设置人设'}`
+    ).join("\n\n")
   : "无"}`;
 
     if (npcs.length > 0) {
@@ -4496,7 +4752,7 @@ async function generateNewDirectMessages() {
   // 收集已知的人（AI角色和NPC）
   const knownPeople = [];
   
-  // AI角色
+  // AI角色（带完整人设）
   forumSettings.aiParticipants.forEach(p => {
     const char = characters.find(c => String(c.id) === String(p.charId));
     knownPeople.push({
@@ -4504,7 +4760,7 @@ async function generateNewDirectMessages() {
       name: p.nickname || char?.name || '角色',
       avatar: p.avatar || char?.avatar || '',
       identity: p.identity || '',
-      persona: char?.persona || '',
+      fullPersona: getCharacterFullPersona(p), // 使用完整人设
       type: 'ai',
     });
   });
@@ -4527,19 +4783,24 @@ async function generateNewDirectMessages() {
     .slice(0, 3)
     .map(p => p.content?.substring(0, 50));
   
+  // 获取世界书内容
+  const contextText = `${forumSettings.worldview}\n${userPosts.join('\n')}`;
+  const worldbookContent = getForumWorldbookContent(contextText);
+  
   try {
     const prompt = `你是一个私信生成器。请生成3-5条来自不同人的私信。
 
 【世界观】${forumSettings.worldview || '现代都市'}
+${worldbookContent ? '\n【世界书/详细设定】\n' + worldbookContent : ''}
 
 【用户信息】
 - 昵称：${forumSettings.userNickname || '用户'}
 - 身份：${forumSettings.userIdentity || '普通用户'}
 - 最近发帖：${userPosts.join('; ') || '无'}
 
-【已知的人物】
+【已知的人物（请按人设发私信）】
 ${knownPeople.length > 0 
-  ? knownPeople.map((s, i) => `${i + 1}. ${s.name}：${s.identity || '普通用户'}${s.persona ? '，性格：' + s.persona.substring(0, 50) : ''}`).join('\n')
+  ? knownPeople.map((s, i) => `${i + 1}. ${s.name}\n人设：${s.fullPersona || s.identity || '普通用户'}`).join('\n\n')
   : '无'}
 
 【人物关系】
@@ -4555,13 +4816,13 @@ ${(forumSettings.relationships || []).map(rel => {
     "senderName": "发送者昵称（可以是已知人物或随机网友）",
     "senderType": "known/random",
     "knownIndex": 如果是已知人物填序号(从0开始)否则填null,
-    "content": "私信内容"
+    "content": "私信内容（必须符合该角色的人设和性格）"
   }
 ]
 
 要求：
 1. 生成3-5条来自【不同的人】的私信！每条私信来自不同的人
-2. 可以包含已知人物的私信，也可以包含随机网友的私信
+2. 已知人物发的私信必须符合其人设和性格特点！
 3. 随机网友要有符合世界观的昵称，如"吃瓜小能手"、"路人甲"等
 4. 私信内容可以是：问候、对用户帖子的私下评论、请教问题、分享趣事、搭讪等
 5. 禁止使用[表情]格式，直接用emoji😊❤️
@@ -4777,24 +5038,23 @@ async function generateDMReply() {
   
   showToast("正在生成回复...");
   
-  // 获取对方信息
-  let senderInfo = { name: conversation.name, identity: '', persona: '' };
+  // 获取对方信息（使用完整人设）
+  let senderInfo = { name: conversation.name, identity: '', fullPersona: '' };
   
   // 检查是AI还是NPC
   if (conversation.id.startsWith('ai_')) {
     const charId = conversation.id.replace('ai_', '');
     const participant = forumSettings.aiParticipants.find(p => String(p.charId) === charId);
-    const char = characters.find(c => String(c.id) === charId);
     if (participant) {
       senderInfo.identity = participant.identity || '';
-      senderInfo.persona = char?.persona || '';
+      senderInfo.fullPersona = getCharacterFullPersona(participant); // 使用完整人设
     }
   } else if (conversation.id.startsWith('npc_')) {
     const npcId = conversation.id.replace('npc_', '');
     const npc = (forumSettings.npcs || []).find(n => String(n.id) === npcId);
     if (npc) {
       senderInfo.identity = npc.identity || '';
-      senderInfo.persona = npc.persona || '';
+      senderInfo.fullPersona = npc.persona || '';
     }
   }
   
@@ -4803,14 +5063,18 @@ async function generateDMReply() {
     `${m.sender === 'user' ? forumSettings.userNickname || '用户' : conversation.name}：${m.content}`
   ).join('\n');
   
+  // 获取世界书内容
+  const contextText = `${forumSettings.worldview}\n${recentMessages}`;
+  const worldbookContent = getForumWorldbookContent(contextText);
+  
   try {
     const prompt = `你正在扮演 ${conversation.name} 与用户私信聊天。
 
 【世界观】${forumSettings.worldview}
+${worldbookContent ? '\n【世界书/详细设定】\n' + worldbookContent : ''}
 
-【${conversation.name}的信息】
-- 身份：${senderInfo.identity || '普通用户'}
-- 性格：${senderInfo.persona || '友好'}
+【${conversation.name}的完整人设】
+${senderInfo.fullPersona || senderInfo.identity || '普通用户'}
 
 【用户信息】
 - 昵称：${forumSettings.userNickname || '用户'}
@@ -4820,7 +5084,7 @@ async function generateDMReply() {
 ${recentMessages}
 
 请以${conversation.name}的身份回复最后一条消息。要求：
-1. 符合角色性格
+1. 必须符合角色的人设和性格特点！
 2. 自然、简短
 3. 禁止使用[表情]格式，用emoji代替
 4. 只输出回复内容`;
@@ -5239,6 +5503,14 @@ window.openDirectMessageChat = openDirectMessageChat;
 window.renderDirectMessageChat = renderDirectMessageChat;
 window.sendDirectMessage = sendDirectMessage;
 window.generateDMReply = generateDMReply;
+// 世界书绑定相关
+window.renderForumWorldbookBindings = renderForumWorldbookBindings;
+window.openForumWorldbookSelector = openForumWorldbookSelector;
+window.closeForumWorldbookSelector = closeForumWorldbookSelector;
+window.addForumWorldbook = addForumWorldbook;
+window.removeForumWorldbook = removeForumWorldbook;
+window.getForumWorldbookContent = getForumWorldbookContent;
+window.getCharacterFullPersona = getCharacterFullPersona;
 
 // 页面加载时初始化
 if (document.readyState === "loading") {

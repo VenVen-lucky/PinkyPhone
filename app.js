@@ -1616,11 +1616,11 @@ function switchChatTab(tabName) {
     createGroupBtn.style.display = tabName === "messages" ? "" : "none";
   }
 
-  // 控制顶栏显示（Moment和Me页面隐藏顶栏）
+  // 控制顶栏显示（Moment、Todo和Me页面隐藏顶栏）
   const chatHeader = document.querySelector(".chat-app > .chat-header");
   if (chatHeader) {
     chatHeader.style.display =
-      tabName === "moments" || tabName === "profile" ? "none" : "";
+      tabName === "moments" || tabName === "profile" || tabName === "todo" ? "none" : "";
   }
 
   // 切换到moments时清除朋友圈小红点
@@ -1654,8 +1654,8 @@ function switchChatTab(tabName) {
     chatContent.style.overflowY = "auto";
   } else if (tabName === "todo") {
     chatApp.style.backgroundImage = "none";
-    chatApp.style.background = "#fffafa";
-    chatContent.style.background = "#fffafa";
+    chatApp.style.background = "#fdf8f9";
+    chatContent.style.background = "#fdf8f9";
     tabBar.style.background = "rgba(255, 255, 255, 0.25)";
     tabBar.style.backdropFilter = "blur(30px) saturate(180%)";
     tabBar.style.webkitBackdropFilter = "blur(30px) saturate(180%)";
@@ -1671,11 +1671,11 @@ function switchChatTab(tabName) {
     chatContent.style.overflowY = "hidden";
   }
 
-  // 切换到待办标签时刷新AI角色列表和日期
+  // 切换到待办标签时刷新
   if (tabName === "todo") {
+    if (typeof renderTodoWeekCalendar === "function") renderTodoWeekCalendar();
+    if (typeof renderTodoQuadrants === "function") renderTodoQuadrants();
     if (typeof renderTodoAiCharList === "function") renderTodoAiCharList();
-    if (typeof updateTodoDate === "function") updateTodoDate();
-    if (typeof updateTodoStats === "function") updateTodoStats();
   }
 }
 
@@ -19472,25 +19472,16 @@ function advanceReadingProgress() {
   // 已禁用自动翻页功能，用户手动翻页
 }
 
-// ==================== 待办事项功能（支持重复任务） ====================
+
+
+// ==================== 待办事项功能（四象限月历版） ====================
 window.todoList = [];
 window.todoAiBindings = {};
-window.currentTodoFilter = "all";
-window.lastTodoResetDate = null;
-
-// 默认分类（无emoji）
-window.todoCategories = [
-  { id: "self", name: "自我" },
-  { id: "health", name: "健康" },
-  { id: "study", name: "学习" },
-  { id: "work", name: "工作" },
-  { id: "life", name: "生活" },
-];
-
-// 自定义设置
-window.todoSettings = {
-  greeting: { main: "今天也要加油", sub: "新的一天，新的开始" },
-};
+window.selectedTodoDate = new Date();
+window.todoCurrentYear = new Date().getFullYear();
+window.todoCurrentMonth = new Date().getMonth();
+window.todoPickerYear = new Date().getFullYear();
+window.todoPickerMonth = new Date().getMonth();
 
 // 重复类型
 const REPEAT_TYPES = {
@@ -19508,215 +19499,307 @@ async function initTodoSystem() {
     const savedBindings = await safeLocalforageGet("todoAiBindings");
     window.todoAiBindings = savedBindings || {};
 
-    const savedCategories = await safeLocalforageGet("todoCategories");
-    if (savedCategories && savedCategories.length > 0) {
-      window.todoCategories = savedCategories;
-    }
-
-    const savedSettings = await safeLocalforageGet("todoSettings");
-    if (savedSettings) {
-      window.todoSettings = { ...window.todoSettings, ...savedSettings };
-    }
-
-    const savedResetDate = await safeLocalforageGet("lastTodoResetDate");
-    window.lastTodoResetDate = savedResetDate;
-
-    // 检查并重置重复任务
-    await checkAndResetRepeatingTodos();
-
-    renderTodoFilterBar();
-    renderTodoList();
+    // 重置重复任务
+    await resetRepeatTodos();
+    
+    // 渲染UI
+    renderTodoCalendar();
+    renderTodoQuadrants();
     renderTodoAiCharList();
-    updateTodoDate();
-    updateTodoStats();
   } catch (e) {
     console.error("待办初始化失败", e);
   }
 }
 
-// 检查并重置重复任务
-async function checkAndResetRepeatingTodos() {
+// 重置重复任务
+async function resetRepeatTodos() {
   const today = new Date().toDateString();
-
-  if (window.lastTodoResetDate === today) return;
-
-  const now = new Date();
-  const dayOfWeek = now.getDay(); // 0=周日, 1-5=工作日, 6=周六
-  const isWeekday = dayOfWeek >= 1 && dayOfWeek <= 5;
-
-  let hasChanges = false;
+  const lastReset = await safeLocalforageGet("lastTodoResetDate");
+  if (lastReset === today) return;
 
   window.todoList.forEach((todo) => {
     if (!todo.repeat || todo.repeat === "none") return;
-
+    
+    const now = new Date();
     let shouldReset = false;
-
+    
     switch (todo.repeat) {
       case "daily":
         shouldReset = true;
         break;
       case "weekday":
-        shouldReset = isWeekday;
+        const day = now.getDay();
+        shouldReset = day >= 1 && day <= 5;
         break;
       case "weekly":
-        // 每周一重置
-        shouldReset = dayOfWeek === 1;
+        shouldReset = now.getDay() === 1;
         break;
     }
-
+    
     if (shouldReset && todo.done) {
       todo.done = false;
       todo.doneAt = null;
       todo.lastResetDate = today;
-      hasChanges = true;
     }
   });
 
-  if (hasChanges) {
-    await localforage.setItem("todoList", window.todoList);
-  }
-
-  window.lastTodoResetDate = today;
+  await localforage.setItem("todoList", window.todoList);
   await localforage.setItem("lastTodoResetDate", today);
 }
 
-function updateTodoDate() {
-  const now = new Date();
-  const dayEl = document.getElementById("todoDateDay");
-  const infoEl = document.getElementById("todoDateInfo");
-  const weekdays = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
-
-  if (dayEl) dayEl.textContent = now.getDate();
-  if (infoEl)
-    infoEl.textContent = now.getMonth() + 1 + "月 " + weekdays[now.getDay()];
-
-  const greeting = window.todoSettings.greeting || {
-    main: "今天也要加油",
-    sub: "",
-  };
-  const greetingEl = document.getElementById("todoGreeting");
-  const subEl = document.getElementById("todoGreetingSub");
-  if (greetingEl) greetingEl.textContent = greeting.main;
-  if (subEl) subEl.textContent = greeting.sub;
+// 月份导航
+function todoNavMonth(dir) {
+  window.todoCurrentMonth += dir;
+  if (window.todoCurrentMonth > 11) {
+    window.todoCurrentMonth = 0;
+    window.todoCurrentYear++;
+  } else if (window.todoCurrentMonth < 0) {
+    window.todoCurrentMonth = 11;
+    window.todoCurrentYear--;
+  }
+  
+  // 更新选中日期为该月1号
+  window.selectedTodoDate = new Date(window.todoCurrentYear, window.todoCurrentMonth, 1);
+  
+  renderTodoCalendar();
+  renderTodoQuadrants();
 }
 
-function updateTodoStats() {
-  const total = window.todoList.length;
-  const done = window.todoList.filter((t) => t.done).length;
-  const totalEl = document.getElementById("todoStatTotal");
-  const doneEl = document.getElementById("todoStatDone");
-  const pendingEl = document.getElementById("todoStatPending");
-  if (totalEl) totalEl.textContent = total;
-  if (doneEl) doneEl.textContent = done;
-  if (pendingEl) pendingEl.textContent = total - done;
+function todoGoToday() {
+  const today = new Date();
+  window.todoCurrentYear = today.getFullYear();
+  window.todoCurrentMonth = today.getMonth();
+  window.selectedTodoDate = today;
+  
+  renderTodoCalendar();
+  renderTodoQuadrants();
+  
+  // 滚动到今天
+  setTimeout(() => {
+    const todayEl = document.querySelector('.todo-day-item.today');
+    if (todayEl) {
+      todayEl.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
+  }, 100);
 }
 
-function renderTodoFilterBar() {
-  const bar = document.getElementById("todoFilterBar");
-  if (!bar) return;
-
-  let html = `<button class="todo-filter-btn ${
-    window.currentTodoFilter === "all" ? "active" : ""
-  }" onclick="filterTodos('all')">全部</button>`;
-  window.todoCategories.forEach((cat) => {
-    html += `<button class="todo-filter-btn ${
-      window.currentTodoFilter === cat.id ? "active" : ""
-    }" onclick="filterTodos('${cat.id}')">${cat.name}</button>`;
-  });
-  bar.innerHTML = html;
-}
-
-function filterTodos(filter) {
-  window.currentTodoFilter = filter;
-  renderTodoFilterBar();
-  renderTodoList();
-}
-
-function renderTodoList() {
-  const container = document.getElementById("todoListContainer");
+// 渲染月日历（可滑动）
+function renderTodoCalendar() {
+  const container = document.getElementById("todoCalendarScroll");
+  const monthText = document.getElementById("todoMonthText");
   if (!container) return;
 
-  let todos = window.todoList;
-  if (window.currentTodoFilter !== "all") {
-    todos = todos.filter((t) => t.tag === window.currentTodoFilter);
+  const year = window.todoCurrentYear;
+  const month = window.todoCurrentMonth;
+  const today = new Date();
+  
+  // 获取当月天数
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const weekdays = ["日", "一", "二", "三", "四", "五", "六"];
+  
+  let html = "";
+  
+  for (let day = 1; day <= daysInMonth; day++) {
+    const date = new Date(year, month, day);
+    const dayOfWeek = date.getDay();
+    
+    const isToday = date.toDateString() === today.toDateString();
+    const isSelected = date.toDateString() === window.selectedTodoDate.toDateString();
+    const hasTasks = window.todoList.some(t => {
+      if (t.repeat && t.repeat !== "none") return true;
+      const taskDate = new Date(t.createdAt);
+      return taskDate.toDateString() === date.toDateString();
+    });
+
+    html += `
+      <div class="todo-day-item ${isSelected ? 'selected' : ''} ${isToday ? 'today' : ''} ${hasTasks ? 'has-tasks' : ''}"
+           onclick="selectTodoDate(${year}, ${month}, ${day})">
+        <div class="todo-day-weekday">${weekdays[dayOfWeek]}</div>
+        <div class="todo-day-num">${day}</div>
+        <div class="todo-day-dot"></div>
+      </div>
+    `;
   }
 
-  if (todos.length === 0) {
-    container.innerHTML = `
-      <div class="todo-empty">
-        <div class="todo-empty-icon">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M9 11l3 3L22 4"></path>
-            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
-          </svg>
-        </div>
-        <div class="todo-empty-text">还没有待办事项</div>
-        <div class="todo-empty-hint">点击下方按钮添加</div>
-      </div>`;
-    return;
+  container.innerHTML = html;
+
+  // 更新月份显示
+  if (monthText) {
+    monthText.textContent = `${year}年${month + 1}月`;
+  }
+  
+  // 滚动到选中日期
+  setTimeout(() => {
+    const selectedEl = container.querySelector('.todo-day-item.selected');
+    if (selectedEl) {
+      selectedEl.scrollIntoView({ behavior: 'auto', inline: 'center', block: 'nearest' });
+    }
+  }, 50);
+}
+
+function selectTodoDate(year, month, day) {
+  window.selectedTodoDate = new Date(year, month, day);
+  window.todoCurrentYear = year;
+  window.todoCurrentMonth = month;
+  renderTodoCalendar();
+  renderTodoQuadrants();
+}
+
+// 年月选择器
+function openTodoDatePicker() {
+  window.todoPickerYear = window.todoCurrentYear;
+  window.todoPickerMonth = window.todoCurrentMonth;
+  renderTodoDatePicker();
+  document.getElementById("todoDatePickerOverlay")?.classList.add("active");
+}
+
+function closeTodoDatePicker() {
+  document.getElementById("todoDatePickerOverlay")?.classList.remove("active");
+}
+
+function renderTodoDatePicker() {
+  const yearPicker = document.getElementById("todoYearPicker");
+  const monthPicker = document.getElementById("todoMonthPicker");
+  if (!yearPicker || !monthPicker) return;
+
+  // 年份列表（前后10年）
+  const currentYear = new Date().getFullYear();
+  let yearHtml = "";
+  for (let y = currentYear - 10; y <= currentYear + 10; y++) {
+    yearHtml += `<div class="todo-picker-item ${y === window.todoPickerYear ? 'selected' : ''}" 
+                     onclick="selectTodoPickerYear(${y})">${y}年</div>`;
+  }
+  yearPicker.innerHTML = yearHtml;
+
+  // 月份列表
+  let monthHtml = "";
+  for (let m = 0; m < 12; m++) {
+    monthHtml += `<div class="todo-picker-item ${m === window.todoPickerMonth ? 'selected' : ''}"
+                      onclick="selectTodoPickerMonth(${m})">${m + 1}月</div>`;
+  }
+  monthPicker.innerHTML = monthHtml;
+
+  // 滚动到选中项
+  setTimeout(() => {
+    yearPicker.querySelector('.selected')?.scrollIntoView({ block: 'center' });
+    monthPicker.querySelector('.selected')?.scrollIntoView({ block: 'center' });
+  }, 50);
+}
+
+function selectTodoPickerYear(year) {
+  window.todoPickerYear = year;
+  renderTodoDatePicker();
+}
+
+function selectTodoPickerMonth(month) {
+  window.todoPickerMonth = month;
+  renderTodoDatePicker();
+}
+
+function confirmTodoDatePicker() {
+  window.todoCurrentYear = window.todoPickerYear;
+  window.todoCurrentMonth = window.todoPickerMonth;
+  window.selectedTodoDate = new Date(window.todoPickerYear, window.todoPickerMonth, 1);
+  closeTodoDatePicker();
+  renderTodoCalendar();
+  renderTodoQuadrants();
+}
+
+// 渲染四象限
+function renderTodoQuadrants() {
+  const q1List = document.getElementById("todoQ1List");
+  const q2List = document.getElementById("todoQ2List");
+  const q3List = document.getElementById("todoQ3List");
+  const q4List = document.getElementById("todoQ4List");
+  
+  if (!q1List || !q2List || !q3List || !q4List) return;
+
+  const selectedDateStr = window.selectedTodoDate.toDateString();
+  
+  // 筛选当天的任务
+  const todayTodos = window.todoList.filter(t => {
+    // 重复任务每天都显示
+    if (t.repeat && t.repeat !== "none") return true;
+    const taskDate = new Date(t.createdAt);
+    return taskDate.toDateString() === selectedDateStr;
+  });
+
+  // 按象限分类
+  const q1 = todayTodos.filter(t => t.quadrant === "q1");
+  const q2 = todayTodos.filter(t => t.quadrant === "q2");
+  const q3 = todayTodos.filter(t => t.quadrant === "q3");
+  const q4 = todayTodos.filter(t => t.quadrant === "q4" || !t.quadrant);
+
+  q1List.innerHTML = renderQuadrantTasks(q1);
+  q2List.innerHTML = renderQuadrantTasks(q2);
+  q3List.innerHTML = renderQuadrantTasks(q3);
+  q4List.innerHTML = renderQuadrantTasks(q4);
+}
+
+function renderQuadrantTasks(tasks) {
+  if (tasks.length === 0) {
+    return `
+      <div class="quadrant-empty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M8 12h8"></path>
+        </svg>
+        <span>暂无任务</span>
+      </div>
+    `;
   }
 
-  // 排序：未完成在前，然后按创建时间
-  todos = [...todos].sort((a, b) => {
+  // 排序：未完成在前
+  tasks = [...tasks].sort((a, b) => {
     if (a.done !== b.done) return a.done ? 1 : -1;
     return b.createdAt - a.createdAt;
   });
 
-  let html = "";
-  todos.forEach((todo) => {
-    const cat = window.todoCategories.find((c) => c.id === todo.tag) || {
-      name: "其他",
-    };
-    const repeatLabel =
-      todo.repeat && todo.repeat !== "none" ? REPEAT_TYPES[todo.repeat] : "";
-
-    html += `
-      <div class="todo-item ${todo.done ? "done" : ""}" data-id="${todo.id}">
-        <div class="todo-checkbox" onclick="toggleTodoDone('${todo.id}')">${
-      todo.done ? "✓" : ""
-    }</div>
-        <div class="todo-content" onclick="toggleTodoDone('${todo.id}')">
-          <div class="todo-text">${escapeHtml(todo.text)}</div>
-          <div class="todo-meta">
-            <span class="todo-time">${formatTodoTime(todo.createdAt)}</span>
-            ${
-              repeatLabel
-                ? `<span class="todo-repeat-badge"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 1l4 4-4 4"></path><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><path d="M7 23l-4-4 4-4"></path><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>${repeatLabel}</span>`
-                : ""
-            }
+  return tasks.map(todo => {
+    const repeatLabel = todo.repeat && todo.repeat !== "none" ? REPEAT_TYPES[todo.repeat] : "";
+    
+    return `
+      <div class="quadrant-task ${todo.done ? 'done' : ''}" data-id="${todo.id}">
+        <div class="quadrant-task-checkbox" onclick="toggleTodoDone('${todo.id}')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+        <div class="quadrant-task-content" onclick="toggleTodoDone('${todo.id}')">
+          <div class="quadrant-task-text">${escapeHtml(todo.text)}</div>
+          <div class="quadrant-task-meta">
+            <span class="quadrant-task-time">${formatTodoTime(todo.createdAt)}</span>
+            ${repeatLabel ? `<span class="quadrant-task-repeat">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 1l4 4-4 4"></path>
+                <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+                <path d="M7 23l-4-4 4-4"></path>
+                <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+              </svg>
+              ${repeatLabel}
+            </span>` : ''}
           </div>
         </div>
-        <div class="todo-tag">${cat.name}</div>
-        <div class="todo-actions">
-          <button class="todo-action-btn delete" onclick="deleteTodoItem('${
-            todo.id
-          }')">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </button>
-        </div>
-      </div>`;
-  });
-  container.innerHTML = html;
+        <button class="quadrant-task-delete" onclick="deleteTodoItem('${todo.id}')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    `;
+  }).join("");
 }
 
 function formatTodoTime(ts) {
-  const d = new Date(ts),
-    now = new Date();
+  const d = new Date(ts), now = new Date();
   if (d.toDateString() === now.toDateString()) {
-    return (
-      "今天 " +
-      d.getHours().toString().padStart(2, "0") +
-      ":" +
-      d.getMinutes().toString().padStart(2, "0")
-    );
+    return "今天 " + d.getHours().toString().padStart(2, "0") + ":" + d.getMinutes().toString().padStart(2, "0");
   }
   const y = new Date(now);
   y.setDate(y.getDate() - 1);
   if (d.toDateString() === y.toDateString()) return "昨天";
-  return d.getMonth() + 1 + "/" + d.getDate();
+  return (d.getMonth() + 1) + "/" + d.getDate();
 }
 
 function escapeHtml(t) {
@@ -19725,54 +19808,36 @@ function escapeHtml(t) {
   return d.innerHTML;
 }
 
+// 弹窗
 function openTodoModal() {
   const modal = document.getElementById("todoModalOverlay");
   if (modal) {
     modal.classList.add("active");
     document.getElementById("todoInputText").value = "";
-    renderTodoTagSelect();
+    
+    // 重置象限选择
+    document.querySelectorAll(".todo-quadrant-option").forEach(el => el.classList.remove("selected"));
+    document.querySelector('.todo-quadrant-option[data-quadrant="q1"]')?.classList.add("selected");
+    
     // 重置重复选择
-    document
-      .querySelectorAll(".todo-repeat-item")
-      .forEach((el) => el.classList.remove("selected"));
-    document
-      .querySelector('.todo-repeat-item[data-repeat="none"]')
-      ?.classList.add("selected");
-    document.getElementById("todoInputText").focus();
+    document.querySelectorAll(".todo-repeat-item").forEach(el => el.classList.remove("selected"));
+    document.querySelector('.todo-repeat-item[data-repeat="none"]')?.classList.add("selected");
+    
+    setTimeout(() => document.getElementById("todoInputText")?.focus(), 100);
   }
-}
-
-function renderTodoTagSelect() {
-  const container = document.getElementById("todoTagSelect");
-  if (!container) return;
-  let html = "";
-  window.todoCategories.forEach((cat, i) => {
-    html += `<div class="todo-category-item ${
-      i === 0 ? "selected" : ""
-    }" data-tag="${
-      cat.id
-    }" onclick="selectTodoTag(this)"><div class="todo-category-name">${
-      cat.name
-    }</div></div>`;
-  });
-  container.innerHTML = html;
 }
 
 function closeTodoModal() {
   document.getElementById("todoModalOverlay")?.classList.remove("active");
 }
 
-function selectTodoTag(el) {
-  document
-    .querySelectorAll(".todo-category-item")
-    .forEach((o) => o.classList.remove("selected"));
+function selectTodoQuadrant(el) {
+  document.querySelectorAll(".todo-quadrant-option").forEach(o => o.classList.remove("selected"));
   el.classList.add("selected");
 }
 
 function selectTodoRepeat(el) {
-  document
-    .querySelectorAll(".todo-repeat-item")
-    .forEach((o) => o.classList.remove("selected"));
+  document.querySelectorAll(".todo-repeat-item").forEach(o => o.classList.remove("selected"));
   el.classList.add("selected");
 }
 
@@ -19783,10 +19848,8 @@ async function saveTodoItem() {
     return;
   }
 
-  const tagEl = document.querySelector(".todo-category-item.selected");
-  const tag = tagEl
-    ? tagEl.dataset.tag
-    : window.todoCategories[0]?.id || "self";
+  const quadrantEl = document.querySelector(".todo-quadrant-option.selected");
+  const quadrant = quadrantEl ? quadrantEl.dataset.quadrant : "q4";
 
   const repeatEl = document.querySelector(".todo-repeat-item.selected");
   const repeat = repeatEl ? repeatEl.dataset.repeat : "none";
@@ -19794,73 +19857,80 @@ async function saveTodoItem() {
   window.todoList.push({
     id: "todo_" + Date.now(),
     text,
-    tag,
+    quadrant,
     repeat,
     done: false,
-    createdAt: Date.now(),
+    createdAt: window.selectedTodoDate.getTime(),
   });
 
   await localforage.setItem("todoList", window.todoList);
   closeTodoModal();
-  renderTodoList();
-  updateTodoStats();
+  renderTodoCalendar();
+  renderTodoQuadrants();
   showToast("添加成功");
 }
 
 async function toggleTodoDone(id) {
-  const todo = window.todoList.find((t) => t.id === id);
+  const todo = window.todoList.find(t => t.id === id);
   if (todo) {
     const wasDone = todo.done;
     todo.done = !todo.done;
     todo.doneAt = todo.done ? Date.now() : null;
     await localforage.setItem("todoList", window.todoList);
-    renderTodoList();
-    updateTodoStats();
+    renderTodoQuadrants();
 
     if (todo.done && !wasDone) {
       showToast("完成一项");
-      notifyAiTodoCompleted(todo);
+      // 触发AI督促通知
+      triggerTodoAiNotification(todo);
     }
   }
 }
 
-async function notifyAiTodoCompleted(todo) {
-  const bindingIds = Object.keys(window.todoAiBindings).filter(
-    (id) => window.todoAiBindings[id]
-  );
+async function deleteTodoItem(id) {
+  window.todoList = window.todoList.filter(t => t.id !== id);
+  await localforage.setItem("todoList", window.todoList);
+  renderTodoCalendar();
+  renderTodoQuadrants();
+  showToast("已删除");
+}
+
+// AI督促 - 完成任务后发送消息到聊天
+async function triggerTodoAiNotification(todo) {
+  const bindingIds = Object.keys(window.todoAiBindings).filter(id => window.todoAiBindings[id]);
   if (bindingIds.length === 0) return;
 
-  const category = window.todoCategories.find((c) => c.id === todo.tag);
-  const categoryName = category ? category.name : "其他";
+  const quadrantNames = {
+    q1: "重要且紧急",
+    q2: "重要不紧急", 
+    q3: "紧急不重要",
+    q4: "不重要不紧急"
+  };
+  const categoryName = quadrantNames[todo.quadrant] || "其他";
 
   for (const charId of bindingIds) {
-    const char = characters.find((c) => String(c.id) === charId);
+    const char = characters.find(c => String(c.id) === charId);
     if (!char) continue;
 
+    // 获取聊天设置和API配置
     const settings = chatSettings[charId] || {};
-    const apiPreset =
-      apiPresets.find((p) => p.id === settings.apiPreset) || apiPresets[0];
+    const apiPreset = apiPresets.find(p => p.id === settings.apiPreset) || apiPresets[0];
 
     if (!apiPreset || !apiPreset.key) {
       console.log("未配置API，跳过待办完成通知");
       continue;
     }
 
+    // 构建API请求
     let apiUrl = apiPreset.url.replace(/\/$/, "");
     if (!apiUrl.endsWith("/chat/completions")) {
-      if (apiUrl.endsWith("/v1")) {
-        apiUrl += "/chat/completions";
-      } else if (!apiUrl.includes("/chat/completions")) {
-        apiUrl += "/v1/chat/completions";
-      }
+      apiUrl += "/chat/completions";
     }
 
-    const persona = settings.persona || `你是${char.name}，一个友善的AI助手。`;
-    const systemPrompt = `${persona}\n\n【重要】用1句话简短地夸奖或鼓励用户完成了待办事项，语气要符合你的人设，不要太长。`;
-    const userMessage = `用户刚刚完成了待办事项「${todo.text}」(分类:${categoryName})，请夸奖鼓励:`;
+    const prompt = `用户刚刚完成了一个待办事项：「${todo.text}」（分类：${categoryName}）。请用简短温馨的话鼓励用户，表达你对ta完成任务的认可，不超过50字，符合你的性格特点。`;
 
     try {
-      const response = await fetch(apiUrl, {
+      const resp = await fetch(apiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -19869,300 +19939,123 @@ async function notifyAiTodoCompleted(todo) {
         body: JSON.stringify({
           model: apiPreset.model,
           messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: userMessage },
+            { role: "system", content: char.systemPrompt || "你是一个温柔的AI助手。" },
+            { role: "user", content: prompt },
           ],
-          temperature: 0.8,
-          stream: false,
+          max_tokens: 150,
         }),
       });
 
-      if (!response.ok) continue;
-
-      const data = await response.json();
-      let aiReply = data.choices?.[0]?.message?.content;
-
-      if (aiReply) {
-        const numCharId = parseInt(charId) || charId;
-        let history = chatHistories[numCharId] || [];
-        history.push({
-          role: "assistant",
-          content: aiReply,
-          timestamp: Date.now(),
-        });
-        chatHistories[numCharId] = history;
-        await localforage.setItem("chatHistories", chatHistories);
+      if (resp.ok) {
+        const data = await resp.json();
+        const reply = data.choices?.[0]?.message?.content?.trim();
+        if (reply) {
+          // 添加消息到聊天记录
+          await addTodoNotificationToChat(charId, char, todo, reply);
+          showToast(`${char.name} 发来鼓励~`);
+        }
       }
     } catch (e) {
-      console.error("待办完成通知失败:", e);
+      console.log("AI督促通知失败", e);
     }
   }
 }
 
-async function deleteTodoItem(id) {
-  if (!confirm("确定删除这条待办？")) return;
-  window.todoList = window.todoList.filter((t) => t.id !== id);
-  await localforage.setItem("todoList", window.todoList);
-  renderTodoList();
-  updateTodoStats();
-  showToast("已删除");
+// 将督促消息添加到聊天记录
+async function addTodoNotificationToChat(charId, char, todo, reply) {
+  // 获取聊天记录
+  let history = await safeLocalforageGet(`chat_${charId}`) || [];
+  
+  // 添加系统提示消息（用户完成任务）
+  const userAction = {
+    role: "system",
+    content: `[用户完成了待办事项：${todo.text}]`,
+    timestamp: Date.now() - 1000,
+    isNotification: true
+  };
+  
+  // 添加AI回复消息
+  const aiReply = {
+    role: "assistant",
+    content: reply,
+    timestamp: Date.now(),
+    isNotification: true,
+    notificationType: "todo_complete"
+  };
+  
+  history.push(userAction, aiReply);
+  await localforage.setItem(`chat_${charId}`, history);
+  
+  // 更新消息列表显示
+  if (typeof renderMessageList === "function") {
+    renderMessageList();
+  }
 }
 
 function renderTodoAiCharList() {
   const container = document.getElementById("todoAiCharList");
   if (!container) return;
+
   if (!characters || characters.length === 0) {
-    container.innerHTML = `<div class="todo-ai-empty">还没有创建角色</div>`;
+    container.innerHTML = '<div class="todo-ai-empty">还没有创建角色</div>';
     return;
   }
+
   let html = "";
-  characters.forEach((char) => {
-    const charId = String(char.id);
-    const isActive = window.todoAiBindings[charId];
+  characters.forEach(char => {
+    const isActive = window.todoAiBindings[char.id];
     const avatar = char.avatar
-      ? `<img src="${char.avatar}" alt="">`
-      : char.name
-      ? char.name.charAt(0)
-      : "?";
-    html += `<div class="todo-ai-item ${
-      isActive ? "active" : ""
-    }" onclick="toggleTodoAiBinding('${charId}')"><div class="todo-ai-avatar">${avatar}</div><span class="todo-ai-name">${
-      char.name || "未命名"
-    }</span></div>`;
+      ? `<img src="${char.avatar}" />`
+      : char.name.charAt(0);
+
+    html += `
+      <div class="todo-ai-item ${isActive ? 'active' : ''}" onclick="toggleTodoAiBinding('${char.id}')">
+        <div class="todo-ai-avatar">${avatar}</div>
+        <div class="todo-ai-name">${char.name}</div>
+      </div>
+    `;
   });
+
   container.innerHTML = html;
 }
 
 async function toggleTodoAiBinding(charId) {
-  if (window.todoAiBindings[charId]) {
-    delete window.todoAiBindings[charId];
-    showToast("已取消督促");
-  } else {
-    window.todoAiBindings[charId] = true;
-    const char = characters.find((c) => String(c.id) === charId);
-    showToast(`${char?.name || "TA"}会督促你完成待办`);
-    aiGreetForTodoBinding(charId);
-  }
+  window.todoAiBindings[charId] = !window.todoAiBindings[charId];
   await localforage.setItem("todoAiBindings", window.todoAiBindings);
   renderTodoAiCharList();
+  showToast(window.todoAiBindings[charId] ? "已绑定督促助手" : "已取消绑定");
 }
 
-async function aiGreetForTodoBinding(charId) {
-  const char = characters.find((c) => String(c.id) === charId);
-  if (!char) return;
-
-  const pending = window.todoList.filter((t) => !t.done);
-  const todoSummary =
-    pending.length > 0
-      ? pending
-          .slice(0, 5)
-          .map((t) => `「${t.text}」`)
-          .join("、") + (pending.length > 5 ? "等" : "")
-      : "暂无待办事项";
-
-  const settings = chatSettings[charId] || {};
-  const apiPreset =
-    apiPresets.find((p) => p.id === settings.apiPreset) || apiPresets[0];
-
-  if (!apiPreset || !apiPreset.key) {
-    console.log("未配置API，跳过AI问候");
-    return;
-  }
-
-  let apiUrl = apiPreset.url.replace(/\/$/, "");
-  if (!apiUrl.endsWith("/chat/completions")) {
-    if (apiUrl.endsWith("/v1")) {
-      apiUrl += "/chat/completions";
-    } else if (!apiUrl.includes("/chat/completions")) {
-      apiUrl += "/v1/chat/completions";
-    }
-  }
-
-  const persona = settings.persona || `你是${char.name}，一个友善的AI助手。`;
-  const systemPrompt = `${persona}\n\n【重要】直接用1-2句话回应，不要列举选项，不要编号。`;
-  const userMessage = `用户选你当待办督促助手。待办: ${todoSummary}。请直接回应:`;
-
-  try {
-    const response = await fetch(apiUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiPreset.key}`,
-      },
-      body: JSON.stringify({
-        model: apiPreset.model,
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userMessage },
-        ],
-        temperature: 0.8,
-        stream: false,
-      }),
-    });
-
-    if (!response.ok) return;
-
-    const data = await response.json();
-    let aiReply = data.choices?.[0]?.message?.content;
-
-    if (!aiReply) {
-      aiReply = "我会帮你督促完成待办的~";
-    }
-
-    const numCharId = parseInt(charId) || charId;
-    let history = chatHistories[numCharId] || [];
-    history.push({
-      role: "assistant",
-      content: aiReply,
-      timestamp: Date.now(),
-    });
-    chatHistories[numCharId] = history;
-    await localforage.setItem("chatHistories", chatHistories);
-  } catch (e) {
-    console.error("AI问候失败:", e);
-  }
-}
-
-function openTodoSettingsModal() {
-  const modal = document.getElementById("todoSettingsOverlay");
-  if (modal) {
-    modal.classList.add("active");
-    loadGreetingForEdit();
-    renderCategoryList();
-  }
-}
-
-function closeTodoSettingsModal() {
-  document.getElementById("todoSettingsOverlay")?.classList.remove("active");
-}
-
-function loadGreetingForEdit() {
-  const g = window.todoSettings.greeting || { main: "", sub: "" };
-  const mainInput = document.getElementById("greetingMainInput");
-  const subInput = document.getElementById("greetingSubInput");
-  const previewMain = document.getElementById("greetingPreviewMain");
-  const previewSub = document.getElementById("greetingPreviewSub");
-
-  if (mainInput) mainInput.value = g.main;
-  if (subInput) subInput.value = g.sub;
-  if (previewMain) previewMain.textContent = g.main || "(未设置)";
-  if (previewSub) previewSub.textContent = g.sub || "";
-}
-
-async function saveGreeting() {
-  const main = document.getElementById("greetingMainInput").value.trim();
-  const sub = document.getElementById("greetingSubInput").value.trim();
-
-  if (!main) {
-    showToast("请输入问候语");
-    return;
-  }
-
-  window.todoSettings.greeting = { main, sub };
-  await localforage.setItem("todoSettings", window.todoSettings);
-
-  document.getElementById("greetingPreviewMain").textContent = main;
-  document.getElementById("greetingPreviewSub").textContent = sub;
-  updateTodoDate();
-  showToast("已保存");
-}
-
-function renderCategoryList() {
-  const container = document.getElementById("todoCategoryList");
-  if (!container) return;
-
-  let html = "";
-  window.todoCategories.forEach((cat) => {
-    html += `<div class="todo-category-item" onclick="deleteCategory('${cat.id}')"><div class="todo-category-name">${cat.name}</div></div>`;
-  });
-  container.innerHTML = html;
-}
-
-async function addTodoCategory() {
-  const nameInput = document.getElementById("newCategoryName");
-  const name = nameInput.value.trim();
-
-  if (!name) {
-    showToast("请输入分类名称");
-    return;
-  }
-
-  if (name.length > 10) {
-    showToast("分类名称不能超过10个字");
-    return;
-  }
-
-  const id = "cat_" + Date.now();
-  window.todoCategories.push({ id, name });
-  await localforage.setItem("todoCategories", window.todoCategories);
-
-  nameInput.value = "";
-  renderCategoryList();
-  renderTodoFilterBar();
-  showToast("分类已添加");
-}
-
-async function deleteCategory(id) {
-  const defaultIds = ["self", "health", "study", "work", "life"];
-  if (defaultIds.includes(id)) {
-    showToast("默认分类不能删除");
-    return;
-  }
-
-  if (!confirm("确定删除这个分类？")) return;
-
-  window.todoCategories = window.todoCategories.filter((c) => c.id !== id);
-  await localforage.setItem("todoCategories", window.todoCategories);
-
-  renderCategoryList();
-  renderTodoFilterBar();
-  showToast("已删除");
-}
-
-// 生成待办提示词（给AI用）
+// 生成给AI的待办提示（在聊天时使用）
 function generateTodoPromptForAi(charId) {
-  const id = String(charId);
-  if (!window.todoAiBindings[id]) return "";
+  if (!window.todoAiBindings[charId]) return "";
 
-  const pending = window.todoList.filter((t) => !t.done);
-  const repeating = pending.filter((t) => t.repeat && t.repeat !== "none");
-  const doneToday = window.todoList.filter(
-    (t) =>
-      t.done &&
-      t.doneAt &&
-      new Date(t.doneAt).toDateString() === new Date().toDateString()
-  );
+  const pending = window.todoList.filter(t => !t.done);
+  if (pending.length === 0) return "";
 
-  if (pending.length === 0 && doneToday.length === 0) return "";
+  const quadrantNames = {
+    q1: "重要且紧急",
+    q2: "重要不紧急",
+    q3: "紧急不重要", 
+    q4: "不重要不紧急"
+  };
 
-  let prompt =
-    "\n\n【待办督促】用户让你帮忙督促完成待办，在对话中自然地关心和提醒，但不要每条都提，大约每3-5条消息自然地提一次。\n";
-
-  if (pending.length > 0) {
-    const texts = pending
-      .slice(0, 5)
-      .map((t) => t.text)
-      .join("、");
-    prompt += `未完成: ${pending.length}项 - ${texts}${
-      pending.length > 5 ? "等" : ""
-    }。\n`;
+  let prompt = "\n\n[待办事项督促]\n用户有以下待办事项未完成：\n";
+  pending.slice(0, 5).forEach(t => {
+    const qName = quadrantNames[t.quadrant] || "其他";
+    prompt += `- ${t.text} (${qName})\n`;
+  });
+  if (pending.length > 5) {
+    prompt += `...还有${pending.length - 5}项\n`;
   }
+  prompt += "请在合适的时机温柔地提醒用户完成待办。";
 
-  if (repeating.length > 0) {
-    prompt += `其中有${repeating.length}项是每日/定期任务，要特别关注。\n`;
-  }
-
-  if (doneToday.length > 0) {
-    prompt += `今天已完成${doneToday.length}项，可以适时鼓励。\n`;
-  }
-
-  prompt += "语气温柔自然，融入对话，不要生硬。";
   return prompt;
 }
 
-// 生成经期提示词（预留接口）
-function generatePeriodPromptForAi() {
-  return "";
+// 兼容旧函数名
+function renderTodoWeekCalendar() {
+  renderTodoCalendar();
 }
 
 // ==================== QQ空间风格动态系统 ====================
