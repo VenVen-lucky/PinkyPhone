@@ -636,6 +636,25 @@
                       <circle cx="12" cy="12" r="3"></circle>
                     </svg>
                     谁可以看
+                    <button
+                      class="ig-manage-groups-btn"
+                      onclick="openGroupManageModal()"
+                      title="管理分组"
+                    >
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path
+                          d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
+                        ></path>
+                      </svg>
+                    </button>
                   </div>
                   <div class="ig-visibility-options" id="visibilityOptions">
                     <div
@@ -646,6 +665,130 @@
                       <span class="check-icon">✓</span> 公开
                     </div>
                     <!-- 分组选项会通过JS动态渲染 -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 自定义分组管理弹窗 -->
+          <div
+            class="ig-group-manage-modal"
+            id="igGroupManageModal"
+            onclick="if(event.target===this)closeGroupManageModal()"
+          >
+            <div class="ig-group-manage-content">
+              <div class="ig-group-manage-header">
+                <button
+                  class="ig-group-manage-close"
+                  onclick="closeGroupManageModal()"
+                >
+                  关闭
+                </button>
+                <span class="ig-group-manage-title">管理自定义分组</span>
+                <button
+                  class="ig-group-manage-add"
+                  onclick="openCreateGroupModal()"
+                >
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                </button>
+              </div>
+              <div class="ig-group-manage-list" id="customGroupList">
+                <!-- 分组列表通过JS渲染 -->
+              </div>
+            </div>
+          </div>
+
+          <!-- 创建/编辑分组弹窗 -->
+          <div
+            class="ig-create-group-modal"
+            id="igCreateGroupModal"
+            onclick="if(event.target===this)closeCreateGroupModal()"
+          >
+            <div class="ig-create-group-content">
+              <div class="ig-create-group-header">
+                <button
+                  class="ig-create-group-back"
+                  onclick="closeCreateGroupModal()"
+                >
+                  取消
+                </button>
+                <span class="ig-create-group-title" id="createGroupTitle"
+                  >新建分组</span
+                >
+                <button
+                  class="ig-create-group-save"
+                  onclick="saveCustomGroup()"
+                >
+                  保存
+                </button>
+              </div>
+              <div class="ig-create-group-body">
+                <div class="ig-create-group-name-section">
+                  <label>分组名称</label>
+                  <input
+                    type="text"
+                    id="customGroupNameInput"
+                    placeholder="例如：仅闺蜜可见、不给谁看..."
+                    maxlength="20"
+                  />
+                </div>
+                <div class="ig-create-group-type-section">
+                  <label>分组类型</label>
+                  <div class="ig-group-type-options">
+                    <div
+                      class="ig-group-type-option selected"
+                      data-type="include"
+                      onclick="selectGroupType('include', this)"
+                    >
+                      <div class="ig-group-type-info">
+                        <div class="ig-group-type-name">部分可见</div>
+                        <div class="ig-group-type-desc">只有选中的人可以看</div>
+                      </div>
+                    </div>
+                    <div
+                      class="ig-group-type-option"
+                      data-type="exclude"
+                      onclick="selectGroupType('exclude', this)"
+                    >
+                      <div class="ig-group-type-info">
+                        <div class="ig-group-type-name">不给谁看</div>
+                        <div class="ig-group-type-desc">选中的人看不到</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="ig-create-group-members-section">
+                  <div class="ig-members-header">
+                    <label id="membersLabel">选择可见的人</label>
+                    <div class="ig-members-actions">
+                      <button onclick="selectAllGroupMembers()">全选</button>
+                      <button onclick="deselectAllGroupMembers()">清空</button>
+                    </div>
+                  </div>
+                  <div class="ig-members-search">
+                    <input
+                      type="text"
+                      id="groupMemberSearch"
+                      placeholder="搜索好友..."
+                      oninput="filterGroupMemberList(this.value)"
+                    />
+                  </div>
+                  <div class="ig-members-list" id="groupMemberList">
+                    <!-- 好友列表通过JS渲染 -->
+                  </div>
+                  <div class="ig-members-count">
+                    已选择 <span id="groupMemberCount">0</span> 人
                   </div>
                 </div>
               </div>
@@ -7470,23 +7613,54 @@
         ></textarea>
         <div class="forum-compose-images" id="forumComposeImages"></div>
         <div class="forum-compose-toolbar">
-          <button class="forum-compose-tool-btn" onclick="document.getElementById('forumComposeImageInput').click()" title="添加图片">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+          <button
+            class="forum-compose-tool-btn"
+            onclick="document.getElementById('forumComposeImageInput').click()"
+            title="添加图片"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              width="22"
+              height="22"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
               <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
               <circle cx="8.5" cy="8.5" r="1.5"></circle>
               <polyline points="21 15 16 10 5 21"></polyline>
             </svg>
           </button>
-          <button class="forum-compose-tool-btn" onclick="insertImagePlaceholder()" title="添加图片描述">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <button
+            class="forum-compose-tool-btn"
+            onclick="insertImagePlaceholder()"
+            title="添加图片描述"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              width="22"
+              height="22"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+              ></path>
               <polyline points="14 2 14 8 20 8"></polyline>
               <line x1="12" y1="18" x2="12" y2="12"></line>
               <line x1="9" y1="15" x2="15" y2="15"></line>
             </svg>
           </button>
         </div>
-        <input type="file" id="forumComposeImageInput" accept="image/*" multiple style="display:none" onchange="handleComposeImageUpload(this)">
+        <input
+          type="file"
+          id="forumComposeImageInput"
+          accept="image/*"
+          multiple
+          style="display: none"
+          onchange="handleComposeImageUpload(this)"
+        />
       </div>
     </div>
 

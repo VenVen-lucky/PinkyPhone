@@ -1476,9 +1476,13 @@ function loadSavedData() {
   if (avatarData) {
     const img = document.getElementById("avatarImg");
     const placeholder = document.getElementById("avatarPlaceholder");
-    img.src = avatarData;
-    img.style.display = "block";
-    placeholder.style.display = "none";
+    if (img) {
+      img.src = avatarData;
+      img.style.display = "block";
+    }
+    if (placeholder) {
+      placeholder.style.display = "none";
+    }
   }
 
   // Profile fields
@@ -1494,10 +1498,12 @@ function loadSavedData() {
     const saved = localStorage.getItem("profile_" + field);
     if (saved) {
       const element = document.getElementById(elementMap[field]);
-      if (field === "handle") {
-        element.textContent = "@" + saved.replace("@", "");
-      } else {
-        element.textContent = saved;
+      if (element) {
+        if (field === "handle") {
+          element.textContent = "@" + saved.replace("@", "");
+        } else {
+          element.textContent = saved;
+        }
       }
     }
   });
@@ -20672,6 +20678,10 @@ function formatPostTime(timestamp) {
 // 当前选中的可见范围
 var selectedVisibility = "all";
 var selectedVisibilityGroups = [];
+var customVisibilityGroups = []; // 用户创建的自定义分组
+var editingCustomGroupId = null; // 正在编辑的分组ID
+var tempGroupMembers = []; // 临时成员列表
+var tempGroupType = "include"; // 临时分组类型
 
 function openPostModal() {
   document.getElementById("igPostModal").classList.add("active");
@@ -20696,12 +20706,12 @@ function renderVisibilityOptions() {
   const container = document.getElementById("visibilityOptions");
   if (!container) return;
 
-  // 获取所有分组
-  const groups = new Set();
+  // 获取角色自带的分组
+  const charGroups = new Set();
   characters.forEach((char) => {
     const settings = chatSettings[char.id] || {};
     if (settings.group && settings.group !== "none") {
-      groups.add(settings.group);
+      charGroups.add(settings.group);
     }
   });
 
@@ -20711,12 +20721,26 @@ function renderVisibilityOptions() {
     <span class="check-icon">✓</span> 公开
   </div>`;
 
-  groups.forEach((group) => {
+  // 角色自带分组
+  charGroups.forEach((group) => {
     const isSelected = selectedVisibilityGroups.includes(group);
     html += `<div class="ig-visibility-option ${
       isSelected ? "selected" : ""
     }" data-value="${group}" onclick="toggleVisibilityGroup('${group}', this)">
       <span class="check-icon">✓</span> ${group}
+    </div>`;
+  });
+
+  // 自定义分组
+  customVisibilityGroups.forEach((group) => {
+    const isSelected = selectedVisibilityGroups.includes("custom_" + group.id);
+    const typeIcon = group.type === "exclude" ? "🙈" : "👁️";
+    html += `<div class="ig-visibility-option custom-group ${
+      isSelected ? "selected" : ""
+    }" data-value="custom_${group.id}" onclick="toggleVisibilityGroup('custom_${group.id}', this)">
+      <span class="check-icon">✓</span> 
+      <span class="group-type-badge">${typeIcon}</span>
+      ${group.name}
     </div>`;
   });
 
@@ -20766,6 +20790,329 @@ function toggleVisibilityGroup(group, el) {
 function closePostModal() {
   document.getElementById("igPostModal").classList.remove("active");
 }
+
+// ==================== 自定义分组管理功能 ====================
+
+// 初始化自定义分组数据
+async function initCustomGroups() {
+  const saved = await safeLocalforageGet("customVisibilityGroups");
+  if (saved) {
+    customVisibilityGroups = saved;
+  }
+}
+
+// 保存自定义分组数据
+async function saveCustomGroups() {
+  await localforage.setItem("customVisibilityGroups", customVisibilityGroups);
+}
+
+// 打开分组管理弹窗
+function openGroupManageModal() {
+  const modal = document.getElementById("igGroupManageModal");
+  modal.classList.add("active");
+  renderCustomGroupList();
+}
+
+// 关闭分组管理弹窗
+function closeGroupManageModal() {
+  const modal = document.getElementById("igGroupManageModal");
+  modal.classList.remove("active");
+}
+
+// 渲染分组列表
+function renderCustomGroupList() {
+  const container = document.getElementById("customGroupList");
+  if (!container) return;
+  
+  if (customVisibilityGroups.length === 0) {
+    container.innerHTML = `
+      <div class="ig-group-empty">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+          <circle cx="9" cy="7" r="4"></circle>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+        </svg>
+        <div class="empty-title">还没有自定义分组</div>
+        <div class="empty-desc">点击右上角 + 创建一个分组<br>方便下次快速选择可见范围</div>
+      </div>
+    `;
+    return;
+  }
+  
+  let html = "";
+  customVisibilityGroups.forEach(group => {
+    const typeIcon = group.type === "exclude" ? "🙈" : "👁️";
+    const typeTag = group.type === "exclude" ? "不给谁看" : "部分可见";
+    const typeClass = group.type === "exclude" ? "exclude" : "";
+    
+    html += `
+      <div class="ig-group-item" data-group-id="${group.id}">
+        <div class="ig-group-icon ${typeClass}">${typeIcon}</div>
+        <div class="ig-group-info">
+          <div class="ig-group-name">
+            ${group.name}
+            <span class="ig-group-type-tag ${typeClass}">${typeTag}</span>
+          </div>
+          <div class="ig-group-members">${group.members.length} 人</div>
+        </div>
+        <div class="ig-group-actions">
+          <button class="ig-group-action-btn" onclick="editCustomGroup('${group.id}')" title="编辑">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+          </button>
+          <button class="ig-group-action-btn delete" onclick="deleteCustomGroup('${group.id}')" title="删除">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    `;
+  });
+  
+  container.innerHTML = html;
+}
+
+// 打开创建分组弹窗
+function openCreateGroupModal() {
+  editingCustomGroupId = null;
+  tempGroupMembers = [];
+  tempGroupType = "include";
+  
+  document.getElementById("createGroupTitle").textContent = "新建分组";
+  document.getElementById("customGroupNameInput").value = "";
+  
+  // 重置类型选择
+  document.querySelectorAll(".ig-group-type-option").forEach(opt => {
+    opt.classList.remove("selected");
+    if (opt.dataset.type === "include") {
+      opt.classList.add("selected");
+    }
+  });
+  
+  updateMembersLabel();
+  renderGroupMemberList();
+  updateGroupMemberCount();
+  
+  document.getElementById("igCreateGroupModal").classList.add("active");
+}
+
+// 编辑分组
+function editCustomGroup(groupId) {
+  const group = customVisibilityGroups.find(g => g.id === groupId);
+  if (!group) return;
+  
+  editingCustomGroupId = groupId;
+  tempGroupMembers = [...group.members];
+  tempGroupType = group.type;
+  
+  document.getElementById("createGroupTitle").textContent = "编辑分组";
+  document.getElementById("customGroupNameInput").value = group.name;
+  
+  // 设置类型选择
+  document.querySelectorAll(".ig-group-type-option").forEach(opt => {
+    opt.classList.remove("selected");
+    if (opt.dataset.type === group.type) {
+      opt.classList.add("selected");
+    }
+  });
+  
+  updateMembersLabel();
+  renderGroupMemberList();
+  updateGroupMemberCount();
+  
+  document.getElementById("igCreateGroupModal").classList.add("active");
+}
+
+// 关闭创建分组弹窗
+function closeCreateGroupModal() {
+  document.getElementById("igCreateGroupModal").classList.remove("active");
+  document.getElementById("groupMemberSearch").value = "";
+}
+
+// 选择分组类型
+function selectGroupType(type, el) {
+  tempGroupType = type;
+  document.querySelectorAll(".ig-group-type-option").forEach(opt => {
+    opt.classList.remove("selected");
+  });
+  el.classList.add("selected");
+  updateMembersLabel();
+}
+
+// 更新成员选择标签
+function updateMembersLabel() {
+  const label = document.getElementById("membersLabel");
+  if (label) {
+    label.textContent = tempGroupType === "exclude" ? "选择不给谁看" : "选择可见的人";
+  }
+}
+
+// 渲染成员列表
+function renderGroupMemberList(searchTerm = "") {
+  const container = document.getElementById("groupMemberList");
+  if (!container) return;
+  
+  const chars = window.characters || [];
+  
+  if (chars.length === 0) {
+    container.innerHTML = `<div class="ig-members-empty">还没有好友，去聊天页面添加角色吧</div>`;
+    return;
+  }
+  
+  let filteredChars = chars;
+  if (searchTerm) {
+    const term = searchTerm.toLowerCase();
+    filteredChars = chars.filter(char => {
+      const name = (char.note || char.name || "").toLowerCase();
+      return name.includes(term);
+    });
+  }
+  
+  if (filteredChars.length === 0) {
+    container.innerHTML = `<div class="ig-members-empty">没有找到匹配的好友</div>`;
+    return;
+  }
+  
+  let html = "";
+  filteredChars.forEach(char => {
+    const isSelected = tempGroupMembers.includes(String(char.id));
+    
+    let avatarHtml = "";
+    if (char.avatar) {
+      if (char.avatar.startsWith("data:") || char.avatar.startsWith("http")) {
+        avatarHtml = `<img src="${char.avatar}" alt="">`;
+      } else {
+        avatarHtml = `<span class="avatar-emoji">${char.avatar}</span>`;
+      }
+    } else {
+      avatarHtml = `<span class="avatar-emoji">🤖</span>`;
+    }
+    
+    html += `
+      <div class="ig-member-item ${isSelected ? 'selected' : ''}" 
+           data-char-id="${char.id}" 
+           onclick="toggleGroupMember('${char.id}', this)">
+        <div class="ig-member-checkbox">${isSelected ? '✓' : ''}</div>
+        <div class="ig-member-avatar">${avatarHtml}</div>
+        <div class="ig-member-name">${char.note || char.name || '未命名'}</div>
+      </div>
+    `;
+  });
+  
+  container.innerHTML = html;
+}
+
+// 搜索过滤
+function filterGroupMemberList(value) {
+  renderGroupMemberList(value.trim());
+}
+
+// 切换成员选中
+function toggleGroupMember(charId, el) {
+  const id = String(charId);
+  const index = tempGroupMembers.indexOf(id);
+  
+  if (index > -1) {
+    tempGroupMembers.splice(index, 1);
+    el.classList.remove("selected");
+    el.querySelector(".ig-member-checkbox").textContent = "";
+  } else {
+    tempGroupMembers.push(id);
+    el.classList.add("selected");
+    el.querySelector(".ig-member-checkbox").textContent = "✓";
+  }
+  
+  updateGroupMemberCount();
+}
+
+// 全选成员
+function selectAllGroupMembers() {
+  const chars = window.characters || [];
+  tempGroupMembers = chars.map(c => String(c.id));
+  renderGroupMemberList(document.getElementById("groupMemberSearch")?.value || "");
+  updateGroupMemberCount();
+}
+
+// 清空选择
+function deselectAllGroupMembers() {
+  tempGroupMembers = [];
+  renderGroupMemberList(document.getElementById("groupMemberSearch")?.value || "");
+  updateGroupMemberCount();
+}
+
+// 更新成员数量
+function updateGroupMemberCount() {
+  const countEl = document.getElementById("groupMemberCount");
+  if (countEl) {
+    countEl.textContent = tempGroupMembers.length;
+  }
+}
+
+// 保存分组
+async function saveCustomGroup() {
+  const name = document.getElementById("customGroupNameInput").value.trim();
+  
+  if (!name) {
+    showToast("请输入分组名称");
+    return;
+  }
+  
+  if (tempGroupMembers.length === 0) {
+    showToast("请至少选择一个人");
+    return;
+  }
+  
+  if (editingCustomGroupId) {
+    // 编辑模式
+    const index = customVisibilityGroups.findIndex(g => g.id === editingCustomGroupId);
+    if (index > -1) {
+      customVisibilityGroups[index] = {
+        ...customVisibilityGroups[index],
+        name: name,
+        type: tempGroupType,
+        members: [...tempGroupMembers]
+      };
+    }
+    showToast("分组已更新");
+  } else {
+    // 新建模式
+    const newGroup = {
+      id: "cg_" + Date.now(),
+      name: name,
+      type: tempGroupType,
+      members: [...tempGroupMembers],
+      createdAt: Date.now()
+    };
+    customVisibilityGroups.push(newGroup);
+    showToast("分组创建成功");
+  }
+  
+  await saveCustomGroups();
+  closeCreateGroupModal();
+  renderCustomGroupList();
+  renderVisibilityOptions(); // 更新发帖弹窗的选项
+}
+
+// 删除分组
+async function deleteCustomGroup(groupId) {
+  if (!confirm("确定要删除这个分组吗？")) return;
+  
+  customVisibilityGroups = customVisibilityGroups.filter(g => g.id !== groupId);
+  await saveCustomGroups();
+  renderCustomGroupList();
+  renderVisibilityOptions();
+  showToast("分组已删除");
+}
+
+// 在初始化时加载自定义分组
+document.addEventListener("DOMContentLoaded", () => {
+  initCustomGroups();
+});
 
 // 选择图片选项
 function selectImageOption(type) {
@@ -20869,11 +21216,40 @@ async function aiInteractWithPost(post) {
     post.visibleGroups &&
     post.visibleGroups.length > 0
   ) {
-    // 只有指定分组的AI可以看到
+    // 处理分组可见（包括自定义分组）
     eligibleChars = window.characters.filter((char) => {
       const settings = chatSettings[char.id] || {};
-      return post.visibleGroups.includes(settings.group);
+      const charId = String(char.id);
+      
+      for (const groupKey of post.visibleGroups) {
+        // 检查是否是自定义分组
+        if (groupKey.startsWith("custom_")) {
+          const customGroupId = groupKey.replace("custom_", "");
+          const customGroup = customVisibilityGroups.find(g => g.id === customGroupId);
+          
+          if (customGroup) {
+            if (customGroup.type === "include") {
+              // 部分可见：只有在成员列表中的才能看
+              if (customGroup.members.includes(charId)) {
+                return true;
+              }
+            } else if (customGroup.type === "exclude") {
+              // 不给谁看：不在成员列表中的才能看
+              if (!customGroup.members.includes(charId)) {
+                return true;
+              }
+            }
+          }
+        } else {
+          // 普通分组
+          if (settings.group === groupKey) {
+            return true;
+          }
+        }
+      }
+      return false;
     });
+    
     console.log(
       "可见分组:",
       post.visibleGroups,
@@ -25553,6 +25929,25 @@ Object.assign(window, {
   renderVisibilityOptions,
   selectVisibility,
   toggleVisibilityGroup,
+  // 自定义分组管理功能
+  initCustomGroups,
+  saveCustomGroups,
+  openGroupManageModal,
+  closeGroupManageModal,
+  renderCustomGroupList,
+  openCreateGroupModal,
+  editCustomGroup,
+  closeCreateGroupModal,
+  selectGroupType,
+  updateMembersLabel,
+  renderGroupMemberList,
+  filterGroupMemberList,
+  toggleGroupMember,
+  selectAllGroupMembers,
+  deselectAllGroupMembers,
+  updateGroupMemberCount,
+  saveCustomGroup,
+  deleteCustomGroup,
   toggleLike,
   toggleBookmark,
   openComments,
