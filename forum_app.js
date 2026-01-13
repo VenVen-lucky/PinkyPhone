@@ -2601,7 +2601,7 @@ ${replier ? `请你扮演「${replier.name}」回复这条评论。\n角色人�
         model: apiConfig.model || "gpt-3.5-turbo",
         messages: [{ role: "user", content: prompt }],
         temperature: 0.9,
-        max_tokens: 100,
+        
       }),
     });
 
