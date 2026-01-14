@@ -22,29 +22,23 @@ window.editingEntryIndex = null; // 正在编辑的条目索引
 window.tempWorldbookEntries = []; // 临时条目列表
 
 // 转发卡片渲染函数（备份，如果forum_app.js未加载则使用此函数）
-window.renderRetweetCard =
-  window.renderRetweetCard ||
-  function (cardData) {
-    if (!cardData) return "";
-
-    const avatarHtml = cardData.authorAvatar
-      ? `<img src="${cardData.authorAvatar}" alt="">`
-      : cardData.authorName
-      ? cardData.authorName.charAt(0)
-      : "📝";
-
-    // 转义HTML
-    const escapeHtml = (text) => {
-      if (!text) return "";
-      const div = document.createElement("div");
-      div.textContent = text;
-      return div.innerHTML;
-    };
-
-    return `
-    <div class="retweet-card" onclick="if(typeof openForumPostFromCard==='function')openForumPostFromCard(${
-      cardData.postId
-    })">
+window.renderRetweetCard = window.renderRetweetCard || function(cardData) {
+  if (!cardData) return '';
+  
+  const avatarHtml = cardData.authorAvatar 
+    ? `<img src="${cardData.authorAvatar}" alt="">`
+    : (cardData.authorName ? cardData.authorName.charAt(0) : '📝');
+  
+  // 转义HTML
+  const escapeHtml = (text) => {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  };
+  
+  return `
+    <div class="retweet-card" onclick="if(typeof openForumPostFromCard==='function')openForumPostFromCard(${cardData.postId})">
       <div class="retweet-card-label">
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M17 1l4 4-4 4"></path>
@@ -58,10 +52,8 @@ window.renderRetweetCard =
         <div class="retweet-card-header">
           <div class="retweet-card-avatar">${avatarHtml}</div>
           <div class="retweet-card-author-info">
-            <span class="retweet-card-author">${escapeHtml(
-              cardData.authorName
-            )}</span>
-            <span class="retweet-card-handle">@${cardData.handle || ""}</span>
+            <span class="retweet-card-author">${escapeHtml(cardData.authorName)}</span>
+            <span class="retweet-card-handle">@${cardData.handle || ''}</span>
           </div>
         </div>
         <div class="retweet-card-content">${escapeHtml(cardData.content)}</div>
@@ -91,7 +83,7 @@ window.renderRetweetCard =
       </div>
     </div>
   `;
-  };
+};
 
 // 全局安全读取函数，处理数据损坏情况
 async function safeLocalforageGet(key) {
@@ -1628,9 +1620,7 @@ function switchChatTab(tabName) {
   const chatHeader = document.querySelector(".chat-app > .chat-header");
   if (chatHeader) {
     chatHeader.style.display =
-      tabName === "moments" || tabName === "profile" || tabName === "todo"
-        ? "none"
-        : "";
+      tabName === "moments" || tabName === "profile" || tabName === "todo" ? "none" : "";
   }
 
   // 切换到moments时清除朋友圈小红点
@@ -2126,30 +2116,20 @@ async function loadGroupMessages(groupId) {
         let contentHtml = isHtmlMsg
           ? msg.content
           : processAtMentions(escapeHtml(msg.content));
-
+        
         // 检测是否有转发卡片数据
-        if (msg.retweetCard && typeof renderRetweetCard === "function") {
+        if (msg.retweetCard && typeof renderRetweetCard === 'function') {
           // 如果是纯转发消息或内容为空，只显示卡片
-          if (
-            msg.isRetweetOnly ||
-            !msg.content ||
-            msg.content.trim() === "" ||
-            /^\[转发帖子\]/.test((msg.content || "").trim())
-          ) {
+          if (msg.isRetweetOnly || !msg.content || msg.content.trim() === '' || /^\[转发帖子\]/.test((msg.content || '').trim())) {
             contentHtml = renderRetweetCard(msg.retweetCard);
           } else {
             contentHtml += renderRetweetCard(msg.retweetCard);
           }
         }
-
+        
         // 检测是否只有转发卡片
-        const isRetweetOnly =
-          msg.retweetCard &&
-          (msg.isRetweetOnly ||
-            !msg.content ||
-            msg.content.trim() === "" ||
-            /^\[转发帖子\]/.test((msg.content || "").trim()));
-
+        const isRetweetOnly = msg.retweetCard && (msg.isRetweetOnly || !msg.content || msg.content.trim() === '' || /^\[转发帖子\]/.test((msg.content || '').trim()));
+        
         // 检测是否是表情包消息
         const isSticker =
           isHtmlMsg &&
@@ -2176,9 +2156,9 @@ async function loadGroupMessages(groupId) {
         }
 
         // 转发卡片特殊样式
-        const retweetStyle = isRetweetOnly
-          ? 'style="background:transparent!important;box-shadow:none!important;padding:0!important;"'
-          : "";
+        const retweetStyle = isRetweetOnly 
+          ? 'style="background:transparent!important;box-shadow:none!important;padding:0!important;"' 
+          : '';
 
         return `
         <div class="msg-row user group-msg" 
@@ -2407,14 +2387,9 @@ async function loadGroupMessages(groupId) {
         }
 
         // 检测是否有转发卡片数据
-        if (msg.retweetCard && typeof renderRetweetCard === "function") {
+        if (msg.retweetCard && typeof renderRetweetCard === 'function') {
           // 如果是纯转发消息或内容为空，只显示卡片
-          if (
-            msg.isRetweetOnly ||
-            !msg.content ||
-            msg.content.trim() === "" ||
-            /^\[转发帖子\]/.test((msg.content || "").trim())
-          ) {
+          if (msg.isRetweetOnly || !msg.content || msg.content.trim() === '' || /^\[转发帖子\]/.test((msg.content || '').trim())) {
             contentHtml = renderRetweetCard(msg.retweetCard);
           } else {
             contentHtml += renderRetweetCard(msg.retweetCard);
@@ -2422,12 +2397,7 @@ async function loadGroupMessages(groupId) {
         }
 
         // 检测是否只有转发卡片
-        const isRetweetOnly =
-          msg.retweetCard &&
-          (msg.isRetweetOnly ||
-            !msg.content ||
-            msg.content.trim() === "" ||
-            /^\[转发帖子\]/.test((msg.content || "").trim()));
+        const isRetweetOnly = msg.retweetCard && (msg.isRetweetOnly || !msg.content || msg.content.trim() === '' || /^\[转发帖子\]/.test((msg.content || '').trim()));
 
         // 检测是否是表情包消息
         const isSticker =
@@ -4258,7 +4228,7 @@ ${memberInfos
       body: JSON.stringify({
         model: preset.model || "gpt-3.5-turbo",
         messages: messages,
-
+        
         temperature:
           preset.temperature !== undefined ? Number(preset.temperature) : 0.8,
       }),
@@ -6229,14 +6199,9 @@ window.renderMessageGroup = function (
       }
 
       // 检测是否有转发卡片数据
-      if (m.retweetCard && typeof renderRetweetCard === "function") {
+      if (m.retweetCard && typeof renderRetweetCard === 'function') {
         // 如果是纯转发消息或内容为空，只显示卡片
-        if (
-          m.isRetweetOnly ||
-          !rawContent ||
-          rawContent.trim() === "" ||
-          /^\[转发帖子\]/.test(rawContent.trim())
-        ) {
+        if (m.isRetweetOnly || !rawContent || rawContent.trim() === '' || /^\[转发帖子\]/.test(rawContent.trim())) {
           contentHtml = renderRetweetCard(m.retweetCard);
         } else {
           contentHtml += renderRetweetCard(m.retweetCard);
@@ -6248,18 +6213,12 @@ window.renderMessageGroup = function (
         contentHtml.includes("transfer-card") ||
         contentHtml.includes("location-card") ||
         contentHtml.includes("retweet-card");
-
+      
       // 如果只有转发卡片，不需要气泡背景
-      const isRetweetOnly =
-        m.retweetCard &&
-        (m.isRetweetOnly ||
-          !rawContent ||
-          rawContent.trim() === "" ||
-          /^\[转发帖子\]/.test(rawContent.trim()));
-      const specialBubbleStyle =
-        isSpecialCard || isRetweetOnly
-          ? 'style="background:transparent!important;box-shadow:none!important;padding:0!important;"'
-          : "";
+      const isRetweetOnly = m.retweetCard && (m.isRetweetOnly || !rawContent || rawContent.trim() === '' || /^\[转发帖子\]/.test(rawContent.trim()));
+      const specialBubbleStyle = (isSpecialCard || isRetweetOnly)
+        ? 'style="background:transparent!important;box-shadow:none!important;padding:0!important;"'
+        : "";
 
       // 生成引用显示HTML
       let quoteHtml = "";
@@ -10211,7 +10170,6 @@ todoCardStyle.textContent = `
     font-size: 9px !important;
     font-weight: 600 !important;
     color: #fff !important;
-    display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
     background-color: #f8a5b8 !important;
@@ -10221,6 +10179,10 @@ todoCardStyle.textContent = `
     -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E") center/contain no-repeat !important;
     mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E") center/contain no-repeat !important;
     border-radius: 0 !important;
+  }
+  
+  .tab-badge[style*="display: none"] {
+    display: none !important;
   }
 `;
 document.head.appendChild(todoCardStyle);
@@ -10331,11 +10293,15 @@ function clearUnreadForChar(charId) {
 // 更新消息tab的小红点
 function updateMessagesBadge() {
   const badge = document.getElementById("messagesBadge");
+  if (!badge) return;
   const total = Object.values(unreadMessages).reduce((a, b) => a + b, 0);
 
   if (total > 0) {
     badge.textContent = total > 99 ? "99+" : total;
-    badge.style.display = total > 0 ? "flex" : "none";
+    badge.style.display = "inline-flex";
+  } else {
+    badge.style.display = "none";
+    badge.style.setProperty("display", "none", "important");
   }
 }
 
@@ -10354,12 +10320,14 @@ function clearUnreadMoments() {
 // 更新朋友圈tab的小红点
 function updateMomentsBadge() {
   const badge = document.getElementById("momentsBadge");
+  if (!badge) return;
 
   if (unreadMoments > 0) {
     badge.textContent = unreadMoments > 99 ? "99+" : unreadMoments;
-    badge.style.display = "flex";
+    badge.style.display = "inline-flex";
   } else {
     badge.style.display = "none";
+    badge.style.setProperty("display", "none", "important");
   }
 }
 
@@ -11592,12 +11560,8 @@ function renderConversation() {
         );
         currentGroup = [];
       }
-      const todoTypeClass =
-        msg.todoType === "todo_complete"
-          ? "complete"
-          : msg.todoType === "todo_add"
-          ? "add"
-          : "binding";
+      const todoTypeClass = msg.todoType === "todo_complete" ? "complete" : 
+                           msg.todoType === "todo_add" ? "add" : "binding";
       html += `<div class="msg-todo-card-wrap">
         <div class="todo-notification-card ${todoTypeClass}">
           <div class="todo-card-icon"></div>
@@ -19675,6 +19639,8 @@ function advanceReadingProgress() {
   // 已禁用自动翻页功能，用户手动翻页
 }
 
+
+
 // ==================== 待办事项功能（四象限月历版） ====================
 window.todoList = [];
 window.todoAiBindings = {};
@@ -19702,7 +19668,7 @@ async function initTodoSystem() {
 
     // 重置重复任务
     await resetRepeatTodos();
-
+    
     // 渲染UI
     renderTodoCalendar();
     renderTodoQuadrants();
@@ -19720,10 +19686,10 @@ async function resetRepeatTodos() {
 
   window.todoList.forEach((todo) => {
     if (!todo.repeat || todo.repeat === "none") return;
-
+    
     const now = new Date();
     let shouldReset = false;
-
+    
     switch (todo.repeat) {
       case "daily":
         shouldReset = true;
@@ -19736,7 +19702,7 @@ async function resetRepeatTodos() {
         shouldReset = now.getDay() === 1;
         break;
     }
-
+    
     if (shouldReset && todo.done) {
       todo.done = false;
       todo.doneAt = null;
@@ -19758,14 +19724,10 @@ function todoNavMonth(dir) {
     window.todoCurrentMonth = 11;
     window.todoCurrentYear--;
   }
-
+  
   // 更新选中日期为该月1号
-  window.selectedTodoDate = new Date(
-    window.todoCurrentYear,
-    window.todoCurrentMonth,
-    1
-  );
-
+  window.selectedTodoDate = new Date(window.todoCurrentYear, window.todoCurrentMonth, 1);
+  
   renderTodoCalendar();
   renderTodoQuadrants();
 }
@@ -19775,19 +19737,15 @@ function todoGoToday() {
   window.todoCurrentYear = today.getFullYear();
   window.todoCurrentMonth = today.getMonth();
   window.selectedTodoDate = today;
-
+  
   renderTodoCalendar();
   renderTodoQuadrants();
-
+  
   // 滚动到今天
   setTimeout(() => {
-    const todayEl = document.querySelector(".todo-day-item.today");
+    const todayEl = document.querySelector('.todo-day-item.today');
     if (todayEl) {
-      todayEl.scrollIntoView({
-        behavior: "smooth",
-        inline: "center",
-        block: "nearest",
-      });
+      todayEl.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
     }
   }, 100);
 }
@@ -19801,30 +19759,28 @@ function renderTodoCalendar() {
   const year = window.todoCurrentYear;
   const month = window.todoCurrentMonth;
   const today = new Date();
-
+  
   // 获取当月天数
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const weekdays = ["日", "一", "二", "三", "四", "五", "六"];
-
+  
   let html = "";
-
+  
   for (let day = 1; day <= daysInMonth; day++) {
     const date = new Date(year, month, day);
     const dayOfWeek = date.getDay();
     const dateStr = date.toDateString();
-
+    
     const isToday = dateStr === today.toDateString();
     const isSelected = dateStr === window.selectedTodoDate.toDateString();
-
+    
     // 获取该日期的任务
     const tasksForDate = getTodosForDate(date);
     const hasTasks = tasksForDate.length > 0;
-    const allDone = hasTasks && tasksForDate.every((t) => t.done);
+    const allDone = hasTasks && tasksForDate.every(t => t.done);
 
     html += `
-      <div class="todo-day-item ${isSelected ? "selected" : ""} ${
-      isToday ? "today" : ""
-    } ${hasTasks ? "has-tasks" : ""} ${allDone ? "all-done" : ""}"
+      <div class="todo-day-item ${isSelected ? 'selected' : ''} ${isToday ? 'today' : ''} ${hasTasks ? 'has-tasks' : ''} ${allDone ? 'all-done' : ''}"
            onclick="selectTodoDate(${year}, ${month}, ${day})">
         <div class="todo-day-weekday">${weekdays[dayOfWeek]}</div>
         <div class="todo-day-num">${day}</div>
@@ -19839,16 +19795,12 @@ function renderTodoCalendar() {
   if (monthText) {
     monthText.textContent = `${year}年${month + 1}月`;
   }
-
+  
   // 滚动到选中日期
   setTimeout(() => {
-    const selectedEl = container.querySelector(".todo-day-item.selected");
+    const selectedEl = container.querySelector('.todo-day-item.selected');
     if (selectedEl) {
-      selectedEl.scrollIntoView({
-        behavior: "auto",
-        inline: "center",
-        block: "nearest",
-      });
+      selectedEl.scrollIntoView({ behavior: 'auto', inline: 'center', block: 'nearest' });
     }
   }, 50);
 }
@@ -19860,44 +19812,42 @@ function getTodosForDate(date) {
   today.setHours(0, 0, 0, 0);
   const targetDate = new Date(date);
   targetDate.setHours(0, 0, 0, 0);
-
-  return window.todoList
-    .filter((t) => {
-      const taskDate = new Date(t.createdAt);
-      taskDate.setHours(0, 0, 0, 0);
-
-      // 非重复任务：只在创建日期显示
-      if (!t.repeat || t.repeat === "none") {
-        return taskDate.toDateString() === dateStr;
-      }
-
-      // 重复任务：只在创建日期及之后显示
-      if (targetDate < taskDate) return false;
-
-      // 检查重复规则
-      switch (t.repeat) {
-        case "daily":
-          return true;
-        case "weekly":
-          return taskDate.getDay() === targetDate.getDay();
-        case "monthly":
-          return taskDate.getDate() === targetDate.getDate();
-        default:
-          return false;
-      }
-    })
-    .map((t) => {
-      // 对于重复任务，判断在目标日期是否完成
-      // 只有今天的完成状态才是真实的，其他日期都显示未完成
-      if (t.repeat && t.repeat !== "none") {
-        const isTargetToday = targetDate.getTime() === today.getTime();
-        return {
-          ...t,
-          done: isTargetToday ? t.done : false,
-        };
-      }
-      return t;
-    });
+  
+  return window.todoList.filter(t => {
+    const taskDate = new Date(t.createdAt);
+    taskDate.setHours(0, 0, 0, 0);
+    
+    // 非重复任务：只在创建日期显示
+    if (!t.repeat || t.repeat === "none") {
+      return taskDate.toDateString() === dateStr;
+    }
+    
+    // 重复任务：只在创建日期及之后显示
+    if (targetDate < taskDate) return false;
+    
+    // 检查重复规则
+    switch(t.repeat) {
+      case "daily":
+        return true;
+      case "weekly":
+        return taskDate.getDay() === targetDate.getDay();
+      case "monthly":
+        return taskDate.getDate() === targetDate.getDate();
+      default:
+        return false;
+    }
+  }).map(t => {
+    // 对于重复任务，判断在目标日期是否完成
+    // 只有今天的完成状态才是真实的，其他日期都显示未完成
+    if (t.repeat && t.repeat !== "none") {
+      const isTargetToday = targetDate.getTime() === today.getTime();
+      return {
+        ...t,
+        done: isTargetToday ? t.done : false
+      };
+    }
+    return t;
+  });
 }
 
 function selectTodoDate(year, month, day) {
@@ -19929,9 +19879,7 @@ function renderTodoDatePicker() {
   const currentYear = new Date().getFullYear();
   let yearHtml = "";
   for (let y = currentYear - 10; y <= currentYear + 10; y++) {
-    yearHtml += `<div class="todo-picker-item ${
-      y === window.todoPickerYear ? "selected" : ""
-    }" 
+    yearHtml += `<div class="todo-picker-item ${y === window.todoPickerYear ? 'selected' : ''}" 
                      onclick="selectTodoPickerYear(${y})">${y}年</div>`;
   }
   yearPicker.innerHTML = yearHtml;
@@ -19939,17 +19887,15 @@ function renderTodoDatePicker() {
   // 月份列表
   let monthHtml = "";
   for (let m = 0; m < 12; m++) {
-    monthHtml += `<div class="todo-picker-item ${
-      m === window.todoPickerMonth ? "selected" : ""
-    }"
+    monthHtml += `<div class="todo-picker-item ${m === window.todoPickerMonth ? 'selected' : ''}"
                       onclick="selectTodoPickerMonth(${m})">${m + 1}月</div>`;
   }
   monthPicker.innerHTML = monthHtml;
 
   // 滚动到选中项
   setTimeout(() => {
-    yearPicker.querySelector(".selected")?.scrollIntoView({ block: "center" });
-    monthPicker.querySelector(".selected")?.scrollIntoView({ block: "center" });
+    yearPicker.querySelector('.selected')?.scrollIntoView({ block: 'center' });
+    monthPicker.querySelector('.selected')?.scrollIntoView({ block: 'center' });
   }, 50);
 }
 
@@ -19966,11 +19912,7 @@ function selectTodoPickerMonth(month) {
 function confirmTodoDatePicker() {
   window.todoCurrentYear = window.todoPickerYear;
   window.todoCurrentMonth = window.todoPickerMonth;
-  window.selectedTodoDate = new Date(
-    window.todoPickerYear,
-    window.todoPickerMonth,
-    1
-  );
+  window.selectedTodoDate = new Date(window.todoPickerYear, window.todoPickerMonth, 1);
   closeTodoDatePicker();
   renderTodoCalendar();
   renderTodoQuadrants();
@@ -19982,17 +19924,17 @@ function renderTodoQuadrants() {
   const q2List = document.getElementById("todoQ2List");
   const q3List = document.getElementById("todoQ3List");
   const q4List = document.getElementById("todoQ4List");
-
+  
   if (!q1List || !q2List || !q3List || !q4List) return;
 
   // 使用getTodosForDate获取当天任务（正确处理重复任务的完成状态）
   const todayTodos = getTodosForDate(window.selectedTodoDate);
 
   // 按象限分类
-  const q1 = todayTodos.filter((t) => t.quadrant === "q1");
-  const q2 = todayTodos.filter((t) => t.quadrant === "q2");
-  const q3 = todayTodos.filter((t) => t.quadrant === "q3");
-  const q4 = todayTodos.filter((t) => t.quadrant === "q4" || !t.quadrant);
+  const q1 = todayTodos.filter(t => t.quadrant === "q1");
+  const q2 = todayTodos.filter(t => t.quadrant === "q2");
+  const q3 = todayTodos.filter(t => t.quadrant === "q3");
+  const q4 = todayTodos.filter(t => t.quadrant === "q4" || !t.quadrant);
 
   q1List.innerHTML = renderQuadrantTasks(q1);
   q2List.innerHTML = renderQuadrantTasks(q2);
@@ -20019,33 +19961,21 @@ function renderQuadrantTasks(tasks) {
     return b.createdAt - a.createdAt;
   });
 
-  return tasks
-    .map((todo) => {
-      const repeatLabel =
-        todo.repeat && todo.repeat !== "none" ? REPEAT_TYPES[todo.repeat] : "";
-
-      return `
-      <div class="quadrant-task ${todo.done ? "done" : ""}" data-id="${
-        todo.id
-      }">
-        <div class="quadrant-task-checkbox" onclick="toggleTodoDone('${
-          todo.id
-        }')">
+  return tasks.map(todo => {
+    const repeatLabel = todo.repeat && todo.repeat !== "none" ? REPEAT_TYPES[todo.repeat] : "";
+    
+    return `
+      <div class="quadrant-task ${todo.done ? 'done' : ''}" data-id="${todo.id}">
+        <div class="quadrant-task-checkbox" onclick="toggleTodoDone('${todo.id}')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="20 6 9 17 4 12"></polyline>
           </svg>
         </div>
-        <div class="quadrant-task-content" onclick="toggleTodoDone('${
-          todo.id
-        }')">
+        <div class="quadrant-task-content" onclick="toggleTodoDone('${todo.id}')">
           <div class="quadrant-task-text">${escapeHtml(todo.text)}</div>
           <div class="quadrant-task-meta">
-            <span class="quadrant-task-time">${formatTodoTime(
-              todo.createdAt
-            )}</span>
-            ${
-              repeatLabel
-                ? `<span class="quadrant-task-repeat">
+            <span class="quadrant-task-time">${formatTodoTime(todo.createdAt)}</span>
+            ${repeatLabel ? `<span class="quadrant-task-repeat">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M17 1l4 4-4 4"></path>
                 <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
@@ -20053,14 +19983,10 @@ function renderQuadrantTasks(tasks) {
                 <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
               </svg>
               ${repeatLabel}
-            </span>`
-                : ""
-            }
+            </span>` : ''}
           </div>
         </div>
-        <button class="quadrant-task-delete" onclick="deleteTodoItem('${
-          todo.id
-        }')">
+        <button class="quadrant-task-delete" onclick="deleteTodoItem('${todo.id}')">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="18" y1="6" x2="6" y2="18"></line>
             <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -20068,25 +19994,18 @@ function renderQuadrantTasks(tasks) {
         </button>
       </div>
     `;
-    })
-    .join("");
+  }).join("");
 }
 
 function formatTodoTime(ts) {
-  const d = new Date(ts),
-    now = new Date();
+  const d = new Date(ts), now = new Date();
   if (d.toDateString() === now.toDateString()) {
-    return (
-      "今天 " +
-      d.getHours().toString().padStart(2, "0") +
-      ":" +
-      d.getMinutes().toString().padStart(2, "0")
-    );
+    return "今天 " + d.getHours().toString().padStart(2, "0") + ":" + d.getMinutes().toString().padStart(2, "0");
   }
   const y = new Date(now);
   y.setDate(y.getDate() - 1);
   if (d.toDateString() === y.toDateString()) return "昨天";
-  return d.getMonth() + 1 + "/" + d.getDate();
+  return (d.getMonth() + 1) + "/" + d.getDate();
 }
 
 function escapeHtml(t) {
@@ -20101,23 +20020,15 @@ function openTodoModal() {
   if (modal) {
     modal.classList.add("active");
     document.getElementById("todoInputText").value = "";
-
+    
     // 重置象限选择
-    document
-      .querySelectorAll(".todo-quadrant-option")
-      .forEach((el) => el.classList.remove("selected"));
-    document
-      .querySelector('.todo-quadrant-option[data-quadrant="q1"]')
-      ?.classList.add("selected");
-
+    document.querySelectorAll(".todo-quadrant-option").forEach(el => el.classList.remove("selected"));
+    document.querySelector('.todo-quadrant-option[data-quadrant="q1"]')?.classList.add("selected");
+    
     // 重置重复选择
-    document
-      .querySelectorAll(".todo-repeat-item")
-      .forEach((el) => el.classList.remove("selected"));
-    document
-      .querySelector('.todo-repeat-item[data-repeat="none"]')
-      ?.classList.add("selected");
-
+    document.querySelectorAll(".todo-repeat-item").forEach(el => el.classList.remove("selected"));
+    document.querySelector('.todo-repeat-item[data-repeat="none"]')?.classList.add("selected");
+    
     setTimeout(() => document.getElementById("todoInputText")?.focus(), 100);
   }
 }
@@ -20127,16 +20038,12 @@ function closeTodoModal() {
 }
 
 function selectTodoQuadrant(el) {
-  document
-    .querySelectorAll(".todo-quadrant-option")
-    .forEach((o) => o.classList.remove("selected"));
+  document.querySelectorAll(".todo-quadrant-option").forEach(o => o.classList.remove("selected"));
   el.classList.add("selected");
 }
 
 function selectTodoRepeat(el) {
-  document
-    .querySelectorAll(".todo-repeat-item")
-    .forEach((o) => o.classList.remove("selected"));
+  document.querySelectorAll(".todo-repeat-item").forEach(o => o.classList.remove("selected"));
   el.classList.add("selected");
 }
 
@@ -20169,13 +20076,13 @@ async function saveTodoItem() {
   renderTodoCalendar();
   renderTodoQuadrants();
   showToast("添加成功");
-
+  
   // 通知绑定的AI角色
   triggerTodoAddNotification(newTodo);
 }
 
 async function toggleTodoDone(id) {
-  const todo = window.todoList.find((t) => t.id === id);
+  const todo = window.todoList.find(t => t.id === id);
   if (todo) {
     const wasDone = todo.done;
     todo.done = !todo.done;
@@ -20192,7 +20099,7 @@ async function toggleTodoDone(id) {
 }
 
 async function deleteTodoItem(id) {
-  window.todoList = window.todoList.filter((t) => t.id !== id);
+  window.todoList = window.todoList.filter(t => t.id !== id);
   await localforage.setItem("todoList", window.todoList);
   renderTodoCalendar();
   renderTodoQuadrants();
@@ -20201,16 +20108,14 @@ async function deleteTodoItem(id) {
 
 // AI督促 - 完成任务后发送消息到聊天
 async function triggerTodoAiNotification(todo) {
-  const bindingIds = Object.keys(window.todoAiBindings).filter(
-    (id) => window.todoAiBindings[id]
-  );
+  const bindingIds = Object.keys(window.todoAiBindings).filter(id => window.todoAiBindings[id]);
   if (bindingIds.length === 0) return;
 
   const quadrantNames = {
     q1: "重要且紧急",
-    q2: "重要不紧急",
+    q2: "重要不紧急", 
     q3: "紧急不重要",
-    q4: "不重要不紧急",
+    q4: "不重要不紧急"
   };
   const categoryName = quadrantNames[todo.quadrant] || "其他";
 
@@ -20227,17 +20132,15 @@ async function triggerTodoAiNotification(todo) {
   }
 
   for (const charId of bindingIds) {
-    const char = characters.find((c) => String(c.id) === String(charId));
+    const char = characters.find(c => String(c.id) === String(charId));
     if (!char) continue;
 
     // 获取角色完整人设
     const settings = chatSettings[charId] || {};
     const persona = settings.persona || char.description || char.persona || "";
     const charName = settings.charName || char.name || "助手";
-
-    const systemPrompt = persona
-      ? `你是${charName}。${persona}`
-      : `你是${charName}，一个温柔体贴的AI助手。`;
+    
+    const systemPrompt = persona ? `你是${charName}。${persona}` : `你是${charName}，一个温柔体贴的AI助手。`;
     const userPrompt = `用户刚刚完成了一个待办事项：「${todo.text}」（分类：${categoryName}）。请用简短温馨的话鼓励用户，表达你对ta完成任务的认可，不超过50字，符合你的性格特点。`;
 
     try {
@@ -20253,6 +20156,7 @@ async function triggerTodoAiNotification(todo) {
             { role: "system", content: systemPrompt },
             { role: "user", content: userPrompt },
           ],
+          
         }),
       });
 
@@ -20261,13 +20165,7 @@ async function triggerTodoAiNotification(todo) {
         const reply = data.choices?.[0]?.message?.content?.trim();
         if (reply) {
           // 添加消息到聊天记录
-          await addTodoNotificationToChat(
-            charId,
-            char,
-            todo,
-            reply,
-            "todo_complete"
-          );
+          await addTodoNotificationToChat(charId, char, todo, reply, "todo_complete");
           showToast(`${char.name} 发来鼓励~`);
         }
       }
@@ -20279,16 +20177,14 @@ async function triggerTodoAiNotification(todo) {
 
 // AI督促 - 添加任务后发送消息到聊天
 async function triggerTodoAddNotification(todo) {
-  const bindingIds = Object.keys(window.todoAiBindings).filter(
-    (id) => window.todoAiBindings[id]
-  );
+  const bindingIds = Object.keys(window.todoAiBindings).filter(id => window.todoAiBindings[id]);
   if (bindingIds.length === 0) return;
 
   const quadrantNames = {
     q1: "重要且紧急",
-    q2: "重要不紧急",
+    q2: "重要不紧急", 
     q3: "紧急不重要",
-    q4: "不重要不紧急",
+    q4: "不重要不紧急"
   };
   const categoryName = quadrantNames[todo.quadrant] || "其他";
 
@@ -20305,17 +20201,15 @@ async function triggerTodoAddNotification(todo) {
   }
 
   for (const charId of bindingIds) {
-    const char = characters.find((c) => String(c.id) === String(charId));
+    const char = characters.find(c => String(c.id) === String(charId));
     if (!char) continue;
 
     // 获取角色完整人设
     const settings = chatSettings[charId] || {};
     const persona = settings.persona || char.description || char.persona || "";
     const charName = settings.charName || char.name || "助手";
-
-    const systemPrompt = persona
-      ? `你是${charName}。${persona}`
-      : `你是${charName}，一个温柔体贴的AI助手。`;
+    
+    const systemPrompt = persona ? `你是${charName}。${persona}` : `你是${charName}，一个温柔体贴的AI助手。`;
     const userPrompt = `用户刚刚添加了一个新的待办事项：「${todo.text}」（分类：${categoryName}）。请用简短的话回应，可以是鼓励、提醒重要性、或者表示会帮助督促等，不超过50字，符合你的性格特点。`;
 
     try {
@@ -20331,6 +20225,7 @@ async function triggerTodoAddNotification(todo) {
             { role: "system", content: systemPrompt },
             { role: "user", content: userPrompt },
           ],
+          
         }),
       });
 
@@ -20339,13 +20234,7 @@ async function triggerTodoAddNotification(todo) {
         const reply = data.choices?.[0]?.message?.content?.trim();
         if (reply) {
           // 添加消息到聊天记录
-          await addTodoNotificationToChat(
-            charId,
-            char,
-            todo,
-            reply,
-            "todo_add"
-          );
+          await addTodoNotificationToChat(charId, char, todo, reply, "todo_add");
           showToast(`${char.name} 收到了~`);
         }
       }
@@ -20356,23 +20245,17 @@ async function triggerTodoAddNotification(todo) {
 }
 
 // 将督促消息添加到聊天记录
-async function addTodoNotificationToChat(
-  charId,
-  char,
-  todo,
-  reply,
-  notificationType = "todo_complete"
-) {
+async function addTodoNotificationToChat(charId, char, todo, reply, notificationType = "todo_complete") {
   // 确保chatHistories中有该角色的记录
   if (!chatHistories[charId]) {
     chatHistories[charId] = [];
   }
-
+  
   // 根据类型设置不同的卡片信息
   let cardTitle = "";
   let cardDesc = "";
-
-  switch (notificationType) {
+  
+  switch(notificationType) {
     case "binding":
       cardTitle = "督促助手已绑定";
       cardDesc = `${char.name}现在会关注你的待办事项`;
@@ -20387,7 +20270,7 @@ async function addTodoNotificationToChat(
       cardDesc = todo.text;
       break;
   }
-
+  
   // 添加待办通知卡片
   const todoCard = {
     type: "todo-card",
@@ -20396,22 +20279,22 @@ async function addTodoNotificationToChat(
     cardDesc: cardDesc,
     timestamp: Date.now() - 1000,
   };
-
+  
   // 添加AI回复消息
   const aiReply = {
     role: "assistant",
     content: reply,
     timestamp: Date.now(),
   };
-
+  
   chatHistories[charId].push(todoCard, aiReply);
-
+  
   // 保存到localforage
   await localforage.setItem("chatHistories", chatHistories);
-
+  
   // 统一使用字符串类型的charId
   const charIdStr = String(charId);
-
+  
   // 如果当前正在查看这个角色的对话，刷新显示
   if (String(currentChatCharId) === charIdStr) {
     if (typeof renderConversation === "function") {
@@ -20419,7 +20302,7 @@ async function addTodoNotificationToChat(
     }
   } else {
     // 不在当前对话，增加未读消息计数并显示弹窗
-    const charObj = characters.find((c) => String(c.id) === charIdStr);
+    const charObj = characters.find(c => String(c.id) === charIdStr);
     if (charObj) {
       // 使用addUnreadMessage来正确更新未读
       if (typeof addUnreadMessage === "function") {
@@ -20427,18 +20310,13 @@ async function addTodoNotificationToChat(
       }
       // 显示消息弹窗通知
       if (typeof showMessageNotification === "function") {
-        showMessageNotification(
-          charObj.id,
-          charObj.name,
-          charObj.avatar,
-          reply
-        );
+        showMessageNotification(charObj.id, charObj.note || charObj.name, charObj.avatar, reply);
       }
     }
   }
-
+  
   // 更新消息列表预览
-  const charObj = characters.find((c) => String(c.id) === charIdStr);
+  const charObj = characters.find(c => String(c.id) === charIdStr);
   if (charObj && typeof updateCharacterLastMessage === "function") {
     updateCharacterLastMessage(charObj.id, reply);
   }
@@ -20454,16 +20332,14 @@ function renderTodoAiCharList() {
   }
 
   let html = "";
-  characters.forEach((char) => {
+  characters.forEach(char => {
     const isActive = window.todoAiBindings[char.id];
     const avatar = char.avatar
       ? `<img src="${char.avatar}" />`
       : char.name.charAt(0);
 
     html += `
-      <div class="todo-ai-item ${
-        isActive ? "active" : ""
-      }" onclick="toggleTodoAiBinding('${char.id}')">
+      <div class="todo-ai-item ${isActive ? 'active' : ''}" onclick="toggleTodoAiBinding('${char.id}')">
         <div class="todo-ai-avatar">${avatar}</div>
         <div class="todo-ai-name">${char.name}</div>
       </div>
@@ -20478,7 +20354,7 @@ async function toggleTodoAiBinding(charId) {
   window.todoAiBindings[charId] = !window.todoAiBindings[charId];
   await localforage.setItem("todoAiBindings", window.todoAiBindings);
   renderTodoAiCharList();
-
+  
   if (window.todoAiBindings[charId] && !wasBinding) {
     showToast("已绑定督促助手");
     // 发送绑定欢迎消息
@@ -20490,26 +20366,26 @@ async function toggleTodoAiBinding(charId) {
 
 // AI绑定时发送欢迎消息
 async function triggerTodoAiBindingMessage(charId) {
-  const char = characters.find((c) => String(c.id) === String(charId));
+  const char = characters.find(c => String(c.id) === String(charId));
   if (!char) return;
-
+  
   const apiConfig = getActiveApiConfig();
   if (!apiConfig || !apiConfig.url || !apiConfig.key) {
     console.log("未配置API，跳过绑定欢迎消息");
     return;
   }
-
+  
   // 获取角色人设
   const settings = chatSettings[charId] || {};
   const persona = settings.persona || char.description || char.persona || "";
   const charName = settings.charName || char.name || "助手";
-
+  
   // 获取当前待办列表
-  const pending = window.todoList.filter((t) => !t.done);
+  const pending = window.todoList.filter(t => !t.done);
   let todoInfo = "";
   if (pending.length > 0) {
     todoInfo = `\n用户当前有${pending.length}个待办事项：\n`;
-    pending.slice(0, 3).forEach((t) => {
+    pending.slice(0, 3).forEach(t => {
       todoInfo += `- ${t.text}\n`;
     });
     if (pending.length > 3) {
@@ -20518,17 +20394,15 @@ async function triggerTodoAiBindingMessage(charId) {
   } else {
     todoInfo = "\n用户目前没有待办事项。";
   }
-
+  
   let apiUrl = apiConfig.url.replace(/\/$/, "");
   if (!apiUrl.endsWith("/chat/completions")) {
     apiUrl += "/chat/completions";
   }
-
-  const systemPrompt = persona
-    ? `你是${charName}。${persona}`
-    : `你是${charName}，一个温柔体贴的AI助手。`;
+  
+  const systemPrompt = persona ? `你是${charName}。${persona}` : `你是${charName}，一个温柔体贴的AI助手。`;
   const userPrompt = `用户刚刚把你设为了待办事项督促助手，你现在可以看到用户的待办事项了。${todoInfo}\n\n请用符合你性格的方式打个招呼，表示你会帮助用户管理待办事项。简短温馨，不超过80字。`;
-
+  
   try {
     const resp = await fetch(apiUrl, {
       method: "POST",
@@ -20542,20 +20416,15 @@ async function triggerTodoAiBindingMessage(charId) {
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
+        
       }),
     });
-
+    
     if (resp.ok) {
       const data = await resp.json();
       const reply = data.choices?.[0]?.message?.content?.trim();
       if (reply) {
-        await addTodoNotificationToChat(
-          charId,
-          char,
-          { text: "绑定督促助手" },
-          reply,
-          "binding"
-        );
+        await addTodoNotificationToChat(charId, char, { text: "绑定督促助手" }, reply, "binding");
         showToast(`${char.name} 发来消息~`);
       }
     }
@@ -20568,33 +20437,33 @@ async function triggerTodoAiBindingMessage(charId) {
 function generateTodoPromptForAi(charId) {
   if (!window.todoAiBindings[charId]) return "";
 
-  const pending = window.todoList.filter((t) => !t.done);
+  const pending = window.todoList.filter(t => !t.done);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const todayTime = today.getTime();
-
+  
   // 获取今天完成的待办
-  const completedToday = window.todoList.filter((t) => {
+  const completedToday = window.todoList.filter(t => {
     if (!t.done || !t.doneAt) return false;
     return t.doneAt >= todayTime;
   });
-
+  
   // 如果没有待办事项，返回空
   if (pending.length === 0 && completedToday.length === 0) return "";
 
   const quadrantNames = {
     q1: "重要且紧急",
     q2: "重要不紧急",
-    q3: "紧急不重要",
-    q4: "不重要不紧急",
+    q3: "紧急不重要", 
+    q4: "不重要不紧急"
   };
 
   let prompt = "\n\n[待办事项信息]\n";
-
+  
   // 显示未完成的待办
   if (pending.length > 0) {
     prompt += "未完成的待办：\n";
-    pending.slice(0, 5).forEach((t) => {
+    pending.slice(0, 5).forEach(t => {
       const qName = quadrantNames[t.quadrant] || "其他";
       prompt += `- ${t.text} (${qName})\n`;
     });
@@ -20602,21 +20471,20 @@ function generateTodoPromptForAi(charId) {
       prompt += `...还有${pending.length - 5}项未完成\n`;
     }
   }
-
+  
   // 显示今天已完成的待办
   if (completedToday.length > 0) {
     prompt += "\n今天已完成：\n";
-    completedToday.slice(0, 3).forEach((t) => {
+    completedToday.slice(0, 3).forEach(t => {
       prompt += `- ✓ ${t.text}\n`;
     });
     if (completedToday.length > 3) {
       prompt += `...还有${completedToday.length - 3}项已完成\n`;
     }
   }
-
+  
   if (pending.length > 0) {
-    prompt +=
-      "\n请在合适的时机温柔地提醒用户完成待办，也可以表扬用户完成的事项。";
+    prompt += "\n请在合适的时机温柔地提醒用户完成待办，也可以表扬用户完成的事项。";
   } else {
     prompt += "\n用户今天完成了所有待办，可以适当表扬鼓励！";
   }
@@ -21201,9 +21069,7 @@ function renderVisibilityOptions() {
     const typeIcon = group.type === "exclude" ? "🙈" : "👁️";
     html += `<div class="ig-visibility-option custom-group ${
       isSelected ? "selected" : ""
-    }" data-value="custom_${group.id}" onclick="toggleVisibilityGroup('custom_${
-      group.id
-    }', this)">
+    }" data-value="custom_${group.id}" onclick="toggleVisibilityGroup('custom_${group.id}', this)">
       <span class="check-icon">✓</span> 
       <span class="group-type-badge">${typeIcon}</span>
       ${group.name}
@@ -21289,7 +21155,7 @@ function closeGroupManageModal() {
 function renderCustomGroupList() {
   const container = document.getElementById("customGroupList");
   if (!container) return;
-
+  
   if (customVisibilityGroups.length === 0) {
     container.innerHTML = `
       <div class="ig-group-empty">
@@ -21305,13 +21171,13 @@ function renderCustomGroupList() {
     `;
     return;
   }
-
+  
   let html = "";
-  customVisibilityGroups.forEach((group) => {
+  customVisibilityGroups.forEach(group => {
     const typeIcon = group.type === "exclude" ? "🙈" : "👁️";
     const typeTag = group.type === "exclude" ? "不给谁看" : "部分可见";
     const typeClass = group.type === "exclude" ? "exclude" : "";
-
+    
     html += `
       <div class="ig-group-item" data-group-id="${group.id}">
         <div class="ig-group-icon ${typeClass}">${typeIcon}</div>
@@ -21339,7 +21205,7 @@ function renderCustomGroupList() {
       </div>
     `;
   });
-
+  
   container.innerHTML = html;
 }
 
@@ -21348,49 +21214,49 @@ function openCreateGroupModal() {
   editingCustomGroupId = null;
   tempGroupMembers = [];
   tempGroupType = "include";
-
+  
   document.getElementById("createGroupTitle").textContent = "新建分组";
   document.getElementById("customGroupNameInput").value = "";
-
+  
   // 重置类型选择
-  document.querySelectorAll(".ig-group-type-option").forEach((opt) => {
+  document.querySelectorAll(".ig-group-type-option").forEach(opt => {
     opt.classList.remove("selected");
     if (opt.dataset.type === "include") {
       opt.classList.add("selected");
     }
   });
-
+  
   updateMembersLabel();
   renderGroupMemberList();
   updateGroupMemberCount();
-
+  
   document.getElementById("igCreateGroupModal").classList.add("active");
 }
 
 // 编辑分组
 function editCustomGroup(groupId) {
-  const group = customVisibilityGroups.find((g) => g.id === groupId);
+  const group = customVisibilityGroups.find(g => g.id === groupId);
   if (!group) return;
-
+  
   editingCustomGroupId = groupId;
   tempGroupMembers = [...group.members];
   tempGroupType = group.type;
-
+  
   document.getElementById("createGroupTitle").textContent = "编辑分组";
   document.getElementById("customGroupNameInput").value = group.name;
-
+  
   // 设置类型选择
-  document.querySelectorAll(".ig-group-type-option").forEach((opt) => {
+  document.querySelectorAll(".ig-group-type-option").forEach(opt => {
     opt.classList.remove("selected");
     if (opt.dataset.type === group.type) {
       opt.classList.add("selected");
     }
   });
-
+  
   updateMembersLabel();
   renderGroupMemberList();
   updateGroupMemberCount();
-
+  
   document.getElementById("igCreateGroupModal").classList.add("active");
 }
 
@@ -21403,7 +21269,7 @@ function closeCreateGroupModal() {
 // 选择分组类型
 function selectGroupType(type, el) {
   tempGroupType = type;
-  document.querySelectorAll(".ig-group-type-option").forEach((opt) => {
+  document.querySelectorAll(".ig-group-type-option").forEach(opt => {
     opt.classList.remove("selected");
   });
   el.classList.add("selected");
@@ -21414,8 +21280,7 @@ function selectGroupType(type, el) {
 function updateMembersLabel() {
   const label = document.getElementById("membersLabel");
   if (label) {
-    label.textContent =
-      tempGroupType === "exclude" ? "选择不给谁看" : "选择可见的人";
+    label.textContent = tempGroupType === "exclude" ? "选择不给谁看" : "选择可见的人";
   }
 }
 
@@ -21423,32 +21288,32 @@ function updateMembersLabel() {
 function renderGroupMemberList(searchTerm = "") {
   const container = document.getElementById("groupMemberList");
   if (!container) return;
-
+  
   const chars = window.characters || [];
-
+  
   if (chars.length === 0) {
     container.innerHTML = `<div class="ig-members-empty">还没有好友，去聊天页面添加角色吧</div>`;
     return;
   }
-
+  
   let filteredChars = chars;
   if (searchTerm) {
     const term = searchTerm.toLowerCase();
-    filteredChars = chars.filter((char) => {
+    filteredChars = chars.filter(char => {
       const name = (char.note || char.name || "").toLowerCase();
       return name.includes(term);
     });
   }
-
+  
   if (filteredChars.length === 0) {
     container.innerHTML = `<div class="ig-members-empty">没有找到匹配的好友</div>`;
     return;
   }
-
+  
   let html = "";
-  filteredChars.forEach((char) => {
+  filteredChars.forEach(char => {
     const isSelected = tempGroupMembers.includes(String(char.id));
-
+    
     let avatarHtml = "";
     if (char.avatar) {
       if (char.avatar.startsWith("data:") || char.avatar.startsWith("http")) {
@@ -21459,18 +21324,18 @@ function renderGroupMemberList(searchTerm = "") {
     } else {
       avatarHtml = `<span class="avatar-emoji">🤖</span>`;
     }
-
+    
     html += `
-      <div class="ig-member-item ${isSelected ? "selected" : ""}" 
+      <div class="ig-member-item ${isSelected ? 'selected' : ''}" 
            data-char-id="${char.id}" 
            onclick="toggleGroupMember('${char.id}', this)">
-        <div class="ig-member-checkbox">${isSelected ? "✓" : ""}</div>
+        <div class="ig-member-checkbox">${isSelected ? '✓' : ''}</div>
         <div class="ig-member-avatar">${avatarHtml}</div>
-        <div class="ig-member-name">${char.note || char.name || "未命名"}</div>
+        <div class="ig-member-name">${char.note || char.name || '未命名'}</div>
       </div>
     `;
   });
-
+  
   container.innerHTML = html;
 }
 
@@ -21483,7 +21348,7 @@ function filterGroupMemberList(value) {
 function toggleGroupMember(charId, el) {
   const id = String(charId);
   const index = tempGroupMembers.indexOf(id);
-
+  
   if (index > -1) {
     tempGroupMembers.splice(index, 1);
     el.classList.remove("selected");
@@ -21493,26 +21358,22 @@ function toggleGroupMember(charId, el) {
     el.classList.add("selected");
     el.querySelector(".ig-member-checkbox").textContent = "✓";
   }
-
+  
   updateGroupMemberCount();
 }
 
 // 全选成员
 function selectAllGroupMembers() {
   const chars = window.characters || [];
-  tempGroupMembers = chars.map((c) => String(c.id));
-  renderGroupMemberList(
-    document.getElementById("groupMemberSearch")?.value || ""
-  );
+  tempGroupMembers = chars.map(c => String(c.id));
+  renderGroupMemberList(document.getElementById("groupMemberSearch")?.value || "");
   updateGroupMemberCount();
 }
 
 // 清空选择
 function deselectAllGroupMembers() {
   tempGroupMembers = [];
-  renderGroupMemberList(
-    document.getElementById("groupMemberSearch")?.value || ""
-  );
+  renderGroupMemberList(document.getElementById("groupMemberSearch")?.value || "");
   updateGroupMemberCount();
 }
 
@@ -21527,28 +21388,26 @@ function updateGroupMemberCount() {
 // 保存分组
 async function saveCustomGroup() {
   const name = document.getElementById("customGroupNameInput").value.trim();
-
+  
   if (!name) {
     showToast("请输入分组名称");
     return;
   }
-
+  
   if (tempGroupMembers.length === 0) {
     showToast("请至少选择一个人");
     return;
   }
-
+  
   if (editingCustomGroupId) {
     // 编辑模式
-    const index = customVisibilityGroups.findIndex(
-      (g) => g.id === editingCustomGroupId
-    );
+    const index = customVisibilityGroups.findIndex(g => g.id === editingCustomGroupId);
     if (index > -1) {
       customVisibilityGroups[index] = {
         ...customVisibilityGroups[index],
         name: name,
         type: tempGroupType,
-        members: [...tempGroupMembers],
+        members: [...tempGroupMembers]
       };
     }
     showToast("分组已更新");
@@ -21559,12 +21418,12 @@ async function saveCustomGroup() {
       name: name,
       type: tempGroupType,
       members: [...tempGroupMembers],
-      createdAt: Date.now(),
+      createdAt: Date.now()
     };
     customVisibilityGroups.push(newGroup);
     showToast("分组创建成功");
   }
-
+  
   await saveCustomGroups();
   closeCreateGroupModal();
   renderCustomGroupList();
@@ -21574,10 +21433,8 @@ async function saveCustomGroup() {
 // 删除分组
 async function deleteCustomGroup(groupId) {
   if (!confirm("确定要删除这个分组吗？")) return;
-
-  customVisibilityGroups = customVisibilityGroups.filter(
-    (g) => g.id !== groupId
-  );
+  
+  customVisibilityGroups = customVisibilityGroups.filter(g => g.id !== groupId);
   await saveCustomGroups();
   renderCustomGroupList();
   renderVisibilityOptions();
@@ -21695,15 +21552,13 @@ async function aiInteractWithPost(post) {
     eligibleChars = window.characters.filter((char) => {
       const settings = chatSettings[char.id] || {};
       const charId = String(char.id);
-
+      
       for (const groupKey of post.visibleGroups) {
         // 检查是否是自定义分组
         if (groupKey.startsWith("custom_")) {
           const customGroupId = groupKey.replace("custom_", "");
-          const customGroup = customVisibilityGroups.find(
-            (g) => g.id === customGroupId
-          );
-
+          const customGroup = customVisibilityGroups.find(g => g.id === customGroupId);
+          
           if (customGroup) {
             if (customGroup.type === "include") {
               // 部分可见：只有在成员列表中的才能看
@@ -21726,7 +21581,7 @@ async function aiInteractWithPost(post) {
       }
       return false;
     });
-
+    
     console.log(
       "可见分组:",
       post.visibleGroups,
@@ -21969,7 +21824,7 @@ ${hasRealImage ? "6. 动态中包含一张图片，请根据图片内容来评�
         body: JSON.stringify({
           model: apiConfigToUse.model,
           messages: [{ role: "user", content: simplePrompt }],
-
+          
           temperature: 0.7,
         }),
       });
@@ -23806,10 +23661,8 @@ function incrementUnreadMoments() {
   const badge = document.getElementById("momentsBadge");
   if (badge) {
     const current = parseInt(badge.textContent) || 0;
-    const newValue = current + 1;
-    badge.textContent = newValue;
-    badge.style.display = "flex";
-    badge.style.display = newValue > 0 ? "flex" : "none";
+    badge.textContent = current + 1;
+    badge.style.display = "inline-flex";
   }
 }
 
@@ -23819,6 +23672,7 @@ function clearUnreadMoments() {
   if (badge) {
     badge.textContent = "0";
     badge.style.display = "none";
+    badge.style.setProperty("display", "none", "important");
   }
 }
 
