@@ -5590,9 +5590,20 @@ function updateConvStatus(statusText) {
 }
 
 // 根据聊天内容生成AI状态（只有单聊才调用）
+// 添加节流：每个角色至少间隔3分钟才更新一次状态
+var lastStatusUpdateTime = {};
+
 async function generateAiStatus(charId) {
   // 检查是否是群聊，群聊不更新状态
   if (currentGroupId) return;
+  
+  // 节流检查：3分钟内不重复更新
+  const now = Date.now();
+  const lastUpdate = lastStatusUpdateTime[charId] || 0;
+  if (now - lastUpdate < 180000) { // 3分钟 = 180000ms
+    console.log("状态更新节流中，跳过");
+    return;
+  }
   
   const apiConfig = getActiveApiConfig();
   if (!apiConfig || !apiConfig.url || !apiConfig.key) return;
@@ -5663,11 +5674,21 @@ ${recentMessages}
     status = status.trim().replace(/^["']|["']$/g, '').replace(/^状态[:：]?\s*/i, '');
     
     if (status && status.length <= 20) {
+      // 检查是否和上次状态重复
+      const oldStatus = aiCharacterStatus[charId]?.status;
+      if (oldStatus === status) {
+        console.log("状态与之前相同，跳过更新");
+        return;
+      }
+      
       aiCharacterStatus[charId] = {
         status: status,
         lastUpdate: Date.now()
       };
       await saveAiCharacterStatus();
+      
+      // 记录更新时间
+      lastStatusUpdateTime[charId] = now;
       
       // 如果当前正在查看这个角色的对话，更新显示
       if (currentChatCharId === charId && !currentGroupId) {
@@ -7375,7 +7396,8 @@ ${m.content}`;
         // 检查是否包含引用标签 [引用:xxx]内容
         let quoteInfo = null;
         let actualContent = partContent;
-        const quoteMatch = partContent.match(/^\[引用[:：]([^\]]+)\](.*)$/s);
+        // 更灵活的引用匹配：支持引用在开头或消息中
+        const quoteMatch = partContent.match(/^\[引用[:：]([^\]]+)\]\s*(.*)$/s);
         if (quoteMatch) {
           quoteInfo = {
             sender: "我", // AI引用的是用户说的话
@@ -7386,7 +7408,12 @@ ${m.content}`;
                 ? quoteMatch[1].substring(0, 50) + "..."
                 : quoteMatch[1],
           };
-          actualContent = quoteMatch[2].trim() || partContent; // 如果没有回复内容，保留原始
+          // 如果引用后有内容就用那个内容，否则显示一个默认回复或空内容（仅显示引用）
+          actualContent = quoteMatch[2].trim();
+          // 如果actualContent为空，不要回退到包含[引用:xxx]的原始内容
+          if (!actualContent) {
+            actualContent = ""; // 只显示引用卡片，不显示文字
+          }
         }
 
         const msgObj = {
@@ -12932,10 +12959,25 @@ async function playVoiceMessage(event, msgIndex) {
 // 播放音频
 function playAudioFromUrl(url, voiceBar) {
   console.log("[Voice] Playing audio from URL:", url);
-  const audio = new Audio(url);
+  
+  // 先停止之前正在播放的音频
+  if (currentPlayingAudio) {
+    try {
+      currentPlayingAudio.pause();
+      currentPlayingAudio.currentTime = 0;
+    } catch (e) {
+      console.warn("[Voice] Error stopping previous audio:", e);
+    }
+    if (currentPlayingBar) {
+      currentPlayingBar.classList.remove("playing");
+    }
+  }
+  
+  const audio = new Audio();
+  audio.preload = "auto";
+  
   currentPlayingAudio = audio;
   currentPlayingBar = voiceBar;
-
   voiceBar.classList.add("playing");
 
   audio.oncanplaythrough = () => {
@@ -12954,21 +12996,33 @@ function playAudioFromUrl(url, voiceBar) {
     voiceBar.classList.remove("playing");
     currentPlayingAudio = null;
     currentPlayingBar = null;
-    showToast("音频播放失败: " + (audio.error?.message || "未知错误"));
+    // 不显示 "The operation was aborted" 错误，这通常是用户主动中断
+    const errorMsg = audio.error?.message || "";
+    if (!errorMsg.includes("aborted")) {
+      showToast("音频播放失败");
+    }
   };
 
-  audio
-    .play()
-    .then(() => {
-      console.log("[Voice] Audio playing...");
-    })
-    .catch((e) => {
-      console.error("[Voice] Audio play error:", e);
-      voiceBar.classList.remove("playing");
-      currentPlayingAudio = null;
-      currentPlayingBar = null;
-      showToast("播放失败: " + e.message);
-    });
+  // 设置src并播放
+  audio.src = url;
+  
+  // 使用setTimeout确保在下一个事件循环中播放，避免一些浏览器问题
+  setTimeout(() => {
+    audio.play()
+      .then(() => {
+        console.log("[Voice] Audio playing...");
+      })
+      .catch((e) => {
+        console.error("[Voice] Audio play error:", e);
+        voiceBar.classList.remove("playing");
+        currentPlayingAudio = null;
+        currentPlayingBar = null;
+        // 不显示 "aborted" 错误
+        if (!e.message.includes("aborted")) {
+          showToast("播放失败");
+        }
+      });
+  }, 50);
 }
 
 // 切换语音文字显示
@@ -13680,37 +13734,36 @@ async function generateHeartVoice(charId, aiResponse, userMessage) {
       return;
     }
 
-    const systemPrompt = `你是一位细腻的文学作家，专门书写${charName}内心独白。你的任务是用散文般的笔触，描绘角色此刻最真实、最隐秘的内心世界。
+    const systemPrompt = `你要为角色"${charName}"生成内心状态描述。用简单自然的语言，像朋友间聊天那样，不要用华丽的文学修辞。
 
 【角色人设】
 ${persona || "(无特定人设)"}
 
-【创作要求】
-1. 必须完全代入角色，以角色的视角和心理来写作，绝不能脱离人设
-2. 文字要细腻、有质感，像小说中的心理描写一样耐人寻味
-3. 禁止使用任何emoji或颜文字
-4. 每一段都要有画面感，让读者能够想象出场景
-5. 语言风格要符合角色的性格和背景
+【要求】
+1. 完全代入角色视角
+2. 语言要简单直白，口语化
+3. 禁止使用emoji或颜文字
+4. 禁止使用比喻、排比等修辞手法
+5. 写得像角色的碎碎念，而不是文学作品
 
 【输出格式】
-必须以JSON格式输出，包含以下4个字段：
+必须以JSON格式输出：
 {
-  "action": "此刻的姿态（30-50字，用细腻的文字描绘角色此刻的动作、姿态、小习惯，要有画面感）",
-  "outfit": "今日的装扮（30-50字，描写角色的穿着打扮，包括衣物的材质、颜色、细节，以及整体给人的感觉）",
-  "mood": "当前心绪（用2-4个简洁的词语描述情绪，如：欣喜、害羞、忐忑、心动、失落、期待、紧张、安心、甜蜜、担忧等。不要写长句，不要用emoji）",
-  "secret": "未说出口的话（50-80字，写出角色内心最想说却没有说出口的话，要符合角色性格，有情感张力，像是日记里的私语）"
+  "action": "此刻在干嘛（15-25字，简单描述动作，比如'托着腮发呆'、'盯着手机屏幕'）",
+  "outfit": "今天穿啥（15-25字，简单说穿着，比如'白T恤加牛仔裤'、'睡衣还没换'）",
+  "mood": "心情怎样（2-3个词，比如：开心、有点紧张、期待）",
+  "secret": "想说但没说的话（30-50字，用角色平时说话的语气写，像对自己嘀咕）"
 }
 
-只输出JSON，不要有任何其他内容。`;
+只输出JSON，不要其他内容。`;
 
-    const userPrompt = `【对话场景】
-用户对${charName}说："${userMessage}"
-
-${charName}的回应："${aiResponse.substring(0, 300)}${
+    const userPrompt = `【场景】
+用户说："${userMessage}"
+${charName}回复："${aiResponse.substring(0, 300)}${
       aiResponse.length > 300 ? "..." : ""
     }"
 
-请以${charName}的视角，用散文般的笔触，写出此刻的内心世界：`;
+请以${charName}的身份，写出此刻的状态：`;
 
     // 确保URL格式正确
     let apiUrl = apiConfigToUse.url.replace(/\/$/, "");
@@ -17084,6 +17137,17 @@ async function generateCallResponse(context) {
     if (persona && persona.trim()) {
       inCallPrompt = persona.trim() + "\n\n";
     }
+
+    // 添加当前时间（重要！让AI知道真实时间）
+    const currentTimeStr = new Date().toLocaleString("zh-CN", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      weekday: "long",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    inCallPrompt += `【当前真实时间】${currentTimeStr}\n\n`;
 
     // 添加聊天记录摘要
     if (recentChatSummary) {
