@@ -228,10 +228,11 @@ div#forumPage,
 /* 帖子头部 */
 .forum-post-header {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 4px;
   margin-bottom: 2px;
   overflow: hidden;
+  flex-wrap: nowrap;
 }
 
 .forum-post-name {
@@ -3637,4 +3638,153 @@ textarea.forum-input {
   background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%) !important;
   color: white !important;
   font-size: 18px !important;
+}
+
+/* ==================== 帖子更多菜单和删除功能 ==================== */
+
+/* 帖子更多按钮 */
+.forum-post-more-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: #536471;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.forum-post-more-btn:hover,
+.forum-post-more-btn:active {
+  background: rgba(244, 143, 177, 0.1);
+  color: #f48fb1;
+}
+
+/* 更多菜单下拉 */
+.forum-post-more-menu {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  min-width: 180px;
+  animation: fadeInScale 0.15s ease-out;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.forum-post-more-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 500;
+  color: #0f1419;
+  transition: background 0.2s;
+}
+
+.forum-post-more-menu-item:active {
+  background: #f7f9f9;
+}
+
+.forum-post-more-menu-item.delete {
+  color: #f4212e;
+}
+
+.forum-post-more-menu-item.delete:active {
+  background: #fef2f2;
+}
+
+/* 删除确认弹窗 */
+.forum-delete-confirm-modal {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  width: 280px;
+  max-width: 90vw;
+  text-align: center;
+}
+
+.forum-delete-confirm-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f1419;
+  margin-bottom: 8px;
+}
+
+.forum-delete-confirm-text {
+  font-size: 15px;
+  color: #536471;
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+
+.forum-delete-confirm-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.forum-delete-cancel-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 9999px;
+  border: 1px solid #cfd9de;
+  background: #ffffff;
+  color: #0f1419;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.forum-delete-cancel-btn:active {
+  background: #f7f9f9;
+}
+
+.forum-delete-confirm-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 9999px;
+  border: none;
+  background: #f4212e;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.forum-delete-confirm-btn:active {
+  background: #dc1e28;
+}
+
+/* ==================== @提及样式 ==================== */
+
+.forum-mention {
+  color: #1d9bf0;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.forum-mention:hover,
+.forum-mention:active {
+  text-decoration: underline;
+  color: #1a8cd8;
 }

@@ -1936,7 +1936,7 @@ function openGroupConversation(groupId) {
     replyBtn.disabled = false;
     replyBtn.classList.remove("loading");
     replyBtn.innerHTML =
-      '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3z"></path><path d="M5 19l1 3 1-3 3-1-3-1-1-3-1 3-3 1 3 1z"></path><path d="M18 14l.5 1.5 1.5.5-1.5.5-.5 1.5-.5-1.5-1.5-.5 1.5-.5.5-1.5z"></path></svg>';
+      '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
   }
 
   document.getElementById("chatConversationPage").classList.add("active");
@@ -1944,11 +1944,17 @@ function openGroupConversation(groupId) {
 
   // 设置群头像
   const avatarEl = document.getElementById("convAvatar");
-  if (group.avatar) {
+  if (group.avatar && group.avatar.trim()) {
     avatarEl.innerHTML = `<img src="${group.avatar}" style="width:100%;height:100%;object-fit:cover;">`;
   } else {
-    avatarEl.innerHTML = "👥";
+    // 没有头像时显示群名首字符
+    const firstChar = (group.name || "群").charAt(0);
+    avatarEl.innerHTML = `<span style="font-size:18px;">${firstChar}</span>`;
   }
+
+  // 群聊状态显示成员数量
+  const memberCount = (group.members || []).length;
+  updateConvStatus(`${memberCount}位成员`);
 
   // 显示群公告栏
   toggleGroupAnnouncementBar(true);
@@ -2037,10 +2043,10 @@ async function loadGroupMessages(groupId) {
                data-voice-text="${escapeHtml(voiceText)}">
             <div class="user-voice-message">
               <div class="user-voice-bar" onclick="playGroupUserVoiceBar(event, ${index})">
-                <span class="user-voice-duration">${duration}"</span>
                 <div class="user-voice-waves">
                   <span></span><span></span><span></span><span></span><span></span>
                 </div>
+                <span class="user-voice-duration">${duration}"</span>
               </div>
               <div class="user-voice-text ${textVisible}" id="groupUserVoiceText-${index}">${escapeHtml(
             voiceText
@@ -5558,6 +5564,121 @@ document.addEventListener("click", function (e) {
 // ==================== CHAT CONVERSATION ====================
 var currentChatCharId = null;
 
+// AI角色状态存储 { charId: { status: "状态文字", lastUpdate: timestamp } }
+var aiCharacterStatus = {};
+
+// 加载AI状态
+async function loadAiCharacterStatus() {
+  const saved = await localforage.getItem("aiCharacterStatus");
+  if (saved) {
+    aiCharacterStatus = saved;
+  }
+}
+loadAiCharacterStatus();
+
+// 保存AI状态
+async function saveAiCharacterStatus() {
+  await localforage.setItem("aiCharacterStatus", aiCharacterStatus);
+}
+
+// 更新顶栏状态显示
+function updateConvStatus(statusText) {
+  const statusEl = document.getElementById("convStatusText");
+  if (statusEl) {
+    statusEl.textContent = statusText || "Online";
+  }
+}
+
+// 根据聊天内容生成AI状态（只有单聊才调用）
+async function generateAiStatus(charId) {
+  // 检查是否是群聊，群聊不更新状态
+  if (currentGroupId) return;
+  
+  const apiConfig = getActiveApiConfig();
+  if (!apiConfig || !apiConfig.url || !apiConfig.key) return;
+  
+  const char = characters.find(c => c.id === charId);
+  if (!char) return;
+  
+  const settings = chatSettings[charId] || {};
+  const history = chatHistories[charId] || [];
+  
+  // 获取最近几条消息作为上下文
+  const recentMessages = history.slice(-6).map(m => {
+    const role = m.role === 'user' ? '用户' : char.name;
+    return `${role}: ${m.content}`;
+  }).join('\n');
+  
+  if (!recentMessages) return;
+  
+  try {
+    const prompt = `你是一个状态生成器。根据以下聊天记录，为AI角色"${settings.charName || char.name}"生成一个简短的状态文字（类似社交软件的在线状态）。
+
+【角色人设】${settings.persona || char.persona || '友好的聊天伴侣'}
+
+【最近聊天】
+${recentMessages}
+
+要求：
+1. 状态要简短，5-15个字
+2. 要体现角色当前正在做的事或状态
+3. 禁止使用emoji、颜文字、特殊符号
+4. 禁止使用省略号、波浪线等装饰性标点
+5. 语气自然朴素，像普通人随手写的
+6. 不要用"ing"、"~"等网络用语
+
+示例状态：
+- 乖乖等小姑娘写作业
+- 准备会前材料
+- 打游戏中
+- 刚睡醒
+- 在看剧
+- 出门买菜
+- 加班
+- 摸鱼
+- 等消息
+
+请只返回状态文字，不要其他内容。`;
+
+    const response = await fetch(`${apiConfig.url}/chat/completions`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiConfig.key}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: apiConfig.model,
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.9,
+        max_tokens: 50,
+      }),
+    });
+
+    if (!response.ok) return;
+    
+    const data = await response.json();
+    let status = data.choices[0]?.message?.content || "";
+    
+    // 清理状态文字
+    status = status.trim().replace(/^["']|["']$/g, '').replace(/^状态[:：]?\s*/i, '');
+    
+    if (status && status.length <= 20) {
+      aiCharacterStatus[charId] = {
+        status: status,
+        lastUpdate: Date.now()
+      };
+      await saveAiCharacterStatus();
+      
+      // 如果当前正在查看这个角色的对话，更新显示
+      if (currentChatCharId === charId && !currentGroupId) {
+        updateConvStatus(status);
+      }
+    }
+  } catch (e) {
+    console.warn("生成AI状态失败:", e);
+  }
+}
+
 // Open conversation
 async function openConversation(charId) {
   // 设置标题栏 (带火花)
@@ -5573,7 +5694,7 @@ async function openConversation(charId) {
     replyBtn.disabled = false;
     replyBtn.classList.remove("loading");
     replyBtn.innerHTML =
-      '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3z"></path><path d="M5 19l1 3 1-3 3-1-3-1-1-3-1 3-3 1 3 1z"></path><path d="M18 14l.5 1.5 1.5.5-1.5.5-.5 1.5-.5-1.5-1.5-.5 1.5-.5.5-1.5z"></path></svg>';
+      '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
   }
 
   // 隐藏群公告栏（单聊不显示）
@@ -5592,10 +5713,20 @@ async function openConversation(charId) {
   // Set header info
   document.getElementById("convName").textContent = char.name;
   const avatarEl = document.getElementById("convAvatar");
-  if (char.avatar) {
+  if (char.avatar && char.avatar.trim()) {
     avatarEl.innerHTML = `<img src="${char.avatar}" alt="${char.name}">`;
   } else {
-    avatarEl.innerHTML = "🤖";
+    // 没有头像时显示名字首字符
+    const firstChar = (char.name || "AI").charAt(0);
+    avatarEl.innerHTML = `<span style="font-size:18px;">${firstChar}</span>`;
+  }
+
+  // 加载并显示AI状态（单聊才显示）
+  const savedStatus = aiCharacterStatus[charId];
+  if (savedStatus && savedStatus.status) {
+    updateConvStatus(savedStatus.status);
+  } else {
+    updateConvStatus("Online");
   }
 
   // 确保chatHistories是最新的 - 从localforage重新读取
@@ -5782,19 +5913,17 @@ window.renderMessageGroup = function (
               <div class="user-voice-bar" onclick="playUserVoiceBar(event, ${
                 m.originalIndex
               })">
-                  <span class="user-voice-duration">${duration}"</span>
                   <div class="user-voice-waves">
                       <span></span><span></span><span></span><span></span><span></span>
                   </div>
+                  <span class="user-voice-duration">${duration}"</span>
               </div>
               <div class="user-voice-text ${textVisible}" id="userVoiceText-${
           m.originalIndex
         }">${escapeHtml(voiceText)}</div>
               <div class="user-voice-to-text-btn" onclick="toggleUserVoiceText(event, ${
                 m.originalIndex
-              })">
-                  ${m.voiceTextVisible ? "收起文字" : "转文字"}
-              </div>
+              })">${m.voiceTextVisible ? "收起文字" : "转文字"}</div>
           </div>
       </div>`;
 
@@ -7360,6 +7489,13 @@ ${m.content}`;
       });
     }
 
+    // 异步更新AI状态（单聊才更新，不阻塞主流程）
+    if (!currentGroupId) {
+      generateAiStatus(savedCharId).catch((e) => {
+        console.warn("AI状态更新失败:", e);
+      });
+    }
+
     // 自动推进阅读进度（如果开启了一起读书功能）
     advanceReadingProgress();
   } catch (error) {
@@ -7368,7 +7504,7 @@ ${m.content}`;
   } finally {
     btn.disabled = false;
     btn.classList.remove("loading");
-    btn.innerHTML = "<span>★</span>";
+    btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
   }
 }
 
@@ -10977,16 +11113,17 @@ function initFlameSettingsUI() {
 }
 // ==================== UI 美化：毛玻璃 & 按钮布局优化 ====================
 
-// 1. 注入样式 (隐藏头像、毛玻璃、圆形按钮)
+// 1. 注入样式 (iOS风格顶栏、毛玻璃、圆形按钮)
 const uiUpgradeStyle = document.createElement("style");
 uiUpgradeStyle.innerHTML = `
-                      /* --- 1. 隐藏聊天顶部标题栏的那个小头像 --- */
+                      /* --- 1. iOS风格聊天顶栏 --- */
                       .conv-title-section .conv-avatar {
-                          display: none !important;
+                          display: flex !important;
+                          width: 42px !important;
+                          height: 42px !important;
                       }
-                      /* 调整名字的位置，因为头像没了，名字要居中显示 */
                       .conv-title-section {
-                          margin: 0 !important;
+                          margin: 0 12px !important;
                           justify-content: center;
                       }
 
@@ -10996,7 +11133,7 @@ uiUpgradeStyle.innerHTML = `
                           background: transparent !important;
                           border: none !important;
                           box-shadow: none !important;
-                          padding-bottom: 25px !important;
+                          padding-bottom: 20px !important;
                       }
                       
                       /* 顶部模糊遮罩 */
@@ -11006,16 +11143,18 @@ uiUpgradeStyle.innerHTML = `
                           top: 0;
                           left: 0;
                           right: 0;
-                          bottom: 0;
-                          backdrop-filter: blur(20px) saturate(180%);
-                          -webkit-backdrop-filter: blur(20px) saturate(180%);
+                          height: 150px;
+                          backdrop-filter: blur(12px) saturate(140%);
+                          -webkit-backdrop-filter: blur(12px) saturate(140%);
                           mask-image: linear-gradient(to bottom, 
                             rgba(0,0,0,1) 0%, 
-                            rgba(0,0,0,0.8) 50%,
+                            rgba(0,0,0,0.9) 40%,
+                            rgba(0,0,0,0.5) 70%,
                             rgba(0,0,0,0) 100%);
                           -webkit-mask-image: linear-gradient(to bottom, 
                             rgba(0,0,0,1) 0%, 
-                            rgba(0,0,0,0.8) 50%,
+                            rgba(0,0,0,0.9) 40%,
+                            rgba(0,0,0,0.5) 70%,
                             rgba(0,0,0,0) 100%);
                           z-index: -1;
                           pointer-events: none;
@@ -11025,26 +11164,31 @@ uiUpgradeStyle.innerHTML = `
                       .conv-input-area {
                           background: transparent !important;
                           border: none !important;
-                          padding-top: 25px !important;
+                          border-top: none !important;
+                          box-shadow: none !important;
+                          padding-top: 35px !important;
+                          padding-bottom: calc(28px + env(safe-area-inset-bottom)) !important;
                       }
                       
-                      /* 底部模糊遮罩 */
+                      /* 底部模糊遮罩 - 跟顶栏一样的效果 */
                       .conv-input-area::before {
                           content: "";
                           position: absolute;
-                          top: 0;
+                          bottom: 0;
                           left: 0;
                           right: 0;
-                          bottom: 0;
-                          backdrop-filter: blur(20px) saturate(180%);
-                          -webkit-backdrop-filter: blur(20px) saturate(180%);
+                          height: 160px;
+                          backdrop-filter: blur(12px) saturate(140%);
+                          -webkit-backdrop-filter: blur(12px) saturate(140%);
                           mask-image: linear-gradient(to top, 
                             rgba(0,0,0,1) 0%, 
-                            rgba(0,0,0,0.8) 60%,
+                            rgba(0,0,0,0.9) 40%,
+                            rgba(0,0,0,0.5) 70%,
                             rgba(0,0,0,0) 100%);
                           -webkit-mask-image: linear-gradient(to top, 
                             rgba(0,0,0,1) 0%, 
-                            rgba(0,0,0,0.8) 60%,
+                            rgba(0,0,0,0.9) 40%,
+                            rgba(0,0,0,0.5) 70%,
                             rgba(0,0,0,0) 100%);
                           z-index: -1;
                           pointer-events: none;
@@ -11075,9 +11219,9 @@ uiUpgradeStyle.innerHTML = `
                       }
                       
                       #replyBtn svg {
-                          stroke: #e91e63;
+                          stroke: none;
                           stroke-width: 2;
-                          fill: none;
+                          fill: #333;
                           width: 20px;
                           height: 20px;
                       }
@@ -11121,8 +11265,13 @@ document.addEventListener("DOMContentLoaded", function () {
     replyBtn.parentNode !== wrapper
   ) {
     replyBtn.innerHTML =
-      '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3z"></path><path d="M5 19l1 3 1-3 3-1-3-1-1-3-1 3-3 1 3 1z"></path><path d="M18 14l.5 1.5 1.5.5-1.5.5-.5 1.5-.5-1.5-1.5-.5 1.5-.5.5-1.5z"></path></svg>';
+      '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
     wrapper.insertBefore(replyBtn, sendBtn);
+    
+    // 修改发送按钮为箭头图标
+    if (sendBtn) {
+      sendBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>';
+    }
     const input = document.getElementById("convInput");
     if (input) input.style.marginRight = "4px";
   }
@@ -11155,9 +11304,9 @@ simpleBtnStyle.innerHTML = `
                       }
                       
                       #replyBtn svg {
-                          stroke: #e91e63;
+                          stroke: none;
                           stroke-width: 2;
-                          fill: none;
+                          fill: #333;
                           width: 20px;
                           height: 20px;
                       }
@@ -13820,6 +13969,14 @@ async function initStickerPanel() {
     window.aiStickerBindings = {};
   }
 
+  // 【新增】默认选中第一个非默认分组（如果有的话）
+  const nonDefaultCategories = window.stickerCategories.filter(cat => cat !== "默认");
+  if (nonDefaultCategories.length > 0) {
+    window.currentCategory = nonDefaultCategories[0];
+  } else {
+    window.currentCategory = "默认";
+  }
+
   renderStickerPanel();
 }
 
@@ -13873,8 +14030,14 @@ function renderCategoryBar() {
   const charId = currentChatCharId ? String(currentChatCharId) : "__global__";
   const boundCategories = window.aiStickerBindings[charId] || [];
 
-  // 渲染所有分类标签
-  window.stickerCategories.forEach((cat) => {
+  // 【修改】重新排序分类：把"默认"放到最后
+  const sortedCategories = [
+    ...window.stickerCategories.filter(cat => cat !== "默认"),
+    ...window.stickerCategories.filter(cat => cat === "默认")
+  ];
+
+  // 渲染所有分类标签（使用排序后的分类）
+  sortedCategories.forEach((cat) => {
     const activeClass = cat === window.currentCategory ? "active" : "";
     const aiClass = boundCategories.includes(cat) ? "ai-bound" : "";
 
@@ -14056,8 +14219,13 @@ async function deleteCategory(cat) {
       localforage.setItem("stickerCategories", window.stickerCategories),
     ]);
 
-    // 切换回默认
-    switchCategory("默认");
+    // 【修改】切换到第一个非默认分类，如果没有则切换到默认
+    const nonDefaultCats = window.stickerCategories.filter(c => c !== "默认");
+    if (nonDefaultCats.length > 0) {
+      switchCategory(nonDefaultCats[0]);
+    } else {
+      switchCategory("默认");
+    }
     showToast("分类已删除");
   }
 }
@@ -14665,6 +14833,7 @@ function extractUrlsFromText(text) {
 // 1. 切换面板 (加号面板 vs 表情面板)
 function toggleChatPanel(type) {
   const plusPanel = document.getElementById("plusPanel");
+  const plusOverlay = document.getElementById("plusMenuOverlay");
   const emojiPanel = document.getElementById("emojiPanel");
   const inputArea = document.getElementById("convInput");
 
@@ -14679,6 +14848,7 @@ function toggleChatPanel(type) {
     // 如果没开 -> 打开它，并关闭表情面板
     else {
       plusPanel.classList.add("open");
+      if (plusOverlay) plusOverlay.classList.add("open");
       emojiPanel.classList.remove("open");
       setTimeout(scrollToBottom, 300);
     }
@@ -14691,6 +14861,7 @@ function toggleChatPanel(type) {
     else {
       emojiPanel.classList.add("open");
       plusPanel.classList.remove("open");
+      if (plusOverlay) plusOverlay.classList.remove("open");
       // 重新渲染分类栏（确保群聊中不显示绑定按钮）
       renderCategoryBar();
       setTimeout(scrollToBottom, 300);
@@ -14701,6 +14872,7 @@ function toggleChatPanel(type) {
 // 2. 关闭所有面板 (点击空白处调用)
 function closeChatPanel() {
   const plusPanel = document.getElementById("plusPanel");
+  const plusOverlay = document.getElementById("plusMenuOverlay");
   const emojiPanel = document.getElementById("emojiPanel");
 
   let isClosed = true;
@@ -14708,6 +14880,9 @@ function closeChatPanel() {
   if (plusPanel && plusPanel.classList.contains("open")) {
     plusPanel.classList.remove("open");
     isClosed = false;
+  }
+  if (plusOverlay && plusOverlay.classList.contains("open")) {
+    plusOverlay.classList.remove("open");
   }
   if (emojiPanel && emojiPanel.classList.contains("open")) {
     emojiPanel.classList.remove("open");
@@ -14724,6 +14899,15 @@ function scrollToBottom() {
   const container = document.getElementById("convMessages");
   if (container) container.scrollTop = container.scrollHeight;
 }
+
+// 关闭加号菜单
+function closePlusMenu() {
+  const plusPanel = document.getElementById("plusPanel");
+  const plusOverlay = document.getElementById("plusMenuOverlay");
+  if (plusPanel) plusPanel.classList.remove("open");
+  if (plusOverlay) plusOverlay.classList.remove("open");
+}
+
 // 4. 发送图片功能
 async function handleChatImageUpload(input) {
   const file = input.files[0];
@@ -17514,8 +17698,8 @@ async function sendVoiceAsUserMessage(voiceText, duration) {
     }, 100);
   }
 
-  // 触发AI回复
-  await requestAIReplyForVoice(voiceText, duration);
+  // 【修复】不自动触发AI回复，让用户自己决定
+  // await requestAIReplyForVoice(voiceText, duration);
 }
 
 // 群聊发送语音消息
@@ -23495,8 +23679,28 @@ async function sendBackgroundMessage(charId, content) {
     updateCharacterLastMessage(charId, content);
   }
 
-  // 显示通知
+  // 显示应用内通知
   showMessageNotification(charId, char.note || char.name, char.avatar, content);
+
+  // 【修复】如果应用在后台，发送系统级通知
+  if (document.visibilityState === "hidden") {
+    console.log("后台活动：App在后台，发送系统通知...");
+    let notifyName = char.note || char.name || "AI伴侣";
+    
+    if ("serviceWorker" in navigator && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.ready
+        .then((registration) => {
+          registration.showNotification(notifyName, {
+            body: content,
+            icon: char.avatar || "https://i.postimg.cc/8kmQwCr0/IMG-2897.jpg",
+            tag: "bg-chat-msg-" + Date.now(),
+            renotify: true,
+            vibrate: [200, 100, 200],
+          });
+        })
+        .catch((e) => console.error("后台活动通知发送失败:", e));
+    }
+  }
 
   // 添加未读
   if (typeof addUnreadMessage === "function") {
@@ -23654,6 +23858,26 @@ function showMomentNotification(char, content) {
   notificationTimeout = setTimeout(() => {
     notification.classList.remove("show");
   }, 4000);
+
+  // 【修复】如果应用在后台，发送系统级通知
+  if (document.visibilityState === "hidden") {
+    console.log("动态通知：App在后台，发送系统通知...");
+    let notifyName = char.note || char.name || "AI伴侣";
+    
+    if ("serviceWorker" in navigator && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.ready
+        .then((registration) => {
+          registration.showNotification(notifyName + " 发布了新动态", {
+            body: content.length > 50 ? content.substring(0, 50) + "..." : content,
+            icon: char.avatar || "https://i.postimg.cc/8kmQwCr0/IMG-2897.jpg",
+            tag: "moment-" + Date.now(),
+            renotify: true,
+            vibrate: [200, 100, 200],
+          });
+        })
+        .catch((e) => console.error("动态通知发送失败:", e));
+    }
+  }
 }
 
 // 增加未读动态计数
@@ -26073,6 +26297,7 @@ Object.assign(window, {
   // 聊天面板
   toggleChatPanel,
   closeChatPanel,
+  closePlusMenu,
   // 多媒体消息
   sendRedPacket,
   sendNudge,

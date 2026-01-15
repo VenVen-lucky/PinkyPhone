@@ -287,6 +287,15 @@ function renderForumPostItem(post) {
             <span>·</span>
             <span>${timeStr}</span>
           </div>
+          ${post.authorType === 'user' ? `
+          <button class="forum-post-more-btn" onclick="event.stopPropagation(); showPostMoreMenu(${post.id}, this)" title="更多">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+              <circle cx="5" cy="12" r="2"></circle>
+              <circle cx="12" cy="12" r="2"></circle>
+              <circle cx="19" cy="12" r="2"></circle>
+            </svg>
+          </button>
+          ` : ''}
         </div>
         
         ${post.content ? `<div class="forum-post-content">${contentHtml}</div>` : ''}
@@ -2227,7 +2236,9 @@ async function toggleForumPostLike(postId) {
   post.likes = (post.likes || 0) + (post.liked ? 1 : -1);
 
   await localforage.setItem("forumPosts", forumPosts);
-  renderForumFeed();
+  
+  // 根据当前页面智能渲染
+  smartRenderCurrentPage();
 }
 
 async function toggleForumCommentLike(postId, commentId) {
@@ -2813,6 +2824,129 @@ JSON格式：
 
 // ==================== 工具函数 ====================
 
+// 显示帖子更多菜单
+function showPostMoreMenu(postId, btnEl) {
+  // 移除已存在的菜单
+  const existingMenu = document.querySelector('.forum-post-more-menu');
+  if (existingMenu) existingMenu.remove();
+  
+  const menu = document.createElement('div');
+  menu.className = 'forum-post-more-menu';
+  menu.innerHTML = `
+    <div class="forum-post-more-menu-item delete" onclick="confirmDeletePost(${postId})">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="3 6 5 6 21 6"></polyline>
+        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+        <line x1="10" y1="11" x2="10" y2="17"></line>
+        <line x1="14" y1="11" x2="14" y2="17"></line>
+      </svg>
+      <span>删除帖子</span>
+    </div>
+  `;
+  
+  // 定位菜单
+  const rect = btnEl.getBoundingClientRect();
+  menu.style.position = 'fixed';
+  menu.style.top = (rect.bottom + 4) + 'px';
+  menu.style.right = (window.innerWidth - rect.right) + 'px';
+  menu.style.zIndex = '1000';
+  
+  document.body.appendChild(menu);
+  
+  // 点击其他地方关闭菜单
+  const closeMenu = (e) => {
+    if (!menu.contains(e.target) && e.target !== btnEl) {
+      menu.remove();
+      document.removeEventListener('click', closeMenu);
+    }
+  };
+  setTimeout(() => document.addEventListener('click', closeMenu), 0);
+}
+
+// 确认删除帖子
+function confirmDeletePost(postId) {
+  // 关闭更多菜单
+  const existingMenu = document.querySelector('.forum-post-more-menu');
+  if (existingMenu) existingMenu.remove();
+  
+  // 显示确认对话框
+  const modal = document.createElement('div');
+  modal.className = 'forum-modal-overlay';
+  modal.id = 'forumDeleteConfirmModal';
+  modal.innerHTML = `
+    <div class="forum-delete-confirm-modal">
+      <div class="forum-delete-confirm-title">删除帖子？</div>
+      <div class="forum-delete-confirm-text">此操作无法撤销，这条帖子将从你的主页移除。</div>
+      <div class="forum-delete-confirm-actions">
+        <button class="forum-delete-cancel-btn" onclick="document.getElementById('forumDeleteConfirmModal').remove()">取消</button>
+        <button class="forum-delete-confirm-btn" onclick="deleteForumPost(${postId})">删除</button>
+      </div>
+    </div>
+  `;
+  modal.onclick = (e) => {
+    if (e.target === modal) modal.remove();
+  };
+  document.body.appendChild(modal);
+}
+
+// 删除帖子
+async function deleteForumPost(postId) {
+  // 关闭确认对话框
+  const modal = document.getElementById('forumDeleteConfirmModal');
+  if (modal) modal.remove();
+  
+  // 找到并删除帖子
+  const postIndex = forumPosts.findIndex(p => Number(p.id) === Number(postId));
+  if (postIndex === -1) {
+    showToast('找不到该帖子');
+    return;
+  }
+  
+  // 确保只能删除自己的帖子
+  if (forumPosts[postIndex].authorType !== 'user') {
+    showToast('只能删除自己的帖子');
+    return;
+  }
+  
+  // 从数组中移除
+  forumPosts.splice(postIndex, 1);
+  
+  // 保存到本地存储
+  await localforage.setItem("forumPosts", forumPosts);
+  
+  // 根据当前页面智能渲染
+  smartRenderCurrentPage();
+  showToast('帖子已删除');
+}
+
+// 智能渲染当前页面（根据用户所在位置）
+function smartRenderCurrentPage() {
+  const currentSection = window.currentForumSection || 'home';
+  
+  // 如果正在查看其他用户主页
+  if (currentViewingUser) {
+    const userPosts = forumPosts.filter(p => 
+      p.authorName === currentViewingUser.name && p.authorType !== 'user'
+    );
+    renderOtherUserProfile(currentViewingUser, userPosts, false);
+    return;
+  }
+  
+  // 根据当前section渲染
+  switch (currentSection) {
+    case 'profile':
+      renderForumProfile();
+      break;
+    case 'hot':
+      renderForumHot();
+      break;
+    case 'home':
+    default:
+      renderForumFeed();
+      break;
+  }
+}
+
 // 生成英文handle
 function generateEnglishHandle(name) {
   const prefixes = ['cool', 'happy', 'cute', 'super', 'tiny', 'big', 'sweet', 'star', 'moon', 'sun', 'sky', 'lucky', 'nice'];
@@ -2849,6 +2983,13 @@ function formatForumContent(content) {
   // 先转义HTML
   let html = escapeForumHtml(content);
   
+  // 处理@提及 - 支持 @用户名 或 @handle 格式
+  // 匹配 @后面跟着的中文、英文、数字、下划线，直到遇到空格或标点
+  html = html.replace(/@([a-zA-Z0-9_\u4e00-\u9fa5]+)/g, (match, name) => {
+    const escapedName = name.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+    return `<span class="forum-mention" onclick="event.stopPropagation(); handleMentionClick('${escapedName}')">@${name}</span>`;
+  });
+  
   // 替换 [图片] 或 [图片:描述] 为图片占位符
   // 匹配 [图片] 或 [图片:xxx]
   html = html.replace(/\[图片(?::([^\]]*))?\]/g, (match, desc) => {
@@ -2881,6 +3022,60 @@ function formatForumContent(content) {
   });
   
   return html;
+}
+
+// 处理@提及点击
+function handleMentionClick(name) {
+  // 先检查是否是用户自己
+  if (name === forumSettings.userNickname || name === forumSettings.userHandle) {
+    switchForumSection('profile');
+    return;
+  }
+  
+  // 查找AI角色 - 通过昵称或handle匹配
+  for (const p of forumSettings.aiParticipants) {
+    const char = characters.find(c => String(c.id) === String(p.charId));
+    const charName = p.nickname || char?.name || '';
+    const charHandle = p.handle || generateEnglishHandle(charName);
+    
+    if (charName === name || charHandle === name) {
+      openOtherUserProfile('ai', charName, p.charId);
+      return;
+    }
+  }
+  
+  // 查找NPC - 通过名字或handle匹配
+  for (const npc of (forumSettings.npcs || [])) {
+    const npcHandle = npc.handle || generateEnglishHandle(npc.name);
+    
+    if (npc.name === name || npcHandle === name) {
+      openOtherUserProfile('npc', npc.name, npc.id);
+      return;
+    }
+  }
+  
+  // 查找帖子中出现过的作者
+  const matchedPost = forumPosts.find(p => {
+    const postHandle = p.handle || generateEnglishHandle(p.authorName);
+    return p.authorName === name || postHandle === name;
+  });
+  
+  if (matchedPost) {
+    openOtherUserProfile(matchedPost.authorType, matchedPost.authorName, matchedPost.authorId || '');
+    return;
+  }
+  
+  // 查找评论中出现过的作者
+  for (const post of forumPosts) {
+    const matchedComment = (post.comments || []).find(c => c.authorName === name);
+    if (matchedComment) {
+      openOtherUserProfile(matchedComment.authorType || 'npc', matchedComment.authorName, '');
+      return;
+    }
+  }
+  
+  // 如果找不到，创建一个随机用户主页
+  openOtherUserProfile('random', name, '');
 }
 
 // 显示图片描述弹窗
@@ -5511,6 +5706,13 @@ window.addForumWorldbook = addForumWorldbook;
 window.removeForumWorldbook = removeForumWorldbook;
 window.getForumWorldbookContent = getForumWorldbookContent;
 window.getCharacterFullPersona = getCharacterFullPersona;
+// 帖子删除相关
+window.showPostMoreMenu = showPostMoreMenu;
+window.confirmDeletePost = confirmDeletePost;
+window.deleteForumPost = deleteForumPost;
+window.smartRenderCurrentPage = smartRenderCurrentPage;
+// @提及相关
+window.handleMentionClick = handleMentionClick;
 
 // 页面加载时初始化
 if (document.readyState === "loading") {

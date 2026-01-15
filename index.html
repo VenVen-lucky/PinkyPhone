@@ -55,6 +55,7 @@
     <link rel="stylesheet" href="phone_peek.css" />
     <link rel="stylesheet" href="continue_chat.css" />
     <link rel="stylesheet" href="forum_app.css" />
+    <link rel="stylesheet" href="companion.css" />
   </head>
   <body>
     <!-- Decorative stars -->
@@ -244,7 +245,7 @@
               <span class="app-name">陪伴</span>
             </div>
 
-            <!-- 拍立得小组件 (2x2) - 右下角 -->
+            <!-- 拍立得小组件 (2x2) - 右侧，预设论坛正下方 -->
             <div class="polaroid-widget widget-2x2" id="polaroidWidget">
               <div
                 class="polaroid-photo-area"
@@ -270,6 +271,17 @@
                 accept="image/*"
                 onchange="handlePolaroidChange(this)"
               />
+            </div>
+
+            <!-- 查手机在情侣空间正下方 -->
+            <div class="app-item" onclick="openPhonePeekSelector()">
+              <div class="app-icon gradient-cyan" id="appIcon_phonepeek">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                  <line x1="12" y1="18" x2="12.01" y2="18"></line>
+                </svg>
+              </div>
+              <span class="app-name" id="appName_phonepeek">查手机</span>
             </div>
           </div>
         </div>
@@ -2234,7 +2246,20 @@
 
           <!-- 选择AI角色 -->
           <div class="companion-section">
-            <div class="companion-section-title">👤 选择陪伴角色</div>
+            <div class="companion-section-title">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              选择陪伴角色
+            </div>
             <div class="companion-char-select" id="companionCharSelect">
               <!-- 动态渲染角色列表 -->
             </div>
@@ -2242,32 +2267,137 @@
 
           <!-- 陪伴项目 -->
           <div class="companion-section">
-            <div class="companion-section-title">📝 陪伴项目</div>
+            <div class="companion-section-title">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"
+                ></path>
+                <path
+                  d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
+                ></path>
+              </svg>
+              陪伴项目
+            </div>
             <input
               type="text"
               class="companion-input"
               id="companionTaskInput"
               placeholder="输入你想做的事情，例如：学习英语、写论文..."
             />
+
+            <!-- 从待办事项选择 -->
+            <div class="companion-todo-select" id="companionTodoSelect">
+              <div class="companion-todo-label">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <polyline points="9 11 12 14 22 4"></polyline>
+                  <path
+                    d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"
+                  ></path>
+                </svg>
+                或从待办事项中选择
+              </div>
+              <div class="companion-todo-list" id="companionTodoList">
+                <!-- 动态渲染待办事项 -->
+              </div>
+            </div>
           </div>
 
           <!-- 陪伴时长 -->
           <div class="companion-section">
-            <div class="companion-section-title">⏱️ 陪伴时长（分钟）</div>
-            <input
-              type="number"
-              class="companion-input"
-              id="companionDurationInput"
-              placeholder="输入时长"
-              value="45"
-              min="1"
-              max="480"
-            />
+            <div class="companion-section-title">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              陪伴时长
+            </div>
+            <div class="companion-duration-row">
+              <input
+                type="number"
+                class="companion-duration-input"
+                id="companionDurationInput"
+                placeholder="45"
+                value="45"
+                min="1"
+                max="480"
+              />
+              <span class="companion-duration-unit">分钟</span>
+            </div>
+            <div class="companion-duration-hint">
+              可输入1-480分钟（最长8小时）
+            </div>
+            <div class="companion-duration-presets">
+              <span
+                class="companion-duration-preset"
+                onclick="setCompanionDuration(15)"
+                >15分钟</span
+              >
+              <span
+                class="companion-duration-preset"
+                onclick="setCompanionDuration(25)"
+                >25分钟</span
+              >
+              <span
+                class="companion-duration-preset active"
+                onclick="setCompanionDuration(45)"
+                >45分钟</span
+              >
+              <span
+                class="companion-duration-preset"
+                onclick="setCompanionDuration(60)"
+                >1小时</span
+              >
+              <span
+                class="companion-duration-preset"
+                onclick="setCompanionDuration(90)"
+                >1.5小时</span
+              >
+              <span
+                class="companion-duration-preset"
+                onclick="setCompanionDuration(120)"
+                >2小时</span
+              >
+            </div>
           </div>
 
           <!-- 鼓励频率 -->
           <div class="companion-section">
-            <div class="companion-section-title">💬 鼓励频率</div>
+            <div class="companion-section-title">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                ></path>
+              </svg>
+              鼓励频率
+            </div>
             <div class="companion-freq-select">
               <span class="companion-freq-tag" onclick="setEncourageFreq(3)"
                 >频繁(3分钟)</span
@@ -2288,54 +2418,57 @@
 
           <!-- 语音鼓励 -->
           <div class="companion-section">
-            <div
-              style="
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-              "
-            >
-              <div>
+            <div class="companion-toggle-row">
+              <div class="companion-toggle-info">
                 <div class="companion-section-title" style="margin-bottom: 4px">
-                  🔊 语音鼓励
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <polygon
+                      points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"
+                    ></polygon>
+                    <path
+                      d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"
+                    ></path>
+                  </svg>
+                  语音鼓励
                 </div>
-                <div style="font-size: 0.75rem; color: #999">
+                <div class="companion-toggle-desc">
                   开启后AI会用语音给你加油
                 </div>
               </div>
               <div
+                class="companion-toggle"
                 id="companionVoiceToggle"
                 onclick="toggleCompanionVoice()"
-                style="
-                  width: 50px;
-                  height: 28px;
-                  border-radius: 14px;
-                  background: #e0e0e0;
-                  position: relative;
-                  cursor: pointer;
-                  transition: all 0.3s;
-                "
               >
-                <div
-                  style="
-                    width: 24px;
-                    height: 24px;
-                    border-radius: 50%;
-                    background: #fff;
-                    position: absolute;
-                    top: 2px;
-                    left: 2px;
-                    transition: all 0.3s;
-                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-                  "
-                ></div>
+                <div class="companion-toggle-handle"></div>
               </div>
             </div>
           </div>
 
           <!-- 背景设置 -->
           <div class="companion-section">
-            <div class="companion-section-title">🖼️ 陪伴背景</div>
+            <div class="companion-section-title">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+              </svg>
+              陪伴背景
+            </div>
             <div class="companion-bg-list" id="companionBgList">
               <!-- 已添加的背景预览 -->
             </div>
@@ -2343,7 +2476,17 @@
               class="companion-bg-add"
               onclick="document.getElementById('companionBgInput').click()"
             >
-              <span>+</span>
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
               <span>添加图片/视频</span>
             </div>
             <input
@@ -2354,7 +2497,7 @@
               style="display: none"
               onchange="handleCompanionBgSelect(event)"
             />
-            <div style="font-size: 0.75rem; color: #999; margin-top: 8px">
+            <div class="companion-bg-hint">
               支持多张图片轮播（每10秒切换）或单个视频
             </div>
 
@@ -2380,7 +2523,17 @@
 
           <!-- 开始按钮 -->
           <button class="companion-start-btn" onclick="startCompanion()">
-            开始陪伴 ✨
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            开始陪伴
           </button>
         </div>
 
@@ -2427,9 +2580,24 @@
             id="companionHistoryEmpty"
             style="display: none"
           >
-            <div class="empty-icon">📝</div>
-            <div class="empty-text">还没有陪伴记录</div>
-            <div class="empty-hint">开始你的第一次陪伴吧！</div>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+              ></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <p>还没有陪伴记录</p>
+            <p style="font-size: 12px; color: #ccc">开始你的第一次陪伴吧！</p>
           </div>
         </div>
 
@@ -2456,7 +2624,7 @@
 
           <!-- AI角色显示 -->
           <div class="companion-char-display">
-            <div class="companion-char-avatar" id="companionCharAvatar">😊</div>
+            <div class="companion-char-avatar" id="companionCharAvatar"></div>
             <div class="companion-char-name" id="companionCharName">AI</div>
           </div>
 
@@ -2521,23 +2689,67 @@
               class="companion-action-btn chat"
               onclick="openCompanionChat()"
             >
-              💬 聊聊天
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                ></path>
+              </svg>
+              聊天
             </button>
             <button
               class="companion-action-btn pause"
               id="companionPauseBtn"
               onclick="toggleCompanionPause()"
             >
-              ⏸️ 暂停
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="6" y="4" width="4" height="16"></rect>
+                <rect x="14" y="4" width="4" height="16"></rect>
+              </svg>
+              暂停
             </button>
             <button
               class="companion-action-btn complete"
               onclick="completeCompanion()"
             >
-              ✅ 完成
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              完成
             </button>
             <button class="companion-action-btn quit" onclick="quitCompanion()">
-              ❌ 放弃
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+              放弃
             </button>
           </div>
         </div>
@@ -2547,7 +2759,7 @@
           <div class="companion-chat-container">
             <div class="companion-chat-header">
               <span>和 <span id="companionChatCharName">AI</span> 聊聊</span>
-              <button onclick="closeCompanionChat()">✕</button>
+              <button onclick="closeCompanionChat()">×</button>
             </div>
             <div class="companion-chat-messages" id="companionChatMessages">
               <!-- 聊天消息 -->
@@ -3336,6 +3548,29 @@
                   placeholder="APP名称"
                 />
               </div>
+              <div class="app-customize-item">
+                <div
+                  class="app-customize-icon"
+                  id="customIcon_phonepeek"
+                  onclick="document.getElementById('iconInput_phonepeek').click()"
+                >
+                  查手机
+                </div>
+                <input
+                  type="file"
+                  id="iconInput_phonepeek"
+                  accept="image/*"
+                  style="display: none"
+                  onchange="previewAppIcon('phonepeek', this)"
+                />
+                <input
+                  type="text"
+                  class="app-customize-name"
+                  id="customName_phonepeek"
+                  value="查手机"
+                  placeholder="APP名称"
+                />
+              </div>
             </div>
           </div>
 
@@ -3805,17 +4040,23 @@
         </button>
         <div class="conv-title-section">
           <div class="conv-avatar" id="convAvatar">AI</div>
-          <span class="conv-name" id="convName">角色名称</span>
+          <div class="conv-info">
+            <span class="conv-name" id="convName">角色名称</span>
+            <span class="conv-status" id="convStatusWrapper">
+              <span class="conv-status-dot"></span>
+              <span id="convStatusText">Online</span>
+            </span>
+          </div>
         </div>
         <div class="conv-header-btns">
           <button
-            class="conv-heart-btn"
+            class="conv-capsule-btn"
             id="heartVoiceBtn"
             onclick="showHeartVoice()"
           >
             <svg
-              width="20"
-              height="20"
+              width="18"
+              height="18"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -3828,20 +4069,20 @@
               ></path>
             </svg>
           </button>
-          <button class="conv-menu-btn" onclick="openChatSettings()">
+          <div class="conv-capsule-divider"></div>
+          <button class="conv-capsule-btn" onclick="openChatSettings()">
             <svg
-              width="22"
-              height="22"
+              width="18"
+              height="18"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
               stroke-linecap="round"
               stroke-linejoin="round"
             >
-              <circle cx="12" cy="12" r="3"></circle>
-              <path
-                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
-              ></path>
+              <circle cx="12" cy="12" r="1.5"></circle>
+              <circle cx="19" cy="12" r="1.5"></circle>
+              <circle cx="5" cy="12" r="1.5"></circle>
             </svg>
           </button>
         </div>
@@ -3988,244 +4229,126 @@
           </button>
 
           <button class="conv-send-btn" onclick="sendUserMessage()">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5">
               <line x1="12" y1="19" x2="12" y2="5"></line>
               <polyline points="5 12 12 5 19 12"></polyline>
             </svg>
           </button>
         </div>
 
-        <div class="chat-panel" id="plusPanel">
-          <div class="panel-grid">
-            <div class="panel-item" onclick="rerollAIReply()">
-              <div class="panel-icon-box bg-reroll">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <polyline points="23 4 23 10 17 10"></polyline>
-                  <polyline points="1 20 1 14 7 14"></polyline>
-                  <path
-                    d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"
-                  ></path>
-                </svg>
-              </div>
-              <span class="panel-label">重roll</span>
+        <!-- iOS风格悬浮菜单 -->
+        <div class="plus-menu-overlay" id="plusMenuOverlay" onclick="closePlusMenu()"></div>
+        <div class="plus-menu" id="plusPanel">
+          <div class="plus-menu-item" onclick="openSendImageModal(); closePlusMenu();">
+            <div class="plus-menu-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                <circle cx="12" cy="13" r="4"></circle>
+              </svg>
             </div>
-            <div class="panel-item" onclick="openSendImageModal()">
-              <div class="panel-icon-box bg-camera">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                  <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                  <polyline points="21 15 16 10 5 21"></polyline>
-                </svg>
-              </div>
-              <span class="panel-label">照片</span>
-            </div>
-            <div class="panel-item" onclick="startVoiceCall()">
-              <div class="panel-icon-box bg-call">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path
-                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
-                  ></path>
-                </svg>
-              </div>
-              <span class="panel-label">语音通话</span>
-            </div>
-            <div class="panel-item" onclick="startVideoCall()">
-              <div class="panel-icon-box bg-video">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <polygon points="23 7 16 12 23 17 23 7"></polygon>
-                  <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
-                </svg>
-              </div>
-              <span class="panel-label">视频通话</span>
-            </div>
-            <div class="panel-item" onclick="sendFakeLocation()">
-              <div class="panel-icon-box bg-location">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path
-                    d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"
-                  ></path>
-                  <circle cx="12" cy="10" r="3"></circle>
-                </svg>
-              </div>
-              <span class="panel-label">位置</span>
-            </div>
-            <div class="panel-item" onclick="openVoiceMessageModal()">
-              <div class="panel-icon-box bg-voice-msg">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path
-                    d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"
-                  ></path>
-                  <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                  <line x1="12" y1="19" x2="12" y2="23"></line>
-                  <line x1="8" y1="23" x2="16" y2="23"></line>
-                </svg>
-              </div>
-              <span class="panel-label">语音</span>
-            </div>
-            <div class="panel-item" onclick="openTransferModal()">
-              <div class="panel-icon-box bg-transfer">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <line x1="12" y1="1" x2="12" y2="23"></line>
-                  <path
-                    d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"
-                  ></path>
-                </svg>
-              </div>
-              <span class="panel-label">转账</span>
-            </div>
-            <div class="panel-item" onclick="openReadTogether()">
-              <div class="panel-icon-box bg-book">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                  <path
-                    d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"
-                  ></path>
-                </svg>
-              </div>
-              <span class="panel-label">一起读书</span>
-            </div>
-            <div class="panel-item" onclick="openMusicTogether()">
-              <div class="panel-icon-box bg-music">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path d="M9 18V5l12-2v13"></path>
-                  <circle cx="6" cy="18" r="3"></circle>
-                  <circle cx="18" cy="16" r="3"></circle>
-                </svg>
-              </div>
-              <span class="panel-label">一起听歌</span>
-            </div>
-            <div class="panel-item" onclick="openPhonePeek()">
-              <div class="panel-icon-box bg-phone">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                >
-                  <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
-                  <line x1="12" y1="18" x2="12.01" y2="18"></line>
-                </svg>
-              </div>
-              <span class="panel-label">查手机</span>
-            </div>
-            <div class="panel-item" onclick="continueChat()">
-              <div class="panel-icon-box bg-continue">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path d="M5 12h14"></path>
-                  <path d="M12 5l7 7-7 7"></path>
-                </svg>
-              </div>
-              <span class="panel-label">续写</span>
-            </div>
+            <span class="plus-menu-label">Camera</span>
           </div>
-          <input
-            type="file"
-            id="chatImgInput"
-            hidden
-            accept="image/*"
-            onchange="handleChatImageUpload(this)"
-          />
+          <div class="plus-menu-item" onclick="document.getElementById('chatImgInput').click(); closePlusMenu();">
+            <div class="plus-menu-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+              </svg>
+            </div>
+            <span class="plus-menu-label">Photos</span>
+          </div>
+          <div class="plus-menu-item" onclick="toggleChatPanel('emoji'); closePlusMenu();">
+            <div class="plus-menu-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                <line x1="15" y1="9" x2="15.01" y2="9"></line>
+              </svg>
+            </div>
+            <span class="plus-menu-label">Stickers</span>
+          </div>
+          <div class="plus-menu-item" onclick="openVoiceMessageModal(); closePlusMenu();">
+            <div class="plus-menu-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                <line x1="12" y1="19" x2="12" y2="23"></line>
+                <line x1="8" y1="23" x2="16" y2="23"></line>
+              </svg>
+            </div>
+            <span class="plus-menu-label">Audio</span>
+          </div>
+          <div class="plus-menu-item" onclick="rerollAIReply(); closePlusMenu();">
+            <div class="plus-menu-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="23 4 23 10 17 10"></polyline>
+                <polyline points="1 20 1 14 7 14"></polyline>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+              </svg>
+            </div>
+            <span class="plus-menu-label">Reroll</span>
+          </div>
+          <div class="plus-menu-item" onclick="continueChat(); closePlusMenu();">
+            <div class="plus-menu-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12h14"></path>
+                <path d="M12 5l7 7-7 7"></path>
+              </svg>
+            </div>
+            <span class="plus-menu-label">Continue</span>
+          </div>
+          <div class="plus-menu-item" onclick="startVoiceCall(); closePlusMenu();">
+            <div class="plus-menu-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+              </svg>
+            </div>
+            <span class="plus-menu-label">Call</span>
+          </div>
+          <div class="plus-menu-item" onclick="sendFakeLocation(); closePlusMenu();">
+            <div class="plus-menu-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+              </svg>
+            </div>
+            <span class="plus-menu-label">Location</span>
+          </div>
+          <div class="plus-menu-item" onclick="openTransferModal(); closePlusMenu();">
+            <div class="plus-menu-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="1" x2="12" y2="23"></line>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+              </svg>
+            </div>
+            <span class="plus-menu-label">Transfer</span>
+          </div>
+          <div class="plus-menu-item" onclick="openReadTogether(); closePlusMenu();">
+            <div class="plus-menu-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+              </svg>
+            </div>
+            <span class="plus-menu-label">Books</span>
+          </div>
+          <div class="plus-menu-item" onclick="openMusicTogether(); closePlusMenu();">
+            <div class="plus-menu-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 18V5l12-2v13"></path>
+                <circle cx="6" cy="18" r="3"></circle>
+                <circle cx="18" cy="16" r="3"></circle>
+              </svg>
+            </div>
+            <span class="plus-menu-label">Music</span>
+          </div>
+          <input type="file" id="chatImgInput" hidden accept="image/*" onchange="handleChatImageUpload(this)" />
         </div>
 
         <div class="chat-panel" id="emojiPanel">
+
           <!-- 搜索框 -->
           <div class="sticker-search-bar">
             <input
@@ -7786,6 +7909,20 @@
 
     <script src="continue_chat.js"></script>
     <script src="forum_app.js"></script>
+    
+    <!-- 查手机角色选择弹窗 -->
+    <div class="phone-peek-selector-overlay" id="phonePeekSelectorOverlay">
+      <div class="phone-peek-selector-modal">
+        <div class="phone-peek-selector-header">
+          <h3>选择要查看的手机</h3>
+          <button class="phone-peek-selector-close" onclick="closePhonePeekSelector()">✕</button>
+        </div>
+        <div class="phone-peek-selector-list" id="phonePeekSelectorList">
+          <!-- 动态渲染角色列表 -->
+        </div>
+      </div>
+    </div>
+    
     <!-- 查手机页面 -->
     <div class="phone-peek-page" id="phonePeekPage">
       <button class="phone-peek-close" onclick="closePhonePeek()">✕</button>
@@ -7922,5 +8059,6 @@
         once: true,
       });
     </script>
+    <script src="companion_patch.js"></script>
   </body>
 </html>

@@ -12,6 +12,9 @@ window.currentPhoneApp = null;
 // 壁纸数据
 window.phoneWallpapers = {};
 
+// 当前查看的角色ID（用于查手机功能）
+window.currentPhonePeekCharId = null;
+
 // SVG图标定义
 const PhoneIcons = {
   memo: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -129,7 +132,7 @@ async function initPhonePeek() {
 
 // 获取当前角色的手机数据
 function getCharPhoneData() {
-  const charId = currentChatCharId;
+  const charId = window.currentPhonePeekCharId || currentChatCharId;
   if (!charId) return null;
   
   if (!window.phoneDataByChar[charId]) {
@@ -148,7 +151,7 @@ function getCharPhoneData() {
 
 // 获取当前角色的壁纸
 function getCharWallpaper() {
-  const charId = currentChatCharId;
+  const charId = window.currentPhonePeekCharId || currentChatCharId;
   if (!charId || !window.phoneWallpapers[charId]) {
     return WallpaperPresets[0].css;
   }
@@ -157,7 +160,7 @@ function getCharWallpaper() {
 
 // 设置壁纸
 async function setCharWallpaper(wallpaperCss) {
-  const charId = currentChatCharId;
+  const charId = window.currentPhonePeekCharId || currentChatCharId;
   if (!charId) return;
   
   window.phoneWallpapers[charId] = wallpaperCss;
@@ -170,12 +173,89 @@ async function setCharWallpaper(wallpaperCss) {
   }
 }
 
+// ==================== 角色选择弹窗 ====================
+
+// 打开角色选择弹窗
+function openPhonePeekSelector() {
+  const overlay = document.getElementById('phonePeekSelectorOverlay');
+  const list = document.getElementById('phonePeekSelectorList');
+  
+  if (!overlay || !list) return;
+  
+  // 获取所有有聊天记录的角色
+  const availableChars = [];
+  
+  if (typeof characters !== 'undefined' && Array.isArray(characters)) {
+    characters.forEach(char => {
+      // 检查是否有聊天记录
+      const hasHistory = chatHistories && chatHistories[char.id] && chatHistories[char.id].length > 0;
+      const settings = chatSettings && chatSettings[char.id];
+      const charName = settings?.charName || char.name || '未命名角色';
+      const charAvatar = settings?.charAvatar || char.avatar || '';
+      
+      availableChars.push({
+        id: char.id,
+        name: charName,
+        avatar: charAvatar,
+        hasHistory: hasHistory
+      });
+    });
+  }
+  
+  // 渲染角色列表
+  if (availableChars.length === 0) {
+    list.innerHTML = `
+      <div class="phone-peek-selector-empty">
+        <p>暂无可查看的角色</p>
+        <p class="hint">请先创建角色并开始对话</p>
+      </div>
+    `;
+  } else {
+    list.innerHTML = availableChars.map(char => `
+      <div class="phone-peek-selector-item ${!char.hasHistory ? 'no-history' : ''}" 
+           onclick="selectCharForPhonePeek('${char.id}')">
+        <div class="phone-peek-selector-avatar">
+          ${char.avatar ? `<img src="${char.avatar}" alt="${char.name}">` : `<span class="avatar-placeholder">👤</span>`}
+        </div>
+        <div class="phone-peek-selector-info">
+          <div class="phone-peek-selector-name">${escapeHtml(char.name)}</div>
+          ${!char.hasHistory ? '<div class="phone-peek-selector-hint">暂无聊天记录</div>' : ''}
+        </div>
+        <div class="phone-peek-selector-arrow">›</div>
+      </div>
+    `).join('');
+  }
+  
+  overlay.classList.add('active');
+}
+
+// 关闭角色选择弹窗
+function closePhonePeekSelector() {
+  const overlay = document.getElementById('phonePeekSelectorOverlay');
+  if (overlay) {
+    overlay.classList.remove('active');
+  }
+}
+
+// 选择角色并打开查手机
+function selectCharForPhonePeek(charId) {
+  closePhonePeekSelector();
+  window.currentPhonePeekCharId = charId;
+  openPhonePeek(charId);
+}
+
 // 打开查手机页面
-function openPhonePeek() {
-  if (!currentChatCharId) {
-    showToast('请先打开一个对话');
+function openPhonePeek(charId) {
+  // 如果传入了charId，使用它；否则使用当前聊天角色
+  const targetCharId = charId || currentChatCharId;
+  
+  if (!targetCharId) {
+    showToast('请先选择一个角色');
     return;
   }
+  
+  // 设置当前查看的角色
+  window.currentPhonePeekCharId = targetCharId;
   
   const page = document.getElementById('phonePeekPage');
   if (page) {
@@ -199,6 +279,7 @@ function closePhonePeek() {
     page.classList.remove('active');
   }
   window.currentPhoneApp = null;
+  window.currentPhonePeekCharId = null;
 }
 
 // 获取当前时间和日期
@@ -407,8 +488,9 @@ async function generatePhoneContent(appType) {
     throw new Error('请先配置API');
   }
   
-  const char = characters.find(c => c.id === currentChatCharId);
-  const settings = chatSettings[currentChatCharId] || {};
+  const charId = window.currentPhonePeekCharId || currentChatCharId;
+  const char = characters.find(c => c.id === charId);
+  const settings = chatSettings[charId] || {};
   const charName = settings.charName || char?.name || '角色';
   const persona = settings.persona || char?.persona || '一个友好的人';
   const userNickname = settings.userNickname || '用户';
@@ -603,11 +685,12 @@ function renderChatApp(data, skipRealChat = false) {
 // 获取真实的和用户的聊天记录
 function getRealChatWithUser() {
   try {
-    const char = characters.find(c => c.id === currentChatCharId);
-    const settings = chatSettings[currentChatCharId] || {};
+    const charId = window.currentPhonePeekCharId || currentChatCharId;
+    const char = characters.find(c => c.id === charId);
+    const settings = chatSettings[charId] || {};
     const userNickname = settings.userNickname || '宝贝';
     
-    const history = chatHistories[currentChatCharId];
+    const history = chatHistories[charId];
     if (!history || history.length === 0) return null;
     
     const recentMessages = history.slice(-10);
@@ -842,5 +925,8 @@ Object.assign(window, {
   closeWallpaperModal,
   selectPresetWallpaper,
   uploadCustomWallpaper,
-  handleWallpaperUpload
+  handleWallpaperUpload,
+  openPhonePeekSelector,
+  closePhonePeekSelector,
+  selectCharForPhonePeek
 });

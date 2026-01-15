@@ -1218,3 +1218,176 @@
     max-width: 320px;
   }
 }
+
+/* ==================== 查手机角色选择弹窗 ==================== */
+
+.phone-peek-selector-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: var(--z-modal);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.phone-peek-selector-overlay.active {
+  display: flex;
+}
+
+.phone-peek-selector-modal {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 360px;
+  max-height: 70vh;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  animation: phonePeekSelectorSlideUp 0.3s ease;
+}
+
+@keyframes phonePeekSelectorSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.phone-peek-selector-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.phone-peek-selector-header h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  color: #1d1d1f;
+}
+
+.phone-peek-selector-close {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 50%;
+  color: #666;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.phone-peek-selector-close:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.phone-peek-selector-list {
+  max-height: calc(70vh - 60px);
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+.phone-peek-selector-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.phone-peek-selector-item:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.phone-peek-selector-item:active {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.phone-peek-selector-item.no-history {
+  opacity: 0.6;
+}
+
+.phone-peek-selector-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #fce4ec, #f8bbd9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.phone-peek-selector-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.phone-peek-selector-avatar .avatar-placeholder {
+  font-size: 24px;
+}
+
+.phone-peek-selector-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.phone-peek-selector-name {
+  font-size: 16px;
+  font-weight: 500;
+  color: #1d1d1f;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.phone-peek-selector-hint {
+  font-size: 12px;
+  color: #8e8e93;
+  margin-top: 2px;
+}
+
+.phone-peek-selector-arrow {
+  font-size: 20px;
+  color: #c7c7cc;
+  font-weight: 300;
+}
+
+.phone-peek-selector-empty {
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.phone-peek-selector-empty p {
+  margin: 0;
+  font-size: 15px;
+  color: #666;
+}
+
+.phone-peek-selector-empty .hint {
+  font-size: 13px;
+  color: #999;
+  margin-top: 8px;
+}

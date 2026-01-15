@@ -520,6 +520,10 @@ body::before {
   background: linear-gradient(135deg, #fff3e0, #ffe0b2);
 }
 
+.app-icon.gradient-cyan {
+  background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
+}
+
 .app-name {
   font-size: 0.75rem;
   font-weight: 500;
@@ -1391,11 +1395,25 @@ body::before {
   gap: 8px;
   padding: 10px 14px;
   background: linear-gradient(135deg, #fff0f5, #fce4ec);
-  border-radius: 16px;
+  border-radius: 7.5px;
   cursor: pointer;
   transition: all 0.2s;
   min-width: 80px;
   max-width: 180px;
+  position: relative;
+}
+/* AI语音条尾巴 */
+.ai-voice-bar::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: -6px;
+  width: 0;
+  height: 0;
+  border: 6px solid transparent;
+  border-bottom: 0;
+  border-right-color: #fce4ec;
+  border-left: 0;
 }
 .ai-voice-bar:active {
   transform: scale(0.98);
@@ -1500,6 +1518,8 @@ body::before {
   border-radius: 12px;
   margin-bottom: 8px;
   border-left: 3px solid #f48fb1;
+  border-bottom: none !important;
+  border-top: none !important;
 }
 .group-quote-preview.active {
   display: flex;
@@ -4563,7 +4583,6 @@ body::before {
   -webkit-overflow-scrolling: touch;
 }
 
-
 /* ==================== TODO 四象限日历主题 ==================== */
 
 /* iOS安全区域 */
@@ -4607,7 +4626,7 @@ body::before {
   cursor: pointer;
   transition: all 0.2s;
   color: #bbb;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .todo-nav-btn:active {
@@ -4654,7 +4673,7 @@ body::before {
   border-radius: 20px;
   padding: 16px 12px;
   margin-bottom: 20px;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.03);
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.03);
 }
 
 .todo-calendar-scroll {
@@ -4709,7 +4728,7 @@ body::before {
 }
 
 .todo-day-item.selected .todo-day-weekday {
-  color: rgba(255,255,255,0.8);
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .todo-day-num {
@@ -4874,7 +4893,7 @@ body::before {
   border-radius: 18px;
   padding: 14px;
   min-height: 140px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.02);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.02);
   display: flex;
   flex-direction: column;
   transition: all 0.2s;
@@ -4885,10 +4904,18 @@ body::before {
 }
 
 /* 象限颜色 */
-.todo-quadrant.q1 { border-top: 3px solid #e57373; }
-.todo-quadrant.q2 { border-top: 3px solid #ffb74d; }
-.todo-quadrant.q3 { border-top: 3px solid #64b5f6; }
-.todo-quadrant.q4 { border-top: 3px solid #a5d6a7; }
+.todo-quadrant.q1 {
+  border-top: 3px solid #e57373;
+}
+.todo-quadrant.q2 {
+  border-top: 3px solid #ffb74d;
+}
+.todo-quadrant.q3 {
+  border-top: 3px solid #64b5f6;
+}
+.todo-quadrant.q4 {
+  border-top: 3px solid #a5d6a7;
+}
 
 .quadrant-header {
   display: flex;
@@ -4905,10 +4932,18 @@ body::before {
   border-radius: 50%;
 }
 
-.q1 .quadrant-dot { background: #e57373; }
-.q2 .quadrant-dot { background: #ffb74d; }
-.q3 .quadrant-dot { background: #64b5f6; }
-.q4 .quadrant-dot { background: #a5d6a7; }
+.q1 .quadrant-dot {
+  background: #e57373;
+}
+.q2 .quadrant-dot {
+  background: #ffb74d;
+}
+.q3 .quadrant-dot {
+  background: #64b5f6;
+}
+.q4 .quadrant-dot {
+  background: #a5d6a7;
+}
 
 .quadrant-title {
   font-size: 0.75rem;
@@ -5365,10 +5400,18 @@ body::before {
   flex-shrink: 0;
 }
 
-.quadrant-option-dot.q1 { background: #e57373; }
-.quadrant-option-dot.q2 { background: #ffb74d; }
-.quadrant-option-dot.q3 { background: #64b5f6; }
-.quadrant-option-dot.q4 { background: #a5d6a7; }
+.quadrant-option-dot.q1 {
+  background: #e57373;
+}
+.quadrant-option-dot.q2 {
+  background: #ffb74d;
+}
+.quadrant-option-dot.q3 {
+  background: #64b5f6;
+}
+.quadrant-option-dot.q4 {
+  background: #a5d6a7;
+}
 
 .todo-quadrant-option span {
   font-size: 0.8rem;
@@ -6854,7 +6897,7 @@ body::before {
 .companion-chat-input-area {
   padding: 12px 16px;
   padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
-  border-top: 1px solid #f0f0f0;
+  border-top: none;
   display: flex;
   gap: 10px;
 }
@@ -7383,8 +7426,8 @@ body::before {
 .conv-header {
   display: flex;
   align-items: center;
-  padding: 10px 16px;
-  padding-top: max(10px, env(safe-area-inset-top));
+  padding: 12px 16px;
+  padding-top: max(12px, env(safe-area-inset-top));
   background: transparent;
   border: none;
   position: absolute;
@@ -7392,14 +7435,14 @@ body::before {
   left: 0;
   right: 0;
   z-index: var(--z-header);
-  padding-bottom: 20px;
+  padding-bottom: 12px;
 }
 
 .conv-back-btn {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border: none;
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.5);
   backdrop-filter: blur(12px) saturate(180%);
   -webkit-backdrop-filter: blur(12px) saturate(180%);
   border-radius: 50%;
@@ -7407,13 +7450,13 @@ body::before {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   transition: transform 0.15s, background 0.15s;
+  flex-shrink: 0;
 }
 .conv-back-btn:active {
   transform: scale(0.92);
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.7);
 }
 .conv-back-btn svg {
   stroke: #333;
@@ -7425,15 +7468,27 @@ body::before {
 .conv-title-section {
   flex: 1;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 2px;
-  margin: 0 40px;
+  gap: 10px;
+  margin: 0 12px;
 }
 
 .conv-avatar {
-  display: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #fce4ec, #f8bbd9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: #c2185b;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .conv-avatar img {
@@ -7442,10 +7497,43 @@ body::before {
   object-fit: cover;
 }
 
+.conv-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
 .conv-name {
   font-size: 1rem;
   font-weight: 600;
   color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.conv-status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  color: #f48fb1;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#convStatusText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.conv-status-dot {
+  width: 6px;
+  height: 6px;
+  background: #f48fb1;
+  border-radius: 50%;
 }
 
 .conv-subtitle {
@@ -7453,80 +7541,78 @@ body::before {
   color: var(--text-secondary);
 }
 
-.conv-menu-btn {
-  width: 36px;
-  height: 36px;
-  border: none;
-  background: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(12px) saturate(180%);
-  -webkit-backdrop-filter: blur(12px) saturate(180%);
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5);
-  transition: transform 0.15s, background 0.15s;
-}
-.conv-menu-btn:active {
-  transform: scale(0.92);
-  background: rgba(255, 255, 255, 0.5);
-}
-
-.conv-menu-btn svg {
-  stroke: #333;
-  stroke-width: 1.8;
-  width: 20px;
-  height: 20px;
-}
-
-/* 心声按钮 */
+/* 右侧胶囊按钮组 - 液态玻璃感 */
 .conv-header-btns {
   display: flex;
   align-items: center;
-  gap: 8px;
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border-radius: 22px;
+  padding: 4px;
+  gap: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  flex-shrink: 0;
 }
 
-.conv-heart-btn {
+.conv-capsule-btn {
   width: 36px;
   height: 36px;
   border: none;
-  background: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(12px) saturate(180%);
-  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  background: transparent;
   border-radius: 50%;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5);
-  transition: transform 0.15s, background 0.15s;
+  transition: background 0.15s;
   position: relative;
 }
-.conv-heart-btn:active {
-  transform: scale(0.92);
+
+.conv-capsule-btn:active {
   background: rgba(255, 255, 255, 0.5);
 }
-.conv-heart-btn svg {
-  stroke: #f48fb1;
-  fill: rgba(244, 143, 177, 0.2);
+
+.conv-capsule-btn svg {
+  stroke: #666;
+  stroke-width: 2;
   width: 18px;
   height: 18px;
 }
-.conv-heart-btn.has-new::after {
+
+.conv-capsule-btn:first-child svg {
+  stroke: #f48fb1;
+  fill: rgba(244, 143, 177, 0.15);
+}
+
+.conv-capsule-divider {
+  width: 1px;
+  height: 20px;
+  background: rgba(0, 0, 0, 0.08);
+}
+
+/* 心声新消息红点 */
+.conv-capsule-btn.has-new::after {
   content: "";
   position: absolute;
-  top: 6px;
-  right: 6px;
+  top: 4px;
+  right: 4px;
   width: 8px;
   height: 8px;
   background: #ff4081;
   border-radius: 50%;
   border: 2px solid white;
+}
+
+/* 保留旧类名兼容性 */
+.conv-menu-btn {
+  display: none;
+}
+
+.conv-heart-btn {
+  display: none;
 }
 
 /* 心声弹窗 */
@@ -7859,54 +7945,61 @@ body::before {
 .msg-row {
   display: flex;
   flex-direction: column;
+  margin: 8px 12px;
   max-width: 80%;
 }
 
 .msg-row.user {
-  align-self: flex-end;
   align-items: flex-end;
 }
 
 .msg-row.ai {
-  align-self: flex-start;
   align-items: flex-start;
 }
 .msg-bubble {
-  padding: 6px 10px;
-  border-radius: 14px;
-  font-size: 0.95rem;
-  line-height: 1.45;
-  word-break: break-word;
-  margin-bottom: 2px;
-
-  /* 关键修复：让气泡包住文字，且支持长文换行 */
-  width: fit-content;
-  max-width: 100%;
-  display: inline-block;
-  white-space: normal;
-
   position: relative;
-  min-height: auto;
+  padding: 8px 12px;
+  border-radius: 7.5px; /* WhatsApp 圆角 */
+  font-size: 14px;
+  line-height: 1.4;
+  word-break: break-word;
+  max-width: 100%;
+  overflow: hidden; /* 新增：防止任何溢出导致空隙 */
 }
 .msg-row.user .msg-bubble {
-  background: linear-gradient(135deg, #fce4ec, #f8bbd9);
-  color: #c2185b;
-  border-bottom-right-radius: 6px;
+  background: #f8bbd9; /* 你的图片是粉色，匹配它；或用 #dcf8c6 为 WhatsApp 绿 */
+  color: #000;
 }
 
-.msg-row.user .msg-bubble:last-child {
-  border-bottom-right-radius: 18px;
+/* 用户气泡尾巴 - border三角形 */
+.msg-row.user .msg-bubble::after {
+  right: -9px; /* 调整为负的 border-width 值，确保贴合 */
+  border-left-color: #f8bbd9; /* 与气泡背景匹配（粉色） */
+  border-right: 0;
 }
 
 .msg-row.ai .msg-bubble {
-  background: white;
-  color: var(--text-primary);
-  border-bottom-left-radius: 6px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  background: #ffffff; /* WhatsApp 白色 */
+  color: #000;
 }
-
-.msg-row.ai .msg-bubble:last-child {
-  border-bottom-left-radius: 18px;
+/* 消息文本 */
+.msg-text {
+  margin-bottom: 4px; /* 给元数据留空间 */
+}
+.msg-bubble::after {
+  content: "";
+  position: absolute;
+  bottom: 0; /* 保持底部对齐 */
+  width: 0;
+  height: 0;
+  border: 9px solid transparent; /* 增大 border-width 以更好覆盖圆角 */
+  border-bottom: 0;
+}
+/* AI气泡尾巴 - border三角形 */
+.msg-row.ai .msg-bubble::after {
+  left: -9px; /* 同上 */
+  border-right-color: #ffffff; /* 与气泡背景匹配 */
+  border-left: 0;
 }
 
 .msg-time {
@@ -9319,7 +9412,7 @@ input[type="range"]::-webkit-slider-thumb {
   background: #d4c4b0;
   border-radius: 2px;
 }
-/* ==================== 终极版：iMessage 完美连发样式 (纯CSS版) ==================== */
+/* ==================== 终极版：WhatsApp 风格连发样式 ==================== */
 
 /* 1. 基础设置：让气泡靠得更近，产生“成组”的感觉 */
 .msg-wrapper .msg-row .msg-bubble {
@@ -9327,31 +9420,15 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 /* ================= AI (左侧) 连发逻辑 ================= */
-/* 规则A：只要不是【第一个】气泡，左上角就要变尖 */
-.msg-row.ai .msg-bubble:not(:first-child) {
-  border-top-left-radius: 4px !important;
-}
-/* 规则B：只要不是【最后一个】气泡，左下角就要变尖 */
-.msg-row.ai .msg-bubble:not(:last-child) {
-  border-bottom-left-radius: 4px !important;
-}
-/* 修复：最后一个气泡的左下角保持圆润（收尾） */
-.msg-row.ai .msg-bubble:last-child {
-  border-bottom-left-radius: 14px !important;
+/* 非最后一个气泡隐藏尾巴 */
+.msg-row.ai .msg-bubble:not(:last-child)::after {
+  display: none !important;
 }
 
 /* ================= 用户 (右侧) 连发逻辑 ================= */
-/* 规则A：只要不是【第一个】气泡，右上角就要变尖 */
-.msg-row.user .msg-bubble:not(:first-child) {
-  border-top-right-radius: 4px !important;
-}
-/* 规则B：只要不是【最后一个】气泡，右下角就要变尖 */
-.msg-row.user .msg-bubble:not(:last-child) {
-  border-bottom-right-radius: 4px !important;
-}
-/* 修复：最后一个气泡的右下角保持圆润（收尾） */
-.msg-row.user .msg-bubble:last-child {
-  border-bottom-right-radius: 14px !important;
+/* 非最后一个气泡隐藏尾巴 */
+.msg-row.user .msg-bubble:not(:last-child)::after {
+  display: none !important;
 }
 /* ==================== 聊天页面重构 (iMessage 风格) ==================== */
 
@@ -9885,13 +9962,26 @@ input[type="range"]::-webkit-slider-thumb {
   gap: 8px;
   padding: 10px 14px;
   background: linear-gradient(135deg, #fce4ec, #f8bbd9);
-  border-radius: 16px;
+  border-radius: 7.5px;
   cursor: pointer;
   transition: all 0.2s;
   min-width: 80px;
   max-width: 180px;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
+}
+/* 用户语音条尾巴 */
+.user-voice-bar::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  right: -6px;
+  width: 0;
+  height: 0;
+  border: 6px solid transparent;
+  border-bottom: 0;
+  border-left-color: #f8bbd9;
+  border-right: 0;
 }
 .user-voice-bar:active {
   transform: scale(0.98);
@@ -10529,7 +10619,8 @@ input[type="range"]::-webkit-slider-thumb {
   align-items: center;
   padding: 8px 12px;
   background: rgba(255, 255, 255, 0.95);
-  border-bottom: 1px solid rgba(244, 143, 177, 0.2);
+  border-bottom: none !important;
+  border: none !important;
   gap: 8px;
 }
 .quote-preview-content {
@@ -10601,12 +10692,22 @@ input[type="range"]::-webkit-slider-thumb {
   padding: 0 !important;
   background: transparent !important;
   border: none !important;
+  border-top: none !important;
+  box-shadow: none !important;
   position: fixed !important;
   bottom: 0;
   left: 0;
   right: 0;
   z-index: 200;
   transition: transform 0.3s ease;
+}
+
+/* 强制移除所有可能产生线条的元素 */
+.conv-input-area *,
+.conv-input-bar *,
+.conv-input-wrapper * {
+  border-top: none !important;
+  border-bottom: none !important;
 }
 
 /* 输入栏这一行 */
@@ -10618,6 +10719,8 @@ input[type="range"]::-webkit-slider-thumb {
   gap: 8px;
   background: transparent;
   border: none;
+  border-top: none !important;
+  box-shadow: none !important;
   flex-wrap: nowrap;
 }
 
@@ -10663,7 +10766,11 @@ input[type="range"]::-webkit-slider-thumb {
   align-items: flex-end;
   min-height: 36px;
   margin: 0 !important;
-  border: none;
+  border: none !important;
+  border-top: none !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+  outline: none !important;
 }
 
 /* 输入框本体 */
@@ -10753,7 +10860,7 @@ input[type="range"]::-webkit-slider-thumb {
   justify-content: center !important;
 }
 .conv-send-btn svg {
-  stroke: #e91e63;
+  stroke: #333;
   stroke-width: 2.5;
   fill: none;
   width: 20px;
@@ -15644,4 +15751,211 @@ input[type="range"]::-webkit-slider-thumb {
 .forward-chat-list {
   max-height: 50vh;
   overflow-y: auto;
+}
+
+/* ========== 用户语音消息样式 ========== */
+.user-voice-message-bubble {
+  background: transparent !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+}
+
+.user-voice-message {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.user-voice-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 20px;
+  background: rgba(248, 187, 217, 0.9);
+  cursor: pointer;
+  min-width: 80px;
+  transition: all 0.2s;
+}
+
+.user-voice-bar:active {
+  transform: scale(0.98);
+  opacity: 0.9;
+}
+
+.user-voice-duration {
+  font-size: 14px;
+  color: #c2185b;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.user-voice-waves {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 18px;
+}
+
+.user-voice-waves span {
+  display: block;
+  width: 3px;
+  height: 8px;
+  background: #c2185b;
+  border-radius: 2px;
+  animation: none;
+}
+
+.user-voice-waves span:nth-child(1) {
+  height: 6px;
+}
+.user-voice-waves span:nth-child(2) {
+  height: 12px;
+}
+.user-voice-waves span:nth-child(3) {
+  height: 18px;
+}
+.user-voice-waves span:nth-child(4) {
+  height: 12px;
+}
+.user-voice-waves span:nth-child(5) {
+  height: 6px;
+}
+
+.user-voice-bar.playing .user-voice-waves span {
+  animation: userVoiceWave 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes userVoiceWave {
+  0% {
+    transform: scaleY(0.5);
+  }
+  100% {
+    transform: scaleY(1.2);
+  }
+}
+
+.user-voice-text {
+  display: none;
+  font-size: 13px;
+  color: #666;
+  background: rgba(248, 187, 217, 0.3);
+  padding: 8px 12px;
+  border-radius: 12px;
+  max-width: 220px;
+  word-break: break-word;
+}
+
+.user-voice-text.visible {
+  display: block;
+}
+
+.user-voice-to-text-btn {
+  font-size: 12px;
+  color: #c2185b;
+  opacity: 0.7;
+  cursor: pointer;
+}
+
+.user-voice-to-text-btn:hover {
+  opacity: 1;
+}
+
+/* ========== iOS iMessage风格悬浮菜单 ========== */
+.plus-menu-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  z-index: 998;
+}
+
+.plus-menu-overlay.open {
+  display: block;
+}
+
+.plus-menu {
+  display: none;
+  position: fixed;
+  left: 16px;
+  bottom: 100px;
+  width: calc(100% - 32px);
+  max-width: 280px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-radius: 14px;
+  padding: 6px 0;
+  z-index: 999;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12);
+  transform: translateY(20px) scale(0.95);
+  opacity: 0;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.plus-menu.open {
+  display: block;
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+.plus-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 11px 16px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.plus-menu-item:active {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.plus-menu-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #f8bbd9, #f48fb1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.plus-menu-icon svg {
+  stroke: white;
+  width: 18px;
+  height: 18px;
+}
+
+.plus-menu-label {
+  font-size: 15px;
+  font-weight: 500;
+  color: #333;
+}
+
+/* ==================== WhatsApp 风格气泡尾巴覆盖 ==================== */
+/* 隐藏非最后一个气泡的尾巴（连续消息只显示最后一个尾巴）*/
+.msg-row.ai .msg-bubble:not(:last-child)::after,
+.msg-row.user .msg-bubble:not(:last-child)::after {
+  display: none !important;
+}
+
+/* 特殊气泡（如表情包、语音）不显示尾巴 */
+.msg-bubble.sticker-bubble::after,
+.msg-bubble.voice-message-bubble::after {
+  display: none !important;
+}
+
+.msg-bubble.sticker-bubble,
+.msg-bubble.voice-message-bubble {
+  border-radius: 7.5px !important;
+  margin: 0 !important;
 }
