@@ -1957,13 +1957,15 @@ function openGroupConversation(groupId) {
   updateConvStatus(`${memberCount}位成员`);
 
   // 显示群公告栏
-  toggleGroupAnnouncementBar(true);
+  toggleGroupAnnouncementBar(false); // 隐藏旧的群公告横条
   const announcement = group.settings?.announcement || "";
   updateGroupAnnouncementBar(announcement);
 
-  // 隐藏心声按钮（群聊不显示心声功能）
+  // 隐藏心声按钮，显示群公告按钮（群聊用群公告代替心声）
   const heartVoiceBtn = document.getElementById("heartVoiceBtn");
   if (heartVoiceBtn) heartVoiceBtn.style.display = "none";
+  const groupAnnouncementBtn = document.getElementById("groupAnnouncementBtn");
+  if (groupAnnouncementBtn) groupAnnouncementBtn.style.display = "";
 
   // 隐藏单聊引用预览，显示群聊引用预览区域
   document.getElementById("quotePreview").style.display = "none";
@@ -5735,9 +5737,11 @@ async function openConversation(charId) {
   toggleGroupAnnouncementBar(false);
   cancelGroupQuote(); // 清除群聊引用
 
-  // 显示心声按钮（单聊显示心声功能）
+  // 显示心声按钮，隐藏群公告按钮（单聊用心声）
   const heartVoiceBtn = document.getElementById("heartVoiceBtn");
   if (heartVoiceBtn) heartVoiceBtn.style.display = "";
+  const groupAnnouncementBtn = document.getElementById("groupAnnouncementBtn");
+  if (groupAnnouncementBtn) groupAnnouncementBtn.style.display = "none";
 
   // 清除该角色的未读消息
   if (typeof clearUnreadForChar === "function") {
@@ -11206,8 +11210,11 @@ uiUpgradeStyle.innerHTML = `
                           height: 56px !important;
                       }
                       .conv-title-section {
-                          margin: 0 12px !important;
-                          justify-content: center;
+                          position: absolute !important;
+                          left: 50% !important;
+                          transform: translateX(-50%) !important;
+                          margin: 0 !important;
+                          justify-content: flex-start;
                       }
 
                       /* --- 2. iOS风格透明模糊效果 --- */
@@ -11217,6 +11224,7 @@ uiUpgradeStyle.innerHTML = `
                           border: none !important;
                           box-shadow: none !important;
                           padding-bottom: 20px !important;
+                          align-items: flex-start !important;
                       }
                       
                       /* 顶部模糊遮罩 */
