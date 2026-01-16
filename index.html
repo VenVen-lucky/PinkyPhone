@@ -276,7 +276,14 @@
             <!-- 查手机在情侣空间正下方 -->
             <div class="app-item" onclick="openPhonePeekSelector()">
               <div class="app-icon gradient-cyan" id="appIcon_phonepeek">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                >
                   <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
                   <line x1="12" y1="18" x2="12.01" y2="18"></line>
                 </svg>
@@ -1480,7 +1487,7 @@
                     ></rect>
                     <line x1="1" y1="10" x2="23" y2="10"></line></svg
                 ></span>
-                <span class="menu-text">我的钱包</span>
+                <span class="menu-text">Wallet</span>
                 <span class="menu-arrow">›</span>
               </div>
               <div class="menu-item" onclick="openFavoritesPage()">
@@ -1499,7 +1506,7 @@
                       points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
                     ></polygon></svg
                 ></span>
-                <span class="menu-text">我的收藏</span>
+                <span class="menu-text">Collect</span>
                 <span class="menu-arrow">›</span>
               </div>
               <div class="menu-item" onclick="openBackgroundActivityPage()">
@@ -1517,7 +1524,7 @@
                     <circle cx="12" cy="12" r="10"></circle>
                     <polyline points="12 6 12 12 16 14"></polyline></svg
                 ></span>
-                <span class="menu-text">后台活动</span>
+                <span class="menu-text">Background activity</span>
                 <span class="menu-arrow" style="color: #f48fb1">›</span>
               </div>
             </div>
@@ -4229,7 +4236,16 @@
           </button>
 
           <button class="conv-send-btn" onclick="sendUserMessage()">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2.5"
+            >
               <line x1="12" y1="19" x2="12" y2="5"></line>
               <polyline points="5 12 12 5 19 12"></polyline>
             </svg>
@@ -4237,20 +4253,50 @@
         </div>
 
         <!-- iOS风格悬浮菜单 -->
-        <div class="plus-menu-overlay" id="plusMenuOverlay" onclick="closePlusMenu()"></div>
+        <div
+          class="plus-menu-overlay"
+          id="plusMenuOverlay"
+          onclick="closePlusMenu()"
+        ></div>
         <div class="plus-menu" id="plusPanel">
-          <div class="plus-menu-item" onclick="openSendImageModal(); closePlusMenu();">
+          <div
+            class="plus-menu-item"
+            onclick="openSendImageModal(); closePlusMenu();"
+          >
             <div class="plus-menu-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"
+                ></path>
                 <circle cx="12" cy="13" r="4"></circle>
               </svg>
             </div>
             <span class="plus-menu-label">Camera</span>
           </div>
-          <div class="plus-menu-item" onclick="document.getElementById('chatImgInput').click(); closePlusMenu();">
+          <div
+            class="plus-menu-item"
+            onclick="document.getElementById('chatImgInput').click(); closePlusMenu();"
+          >
             <div class="plus-menu-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                 <circle cx="8.5" cy="8.5" r="1.5"></circle>
                 <polyline points="21 15 16 10 5 21"></polyline>
@@ -4258,19 +4304,45 @@
             </div>
             <span class="plus-menu-label">Photos</span>
           </div>
-          <div class="plus-menu-item" onclick="startVideoCall(); closePlusMenu();">
+          <div
+            class="plus-menu-item"
+            onclick="startVideoCall(); closePlusMenu();"
+          >
             <div class="plus-menu-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
                 <polygon points="23 7 16 12 23 17 23 7"></polygon>
                 <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
               </svg>
             </div>
             <span class="plus-menu-label">Video</span>
           </div>
-          <div class="plus-menu-item" onclick="openVoiceMessageModal(); closePlusMenu();">
+          <div
+            class="plus-menu-item"
+            onclick="openVoiceMessageModal(); closePlusMenu();"
+          >
             <div class="plus-menu-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"
+                ></path>
                 <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
                 <line x1="12" y1="19" x2="12" y2="23"></line>
                 <line x1="8" y1="23" x2="16" y2="23"></line>
@@ -4278,63 +4350,155 @@
             </div>
             <span class="plus-menu-label">Audio</span>
           </div>
-          <div class="plus-menu-item" onclick="rerollAIReply(); closePlusMenu();">
+          <div
+            class="plus-menu-item"
+            onclick="rerollAIReply(); closePlusMenu();"
+          >
             <div class="plus-menu-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
                 <polyline points="23 4 23 10 17 10"></polyline>
                 <polyline points="1 20 1 14 7 14"></polyline>
-                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                <path
+                  d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"
+                ></path>
               </svg>
             </div>
             <span class="plus-menu-label">Reroll</span>
           </div>
-          <div class="plus-menu-item" onclick="continueChat(); closePlusMenu();">
+          <div
+            class="plus-menu-item"
+            onclick="continueChat(); closePlusMenu();"
+          >
             <div class="plus-menu-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
                 <path d="M5 12h14"></path>
                 <path d="M12 5l7 7-7 7"></path>
               </svg>
             </div>
             <span class="plus-menu-label">Continue</span>
           </div>
-          <div class="plus-menu-item" onclick="startVoiceCall(); closePlusMenu();">
+          <div
+            class="plus-menu-item"
+            onclick="startVoiceCall(); closePlusMenu();"
+          >
             <div class="plus-menu-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
+                ></path>
               </svg>
             </div>
             <span class="plus-menu-label">Call</span>
           </div>
-          <div class="plus-menu-item" onclick="sendFakeLocation(); closePlusMenu();">
+          <div
+            class="plus-menu-item"
+            onclick="sendFakeLocation(); closePlusMenu();"
+          >
             <div class="plus-menu-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                 <circle cx="12" cy="10" r="3"></circle>
               </svg>
             </div>
             <span class="plus-menu-label">Location</span>
           </div>
-          <div class="plus-menu-item" onclick="openTransferModal(); closePlusMenu();">
+          <div
+            class="plus-menu-item"
+            onclick="openTransferModal(); closePlusMenu();"
+          >
             <div class="plus-menu-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
                 <line x1="12" y1="1" x2="12" y2="23"></line>
-                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                <path
+                  d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"
+                ></path>
               </svg>
             </div>
             <span class="plus-menu-label">Transfer</span>
           </div>
-          <div class="plus-menu-item" onclick="openReadTogether(); closePlusMenu();">
+          <div
+            class="plus-menu-item"
+            onclick="openReadTogether(); closePlusMenu();"
+          >
             <div class="plus-menu-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
                 <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                <path
+                  d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"
+                ></path>
               </svg>
             </div>
             <span class="plus-menu-label">Books</span>
           </div>
-          <div class="plus-menu-item" onclick="openMusicTogether(); closePlusMenu();">
+          <div
+            class="plus-menu-item"
+            onclick="openMusicTogether(); closePlusMenu();"
+          >
             <div class="plus-menu-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
                 <path d="M9 18V5l12-2v13"></path>
                 <circle cx="6" cy="18" r="3"></circle>
                 <circle cx="18" cy="16" r="3"></circle>
@@ -4342,11 +4506,16 @@
             </div>
             <span class="plus-menu-label">Music</span>
           </div>
-          <input type="file" id="chatImgInput" hidden accept="image/*" onchange="handleChatImageUpload(this)" />
+          <input
+            type="file"
+            id="chatImgInput"
+            hidden
+            accept="image/*"
+            onchange="handleChatImageUpload(this)"
+          />
         </div>
 
         <div class="chat-panel" id="emojiPanel">
-
           <!-- 搜索框 -->
           <div class="sticker-search-bar">
             <input
@@ -6533,28 +6702,67 @@
     <div class="wallet-page" id="walletPage">
       <!-- 悬浮关闭按钮 -->
       <button class="wallet-close-btn" onclick="closeWalletPage()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+        >
           <line x1="18" y1="6" x2="6" y2="18"></line>
           <line x1="6" y1="6" x2="18" y2="18"></line>
         </svg>
       </button>
-      
+
       <div class="wallet-page-content">
         <!-- 银行卡样式 -->
         <div class="apple-wallet-card">
           <div class="card-top-row">
             <div class="card-chip">
               <svg viewBox="0 0 50 40" width="36" height="28">
-                <rect x="0" y="0" width="50" height="40" rx="5" fill="rgba(255,255,255,0.3)"/>
-                <rect x="0" y="12" width="50" height="5" fill="rgba(255,255,255,0.5)"/>
-                <rect x="0" y="22" width="50" height="5" fill="rgba(255,255,255,0.5)"/>
-                <rect x="18" y="0" width="5" height="40" fill="rgba(255,255,255,0.4)"/>
-                <rect x="27" y="0" width="5" height="40" fill="rgba(255,255,255,0.4)"/>
+                <rect
+                  x="0"
+                  y="0"
+                  width="50"
+                  height="40"
+                  rx="5"
+                  fill="rgba(255,255,255,0.3)"
+                />
+                <rect
+                  x="0"
+                  y="12"
+                  width="50"
+                  height="5"
+                  fill="rgba(255,255,255,0.5)"
+                />
+                <rect
+                  x="0"
+                  y="22"
+                  width="50"
+                  height="5"
+                  fill="rgba(255,255,255,0.5)"
+                />
+                <rect
+                  x="18"
+                  y="0"
+                  width="5"
+                  height="40"
+                  fill="rgba(255,255,255,0.4)"
+                />
+                <rect
+                  x="27"
+                  y="0"
+                  width="5"
+                  height="40"
+                  fill="rgba(255,255,255,0.4)"
+                />
               </svg>
             </div>
             <div class="card-type-label">储蓄卡</div>
           </div>
-          
+
           <div class="card-balance-section">
             <div class="card-balance-label">账户余额</div>
             <div class="card-balance-amount">
@@ -6562,11 +6770,18 @@
               <span id="walletBalanceDisplay">0.00</span>
             </div>
           </div>
-          
+
           <div class="card-bottom-row">
             <div class="card-number">•••• •••• •••• 8888</div>
             <button class="card-recharge-btn" onclick="openRechargeModal()">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
                 <line x1="12" y1="5" x2="12" y2="19"></line>
                 <line x1="5" y1="12" x2="19" y2="12"></line>
               </svg>
@@ -6574,7 +6789,7 @@
             </button>
           </div>
         </div>
-        
+
         <!-- 交易记录 -->
         <div class="apple-wallet-transactions">
           <div class="transactions-title">交易记录</div>
@@ -7936,20 +8151,25 @@
 
     <script src="continue_chat.js"></script>
     <script src="forum_app.js"></script>
-    
+
     <!-- 查手机角色选择弹窗 -->
     <div class="phone-peek-selector-overlay" id="phonePeekSelectorOverlay">
       <div class="phone-peek-selector-modal">
         <div class="phone-peek-selector-header">
           <h3>选择要查看的手机</h3>
-          <button class="phone-peek-selector-close" onclick="closePhonePeekSelector()">✕</button>
+          <button
+            class="phone-peek-selector-close"
+            onclick="closePhonePeekSelector()"
+          >
+            ✕
+          </button>
         </div>
         <div class="phone-peek-selector-list" id="phonePeekSelectorList">
           <!-- 动态渲染角色列表 -->
         </div>
       </div>
     </div>
-    
+
     <!-- 查手机页面 -->
     <div class="phone-peek-page" id="phonePeekPage">
       <button class="phone-peek-close" onclick="closePhonePeek()">✕</button>
