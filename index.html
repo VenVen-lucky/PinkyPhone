@@ -707,7 +707,7 @@
                 <span class="ig-group-manage-title">管理自定义分组</span>
                 <button
                   class="ig-group-manage-add"
-                  onclick="openCreateGroupModal()"
+                  onclick="openIgGroupModal()"
                 >
                   <svg
                     width="18"
@@ -732,17 +732,17 @@
           <div
             class="ig-create-group-modal"
             id="igCreateGroupModal"
-            onclick="if(event.target===this)closeCreateGroupModal()"
+            onclick="if(event.target===this)closeIgGroupModal()"
           >
             <div class="ig-create-group-content">
               <div class="ig-create-group-header">
                 <button
                   class="ig-create-group-back"
-                  onclick="closeCreateGroupModal()"
+                  onclick="closeIgGroupModal()"
                 >
                   取消
                 </button>
-                <span class="ig-create-group-title" id="createGroupTitle"
+                <span class="ig-create-group-title" id="igGroupTitle"
                   >新建分组</span
                 >
                 <button

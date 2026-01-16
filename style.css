@@ -10735,7 +10735,7 @@ input[type="range"]::-webkit-slider-thumb {
   display: flex;
   align-items: flex-end;
   padding: 6px 12px;
-  padding-bottom: env(safe-area-inset-bottom, 4px); /* iOS PWA 只用安全区域，默认4px */
+  padding-bottom: 4px; /* 固定小间距 */
   gap: 8px;
   background: transparent;
   border: none;

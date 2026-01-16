@@ -22018,12 +22018,12 @@ function renderCustomGroupList() {
 }
 
 // 打开创建分组弹窗
-function openCreateGroupModal() {
+function openIgGroupModal() {
   editingCustomGroupId = null;
   tempGroupMembers = [];
   tempGroupType = "include";
   
-  document.getElementById("createGroupTitle").textContent = "新建分组";
+  document.getElementById("igGroupTitle").textContent = "新建分组";
   document.getElementById("customGroupNameInput").value = "";
   
   // 重置类型选择
@@ -22050,7 +22050,7 @@ function editCustomGroup(groupId) {
   tempGroupMembers = [...group.members];
   tempGroupType = group.type;
   
-  document.getElementById("createGroupTitle").textContent = "编辑分组";
+  document.getElementById("igGroupTitle").textContent = "编辑分组";
   document.getElementById("customGroupNameInput").value = group.name;
   
   // 设置类型选择
@@ -22069,7 +22069,7 @@ function editCustomGroup(groupId) {
 }
 
 // 关闭创建分组弹窗
-function closeCreateGroupModal() {
+function closeIgGroupModal() {
   document.getElementById("igCreateGroupModal").classList.remove("active");
   document.getElementById("groupMemberSearch").value = "";
 }
@@ -22233,7 +22233,7 @@ async function saveCustomGroup() {
   }
   
   await saveCustomGroups();
-  closeCreateGroupModal();
+  closeIgGroupModal();
   renderCustomGroupList();
   renderVisibilityOptions(); // 更新发帖弹窗的选项
 }
@@ -27123,9 +27123,9 @@ Object.assign(window, {
   openGroupManageModal,
   closeGroupManageModal,
   renderCustomGroupList,
-  openCreateGroupModal,
+  openIgGroupModal,
   editCustomGroup,
-  closeCreateGroupModal,
+  closeIgGroupModal,
   selectGroupType,
   updateMembersLabel,
   renderGroupMemberList,
