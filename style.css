@@ -78,9 +78,11 @@ html {
   -webkit-text-size-adjust: 100%;
   height: 100%;
   width: 100%;
+  max-width: 100vw;
   background: #fce4ec;
   overflow: hidden;
   overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
 body {
@@ -88,12 +90,13 @@ body {
   padding: 0;
   height: 100%;
   width: 100%;
-  max-width: 100%;
+  max-width: 100vw;
   overflow: hidden;
   overflow-x: hidden;
   position: relative;
   font-family: "Noto Sans SC", -apple-system, BlinkMacSystemFont, sans-serif;
   background: var(--bg-pink);
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Polka dot background */
@@ -102,14 +105,27 @@ body::before {
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
+  width: 100vw;
+  height: 100vh;
   background-image: radial-gradient(var(--bg-dots) 1.5px, transparent 1.5px);
   background-size: 20px 20px;
-  background-position: 0 0;
+  background-position: 10px 10px;
   opacity: 0.5;
   pointer-events: none;
   z-index: 0;
+  /* 用遮罩隐藏边缘的不完整波点 */
+  -webkit-mask-image: linear-gradient(to right, 
+    transparent 0px,
+    black 10px,
+    black calc(100% - 10px),
+    transparent 100%
+  );
+  mask-image: linear-gradient(to right, 
+    transparent 0px,
+    black 10px,
+    black calc(100% - 10px),
+    transparent 100%
+  );
 }
 
 /* Decorative stars */
@@ -692,11 +708,11 @@ body::before {
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
+  width: 100%;
+  height: 100%;
   background-image: radial-gradient(var(--bg-dots) 1.5px, transparent 1.5px);
   background-size: 20px 20px;
-  background-position: 0 0;
+  background-position: 10px 10px;
   opacity: 0.5;
   pointer-events: none;
   z-index: -1;
@@ -876,7 +892,7 @@ body::before {
     transparent 2px
   ) !important;
   background-size: 20px 20px !important;
-  background-position: 0 0 !important;
+  background-position: 10px 10px !important;
   /* 确保顶部没有白色边框或阴影 */
   border: none !important;
   box-shadow: none !important;
@@ -5766,7 +5782,7 @@ body::before {
 /* Chat Tab Bar */
 .chat-tab-bar {
   position: fixed;
-  bottom: 12px;
+  bottom: calc(12px + env(safe-area-inset-bottom));
   left: 50%;
   transform: translateX(-50%);
   display: flex;
