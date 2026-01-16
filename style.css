@@ -582,6 +582,17 @@ body::before {
   flex: 1;
 }
 
+/* 调整左侧第3、4个app（情侣、陪伴）往上移 */
+.apps-left .app-item:nth-child(2),
+.apps-left .app-item:nth-child(3) {
+  margin-top: -8px;
+}
+
+/* 调整左侧第5个app（查手机）往下移 */
+.apps-left .app-item:nth-child(4) {
+  margin-top: 8px;
+}
+
 /* 右侧区域：聊天、世界书、预设、论坛 + 拍立得 */
 .apps-right {
   display: grid;

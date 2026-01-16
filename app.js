@@ -11,6 +11,10 @@ window.userPersonaPresets = []; // 以前散落在 2660 行
 window.bookshelfData = []; // 以前散落在 3175 行
 window.voiceConfig = {}; // 以前散落在 2980 行
 
+// 全局用户资料（用于聊天界面等）
+window.globalUserAvatar = ""; // 用户头像
+window.globalUserName = "用户"; // 用户名称
+
 // 世界书系统变量
 window.worldbooks = []; // 世界书列表
 window.worldbookGroups = []; // 世界书分组
@@ -120,6 +124,8 @@ async function initApp() {
       safeGet("worldbooks"),
       safeGet("worldbookGroups"),
       safeGet("groupChats"), // 添加群聊数据加载
+      safeGet("userAvatar"), // 新版用户头像
+      safeGet("userName"),   // 新版用户名称
     ]);
 
     // 赋值（如果读取为 null，就用默认值）
@@ -155,6 +161,10 @@ async function initApp() {
 
     // 群聊数据
     groupChats = values[14] || [];
+    
+    // 全局用户资料（用于聊天界面等）
+    window.globalUserAvatar = values[15] || values[10] || ""; // 优先使用新版，兼容旧版
+    window.globalUserName = values[16] || "用户";
 
     // 【✓ 关键修复开始】
     // 必须手动更新 activePresetId 变量，否则界面渲染时不知道刚才读到了什么
@@ -203,6 +213,15 @@ async function initApp() {
     initUserPersonaPresets();
     initPresetSystem(); // 初始化预设系统
     loadSavedData(); // 加载名片、标签、小组件数据
+    
+    // ========== 加载新版名片数据（profile-widget-new）==========
+    await loadNewProfileData();
+    
+    // ========== 加载神秘卡片小组件数据 ==========
+    await loadMysteryWidgetData();
+    
+    // ========== 加载拍立得小组件数据 ==========
+    await loadPolaroidData();
 
     // 如果有自定义字体，应用它
     if (window.activeFontId !== "system") {
@@ -238,6 +257,11 @@ async function initApp() {
       initUserPersonaPresets();
       initPresetSystem();
       loadSavedData(); // 加载名片、标签、小组件数据
+      
+      // 尝试加载小组件数据
+      loadNewProfileData();
+      loadMysteryWidgetData();
+      loadPolaroidData();
     } catch (renderErr) {
       console.error("渲染失败:", renderErr);
     }
@@ -1745,22 +1769,29 @@ async function handleLoveWidgetBgUpload(input) {
 
 // Page navigation
 // Load saved data
-function loadSavedData() {
-  // Avatar
-  const avatarData = localStorage.getItem("avatarImg");
-  if (avatarData) {
-    const img = document.getElementById("avatarImg");
-    const placeholder = document.getElementById("avatarPlaceholder");
-    if (img) {
-      img.src = avatarData;
-      img.style.display = "block";
+async function loadSavedData() {
+  // 注意：这个函数加载的是旧版名片数据（profile-widget），
+  // 新版名片（profile-widget-new）的数据由文件末尾的代码加载
+  
+  // Avatar (旧版)
+  try {
+    const avatarData = await localforage.getItem("avatarImg");
+    if (avatarData) {
+      const img = document.getElementById("avatarImg");
+      const placeholder = document.getElementById("avatarPlaceholder");
+      if (img) {
+        img.src = avatarData;
+        img.style.display = "block";
+      }
+      if (placeholder) {
+        placeholder.style.display = "none";
+      }
     }
-    if (placeholder) {
-      placeholder.style.display = "none";
-    }
+  } catch (e) {
+    console.error("加载旧版头像失败:", e);
   }
 
-  // Profile fields
+  // Profile fields (旧版)
   const fields = ["name", "handle", "bio", "location"];
   const elementMap = {
     name: "profileName",
@@ -1769,25 +1800,31 @@ function loadSavedData() {
     location: "profileLocation",
   };
 
-  fields.forEach((field) => {
-    const saved = localStorage.getItem("profile_" + field);
-    if (saved) {
-      const element = document.getElementById(elementMap[field]);
-      if (element) {
-        if (field === "handle") {
-          element.textContent = "@" + saved.replace("@", "");
-        } else {
-          element.textContent = saved;
+  for (const field of fields) {
+    try {
+      const saved = await localforage.getItem("profile_" + field);
+      if (saved) {
+        const element = document.getElementById(elementMap[field]);
+        if (element) {
+          if (field === "handle") {
+            element.textContent = "@" + saved.replace("@", "");
+          } else {
+            element.textContent = saved;
+          }
         }
       }
+    } catch (e) {
+      console.error(`加载 profile_${field} 失败:`, e);
     }
-  });
+  }
 
   // 加载名片标签数据
   loadTagsData();
 
   // 加载恋爱纪念组件数据
   loadLoveWidgetData();
+  
+  console.log("✓ loadSavedData 完成");
 }
 
 // Close modal on outside click
@@ -2291,7 +2328,7 @@ async function loadGroupMessages(groupId) {
   }
 
   // 获取用户头像
-  const globalUserAvatar = localStorage.getItem("avatarImg");
+  const globalUserAvatar = window.globalUserAvatar || "";
   const group = groupChats.find((g) => g.id === groupId);
   const groupSettings = group?.settings || {};
   const userAvatar = groupSettings.myAvatar || globalUserAvatar || "";
@@ -3027,7 +3064,7 @@ async function renderGroupSelectionMode() {
   const messages = (await localforage.getItem(messagesKey)) || [];
   const container = document.getElementById("convMessages");
 
-  const globalUserAvatar = localStorage.getItem("avatarImg");
+  const globalUserAvatar = window.globalUserAvatar || "";
   const group = groupChats.find((g) => g.id === currentGroupId);
   const groupSettings = group?.settings || {};
   const userAvatar = groupSettings.myAvatar || globalUserAvatar || "";
@@ -11963,7 +12000,7 @@ function renderConversation() {
 
   // 头像逻辑
   const aiAvatarSrc = settings.otherAvatar || (char ? char.avatar : "") || "";
-  const globalUserAvatar = localStorage.getItem("avatarImg");
+  const globalUserAvatar = window.globalUserAvatar || "";
   const userAvatarSrc = settings.myAvatar || globalUserAvatar || "";
 
   let html = "";
@@ -16681,7 +16718,7 @@ async function getGroupCallAIMessage(charId, context, speakerIndex) {
   const group = groupChats.find((g) => g.id === callState.groupId);
   const groupSettings = group?.settings || {};
   const userNickname =
-    groupSettings.myNickname || localStorage.getItem("userName") || "用户";
+    groupSettings.myNickname || window.globalUserName || "用户";
   const userPersona = groupSettings.myPersona || "";
   // 使用群聊设置中的历史消息条数
   const contextCount = groupSettings.contextCount || 20;
@@ -17319,7 +17356,7 @@ async function addGroupCallRecord(
   ) {
     const groupSettings = group.settings || {};
     const userNickname =
-      groupSettings.myNickname || localStorage.getItem("userName") || "用户";
+      groupSettings.myNickname || window.globalUserName || "用户";
 
     // 格式化通话记录
     const callTranscript = conversationHistory
@@ -27585,34 +27622,161 @@ function parseStickersFromText(text) {
 
   return results;
 }
-// === 个人名片交互逻辑 (LocalForage 版) ===
-
-// 1. 页面加载时：异步读取保存的数据
-document.addEventListener("DOMContentLoaded", async () => {
+// ========== 存储诊断工具 ==========
+async function diagnoseStorage() {
+  console.log("========== 存储诊断开始 ==========");
+  
+  // 1. 检查 localforage 是否可用
+  if (typeof localforage === 'undefined') {
+    console.error("❌ localforage 库未加载！");
+    alert("错误：localforage 库未加载，数据无法保存！");
+    return;
+  }
+  console.log("✓ localforage 库已加载");
+  
+  // 2. 检查当前使用的存储驱动
+  const driver = localforage.driver();
+  console.log("当前存储驱动:", driver);
+  
+  // 3. 测试写入和读取
   try {
-    // 使用 await 等待数据从数据库取出
+    const testKey = "__test_" + Date.now();
+    await localforage.setItem(testKey, "test_value");
+    const retrieved = await localforage.getItem(testKey);
+    await localforage.removeItem(testKey);
+    
+    if (retrieved === "test_value") {
+      console.log("✓ 存储读写测试通过");
+    } else {
+      console.error("❌ 存储读写测试失败：值不匹配");
+    }
+  } catch (err) {
+    console.error("❌ 存储读写测试失败:", err);
+  }
+  
+  // 4. 列出所有已保存的键
+  try {
+    const keys = await localforage.keys();
+    console.log("已保存的数据键 (" + keys.length + " 个):", keys);
+    
+    // 5. 计算大致存储大小
+    let totalSize = 0;
+    for (const key of keys) {
+      try {
+        const value = await localforage.getItem(key);
+        const size = new Blob([JSON.stringify(value)]).size;
+        totalSize += size;
+        if (size > 100000) { // 大于100KB的数据
+          console.log(`  ⚠️ 大数据: ${key} = ${(size/1024/1024).toFixed(2)} MB`);
+        }
+      } catch (e) {
+        console.log(`  ❌ 无法读取: ${key}`);
+      }
+    }
+    console.log("总存储大小约: " + (totalSize/1024/1024).toFixed(2) + " MB");
+    
+    // 6. 检查关键数据是否存在
+    const criticalKeys = ['userBg', 'userAvatar', 'userName', 'userBio', 'characters', 'chatHistories', 'mysteryTitle', 'polaroidImg'];
+    console.log("--- 关键数据检查 ---");
+    for (const key of criticalKeys) {
+      const value = await localforage.getItem(key);
+      if (value) {
+        const size = new Blob([JSON.stringify(value)]).size;
+        console.log(`  ✓ ${key}: ${(size/1024).toFixed(1)} KB`);
+      } else {
+        console.log(`  ○ ${key}: 未设置`);
+      }
+    }
+    
+  } catch (err) {
+    console.error("❌ 无法获取存储键:", err);
+  }
+  
+  // 7. 检查存储配额（如果浏览器支持）
+  if (navigator.storage && navigator.storage.estimate) {
+    try {
+      const estimate = await navigator.storage.estimate();
+      const usedMB = (estimate.usage / 1024 / 1024).toFixed(2);
+      const quotaMB = (estimate.quota / 1024 / 1024).toFixed(2);
+      const percent = ((estimate.usage / estimate.quota) * 100).toFixed(1);
+      console.log(`存储配额: 已用 ${usedMB} MB / 总共 ${quotaMB} MB (${percent}%)`);
+      
+      if (percent > 80) {
+        console.warn("⚠️ 存储空间使用超过80%！");
+      }
+    } catch (e) {
+      console.log("无法获取存储配额信息");
+    }
+  }
+  
+  console.log("========== 存储诊断结束 ==========");
+  console.log("提示：如果看到错误，请尝试在设置中清理不需要的数据，或导出重要数据后清除浏览器缓存");
+}
+
+// 页面加载后自动运行诊断
+document.addEventListener("DOMContentLoaded", () => {
+  setTimeout(diagnoseStorage, 2000); // 延迟2秒运行，确保其他加载完成
+});
+
+// 暴露到全局，方便手动调用
+window.diagnoseStorage = diagnoseStorage;
+
+// ========== 加载新版名片数据（profile-widget-new）==========
+async function loadNewProfileData() {
+  try {
     const savedBg = await localforage.getItem("userBg");
     const savedAvatar = await localforage.getItem("userAvatar");
     const savedName = await localforage.getItem("userName");
     const savedBio = await localforage.getItem("userBio");
     const savedLoc = await localforage.getItem("userLocation");
 
-    // 如果取到了，就显示出来
-    if (savedBg) document.getElementById("userProfileBg").src = savedBg;
-    if (savedAvatar)
-      document.getElementById("userProfileAvatar").src = savedAvatar;
-    if (savedName)
-      document.getElementById("userNameDisplay").innerText = savedName;
-    if (savedBio)
-      document.getElementById("userBioDisplay").innerText = savedBio;
-    if (savedLoc)
-      document.getElementById("userLocationDisplay").innerText = savedLoc;
+    if (savedBg) {
+      const el = document.getElementById("userProfileBg");
+      if (el) el.src = savedBg;
+    }
+    if (savedAvatar) {
+      const el = document.getElementById("userProfileAvatar");
+      if (el) el.src = savedAvatar;
+    }
+    if (savedName) {
+      const el = document.getElementById("userNameDisplay");
+      if (el) el.innerText = savedName;
+    }
+    if (savedBio) {
+      const el = document.getElementById("userBioDisplay");
+      if (el) el.innerText = savedBio;
+    }
+    if (savedLoc) {
+      const el = document.getElementById("userLocationDisplay");
+      if (el) el.innerText = savedLoc;
+    }
 
-    console.log("名片数据加载完成！");
+    console.log("✓ 新版名片数据加载完成");
   } catch (err) {
-    console.error("读取数据出错:", err);
+    console.error("读取新版名片数据出错:", err);
   }
-});
+}
+
+// ========== 加载拍立得小组件数据 ==========
+async function loadPolaroidData() {
+  try {
+    const savedP_Img = await localforage.getItem("polaroidImg");
+    const savedP_Text = await localforage.getItem("polaroidText");
+
+    if (savedP_Img) {
+      const el = document.getElementById("polaroidImgDisplay");
+      if (el) el.src = savedP_Img;
+    }
+    if (savedP_Text) {
+      const el = document.getElementById("polaroidTextDisplay");
+      if (el) el.innerText = savedP_Text;
+    }
+    
+    console.log("✓ 拍立得数据加载完成");
+  } catch (err) {
+    console.error("读取拍立得数据出错:", err);
+  }
+}
 
 // 2. 触发背景上传
 function triggerBgUpload() {
@@ -27623,17 +27787,18 @@ function triggerBgUpload() {
 function handleBgChange(input) {
   if (input.files && input.files[0]) {
     const reader = new FileReader();
-    reader.onload = function (e) {
+    reader.onload = async function (e) {
       const result = e.target.result;
       // 1. 马上显示，让用户觉得很快
       document.getElementById("userProfileBg").src = result;
-      // 2. 后台异步保存
-      localforage
-        .setItem("userBg", result)
-        .then(() => {
-          console.log("背景已保存到 localforage");
-        })
-        .catch((err) => console.error("保存背景失败", err));
+      // 2. 等待保存完成
+      try {
+        await localforage.setItem("userBg", result);
+        console.log("✓ 背景已保存");
+      } catch (err) {
+        console.error("保存背景失败", err);
+        showToast("保存失败，请重试");
+      }
     };
     reader.readAsDataURL(input.files[0]);
   }
@@ -27648,45 +27813,56 @@ function triggerAvatarUpload() {
 function handleAvatarChange(input) {
   if (input.files && input.files[0]) {
     const reader = new FileReader();
-    reader.onload = function (e) {
+    reader.onload = async function (e) {
       const result = e.target.result;
       // 1. 马上显示
       document.getElementById("userProfileAvatar").src = result;
-      // 2. 后台异步保存
-      localforage
-        .setItem("userAvatar", result)
-        .then(() => {
-          console.log("头像已保存到 localforage");
-        })
-        .catch((err) => console.error("保存头像失败", err));
+      // 2. 等待保存完成
+      try {
+        await localforage.setItem("userAvatar", result);
+        console.log("✓ 头像已保存");
+      } catch (err) {
+        console.error("保存头像失败", err);
+        showToast("保存失败，请重试");
+      }
     };
     reader.readAsDataURL(input.files[0]);
   }
 }
 
 // 4. 编辑名字
-function editUserName() {
+async function editUserName() {
   const currentText = document.getElementById("userNameDisplay").innerText;
   const newText = prompt("请输入新的名字：", currentText);
   if (newText && newText.trim() !== "") {
     document.getElementById("userNameDisplay").innerText = newText;
-    localforage.setItem("userName", newText);
+    try {
+      await localforage.setItem("userName", newText);
+      console.log("✓ 名字已保存");
+    } catch (e) {
+      showToast("保存失败，请重试");
+    }
   }
 }
 
 // 5. 编辑个签
-function editUserBio() {
+async function editUserBio() {
   const currentText = document.getElementById("userBioDisplay").innerText;
   const newText = prompt("请输入个性签名：", currentText);
   if (newText !== null) {
     const val = newText || "点击这里设置你的个性签名...";
     document.getElementById("userBioDisplay").innerText = val;
-    localforage.setItem("userBio", val);
+    try {
+      await localforage.setItem("userBio", val);
+      console.log("✓ 签名已保存");
+    } catch (e) {
+      showToast("保存失败，请重试");
+    }
   }
 }
 
 // 6. 编辑定位
-function editUserLocation() {
+async function editUserLocation() {
   const currentText = document.getElementById("userLocationDisplay").innerText;
   const newText = prompt(
     "设置你的位置：",
@@ -27695,13 +27871,18 @@ function editUserLocation() {
   if (newText !== null) {
     const val = newText.trim() || "添加定位";
     document.getElementById("userLocationDisplay").innerText = val;
-    localforage.setItem("userLocation", val);
+    try {
+      await localforage.setItem("userLocation", val);
+      console.log("✓ 位置已保存");
+    } catch (e) {
+      showToast("保存失败，请重试");
+    }
   }
 }
 // === 神秘卡片小组件逻辑 ===
 
-// 加载神秘卡片数据
-document.addEventListener("DOMContentLoaded", async () => {
+// 加载神秘卡片数据 - 整合到全局加载流程
+async function loadMysteryWidgetData() {
   try {
     const savedTitle = await localforage.getItem("mysteryTitle");
     const savedText1 = await localforage.getItem("mysteryText1");
@@ -27717,50 +27898,66 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (savedImg1) {
       const img1 = document.getElementById("mysteryImg1");
       const emoji1 = document.getElementById("mysteryEmoji1");
-      img1.src = savedImg1;
-      img1.style.display = "block";
+      if (img1) {
+        img1.src = savedImg1;
+        img1.style.display = "block";
+      }
       if (emoji1) emoji1.style.display = "none";
     }
     if (savedImg2) {
       const img2 = document.getElementById("mysteryImg2");
       const emoji2 = document.getElementById("mysteryEmoji2");
-      img2.src = savedImg2;
-      img2.style.display = "block";
+      if (img2) {
+        img2.src = savedImg2;
+        img2.style.display = "block";
+      }
       if (emoji2) emoji2.style.display = "none";
     }
     
-    console.log("神秘卡片数据加载完成！");
+    console.log("✓ 神秘卡片数据加载完成");
   } catch (err) {
     console.error("读取神秘卡片数据出错:", err);
   }
-});
+}
 
-// 编辑手写体标题
-function editMysteryTitle() {
+// 编辑手写体标题 - 添加await确保保存成功
+async function editMysteryTitle() {
   const currentText = document.getElementById("mysteryTitle").innerText;
   const newText = prompt("编辑标题：", currentText);
   if (newText !== null && newText.trim() !== "") {
     document.getElementById("mysteryTitle").innerText = newText;
-    localforage.setItem("mysteryTitle", newText);
+    try {
+      await localforage.setItem("mysteryTitle", newText);
+      console.log("✓ 标题已保存");
+    } catch (e) {
+      console.error("保存标题失败:", e);
+      showToast("保存失败，请重试");
+    }
   }
 }
 
-// 编辑胶囊卡片文字
-function editMysteryText(cardNum) {
+// 编辑胶囊卡片文字 - 添加await确保保存成功
+async function editMysteryText(cardNum) {
   const element = document.getElementById("mysteryText" + cardNum);
   const currentText = element.innerText;
   const newText = prompt("编辑文字：", currentText);
   if (newText !== null && newText.trim() !== "") {
     element.innerText = newText;
-    localforage.setItem("mysteryText" + cardNum, newText);
+    try {
+      await localforage.setItem("mysteryText" + cardNum, newText);
+      console.log("✓ 文字已保存");
+    } catch (e) {
+      console.error("保存文字失败:", e);
+      showToast("保存失败，请重试");
+    }
   }
 }
 
-// 处理胶囊图片上传
+// 处理胶囊图片上传 - 添加await确保保存成功
 function handleMysteryImgUpload(cardNum, input) {
   if (input.files && input.files[0]) {
     const reader = new FileReader();
-    reader.onload = function (e) {
+    reader.onload = async function (e) {
       const result = e.target.result;
       const imgEl = document.getElementById("mysteryImg" + cardNum);
       const emojiEl = document.getElementById("mysteryEmoji" + cardNum);
@@ -27769,7 +27966,13 @@ function handleMysteryImgUpload(cardNum, input) {
       imgEl.style.display = "block";
       if (emojiEl) emojiEl.style.display = "none";
       
-      localforage.setItem("mysteryImg" + cardNum, result);
+      try {
+        await localforage.setItem("mysteryImg" + cardNum, result);
+        console.log("✓ 图片已保存");
+      } catch (e) {
+        console.error("保存图片失败:", e);
+        showToast("保存失败，请重试");
+      }
     };
     reader.readAsDataURL(input.files[0]);
   }
@@ -27787,21 +27990,6 @@ function handleMysteryCard2Click(event) {
 
 // === 拍立得小组件逻辑 ===
 
-document.addEventListener("DOMContentLoaded", async () => {
-  try {
-    // 读取拍立得数据
-    const savedP_Img = await localforage.getItem("polaroidImg");
-    const savedP_Text = await localforage.getItem("polaroidText");
-
-    if (savedP_Img)
-      document.getElementById("polaroidImgDisplay").src = savedP_Img;
-    if (savedP_Text)
-      document.getElementById("polaroidTextDisplay").innerText = savedP_Text;
-  } catch (err) {
-    console.error("读取拍立得数据出错:", err);
-  }
-});
-
 // 1. 触发拍立得图片上传
 function triggerPolaroidUpload() {
   document.getElementById("polaroidInput").click();
@@ -27811,18 +27999,24 @@ function triggerPolaroidUpload() {
 function handlePolaroidChange(input) {
   if (input.files && input.files[0]) {
     const reader = new FileReader();
-    reader.onload = function (e) {
+    reader.onload = async function (e) {
       const result = e.target.result;
       document.getElementById("polaroidImgDisplay").src = result;
-      // 保存到 localforage
-      localforage.setItem("polaroidImg", result);
+      // 等待保存完成
+      try {
+        await localforage.setItem("polaroidImg", result);
+        console.log("✓ 拍立得图片已保存");
+      } catch (err) {
+        console.error("保存拍立得图片失败:", err);
+        showToast("保存失败，请重试");
+      }
     };
     reader.readAsDataURL(input.files[0]);
   }
 }
 
 // 3. 编辑拍立得文字
-function editPolaroidText(event) {
+async function editPolaroidText(event) {
   // 防止冒泡（虽然结构分开了，加上更保险）
   event.stopPropagation();
 
@@ -27833,6 +28027,12 @@ function editPolaroidText(event) {
     // 允许空字符串，但不允许取消
     const finalVal = newText.trim() || "My Moment";
     document.getElementById("polaroidTextDisplay").innerText = finalVal;
-    localforage.setItem("polaroidText", finalVal);
+    try {
+      await localforage.setItem("polaroidText", finalVal);
+      console.log("✓ 拍立得文字已保存");
+    } catch (err) {
+      console.error("保存拍立得文字失败:", err);
+      showToast("保存失败，请重试");
+    }
   }
 }
