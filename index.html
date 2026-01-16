@@ -6529,27 +6529,56 @@
       <div class="notification-time" id="notificationTime">刚刚</div>
     </div>
 
-    <!-- 钱包详情页 -->
+    <!-- 钱包详情页 - Apple Wallet 风格 -->
     <div class="wallet-page" id="walletPage">
-      <div class="wallet-page-header">
-        <button class="wallet-page-back" onclick="closeWalletPage()">‹</button>
-        <span>我的钱包</span>
-        <span style="width: 30px"></span>
-      </div>
+      <!-- 悬浮关闭按钮 -->
+      <button class="wallet-close-btn" onclick="closeWalletPage()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+      
       <div class="wallet-page-content">
-        <div class="wallet-balance-card">
-          <div class="wallet-balance-label">账户余额（元）</div>
-          <div class="wallet-balance-value" id="walletBalanceDisplay">0.00</div>
-          <div class="wallet-balance-actions">
-            <button class="wallet-action-btn" onclick="openRechargeModal()">
-              <span>💳</span>
-              <span>充值</span>
+        <!-- 银行卡样式 -->
+        <div class="apple-wallet-card">
+          <div class="card-top-row">
+            <div class="card-chip">
+              <svg viewBox="0 0 50 40" width="36" height="28">
+                <rect x="0" y="0" width="50" height="40" rx="5" fill="rgba(255,255,255,0.3)"/>
+                <rect x="0" y="12" width="50" height="5" fill="rgba(255,255,255,0.5)"/>
+                <rect x="0" y="22" width="50" height="5" fill="rgba(255,255,255,0.5)"/>
+                <rect x="18" y="0" width="5" height="40" fill="rgba(255,255,255,0.4)"/>
+                <rect x="27" y="0" width="5" height="40" fill="rgba(255,255,255,0.4)"/>
+              </svg>
+            </div>
+            <div class="card-type-label">储蓄卡</div>
+          </div>
+          
+          <div class="card-balance-section">
+            <div class="card-balance-label">账户余额</div>
+            <div class="card-balance-amount">
+              <span class="currency-symbol">¥</span>
+              <span id="walletBalanceDisplay">0.00</span>
+            </div>
+          </div>
+          
+          <div class="card-bottom-row">
+            <div class="card-number">•••• •••• •••• 8888</div>
+            <button class="card-recharge-btn" onclick="openRechargeModal()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              充值
             </button>
           </div>
         </div>
-        <div class="wallet-history-section">
-          <div class="wallet-history-title">交易记录</div>
-          <div class="wallet-history-list" id="walletHistoryListPage">
+        
+        <!-- 交易记录 -->
+        <div class="apple-wallet-transactions">
+          <div class="transactions-title">交易记录</div>
+          <div class="transactions-list" id="walletHistoryListPage">
             <div class="wallet-history-empty">暂无交易记录</div>
           </div>
         </div>
