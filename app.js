@@ -11202,8 +11202,8 @@ uiUpgradeStyle.innerHTML = `
                       /* --- 1. iOS风格聊天顶栏 --- */
                       .conv-title-section .conv-avatar {
                           display: flex !important;
-                          width: 42px !important;
-                          height: 42px !important;
+                          width: 56px !important;
+                          height: 56px !important;
                       }
                       .conv-title-section {
                           margin: 0 12px !important;
