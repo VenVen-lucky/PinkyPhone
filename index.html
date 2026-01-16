@@ -143,152 +143,91 @@
         <!-- Apps -->
         <div class="apps-section">
           <div class="apps-grid">
-            <!-- 恋爱纪念日小组件 (2x2) - 左上角 -->
-            <div
-              class="love-widget widget-2x2"
-              id="loveWidget"
-              onclick="handleLoveWidgetClick(event)"
-            >
-              <div class="love-widget-bg" id="loveWidgetBg"></div>
-              <div
-                class="love-days-row"
-                onclick="openLoveEditModal('startDate')"
-              >
-                <span class="love-days-number" id="loveDaysNumber">0</span>
-                <span class="love-days-unit">天</span>
-              </div>
-
-              <div class="love-avatars-row">
-                <div
-                  class="love-avatar"
-                  onclick="document.getElementById('loveAvatar1Input').click()"
-                >
-                  <img
-                    class="love-avatar-placeholder-img"
-                    id="loveAvatar1Placeholder"
-                    src="https://www.yn12377.cn/jubao/upload/smjb/2025/12/28/b7957012b29e42bdbf237cb27f46bb91.jpg"
-                  />
-                  <img id="loveAvatar1Img" src="" style="display: none" />
+            <!-- 左侧区域 -->
+            <div class="apps-left">
+              <!-- 神秘卡片小组件 (占两列) -->
+              <div class="mystery-widget widget-2x2" id="mysteryWidget">
+                <!-- 手写体标题 -->
+                <div class="mystery-title" id="mysteryTitle" onclick="editMysteryTitle()">
+                  Pinky Phone
                 </div>
-                <div
-                  class="love-avatar"
-                  onclick="document.getElementById('loveAvatar2Input').click()"
-                >
-                  <img
-                    class="love-avatar-placeholder-img"
-                    id="loveAvatar2Placeholder"
-                    src="https://www.yn12377.cn/jubao/upload/smjb/2025/12/28/b7957012b29e42bdbf237cb27f46bb91.jpg"
-                  />
-                  <img id="loveAvatar2Img" src="" style="display: none" />
+                
+                <!-- 第一个胶囊卡片：图片在左 -->
+                <div class="mystery-capsule capsule-img-left" onclick="handleMysteryCard1Click(event)">
+                  <div class="mystery-capsule-img" onclick="event.stopPropagation(); document.getElementById('mysteryImg1Input').click()">
+                    <span class="mystery-emoji" id="mysteryEmoji1">🐰</span>
+                    <img id="mysteryImg1" src="" style="display: none" alt="">
+                  </div>
+                  <div class="mystery-capsule-text" id="mysteryText1" onclick="event.stopPropagation(); editMysteryText(1)">
+                    请输入文字
+                  </div>
                 </div>
-              </div>
-              <input
-                type="file"
-                id="loveAvatar1Input"
-                class="hidden-input"
-                accept="image/*"
-                onchange="handleLoveAvatarUpload(1, this)"
-              />
-              <input
-                type="file"
-                id="loveAvatar2Input"
-                class="hidden-input"
-                accept="image/*"
-                onchange="handleLoveAvatarUpload(2, this)"
-              />
-              <input
-                type="file"
-                id="loveWidgetBgInput"
-                class="hidden-input"
-                accept="image/*"
-                onchange="handleLoveWidgetBgUpload(this)"
-              />
-
-              <div class="love-title-row" onclick="openLoveEditModal('title')">
-                <span class="love-title-text" id="loveTitleText">恋爱纪念</span>
+                
+                <!-- 第二个胶囊卡片：图片在右 -->
+                <div class="mystery-capsule capsule-img-right" onclick="handleMysteryCard2Click(event)">
+                  <div class="mystery-capsule-text" id="mysteryText2" onclick="event.stopPropagation(); editMysteryText(2)">
+                    请输入文字
+                  </div>
+                  <div class="mystery-capsule-img" onclick="event.stopPropagation(); document.getElementById('mysteryImg2Input').click()">
+                    <span class="mystery-emoji" id="mysteryEmoji2">🐰</span>
+                    <img id="mysteryImg2" src="" style="display: none" alt="">
+                  </div>
+                </div>
+                
+                <!-- 隐藏的文件输入 -->
+                <input type="file" id="mysteryImg1Input" class="hidden-input" accept="image/*" onchange="handleMysteryImgUpload(1, this)">
+                <input type="file" id="mysteryImg2Input" class="hidden-input" accept="image/*" onchange="handleMysteryImgUpload(2, this)">
               </div>
 
-              <div
-                class="love-date"
-                id="loveDateText"
-                onclick="openLoveEditModal('startDate')"
-              >
-                2024.01.01
+              <!-- 左侧APP -->
+              <div class="app-item" onclick="openPage('coupleSpacePage')">
+                <div class="app-icon gradient-pink">情侣</div>
+                <span class="app-name">情侣空间</span>
+              </div>
+              <div class="app-item" onclick="openCompanionPage()">
+                <div class="app-icon gradient-blue">陪伴</div>
+                <span class="app-name">陪伴</span>
+              </div>
+              <div class="app-item" onclick="openPhonePeekSelector()">
+                <div class="app-icon gradient-cyan" id="appIcon_phonepeek">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                    <line x1="12" y1="18" x2="12.01" y2="18"></line>
+                  </svg>
+                </div>
+                <span class="app-name">查手机</span>
               </div>
             </div>
 
-            <!-- 右上角4个App -->
-            <div class="app-item" onclick="openPage('chatPage')">
-              <div class="app-icon gradient-pink">聊天</div>
-              <span class="app-name">聊天</span>
-            </div>
-            <div class="app-item" onclick="openPage('worldbookPage')">
-              <div class="app-icon gradient-green">世界书</div>
-              <span class="app-name">世界书</span>
-            </div>
-            <div class="app-item" onclick="openPage('presetPage')">
-              <div class="app-icon gradient-orange">预设</div>
-              <span class="app-name">预设</span>
-            </div>
-            <div class="app-item" onclick="openPage('forumPage')">
-              <div class="app-icon gradient-purple">论坛</div>
-              <span class="app-name">论坛</span>
-            </div>
-
-            <!-- 第三行：情侣、陪伴在左边，拍立得在右边 -->
-            <div class="app-item" onclick="openPage('coupleSpacePage')">
-              <div class="app-icon gradient-pink">情侣</div>
-              <span class="app-name">情侣空间</span>
-            </div>
-            <div class="app-item" onclick="openCompanionPage()">
-              <div class="app-icon gradient-blue">陪伴</div>
-              <span class="app-name">陪伴</span>
-            </div>
-
-            <!-- 拍立得小组件 (2x2) - 右侧，预设论坛正下方 -->
-            <div class="polaroid-widget widget-2x2" id="polaroidWidget">
-              <div
-                class="polaroid-photo-area"
-                onclick="triggerPolaroidUpload()"
-              >
-                <img
-                  id="polaroidImgDisplay"
-                  src="https://images.unsplash.com/photo-1516961642265-531546e84af2?auto=format&fit=crop&w=400&q=80"
-                  alt="拍立得"
-                />
+            <!-- 右侧区域 -->
+            <div class="apps-right">
+              <div class="app-item" onclick="openPage('chatPage')">
+                <div class="app-icon gradient-pink">聊天</div>
+                <span class="app-name">聊天</span>
               </div>
-              <div
-                class="polaroid-caption"
-                id="polaroidTextDisplay"
-                onclick="editPolaroidText(event)"
-              >
-                My Moment
+              <div class="app-item" onclick="openPage('worldbookPage')">
+                <div class="app-icon gradient-green">世界书</div>
+                <span class="app-name">世界书</span>
               </div>
-              <input
-                type="file"
-                id="polaroidInput"
-                hidden
-                accept="image/*"
-                onchange="handlePolaroidChange(this)"
-              />
-            </div>
+              <div class="app-item" onclick="openPage('presetPage')">
+                <div class="app-icon gradient-orange">预设</div>
+                <span class="app-name">预设</span>
+              </div>
+              <div class="app-item" onclick="openPage('forumPage')">
+                <div class="app-icon gradient-purple">论坛</div>
+                <span class="app-name">论坛</span>
+              </div>
 
-            <!-- 查手机在情侣空间正下方 -->
-            <div class="app-item" onclick="openPhonePeekSelector()">
-              <div class="app-icon gradient-cyan" id="appIcon_phonepeek">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                >
-                  <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
-                  <line x1="12" y1="18" x2="12.01" y2="18"></line>
-                </svg>
+              <!-- 拍立得小组件 -->
+              <div class="polaroid-widget widget-2x2" id="polaroidWidget">
+                <div class="polaroid-photo-area" onclick="triggerPolaroidUpload()">
+                  <img id="polaroidImgDisplay" src="https://images.unsplash.com/photo-1516961642265-531546e84af2?auto=format&fit=crop&w=400&q=80" alt="拍立得"/>
+                </div>
+                <div class="polaroid-caption" id="polaroidTextDisplay" onclick="editPolaroidText(event)">
+                  My Moment
+                </div>
+                <input type="file" id="polaroidInput" hidden accept="image/*" onchange="handlePolaroidChange(this)">
               </div>
-              <span class="app-name" id="appName_phonepeek">查手机</span>
             </div>
           </div>
         </div>
@@ -1622,6 +1561,8 @@
             ←
           </button>
           <span class="preset-title"
+            onclick="handlePresetTitleClick(event)"
+            data-click-count="0"
             ><svg
               width="18"
               height="18"
@@ -1845,6 +1786,80 @@
           </button>
         </div>
       </div>
+      
+      <!-- 激活码弹窗 -->
+      <div class="activation-modal" id="activationModal">
+        <div class="activation-modal-content">
+          <div class="activation-modal-header">
+            <span class="activation-modal-title">🔐 导入功能激活</span>
+            <button class="activation-modal-close" onclick="closeActivationModal()">✕</button>
+          </div>
+          <div class="activation-modal-body">
+            <div class="activation-device-section">
+              <div class="activation-label">您的设备码</div>
+              <div class="activation-device-code" id="activationDeviceCode">加载中...</div>
+              <button class="activation-copy-btn" onclick="copyDeviceCode()">📋 复制设备码</button>
+              <div class="activation-hint">请将此设备码发送给管理员获取激活码</div>
+            </div>
+            <div class="activation-input-section">
+              <div class="activation-label">输入激活码</div>
+              <input 
+                type="text" 
+                class="activation-input" 
+                id="activationCodeInput" 
+                placeholder="请输入管理员提供的激活码..."
+                maxlength="32"
+              />
+            </div>
+          </div>
+          <div class="activation-modal-footer">
+            <button class="activation-btn cancel" onclick="closeActivationModal()">取消</button>
+            <button class="activation-btn confirm" onclick="verifyActivationCode()">激活</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 管理员激活码生成弹窗 -->
+      <div class="activation-modal" id="adminActivationModal">
+        <div class="activation-modal-content">
+          <div class="activation-modal-header">
+            <span class="activation-modal-title">🔑 管理员 - 生成激活码</span>
+            <button class="activation-modal-close" onclick="closeAdminActivationModal()">✕</button>
+          </div>
+          <div class="activation-modal-body">
+            <div class="activation-input-section">
+              <div class="activation-label">管理员密钥</div>
+              <input 
+                type="password" 
+                class="activation-input" 
+                id="adminSecretKey" 
+                placeholder="输入您设置的管理员密钥..."
+              />
+              <div class="activation-hint">首次使用会自动设置为管理员密钥</div>
+            </div>
+            <div class="activation-input-section">
+              <div class="activation-label">用户设备码</div>
+              <input 
+                type="text" 
+                class="activation-input" 
+                id="userDeviceCodeInput" 
+                placeholder="粘贴用户发送的设备码..."
+                maxlength="16"
+              />
+            </div>
+            <div class="activation-result-section" id="generatedCodeSection" style="display:none">
+              <div class="activation-label">生成的激活码</div>
+              <div class="activation-generated-code" id="generatedActivationCode"></div>
+              <button class="activation-copy-btn" onclick="copyGeneratedCode()">📋 复制激活码</button>
+            </div>
+          </div>
+          <div class="activation-modal-footer">
+            <button class="activation-btn cancel" onclick="closeAdminActivationModal()">取消</button>
+            <button class="activation-btn confirm" onclick="generateActivationCode()">生成激活码</button>
+          </div>
+        </div>
+      </div>
+      
       <input
         type="file"
         id="presetFileInput"

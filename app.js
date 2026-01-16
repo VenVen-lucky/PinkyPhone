@@ -258,6 +258,9 @@ window.currentPresetEntries = [];
 // 初始化预设系统
 async function initPresetSystem() {
   try {
+    // 初始化激活系统
+    await initActivationSystem();
+    
     let savedPresets = null;
     try {
       savedPresets = await safeLocalforageGet("userPresets");
@@ -786,16 +789,281 @@ function closePresetImportModal() {
   document.getElementById("presetImportModal").classList.remove("active");
 }
 
-// 从文件导入
-function importPresetFromFile() {
+// ==================== 激活码系统 ====================
+let deviceFingerprint = null;
+let isActivated = false;
+
+// 生成设备指纹
+async function generateDeviceFingerprint() {
+  const components = [];
+  
+  // 浏览器信息
+  components.push(navigator.userAgent);
+  components.push(navigator.language);
+  components.push(navigator.platform);
+  
+  // 屏幕信息
+  components.push(screen.width + 'x' + screen.height);
+  components.push(screen.colorDepth);
+  components.push(window.devicePixelRatio);
+  
+  // 时区
+  components.push(Intl.DateTimeFormat().resolvedOptions().timeZone);
+  
+  // Canvas指纹
+  try {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    ctx.textBaseline = 'top';
+    ctx.font = '14px Arial';
+    ctx.fillText('PinkyPhone', 2, 2);
+    components.push(canvas.toDataURL().slice(-50));
+  } catch (e) {}
+  
+  // 生成哈希
+  const str = components.join('|');
+  const hash = await simpleHash(str);
+  
+  // 返回8位设备码
+  return hash.substring(0, 8).toUpperCase();
+}
+
+// 简单哈希函数
+async function simpleHash(str) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(str);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// 初始化激活系统
+async function initActivationSystem() {
+  // 生成设备指纹
+  deviceFingerprint = await generateDeviceFingerprint();
+  
+  // 检查激活状态
+  const savedActivation = await localforage.getItem('presetActivation');
+  if (savedActivation && savedActivation.deviceCode === deviceFingerprint) {
+    isActivated = true;
+  }
+  
+  console.log('设备码:', deviceFingerprint, '激活状态:', isActivated);
+}
+
+// 检查是否已激活
+async function checkActivation() {
+  if (!deviceFingerprint) {
+    await initActivationSystem();
+  }
+  return isActivated;
+}
+
+// 打开激活弹窗
+function openActivationModal() {
+  document.getElementById('activationDeviceCode').textContent = deviceFingerprint || '加载中...';
+  document.getElementById('activationCodeInput').value = '';
+  document.getElementById('activationModal').classList.add('active');
+}
+
+// 关闭激活弹窗
+function closeActivationModal() {
+  document.getElementById('activationModal').classList.remove('active');
+}
+
+// 复制设备码
+async function copyDeviceCode() {
+  try {
+    await navigator.clipboard.writeText(deviceFingerprint);
+    showToast('设备码已复制');
+  } catch (e) {
+    showToast('复制失败，请手动复制');
+  }
+}
+
+// 验证激活码
+async function verifyActivationCode() {
+  const inputCode = document.getElementById('activationCodeInput').value.trim().toUpperCase();
+  
+  if (!inputCode) {
+    showToast('请输入激活码');
+    return;
+  }
+  
+  // 获取管理员密钥哈希
+  const adminKeyHash = await localforage.getItem('adminKeyHash');
+  if (!adminKeyHash) {
+    showToast('系统未初始化，请联系管理员');
+    return;
+  }
+  
+  // 验证激活码：密钥哈希前8位 + 设备码 的哈希
+  const expectedCode = await generateActivationCodeFromKey(adminKeyHash, deviceFingerprint);
+  
+  if (inputCode === expectedCode) {
+    // 激活成功
+    isActivated = true;
+    await localforage.setItem('presetActivation', {
+      deviceCode: deviceFingerprint,
+      activatedAt: new Date().toISOString()
+    });
+    showToast('🎉 激活成功！');
+    closeActivationModal();
+  } else {
+    showToast('激活码无效，请检查后重试');
+  }
+}
+
+// 根据密钥和设备码生成激活码
+async function generateActivationCodeFromKey(keyHash, deviceCode) {
+  const combined = keyHash.substring(0, 16) + deviceCode;
+  const hash = await simpleHash(combined);
+  return hash.substring(0, 12).toUpperCase();
+}
+
+// 打开管理员弹窗
+function openAdminActivationModal() {
+  document.getElementById('adminSecretKey').value = '';
+  document.getElementById('userDeviceCodeInput').value = '';
+  document.getElementById('generatedCodeSection').style.display = 'none';
+  document.getElementById('adminActivationModal').classList.add('active');
+}
+
+// 关闭管理员弹窗
+function closeAdminActivationModal() {
+  document.getElementById('adminActivationModal').classList.remove('active');
+}
+
+// 生成激活码（管理员用）
+async function generateActivationCode() {
+  const secretKey = document.getElementById('adminSecretKey').value.trim();
+  const userDeviceCode = document.getElementById('userDeviceCodeInput').value.trim().toUpperCase();
+  
+  if (!secretKey) {
+    showToast('请输入管理员密钥');
+    return;
+  }
+  
+  if (!userDeviceCode || userDeviceCode.length !== 8) {
+    showToast('请输入有效的8位设备码');
+    return;
+  }
+  
+  // 检查或设置管理员密钥
+  const keyHash = await simpleHash(secretKey);
+  const savedKeyHash = await localforage.getItem('adminKeyHash');
+  
+  if (!savedKeyHash) {
+    // 首次设置管理员密钥
+    await localforage.setItem('adminKeyHash', keyHash);
+    showToast('管理员密钥已设置');
+  } else if (savedKeyHash !== keyHash) {
+    showToast('管理员密钥错误');
+    return;
+  }
+  
+  // 生成激活码
+  const activationCode = await generateActivationCodeFromKey(keyHash, userDeviceCode);
+  
+  document.getElementById('generatedActivationCode').textContent = activationCode;
+  document.getElementById('generatedCodeSection').style.display = 'block';
+}
+
+// 复制生成的激活码
+async function copyGeneratedCode() {
+  const code = document.getElementById('generatedActivationCode').textContent;
+  try {
+    await navigator.clipboard.writeText(code);
+    showToast('激活码已复制');
+  } catch (e) {
+    showToast('复制失败，请手动复制');
+  }
+}
+
+// 管理员入口：连续点击5次标题打开管理面板
+let adminClickCount = 0;
+let adminClickTimer = null;
+
+// ========== 【安全配置】管理员访问密码 ==========
+// 修改下面的 ADMIN_ACCESS_PASSWORD 为你自己的密码
+// 这个密码用于进入管理员面板，与生成激活码的密钥是分开的
+const ADMIN_ACCESS_PASSWORD = "your_secret_password_here"; // ← 改成你的密码
+
+// 简单的密码哈希函数（与 simpleHash 保持一致）
+async function hashPassword(password) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password + "_pinkyphone_admin_salt_2024");
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// 预计算密码哈希（首次加载时计算）
+let adminPasswordHash = null;
+(async function() {
+  adminPasswordHash = await hashPassword(ADMIN_ACCESS_PASSWORD);
+})();
+
+function handlePresetTitleClick(event) {
+  adminClickCount++;
+  
+  if (adminClickTimer) {
+    clearTimeout(adminClickTimer);
+  }
+  
+  adminClickTimer = setTimeout(() => {
+    adminClickCount = 0;
+  }, 2000); // 2秒内连续点击
+  
+  if (adminClickCount >= 5) {
+    adminClickCount = 0;
+    // 不直接打开，先验证密码
+    verifyAdminAccess();
+  }
+}
+
+// 验证管理员访问密码
+async function verifyAdminAccess() {
+  const inputPassword = prompt("请输入管理员访问密码：");
+  
+  if (!inputPassword) {
+    return; // 用户取消
+  }
+  
+  const inputHash = await hashPassword(inputPassword);
+  
+  if (inputHash === adminPasswordHash) {
+    openAdminActivationModal();
+  } else {
+    // 静默失败，不给任何提示，让意外点击的用户以为什么都没发生
+    // 如果你想给提示，可以取消下面这行的注释
+    // showToast('密码错误');
+  }
+}
+
+// 从文件导入（带激活检查）
+async function importPresetFromFile() {
+  const activated = await checkActivation();
+  if (!activated) {
+    closePresetImportModal();
+    openActivationModal();
+    return;
+  }
   closePresetImportModal();
   document.getElementById("presetFileInput").click();
 }
 
-// 处理文件导入
+// 处理文件导入（带激活检查）
 async function handlePresetFileImport(event) {
   const file = event.target.files[0];
   if (!file) return;
+
+  const activated = await checkActivation();
+  if (!activated) {
+    openActivationModal();
+    event.target.value = "";
+    return;
+  }
 
   try {
     const text = await file.text();
@@ -809,8 +1077,15 @@ async function handlePresetFileImport(event) {
   event.target.value = "";
 }
 
-// 从剪贴板导入
+// 从剪贴板导入（带激活检查）
 async function importPresetFromClipboard() {
+  const activated = await checkActivation();
+  if (!activated) {
+    closePresetImportModal();
+    openActivationModal();
+    return;
+  }
+  
   try {
     const text = await navigator.clipboard.readText();
     const data = JSON.parse(text);
@@ -27229,6 +27504,18 @@ Object.assign(window, {
   handlePresetFileImport,
   importPresetFromClipboard,
   importPresetData,
+  // 激活码系统
+  initActivationSystem,
+  checkActivation,
+  openActivationModal,
+  closeActivationModal,
+  copyDeviceCode,
+  verifyActivationCode,
+  openAdminActivationModal,
+  closeAdminActivationModal,
+  generateActivationCode,
+  copyGeneratedCode,
+  handlePresetTitleClick,
   toggleOfflineSettings,
   updateOfflinePresetDropdown,
   onOfflinePresetChange,
@@ -27411,6 +27698,93 @@ function editUserLocation() {
     localforage.setItem("userLocation", val);
   }
 }
+// === 神秘卡片小组件逻辑 ===
+
+// 加载神秘卡片数据
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    const savedTitle = await localforage.getItem("mysteryTitle");
+    const savedText1 = await localforage.getItem("mysteryText1");
+    const savedText2 = await localforage.getItem("mysteryText2");
+    const savedImg1 = await localforage.getItem("mysteryImg1");
+    const savedImg2 = await localforage.getItem("mysteryImg2");
+
+    if (savedTitle) document.getElementById("mysteryTitle").innerText = savedTitle;
+    if (savedText1) document.getElementById("mysteryText1").innerText = savedText1;
+    if (savedText2) document.getElementById("mysteryText2").innerText = savedText2;
+    
+    // 加载图片时隐藏emoji
+    if (savedImg1) {
+      const img1 = document.getElementById("mysteryImg1");
+      const emoji1 = document.getElementById("mysteryEmoji1");
+      img1.src = savedImg1;
+      img1.style.display = "block";
+      if (emoji1) emoji1.style.display = "none";
+    }
+    if (savedImg2) {
+      const img2 = document.getElementById("mysteryImg2");
+      const emoji2 = document.getElementById("mysteryEmoji2");
+      img2.src = savedImg2;
+      img2.style.display = "block";
+      if (emoji2) emoji2.style.display = "none";
+    }
+    
+    console.log("神秘卡片数据加载完成！");
+  } catch (err) {
+    console.error("读取神秘卡片数据出错:", err);
+  }
+});
+
+// 编辑手写体标题
+function editMysteryTitle() {
+  const currentText = document.getElementById("mysteryTitle").innerText;
+  const newText = prompt("编辑标题：", currentText);
+  if (newText !== null && newText.trim() !== "") {
+    document.getElementById("mysteryTitle").innerText = newText;
+    localforage.setItem("mysteryTitle", newText);
+  }
+}
+
+// 编辑胶囊卡片文字
+function editMysteryText(cardNum) {
+  const element = document.getElementById("mysteryText" + cardNum);
+  const currentText = element.innerText;
+  const newText = prompt("编辑文字：", currentText);
+  if (newText !== null && newText.trim() !== "") {
+    element.innerText = newText;
+    localforage.setItem("mysteryText" + cardNum, newText);
+  }
+}
+
+// 处理胶囊图片上传
+function handleMysteryImgUpload(cardNum, input) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const result = e.target.result;
+      const imgEl = document.getElementById("mysteryImg" + cardNum);
+      const emojiEl = document.getElementById("mysteryEmoji" + cardNum);
+      
+      imgEl.src = result;
+      imgEl.style.display = "block";
+      if (emojiEl) emojiEl.style.display = "none";
+      
+      localforage.setItem("mysteryImg" + cardNum, result);
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+// 卡片点击处理（预留）
+function handleMysteryCard1Click(event) {
+  // 可以在这里添加点击整个卡片的行为
+  // 目前只响应图片和文字的独立点击
+}
+
+function handleMysteryCard2Click(event) {
+  // 可以在这里添加点击整个卡片的行为
+}
+
 // === 拍立得小组件逻辑 ===
 
 document.addEventListener("DOMContentLoaded", async () => {

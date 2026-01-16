@@ -444,22 +444,114 @@ body::before {
   margin-top: 16px;
 }
 
-.apps-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px 10px;
-  align-items: start;
-  position: relative;
+/* Apps Grid - 已在下方重新定义为flex布局 */
+
+/* 小组件占2x2位置 - 已在下方重新定义 */
+
+/* ========== 神秘卡片小组件样式 ========== */
+.mystery-widget {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 12px;
 }
 
-/* 小组件占2x2位置 */
-.widget-2x2 {
-  grid-column: span 2;
-  grid-row: span 2;
-  justify-self: stretch;
+/* 手写体标题 */
+.mystery-title {
+  font-family: 'Satisfy', cursive;
+  font-size: 1.3rem;
+  color: rgba(80, 80, 80, 0.75);
+  cursor: pointer;
+  text-align: center;
+  margin-bottom: 4px;
+  transition: opacity 0.2s;
 }
 
-/* 拍立得小组件 - 作为grid内的组件 */
+.mystery-title:active {
+  opacity: 0.6;
+}
+
+/* 胶囊卡片通用样式 */
+.mystery-capsule {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  border-radius: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  padding: 6px;
+  gap: 10px;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+.mystery-capsule:active {
+  transform: scale(0.98);
+}
+
+/* 图片在左的胶囊 */
+.mystery-capsule.capsule-img-left {
+  flex-direction: row;
+  padding-right: 16px;
+}
+
+/* 图片在右的胶囊 */
+.mystery-capsule.capsule-img-right {
+  flex-direction: row;
+  padding-left: 16px;
+}
+
+/* 胶囊内的圆形图片 */
+.mystery-capsule-img {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mystery-capsule-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(100%);
+}
+
+/* emoji占位符样式 */
+.mystery-capsule-img .mystery-emoji {
+  font-size: 24px;
+  line-height: 1;
+}
+
+/* 胶囊内的文字 */
+.mystery-capsule-text {
+  flex: 1;
+  font-size: 0.85rem;
+  color: rgba(60, 60, 60, 0.8);
+  font-weight: 500;
+  cursor: pointer;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.capsule-img-left .mystery-capsule-text {
+  text-align: left;
+}
+
+.capsule-img-right .mystery-capsule-text {
+  text-align: right;
+}
+
+/* 拍立得小组件 */
 .polaroid-widget {
   background: #fff;
   border-radius: 5px;
@@ -473,7 +565,35 @@ body::before {
   cursor: pointer;
   max-width: 140px;
   justify-self: center;
-  margin-right: 10px;
+}
+
+/* Apps区域使用flex左右布局 */
+.apps-grid {
+  display: flex;
+  gap: 12px;
+}
+
+/* 左侧区域：神秘卡片 + 情侣空间、陪伴、查手机 */
+.apps-left {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px 12px;
+  align-items: start;
+  flex: 1;
+}
+
+/* 右侧区域：聊天、世界书、预设、论坛 + 拍立得 */
+.apps-right {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px 12px;
+  align-items: start;
+  flex: 1;
+}
+
+/* 小组件占2x1（一行两列）在各自区域内 */
+.widget-2x2 {
+  grid-column: span 2;
 }
 
 .polaroid-widget:active {
@@ -15518,6 +15638,207 @@ input[type="range"]::-webkit-slider-thumb {
   cursor: pointer;
 }
 
+/* 激活码弹窗样式 */
+.activation-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.activation-modal.active {
+  display: flex;
+}
+
+.activation-modal-content {
+  background: white;
+  width: 100%;
+  max-width: 360px;
+  border-radius: 20px;
+  overflow: hidden;
+  animation: scaleIn 0.25s ease;
+}
+
+.activation-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  background: linear-gradient(135deg, #f48fb1, #ec407a);
+  color: white;
+}
+
+.activation-modal-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.activation-modal-close {
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.activation-modal-body {
+  padding: 20px;
+}
+
+.activation-device-section {
+  background: #f8f8f8;
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.activation-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.activation-device-code {
+  font-family: 'SF Mono', 'Menlo', monospace;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #c2185b;
+  letter-spacing: 2px;
+  padding: 12px;
+  background: white;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  word-break: break-all;
+}
+
+.activation-copy-btn {
+  background: linear-gradient(135deg, #f8bbd9, #f48fb1);
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.activation-copy-btn:active {
+  transform: scale(0.95);
+}
+
+.activation-hint {
+  font-size: 0.75rem;
+  color: #999;
+  margin-top: 10px;
+}
+
+.activation-input-section {
+  margin-bottom: 16px;
+}
+
+.activation-input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid #f0f0f0;
+  border-radius: 12px;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.activation-input:focus {
+  border-color: #f48fb1;
+}
+
+.activation-result-section {
+  background: #e8f5e9;
+  border-radius: 14px;
+  padding: 16px;
+  text-align: center;
+  margin-top: 16px;
+}
+
+.activation-generated-code {
+  font-family: 'SF Mono', 'Menlo', monospace;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #2e7d32;
+  letter-spacing: 1px;
+  padding: 12px;
+  background: white;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  word-break: break-all;
+}
+
+.activation-modal-footer {
+  display: flex;
+  gap: 12px;
+  padding: 16px 20px;
+  background: #f8f8f8;
+}
+
+.activation-btn {
+  flex: 1;
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.activation-btn:active {
+  transform: scale(0.97);
+}
+
+.activation-btn.cancel {
+  background: white;
+  color: #666;
+}
+
+.activation-btn.confirm {
+  background: linear-gradient(135deg, #f48fb1, #ec407a);
+  color: white;
+}
+
+/* 激活状态指示器 */
+.preset-activation-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.preset-activation-status.activated {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.preset-activation-status.not-activated {
+  background: #fff3e0;
+  color: #e65100;
+  cursor: pointer;
+}
+
 /* 批量操作浮动栏 */
 .preset-batch-bar {
   position: fixed;
@@ -15659,9 +15980,9 @@ input[type="range"]::-webkit-slider-thumb {
 /* === 个人名片区域 === */
 .profile-widget-new {
   position: relative;
-  width: 100%;
+  width: calc(100% - 24px); /* 减去两边边距 */
+  margin: 0 auto 12px auto; /* 水平居中，底部留距 */
   overflow: hidden; /* 保持圆角防止背景溢出 */
-  margin-bottom: 12px;
   border-radius: 24px; /* 整体圆角 */
   /* 这里不需要背景色，背景色由内部元素决定 */
 }
