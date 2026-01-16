@@ -21,6 +21,7 @@ body,
   box-shadow: none !important;
   outline: none !important;
   -webkit-box-shadow: none !important;
+  overflow-x: hidden !important;
 }
 
 /* 隐藏所有滚动条 */
@@ -104,7 +105,7 @@ body::before {
   bottom: 0;
   background-image: radial-gradient(var(--bg-dots) 1.5px, transparent 1.5px);
   background-size: 20px 20px;
-  background-position: center center;
+  background-position: 0 0;
   opacity: 0.5;
   pointer-events: none;
   z-index: 0;
@@ -677,6 +678,7 @@ body::before {
   padding-top: calc(16px + env(safe-area-inset-top));
   padding-bottom: calc(20px + env(safe-area-inset-bottom));
   overflow-y: auto;
+  overflow-x: hidden;
   border: none;
   box-shadow: none;
 }
@@ -690,7 +692,7 @@ body::before {
   bottom: 0;
   background-image: radial-gradient(var(--bg-dots) 1.5px, transparent 1.5px);
   background-size: 20px 20px;
-  background-position: center center;
+  background-position: 0 0;
   opacity: 0.5;
   pointer-events: none;
   z-index: -1;
@@ -870,10 +872,11 @@ body::before {
     transparent 2px
   ) !important;
   background-size: 20px 20px !important;
-  background-position: center center !important;
+  background-position: 0 0 !important;
   /* 确保顶部没有白色边框或阴影 */
   border: none !important;
   box-shadow: none !important;
+  overflow-x: hidden !important;
 }
 
 .chat-app.active {
