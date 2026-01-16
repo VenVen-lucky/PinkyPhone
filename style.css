@@ -8,33 +8,19 @@
   user-select: none;
 }
 
-/* 全局修复：强制移除所有可能的右侧阴影和水平滚动 */
-html,
-body,
-.phone-container,
-.main-content,
-.page,
-.chat-app,
-#forumPage,
-.forum-container {
-  border: none !important;
+/* 全局修复：确保没有意外的右侧阴影或边框 */
+html, body, .phone-container, .main-content, .page, .chat-app {
+  border-right: none !important;
   box-shadow: none !important;
   outline: none !important;
-  -webkit-box-shadow: none !important;
-  overflow-x: hidden !important;
-  max-width: 100vw !important;
 }
 
-/* 隐藏所有滚动条 */
+/* 修复iOS Safari可能产生的滚动条或边缘效果 */
 ::-webkit-scrollbar {
-  display: none !important;
-  width: 0 !important;
-  background: transparent !important;
-}
-
-* {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  display: none;
+  width: 0;
+  height: 0;
+  background: transparent;
 }
 
 :root {
@@ -77,26 +63,16 @@ body,
 html {
   -webkit-text-size-adjust: 100%;
   height: 100%;
-  width: 100%;
-  max-width: 100vw;
   background: #fce4ec;
-  overflow: hidden;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
 }
 
 body {
   margin: 0;
-  padding: 0;
   height: 100%;
-  width: 100%;
-  max-width: 100vw;
   overflow: hidden;
-  overflow-x: hidden;
   position: relative;
   font-family: "Noto Sans SC", -apple-system, BlinkMacSystemFont, sans-serif;
   background: var(--bg-pink);
-  -webkit-overflow-scrolling: touch;
 }
 
 /* Polka dot background */
@@ -105,27 +81,14 @@ body::before {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  right: 0;
+  bottom: 0;
   background-image: radial-gradient(var(--bg-dots) 1.5px, transparent 1.5px);
   background-size: 20px 20px;
-  background-position: 10px 10px;
+  background-position: center center;
   opacity: 0.5;
   pointer-events: none;
   z-index: 0;
-  /* 用遮罩隐藏边缘的不完整波点 */
-  -webkit-mask-image: linear-gradient(to right, 
-    transparent 0px,
-    black 10px,
-    black calc(100% - 10px),
-    transparent 100%
-  );
-  mask-image: linear-gradient(to right, 
-    transparent 0px,
-    black 10px,
-    black calc(100% - 10px),
-    transparent 100%
-  );
 }
 
 /* Decorative stars */
@@ -169,11 +132,9 @@ body::before {
 
 .phone-container {
   width: 100%;
-  max-width: 100vw;
   height: 100vh;
   position: relative;
   overflow: hidden;
-  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   background: var(--bg-pink);
@@ -187,7 +148,6 @@ body::before {
   padding-bottom: 90px;
   overflow-y: auto;
   overflow-x: hidden;
-  max-width: 100vw;
 }
 
 /* Top decorative bar - 完全移除 */
@@ -698,7 +658,6 @@ body::before {
   padding-top: calc(16px + env(safe-area-inset-top));
   padding-bottom: calc(20px + env(safe-area-inset-bottom));
   overflow-y: auto;
-  overflow-x: hidden;
   border: none;
   box-shadow: none;
 }
@@ -708,11 +667,11 @@ body::before {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  right: 0;
+  bottom: 0;
   background-image: radial-gradient(var(--bg-dots) 1.5px, transparent 1.5px);
   background-size: 20px 20px;
-  background-position: 10px 10px;
+  background-position: center center;
   opacity: 0.5;
   pointer-events: none;
   z-index: -1;
@@ -892,11 +851,10 @@ body::before {
     transparent 2px
   ) !important;
   background-size: 20px 20px !important;
-  background-position: 10px 10px !important;
+  background-position: center center !important;
   /* 确保顶部没有白色边框或阴影 */
   border: none !important;
   box-shadow: none !important;
-  overflow-x: hidden !important;
 }
 
 .chat-app.active {
@@ -978,10 +936,10 @@ body::before {
   position: sticky;
   top: 0;
   z-index: var(--z-content);
-  margin: 0;
-  padding-left: 16px;
-  padding-right: 16px;
-  width: 100%;
+  margin: 0 -12px; /* 抵消父容器的padding铺满两边 */
+  padding-left: 28px; /* 补偿负margin */
+  padding-right: 28px;
+  width: calc(100% + 24px);
   box-sizing: border-box;
 }
 .tab-header-back {
@@ -2369,8 +2327,8 @@ body::before {
   background: #fff;
   min-height: 100%;
   padding-bottom: 80px;
-  margin: 0;
-  width: 100%;
+  margin: 0 -12px; /* 抵消父容器的padding */
+  width: calc(100% + 24px);
 }
 #momentsTab.active {
   position: relative;
@@ -4637,8 +4595,8 @@ body::before {
   background: linear-gradient(180deg, #fefbfc 0%, #fdf5f7 100%);
   min-height: 100%;
   padding: 0;
-  margin: 0;
-  width: 100%;
+  margin: 0 -12px;
+  width: calc(100% + 24px);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
@@ -5673,8 +5631,8 @@ body::before {
   background: #f5f5f5;
   min-height: 100%;
   overflow: hidden;
-  margin: 0;
-  width: 100%;
+  margin: 0 -12px; /* 抵消父容器的padding */
+  width: calc(100% + 24px);
 }
 
 .profile-header-card {
@@ -5782,7 +5740,7 @@ body::before {
 /* Chat Tab Bar */
 .chat-tab-bar {
   position: fixed;
-  bottom: calc(12px + env(safe-area-inset-bottom));
+  bottom: 12px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -10318,7 +10276,7 @@ input[type="range"]::-webkit-slider-thumb {
   top: 0;
   z-index: var(--z-header);
   background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%);
-  margin: 0 0 16px 0;
+  margin: 0 -16px 16px -16px;
   padding: 16px;
   padding-top: max(16px, env(safe-area-inset-top));
 }
