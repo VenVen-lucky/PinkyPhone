@@ -7407,53 +7407,73 @@ ${m.content}`;
         const isStickerMsg = /^\[(sticker|表情|表情包)[：:]/i.test(partContent);
 
         // 检查是否包含引用标签 [引用:xxx]内容
-        // 使用更复杂的逻辑来处理嵌套方括号
         let quoteInfo = null;
         let actualContent = partContent;
         
-        // 检查是否以 [引用: 或 [引用： 开头
-        const quoteStartMatch = partContent.match(/^\[引用[:：]/);
-        if (quoteStartMatch) {
+        // 检查是否以 [引用: 或 [引用： 开头（支持全角半角冒号）
+        if (/^\[引用[:：]/i.test(partContent)) {
           // 找到引用内容的结束位置（配对的方括号）
-          let bracketCount = 1;
-          let endIndex = quoteStartMatch[0].length;
+          let bracketCount = 0;
+          let quoteStartPos = partContent.indexOf('[');
+          let quoteEndPos = -1;
           
-          for (let ci = endIndex; ci < partContent.length && bracketCount > 0; ci++) {
-            if (partContent[ci] === '[') bracketCount++;
-            else if (partContent[ci] === ']') bracketCount--;
-            if (bracketCount === 0) {
-              endIndex = ci;
-              break;
+          for (let ci = quoteStartPos; ci < partContent.length; ci++) {
+            const char = partContent[ci];
+            if (char === '[' || char === '［') bracketCount++;
+            else if (char === ']' || char === '］') {
+              bracketCount--;
+              if (bracketCount === 0) {
+                quoteEndPos = ci;
+                break;
+              }
             }
           }
           
-          if (bracketCount === 0) {
+          if (quoteEndPos > 0) {
             // 成功找到配对的方括号
-            let quoteContent = partContent.substring(quoteStartMatch[0].length, endIndex);
+            // 提取引用内容（跳过 [引用: 前缀）
+            const prefixMatch = partContent.match(/^\[引用[:：]\s*/);
+            const prefixLen = prefixMatch ? prefixMatch[0].length : 4;
+            let quoteContent = partContent.substring(prefixLen, quoteEndPos).trim();
             
             // 处理引用内容，如果是特殊格式则转换为可读文本
             let displayQuote = quoteContent;
-            if (/^\[(sticker|表情|表情包)[：:]/i.test(quoteContent) || quoteContent.includes('sticker-img')) {
+            
+            // 检测表情包格式（支持多种写法）
+            if (/^\[?(sticker|表情|表情包)[：:]/i.test(quoteContent) || 
+                quoteContent.includes('sticker-img') ||
+                /表情包/.test(quoteContent)) {
               displayQuote = "[表情包]";
-            } else if (/^\[(voice|语音)[：:]/i.test(quoteContent) || quoteContent.includes('voice-')) {
+            }
+            // 检测语音格式
+            else if (/^\[?(voice|语音)[：:]/i.test(quoteContent) || 
+                     quoteContent.includes('voice-')) {
               displayQuote = "[语音消息]";
-            } else {
-              displayQuote = quoteContent.replace(/<[^>]+>/g, "").trim();
-              if (displayQuote.length > 50) displayQuote = displayQuote.substring(0, 50) + "...";
+            }
+            // 普通文本
+            else {
+              // 清理可能的标签格式和HTML
+              displayQuote = quoteContent
+                .replace(/^\[[^\]]*[:：][^\]]*\]\s*/g, '') // 去除 [xxx:yyy] 格式
+                .replace(/<[^>]+>/g, "")
+                .trim();
+              if (!displayQuote || displayQuote === quoteContent) {
+                displayQuote = quoteContent.replace(/<[^>]+>/g, "").trim();
+              }
+              if (displayQuote.length > 50) {
+                displayQuote = displayQuote.substring(0, 50) + "...";
+              }
             }
             
             quoteInfo = {
-              sender: "我", // AI引用的是用户说的话
+              sender: "我",
               senderRole: "user",
               content: displayQuote,
               displayContent: displayQuote,
             };
             
             // 提取引用后的实际内容
-            actualContent = partContent.substring(endIndex + 1).trim();
-            if (!actualContent) {
-              actualContent = ""; // 只显示引用卡片，不显示文字
-            }
+            actualContent = partContent.substring(quoteEndPos + 1).trim();
           }
         }
 
@@ -11234,8 +11254,8 @@ uiUpgradeStyle.innerHTML = `
                           border: none !important;
                           border-top: none !important;
                           box-shadow: none !important;
-                          padding-top: 12px !important;
-                          padding-bottom: calc(8px + env(safe-area-inset-bottom)) !important;
+                          padding-top: 8px !important;
+                          padding-bottom: calc(6px + env(safe-area-inset-bottom)) !important;
                       }
                       
                       /* 底部模糊遮罩 - 跟顶栏一样的效果 */
@@ -11245,16 +11265,16 @@ uiUpgradeStyle.innerHTML = `
                           bottom: 0;
                           left: 0;
                           right: 0;
-                          height: 100px;
+                          height: 80px;
                           backdrop-filter: blur(12px) saturate(140%);
                           -webkit-backdrop-filter: blur(12px) saturate(140%);
                           mask-image: linear-gradient(to top, 
                             rgba(0,0,0,1) 0%, 
-                            rgba(0,0,0,0.8) 50%,
+                            rgba(0,0,0,0.7) 60%,
                             rgba(0,0,0,0) 100%);
                           -webkit-mask-image: linear-gradient(to top, 
                             rgba(0,0,0,1) 0%, 
-                            rgba(0,0,0,0.8) 50%,
+                            rgba(0,0,0,0.7) 60%,
                             rgba(0,0,0,0) 100%);
                           z-index: -1;
                           pointer-events: none;

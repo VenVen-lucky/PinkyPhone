@@ -53,10 +53,22 @@ html, body, .phone-container, .main-content, .page, .chat-app {
 
 /* 修复iOS Safari可能产生的滚动条或边缘效果 */
 ::-webkit-scrollbar {
-  display: none;
-  width: 0;
-  height: 0;
-  background: transparent;
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+
+/* 全局隐藏滚动条 */
+* {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+/* 防止任何元素产生右侧视觉效果 */
+html, body, #app, .phone-container, .main-content, .page {
+  max-width: 100vw !important;
+  overflow-x: hidden !important;
 }
 
 :root {
@@ -99,13 +111,18 @@ html, body, .phone-container, .main-content, .page, .chat-app {
 html {
   -webkit-text-size-adjust: 100%;
   height: 100%;
+  width: 100%;
   background: #fce4ec;
+  overflow-x: hidden;
 }
 
 body {
   margin: 0;
+  padding: 0;
   height: 100%;
+  width: 100%;
   overflow: hidden;
+  overflow-x: hidden;
   position: relative;
   font-family: "Noto Sans SC", -apple-system, BlinkMacSystemFont, sans-serif;
   background: var(--bg-pink);
@@ -121,6 +138,7 @@ body::before {
   bottom: 0;
   background-image: radial-gradient(var(--bg-dots) 1.5px, transparent 1.5px);
   background-size: 20px 20px;
+  background-position: center center;
   opacity: 0.5;
   pointer-events: none;
   z-index: 0;
@@ -167,9 +185,11 @@ body::before {
 
 .phone-container {
   width: 100%;
+  max-width: 100vw;
   height: 100vh;
   position: relative;
   overflow: hidden;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   background: var(--bg-pink);
@@ -182,6 +202,8 @@ body::before {
   padding-top: calc(16px + env(safe-area-inset-top));
   padding-bottom: 90px;
   overflow-y: auto;
+  overflow-x: hidden;
+  max-width: 100vw;
   overflow-x: hidden;
 }
 
@@ -706,6 +728,7 @@ body::before {
   bottom: 0;
   background-image: radial-gradient(var(--bg-dots) 1.5px, transparent 1.5px);
   background-size: 20px 20px;
+  background-position: center center;
   opacity: 0.5;
   pointer-events: none;
   z-index: -1;
@@ -885,6 +908,7 @@ body::before {
     transparent 2px
   ) !important;
   background-size: 20px 20px !important;
+  background-position: center center !important;
   /* 确保顶部没有白色边框或阴影 */
   border: none !important;
   box-shadow: none !important;
@@ -8431,9 +8455,9 @@ body::before {
 
 /* Input area - 底部透明效果 */
 .conv-input-area {
-  padding: 8px 16px;
-  padding-top: 12px;
-  padding-bottom: calc(8px + env(safe-area-inset-bottom));
+  padding: 6px 16px;
+  padding-top: 8px;
+  padding-bottom: calc(6px + env(safe-area-inset-bottom));
   background: transparent;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
