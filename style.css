@@ -15,33 +15,40 @@ html, body, .phone-container, .main-content, .page, .chat-app {
   outline: none !important;
 }
 
-/* 论坛页面右侧阴影修复 */
+/* 确保页面容器没有边缘效果 */
+.phone-container,
+.main-content,
+.page,
+.chat-app,
+.page-content,
 #forumPage,
-#forumPage *,
-.forum-tab,
-.forum-tabs,
 .forum-content,
-.forum-post,
-.forum-posts-container {
-  border-right: none !important;
-  box-shadow: none !important;
-  outline: none !important;
-}
-
-/* 确保页面滚动区域没有边缘效果 */
-.page-content {
+.forum-posts-container,
+.forum-tabs,
+.forum-tab,
+.forum-header {
   border: none !important;
-  box-shadow: none !important;
   outline: none !important;
-  overflow-x: hidden !important;
+  -webkit-box-shadow: none !important;
+  -moz-box-shadow: none !important;
+  box-shadow: none !important;
+  overflow-x: hidden;
 }
 
-/* 修复可能由iOS Safari产生的伪元素阴影 */
+/* 修复滚动区域可能产生的边缘效果 */
+.main-content,
+.page-content,
+.conv-messages {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* 修复可能由边框产生的右侧线条 */
 .page::after,
-#forumPage::after,
-.main-content::after {
+.main-content::after,
+#forumPage::after {
   display: none !important;
-  box-shadow: none !important;
+  content: none !important;
 }
 
 /* 修复iOS Safari可能产生的滚动条或边缘效果 */
@@ -8425,7 +8432,7 @@ body::before {
 /* Input area - 底部透明效果 */
 .conv-input-area {
   padding: 8px 16px;
-  padding-top: 8px;
+  padding-top: 12px;
   padding-bottom: calc(8px + env(safe-area-inset-bottom));
   background: transparent;
   backdrop-filter: none;

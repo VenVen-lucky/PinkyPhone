@@ -2146,7 +2146,11 @@ async function loadGroupMessages(groupId) {
         let quoteHtml = "";
         if (msg.quote) {
           const quoteSender = msg.quote.sender || "消息";
-          const quoteText = formatQuoteDisplay(msg.quote.displayContent || msg.quote.content || "");
+          const quoteText = (
+            msg.quote.displayContent ||
+            msg.quote.content ||
+            ""
+          ).substring(0, 50);
           quoteHtml = `
             <div class="group-msg-quote">
               <div class="group-msg-quote-sender">${escapeHtml(
@@ -2418,7 +2422,11 @@ async function loadGroupMessages(groupId) {
         let quoteHtml = "";
         if (msg.quote) {
           const quoteSender = msg.quote.sender || "消息";
-          const quoteText = formatQuoteDisplay(msg.quote.displayContent || msg.quote.content || "");
+          const quoteText = (
+            msg.quote.displayContent ||
+            msg.quote.content ||
+            ""
+          ).substring(0, 50);
           quoteHtml = `
             <div class="group-msg-quote">
               <div class="group-msg-quote-sender">${escapeHtml(
@@ -4564,20 +4572,15 @@ function setGroupQuote(msgIndex) {
     }
 
     let content = msg.content || "";
-    let displayContent = content;
+    let displayContent = "";
     
     // 检测是否为表情包消息
-    const stickerMatch = content.match(/^\[(sticker|表情|表情包)[：:]\s*([^\]]+)\]$/i);
-    if (stickerMatch) {
+    if (/^\[(sticker|表情|表情包)[：:]/i.test(content) || content.includes('class="sticker-img"')) {
       displayContent = "[表情包]";
     }
     // 检测是否为语音消息
-    else if (/^\[voice[：:]/i.test(content) || content.includes('user-voice-message') || content.includes('ai-voice-bubble')) {
+    else if (/^\[voice[：:]/i.test(content) || /^\[语音[：:]/i.test(content) || content.includes('voice-message') || content.includes('voice-bar')) {
       displayContent = "[语音消息]";
-    }
-    // 检测是否包含表情包图片
-    else if (content.includes('class="sticker-img"')) {
-      displayContent = "[表情包]";
     }
     // 普通文本消息
     else {
@@ -4590,7 +4593,7 @@ function setGroupQuote(msgIndex) {
       sender: senderName,
       senderRole: msg.role,
       charId: msg.charId,
-      content: msg.content,
+      content: displayContent, // 使用处理后的内容，避免嵌套方括号问题
       displayContent: displayContent,
     };
 
@@ -6385,7 +6388,9 @@ window.renderMessageGroup = function (
       if (m.quote) {
         const quoteSender =
           m.quote.sender || (m.quote.senderRole === "user" ? "我" : "TA");
-        const quoteText = formatQuoteDisplay(m.quote.displayContent || m.quote.content || "");
+        const quoteText =
+          m.quote.displayContent ||
+          (m.quote.content || "").replace(/<[^>]+>/g, "").substring(0, 50);
         quoteHtml = `
           <div class="msg-quote">
             <div class="msg-quote-sender">${quoteSender}</div>
@@ -6491,39 +6496,6 @@ function escapeHtml(text) {
   const div = document.createElement("div");
   div.textContent = text;
   return div.innerHTML;
-}
-
-// 格式化引用消息的显示内容（处理表情包、语音等特殊消息）
-function formatQuoteDisplay(content) {
-  if (!content) return "";
-  
-  // 检测表情包消息
-  const stickerMatch = content.match(/^\[(sticker|表情|表情包)[：:]\s*([^\]]+)\]$/i);
-  if (stickerMatch) {
-    return "[表情包]";
-  }
-  
-  // 检测语音消息
-  if (/^\[voice[：:]/i.test(content) || content.includes('user-voice-message') || content.includes('ai-voice-bubble') || content.includes('voice-bar')) {
-    return "[语音消息]";
-  }
-  
-  // 检测HTML中的表情包图片
-  if (content.includes('class="sticker-img"')) {
-    return "[表情包]";
-  }
-  
-  // 检测用户语音消息HTML
-  if (content.includes('user-voice-message-bubble')) {
-    return "[语音消息]";
-  }
-  
-  // 普通文本消息：去除HTML标签
-  let displayText = content.replace(/<[^>]+>/g, "").trim();
-  if (displayText.length > 50) {
-    displayText = displayText.substring(0, 50) + "...";
-  }
-  return displayText;
 }
 
 // 过滤AI回复中的思维链标签
@@ -7435,25 +7407,53 @@ ${m.content}`;
         const isStickerMsg = /^\[(sticker|表情|表情包)[：:]/i.test(partContent);
 
         // 检查是否包含引用标签 [引用:xxx]内容
+        // 使用更复杂的逻辑来处理嵌套方括号
         let quoteInfo = null;
         let actualContent = partContent;
-        // 更灵活的引用匹配：支持引用在开头或消息中
-        const quoteMatch = partContent.match(/^\[引用[:：]([^\]]+)\]\s*(.*)$/s);
-        if (quoteMatch) {
-          quoteInfo = {
-            sender: "我", // AI引用的是用户说的话
-            senderRole: "user",
-            content: quoteMatch[1],
-            displayContent:
-              quoteMatch[1].length > 50
-                ? quoteMatch[1].substring(0, 50) + "..."
-                : quoteMatch[1],
-          };
-          // 如果引用后有内容就用那个内容，否则显示一个默认回复或空内容（仅显示引用）
-          actualContent = quoteMatch[2].trim();
-          // 如果actualContent为空，不要回退到包含[引用:xxx]的原始内容
-          if (!actualContent) {
-            actualContent = ""; // 只显示引用卡片，不显示文字
+        
+        // 检查是否以 [引用: 或 [引用： 开头
+        const quoteStartMatch = partContent.match(/^\[引用[:：]/);
+        if (quoteStartMatch) {
+          // 找到引用内容的结束位置（配对的方括号）
+          let bracketCount = 1;
+          let endIndex = quoteStartMatch[0].length;
+          
+          for (let ci = endIndex; ci < partContent.length && bracketCount > 0; ci++) {
+            if (partContent[ci] === '[') bracketCount++;
+            else if (partContent[ci] === ']') bracketCount--;
+            if (bracketCount === 0) {
+              endIndex = ci;
+              break;
+            }
+          }
+          
+          if (bracketCount === 0) {
+            // 成功找到配对的方括号
+            let quoteContent = partContent.substring(quoteStartMatch[0].length, endIndex);
+            
+            // 处理引用内容，如果是特殊格式则转换为可读文本
+            let displayQuote = quoteContent;
+            if (/^\[(sticker|表情|表情包)[：:]/i.test(quoteContent) || quoteContent.includes('sticker-img')) {
+              displayQuote = "[表情包]";
+            } else if (/^\[(voice|语音)[：:]/i.test(quoteContent) || quoteContent.includes('voice-')) {
+              displayQuote = "[语音消息]";
+            } else {
+              displayQuote = quoteContent.replace(/<[^>]+>/g, "").trim();
+              if (displayQuote.length > 50) displayQuote = displayQuote.substring(0, 50) + "...";
+            }
+            
+            quoteInfo = {
+              sender: "我", // AI引用的是用户说的话
+              senderRole: "user",
+              content: displayQuote,
+              displayContent: displayQuote,
+            };
+            
+            // 提取引用后的实际内容
+            actualContent = partContent.substring(endIndex + 1).trim();
+            if (!actualContent) {
+              actualContent = ""; // 只显示引用卡片，不显示文字
+            }
           }
         }
 
@@ -11234,8 +11234,8 @@ uiUpgradeStyle.innerHTML = `
                           border: none !important;
                           border-top: none !important;
                           box-shadow: none !important;
-                          padding-top: 20px !important;
-                          padding-bottom: calc(10px + env(safe-area-inset-bottom)) !important;
+                          padding-top: 12px !important;
+                          padding-bottom: calc(8px + env(safe-area-inset-bottom)) !important;
                       }
                       
                       /* 底部模糊遮罩 - 跟顶栏一样的效果 */
@@ -11245,18 +11245,16 @@ uiUpgradeStyle.innerHTML = `
                           bottom: 0;
                           left: 0;
                           right: 0;
-                          height: 160px;
+                          height: 100px;
                           backdrop-filter: blur(12px) saturate(140%);
                           -webkit-backdrop-filter: blur(12px) saturate(140%);
                           mask-image: linear-gradient(to top, 
                             rgba(0,0,0,1) 0%, 
-                            rgba(0,0,0,0.9) 40%,
-                            rgba(0,0,0,0.5) 70%,
+                            rgba(0,0,0,0.8) 50%,
                             rgba(0,0,0,0) 100%);
                           -webkit-mask-image: linear-gradient(to top, 
                             rgba(0,0,0,1) 0%, 
-                            rgba(0,0,0,0.9) 40%,
-                            rgba(0,0,0,0.5) 70%,
+                            rgba(0,0,0,0.8) 50%,
                             rgba(0,0,0,0) 100%);
                           z-index: -1;
                           pointer-events: none;
@@ -12696,20 +12694,15 @@ function handleQuoteMsg() {
 
   // 清理消息内容用于显示
   let content = msg.content || "";
-  let displayContent = content;
+  let displayContent = "";
   
   // 检测是否为表情包消息
-  const stickerMatch = content.match(/^\[(sticker|表情|表情包)[：:]\s*([^\]]+)\]$/i);
-  if (stickerMatch) {
+  if (/^\[(sticker|表情|表情包)[：:]/i.test(content) || content.includes('class="sticker-img"')) {
     displayContent = "[表情包]";
   }
   // 检测是否为语音消息
-  else if (/^\[voice[：:]/i.test(content) || content.includes('user-voice-message')) {
+  else if (/^\[voice[：:]/i.test(content) || /^\[语音[：:]/i.test(content) || content.includes('voice-message') || content.includes('voice-bar')) {
     displayContent = "[语音消息]";
-  }
-  // 检测是否包含表情包图片
-  else if (content.includes('class="sticker-img"')) {
-    displayContent = "[表情包]";
   }
   // 普通文本消息
   else {
@@ -12722,7 +12715,7 @@ function handleQuoteMsg() {
     msgIndex: activeMsgIndex,
     sender: senderName,
     senderRole: msg.role,
-    content: msg.content,
+    content: displayContent, // 使用处理后的内容，避免嵌套方括号问题
     displayContent: displayContent,
   };
 
