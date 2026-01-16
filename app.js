@@ -4593,7 +4593,7 @@ function setGroupQuote(msgIndex) {
       sender: senderName,
       senderRole: msg.role,
       charId: msg.charId,
-      content: displayContent, // 使用处理后的内容，避免嵌套方括号问题
+      content: displayContent,
       displayContent: displayContent,
     };
 
@@ -7410,17 +7410,15 @@ ${m.content}`;
         let quoteInfo = null;
         let actualContent = partContent;
         
-        // 检查是否以 [引用: 或 [引用： 开头（支持全角半角冒号）
+        // 检查是否以 [引用: 或 [引用： 开头
         if (/^\[引用[:：]/i.test(partContent)) {
           // 找到引用内容的结束位置（配对的方括号）
           let bracketCount = 0;
-          let quoteStartPos = partContent.indexOf('[');
           let quoteEndPos = -1;
           
-          for (let ci = quoteStartPos; ci < partContent.length; ci++) {
-            const char = partContent[ci];
-            if (char === '[' || char === '［') bracketCount++;
-            else if (char === ']' || char === '］') {
+          for (let ci = 0; ci < partContent.length; ci++) {
+            if (partContent[ci] === '[') bracketCount++;
+            else if (partContent[ci] === ']') {
               bracketCount--;
               if (bracketCount === 0) {
                 quoteEndPos = ci;
@@ -7430,39 +7428,26 @@ ${m.content}`;
           }
           
           if (quoteEndPos > 0) {
-            // 成功找到配对的方括号
             // 提取引用内容（跳过 [引用: 前缀）
             const prefixMatch = partContent.match(/^\[引用[:：]\s*/);
             const prefixLen = prefixMatch ? prefixMatch[0].length : 4;
             let quoteContent = partContent.substring(prefixLen, quoteEndPos).trim();
             
-            // 处理引用内容，如果是特殊格式则转换为可读文本
+            // 处理引用内容
             let displayQuote = quoteContent;
             
-            // 检测表情包格式（支持多种写法）
-            if (/^\[?(sticker|表情|表情包)[：:]/i.test(quoteContent) || 
-                quoteContent.includes('sticker-img') ||
-                /表情包/.test(quoteContent)) {
+            // 检测表情包
+            if (/^\[?(sticker|表情|表情包)[：:]/i.test(quoteContent) || /表情包/.test(quoteContent)) {
               displayQuote = "[表情包]";
             }
-            // 检测语音格式
-            else if (/^\[?(voice|语音)[：:]/i.test(quoteContent) || 
-                     quoteContent.includes('voice-')) {
+            // 检测语音
+            else if (/^\[?(voice|语音)[：:]/i.test(quoteContent)) {
               displayQuote = "[语音消息]";
             }
             // 普通文本
             else {
-              // 清理可能的标签格式和HTML
-              displayQuote = quoteContent
-                .replace(/^\[[^\]]*[:：][^\]]*\]\s*/g, '') // 去除 [xxx:yyy] 格式
-                .replace(/<[^>]+>/g, "")
-                .trim();
-              if (!displayQuote || displayQuote === quoteContent) {
-                displayQuote = quoteContent.replace(/<[^>]+>/g, "").trim();
-              }
-              if (displayQuote.length > 50) {
-                displayQuote = displayQuote.substring(0, 50) + "...";
-              }
+              displayQuote = quoteContent.replace(/<[^>]+>/g, "").trim();
+              if (displayQuote.length > 50) displayQuote = displayQuote.substring(0, 50) + "...";
             }
             
             quoteInfo = {
@@ -12735,7 +12720,7 @@ function handleQuoteMsg() {
     msgIndex: activeMsgIndex,
     sender: senderName,
     senderRole: msg.role,
-    content: displayContent, // 使用处理后的内容，避免嵌套方括号问题
+    content: displayContent,
     displayContent: displayContent,
   };
 

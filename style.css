@@ -15,60 +15,12 @@ html, body, .phone-container, .main-content, .page, .chat-app {
   outline: none !important;
 }
 
-/* 确保页面容器没有边缘效果 */
-.phone-container,
-.main-content,
-.page,
-.chat-app,
-.page-content,
-#forumPage,
-.forum-content,
-.forum-posts-container,
-.forum-tabs,
-.forum-tab,
-.forum-header {
-  border: none !important;
-  outline: none !important;
-  -webkit-box-shadow: none !important;
-  -moz-box-shadow: none !important;
-  box-shadow: none !important;
-  overflow-x: hidden;
-}
-
-/* 修复滚动区域可能产生的边缘效果 */
-.main-content,
-.page-content,
-.conv-messages {
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
-}
-
-/* 修复可能由边框产生的右侧线条 */
-.page::after,
-.main-content::after,
-#forumPage::after {
-  display: none !important;
-  content: none !important;
-}
-
 /* 修复iOS Safari可能产生的滚动条或边缘效果 */
 ::-webkit-scrollbar {
-  display: none !important;
-  width: 0 !important;
-  height: 0 !important;
-  background: transparent !important;
-}
-
-/* 全局隐藏滚动条 */
-* {
-  scrollbar-width: none !important;
-  -ms-overflow-style: none !important;
-}
-
-/* 防止任何元素产生右侧视觉效果 */
-html, body, #app, .phone-container, .main-content, .page {
-  max-width: 100vw !important;
-  overflow-x: hidden !important;
+  display: none;
+  width: 0;
+  height: 0;
+  background: transparent;
 }
 
 :root {
@@ -111,18 +63,13 @@ html, body, #app, .phone-container, .main-content, .page {
 html {
   -webkit-text-size-adjust: 100%;
   height: 100%;
-  width: 100%;
   background: #fce4ec;
-  overflow-x: hidden;
 }
 
 body {
   margin: 0;
-  padding: 0;
   height: 100%;
-  width: 100%;
   overflow: hidden;
-  overflow-x: hidden;
   position: relative;
   font-family: "Noto Sans SC", -apple-system, BlinkMacSystemFont, sans-serif;
   background: var(--bg-pink);
@@ -185,11 +132,9 @@ body::before {
 
 .phone-container {
   width: 100%;
-  max-width: 100vw;
   height: 100vh;
   position: relative;
   overflow: hidden;
-  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   background: var(--bg-pink);
@@ -202,8 +147,6 @@ body::before {
   padding-top: calc(16px + env(safe-area-inset-top));
   padding-bottom: 90px;
   overflow-y: auto;
-  overflow-x: hidden;
-  max-width: 100vw;
   overflow-x: hidden;
 }
 
