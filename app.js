@@ -5848,6 +5848,11 @@ function closeConversation() {
   currentChatCharId = null;
   currentGroupId = null; // 清除群聊ID
 
+  // 【修复】退出多选模式，隐藏底部多选功能栏
+  if (typeof exitSelectionMode === "function") {
+    exitSelectionMode();
+  }
+
   // 隐藏读书悬浮球（离开聊天页面时隐藏）
   hideFloatingBtn();
 
@@ -7113,6 +7118,20 @@ ${m.content}`;
         ? Number(apiConfig.presence_penalty)
         : 0.0;
 
+    // 【修复】心声和AI回复同时生成 - 在发送AI请求的同时启动心声生成
+    // 获取用户最后一条消息，用于心声生成
+    const userMessages =
+      chatHistories[savedCharId]?.filter((m) => m.role === "user") || [];
+    const lastUserMsg = userMessages[userMessages.length - 1]?.content || "";
+    
+    // 异步启动心声生成（不等待结果，与AI回复并行执行）
+    let heartVoicePromise = null;
+    if (typeof generateHeartVoiceParallel === "function") {
+      heartVoicePromise = generateHeartVoiceParallel(savedCharId, lastUserMsg).catch((e) => {
+        console.error("心声生成错误:", e);
+      });
+    }
+
     const response = await fetch(`${apiConfig.url}/chat/completions`, {
       method: "POST",
       headers: {
@@ -7550,17 +7569,8 @@ ${m.content}`;
       checkAndTriggerSummary(settings);
     }
 
-    // 生成心声（异步执行，不阻塞主流程）
-    if (typeof generateHeartVoice === "function") {
-      // 获取用户最后一条消息
-      const userMessages =
-        chatHistories[savedCharId]?.filter((m) => m.role === "user") || [];
-      const lastUserMsg = userMessages[userMessages.length - 1]?.content || "";
-      // 异步生成心声
-      generateHeartVoice(savedCharId, aiReply, lastUserMsg).catch((e) => {
-        console.error("心声生成错误:", e);
-      });
-    }
+    // 【修改】心声已在发送AI请求时并行生成，这里不再重复调用
+    // 原代码：generateHeartVoice(savedCharId, aiReply, lastUserMsg)
 
     // 异步更新AI状态（单聊才更新，不阻塞主流程）
     if (!currentGroupId) {
@@ -12101,16 +12111,22 @@ function favoriteSelectedMessages() {
 }
 
 // ==================== 转发功能 ====================
+// 【新增】转发选中的联系人列表
+var forwardSelectedTargets = new Set();
+
 function showForwardModal() {
   if (selectedIndices.size === 0) {
     showToast("请先选择消息");
     return;
   }
 
+  // 重置多选状态
+  forwardSelectedTargets.clear();
+
   const overlay = document.getElementById("forwardModalOverlay");
   const content = document.getElementById("forwardModalContent");
 
-  // 转发方式选择器
+  // 转发方式选择器和多选提示
   let html = `
     <div class="forward-mode-selector">
       <div class="forward-mode-option ${
@@ -12126,6 +12142,9 @@ function showForwardModal() {
         <div class="forward-mode-text">逐条转发</div>
       </div>
     </div>
+    <div class="forward-multi-select-hint" style="padding:8px 12px;background:linear-gradient(135deg,#fff3e0,#fce4ec);border-radius:8px;margin-bottom:10px;font-size:0.8rem;color:#666;">
+      💡 支持多选：点击选中多个联系人，然后点击下方"确认转发"按钮
+    </div>
     <div class="forward-chat-list">
   `;
 
@@ -12134,9 +12153,10 @@ function showForwardModal() {
     if (char.id === currentChatCharId) return;
 
     html += `
-      <div class="forward-chat-item" onclick="forwardToChat('${
-        char.id
-      }', 'private')">
+      <div class="forward-chat-item" data-target-id="${char.id}" data-target-type="private" onclick="toggleForwardTarget(this, '${char.id}', 'private')">
+        <div class="forward-check-indicator" style="width:20px;height:20px;border:2px solid #ddd;border-radius:50%;margin-right:10px;display:flex;align-items:center;justify-content:center;transition:all 0.2s;">
+          <span style="display:none;color:#4caf50;font-weight:bold;">✓</span>
+        </div>
         <img class="forward-chat-avatar" src="${
           char.avatar ||
           "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐰</text></svg>"
@@ -12155,9 +12175,10 @@ function showForwardModal() {
   if (window.groupChats && window.groupChats.length > 0) {
     window.groupChats.forEach((group) => {
       html += `
-        <div class="forward-chat-item" onclick="forwardToChat('${
-          group.id
-        }', 'group')">
+        <div class="forward-chat-item" data-target-id="${group.id}" data-target-type="group" onclick="toggleForwardTarget(this, '${group.id}', 'group')">
+          <div class="forward-check-indicator" style="width:20px;height:20px;border:2px solid #ddd;border-radius:50%;margin-right:10px;display:flex;align-items:center;justify-content:center;transition:all 0.2s;">
+            <span style="display:none;color:#4caf50;font-weight:bold;">✓</span>
+          </div>
           <img class="forward-chat-avatar" src="${
             group.avatar ||
             "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👥</text></svg>"
@@ -12175,6 +12196,14 @@ function showForwardModal() {
 
   html += "</div>";
 
+  // 添加确认转发按钮
+  html += `
+    <div class="forward-confirm-bar" style="padding:12px;border-top:1px solid #eee;display:flex;gap:10px;justify-content:flex-end;margin-top:10px;">
+      <button onclick="hideForwardModal()" style="padding:10px 20px;border:1px solid #ddd;border-radius:20px;background:#fff;color:#666;cursor:pointer;">取消</button>
+      <button id="forwardConfirmBtn" onclick="confirmMultiForward()" style="padding:10px 20px;border:none;border-radius:20px;background:linear-gradient(135deg,#f48fb1,#ce93d8);color:#fff;cursor:pointer;opacity:0.5;" disabled>确认转发 (0)</button>
+    </div>
+  `;
+
   if (
     characters.length <= 1 &&
     (!window.groupChats || window.groupChats.length === 0)
@@ -12185,6 +12214,90 @@ function showForwardModal() {
 
   content.innerHTML = html;
   overlay.classList.add("active");
+}
+
+// 【新增】切换转发目标选中状态
+function toggleForwardTarget(element, targetId, targetType) {
+  const key = `${targetType}_${targetId}`;
+  const checkIndicator = element.querySelector('.forward-check-indicator');
+  const checkMark = checkIndicator.querySelector('span');
+  
+  if (forwardSelectedTargets.has(key)) {
+    // 取消选中
+    forwardSelectedTargets.delete(key);
+    element.style.background = '';
+    checkIndicator.style.borderColor = '#ddd';
+    checkIndicator.style.background = '';
+    checkMark.style.display = 'none';
+  } else {
+    // 选中
+    forwardSelectedTargets.add(key);
+    element.style.background = 'linear-gradient(135deg, rgba(244,143,177,0.1), rgba(206,147,216,0.1))';
+    checkIndicator.style.borderColor = '#4caf50';
+    checkIndicator.style.background = 'rgba(76,175,80,0.1)';
+    checkMark.style.display = 'block';
+  }
+  
+  // 更新确认按钮状态
+  updateForwardConfirmBtn();
+}
+
+// 【新增】更新确认转发按钮状态
+function updateForwardConfirmBtn() {
+  const btn = document.getElementById('forwardConfirmBtn');
+  if (btn) {
+    const count = forwardSelectedTargets.size;
+    btn.textContent = `确认转发 (${count})`;
+    btn.disabled = count === 0;
+    btn.style.opacity = count === 0 ? '0.5' : '1';
+  }
+}
+
+// 【新增】确认多选转发
+async function confirmMultiForward() {
+  if (forwardSelectedTargets.size === 0) {
+    showToast("请选择至少一个转发对象");
+    return;
+  }
+  
+  const currentChar = characters.find((c) => c.id === currentChatCharId);
+  const sortedIndices = Array.from(selectedIndices).sort((a, b) => a - b);
+  const sourceName = currentChar?.note || currentChar?.name || "未知";
+
+  // 构建转发消息内容
+  let forwardedMessages = [];
+  sortedIndices.forEach((idx) => {
+    const msg = chatHistories[currentChatCharId][idx];
+    if (msg) {
+      forwardedMessages.push({
+        senderName:
+          msg.role === "user"
+            ? window.momentsData?.userProfile?.name || "我"
+            : currentChar?.note || currentChar?.name || "AI",
+        content: msg.content,
+        isHtml: msg.isHtml,
+      });
+    }
+  });
+  
+  // 遍历所有选中的目标进行转发
+  let successCount = 0;
+  for (const key of forwardSelectedTargets) {
+    const [targetType, targetId] = key.split('_');
+    
+    if (forwardMode === "single") {
+      // 【修改】传入false禁止单个转发显示toast
+      await forwardSingleMessages(targetId, targetType, forwardedMessages, sourceName, false);
+    } else {
+      // 【修改】传入false禁止单个转发显示toast
+      await forwardMergedMessages(targetId, targetType, forwardedMessages, sourceName, false);
+    }
+    successCount++;
+  }
+  
+  hideForwardModal();
+  exitSelectionMode();
+  showToast(`已转发到 ${successCount} 个聊天`);
 }
 
 function setForwardMode(mode) {
@@ -12236,11 +12349,12 @@ function forwardMergedMessages(
   targetId,
   chatType,
   forwardedMessages,
-  sourceName
+  sourceName,
+  showNotification = true  // 【新增】是否显示toast通知
 ) {
   const previewCount = Math.min(3, forwardedMessages.length);
   const hasMore = forwardedMessages.length > 3;
-  const forwardId = "fwd_" + Date.now();
+  const forwardId = "fwd_" + Date.now() + "_" + Math.random().toString(36).substr(2, 5);
 
   const previewHtml = forwardedMessages
     .slice(0, previewCount)
@@ -12288,8 +12402,12 @@ function forwardMergedMessages(
       timestamp: Date.now(),
     });
     localforage.setItem("chatHistories", chatHistories);
-    const targetChar = characters.find((c) => c.id === targetId);
-    showToast(`已转发到 ${targetChar?.note || targetChar?.name || "聊天"}`);
+    // 【修改】更新最后消息
+    updateCharacterLastMessage(targetId, "[转发消息]");
+    if (showNotification) {
+      const targetChar = characters.find((c) => c.id === targetId);
+      showToast(`已转发到 ${targetChar?.note || targetChar?.name || "聊天"}`);
+    }
   } else if (chatType === "group") {
     const group = window.groupChats?.find((g) => g.id === targetId);
     if (group) {
@@ -12305,8 +12423,12 @@ function forwardMergedMessages(
         forwardSource: sourceName,
         timestamp: Date.now(),
       });
+      group.lastMessage = "[转发消息]";
+      group.lastMessageTime = Date.now();
       localforage.setItem("groupChats", window.groupChats);
-      showToast(`已转发到群聊 ${group.name || "未命名群聊"}`);
+      if (showNotification) {
+        showToast(`已转发到群聊 ${group.name || "未命名群聊"}`);
+      }
     }
   }
 }
@@ -12316,7 +12438,8 @@ async function forwardSingleMessages(
   targetId,
   chatType,
   forwardedMessages,
-  sourceName
+  sourceName,
+  showNotification = true  // 【新增】是否显示toast通知
 ) {
   const timestamp = Date.now();
 
@@ -12344,8 +12467,12 @@ async function forwardSingleMessages(
     });
 
     await localforage.setItem("chatHistories", chatHistories);
-    const targetChar = characters.find((c) => c.id === targetId);
-    showToast(`已逐条转发 ${forwardedMessages.length} 条消息`);
+    // 【修改】更新最后消息
+    updateCharacterLastMessage(targetId, "[转发消息]");
+    if (showNotification) {
+      const targetChar = characters.find((c) => c.id === targetId);
+      showToast(`已逐条转发 ${forwardedMessages.length} 条消息`);
+    }
   } else if (chatType === "group") {
     const messagesKey = `group_messages_${targetId}`;
     const groupMessages = (await localforage.getItem(messagesKey)) || [];
@@ -12377,7 +12504,9 @@ async function forwardSingleMessages(
       group.lastTime = "刚刚";
       await localforage.setItem("groupChats", window.groupChats);
     }
-    showToast(`已逐条转发 ${forwardedMessages.length} 条消息`);
+    if (showNotification) {
+      showToast(`已逐条转发 ${forwardedMessages.length} 条消息`);
+    }
   }
 }
 
@@ -13529,6 +13658,10 @@ window.forwardGroupSingleMessages = forwardGroupSingleMessages;
 window.setForwardMode = setForwardMode;
 window.forwardMergedMessages = forwardMergedMessages;
 window.forwardSingleMessages = forwardSingleMessages;
+// 【新增】多选转发相关函数
+window.toggleForwardTarget = toggleForwardTarget;
+window.updateForwardConfirmBtn = updateForwardConfirmBtn;
+window.confirmMultiForward = confirmMultiForward;
 
 // 显示转发详情弹窗
 window.showForwardDetail = function (forwardId) {
@@ -13917,8 +14050,170 @@ ${charName}回复："${aiResponse.substring(0, 300)}${
   }
 }
 
+// 【新增】并行心声生成函数（与AI回复同时执行，不需要AI回复内容）
+async function generateHeartVoiceParallel(charId, userMessage) {
+  try {
+    const char = characters.find((c) => c.id === charId);
+    if (!char) return;
+
+    const charSettings = chatSettings[charId] || {};
+    const persona = charSettings.persona || char.description || "";
+    const charName = char.note || char.name || "AI";
+
+    // 获取API配置
+    let apiConfigToUse = null;
+    if (charSettings.apiPreset) {
+      apiConfigToUse = apiPresets.find((p) => p.id === charSettings.apiPreset);
+    }
+    if (!apiConfigToUse) {
+      apiConfigToUse = apiPresets.find((p) => p.id === activePresetId);
+    }
+    if (!apiConfigToUse && apiPresets.length > 0) {
+      apiConfigToUse = apiPresets[0];
+    }
+
+    if (!apiConfigToUse || !apiConfigToUse.key) {
+      console.log("没有可用的API配置，跳过心声生成");
+      return;
+    }
+
+    // 获取最近的对话上下文
+    const recentHistory = chatHistories[charId]?.slice(-6) || [];
+    const contextSummary = recentHistory.map(m => {
+      const role = m.role === 'user' ? '用户' : charName;
+      const content = (m.content || '').replace(/<[^>]+>/g, '').substring(0, 50);
+      return `${role}: ${content}`;
+    }).join('\n');
+
+    const systemPrompt = `你要为角色"${charName}"生成内心状态描述。用简单自然的语言，像朋友间聊天那样，不要用华丽的文学修辞。
+
+【角色人设】
+${persona || "(无特定人设)"}
+
+【要求】
+1. 完全代入角色视角，基于对话上下文推测角色此刻的心理状态
+2. 语言要简单直白，口语化
+3. 禁止使用emoji或颜文字
+4. 禁止使用比喻、排比等修辞手法
+5. 写得像角色的碎碎念，而不是文学作品
+
+【输出格式】
+必须以JSON格式输出：
+{
+  "action": "此刻在干嘛（15-25字，简单描述动作，比如'托着腮发呆'、'盯着手机屏幕'）",
+  "outfit": "今天穿啥（15-25字，简单说穿着，比如'白T恤加牛仔裤'、'睡衣还没换'）",
+  "mood": "心情怎样（2-3个词，比如：开心、有点紧张、期待）",
+  "secret": "想说但没说的话（30-50字，用角色平时说话的语气写，像对自己嘀咕）"
+}
+
+只输出JSON，不要其他内容。`;
+
+    const userPrompt = `【近期对话上下文】
+${contextSummary || '(暂无上下文)'}
+
+【用户刚才说】
+"${userMessage}"
+
+请以${charName}的身份，基于这段对话推测此刻的内心状态：`;
+
+    // 确保URL格式正确
+    let apiUrl = apiConfigToUse.url.replace(/\/$/, "");
+    if (!apiUrl.endsWith("/chat/completions")) {
+      if (apiUrl.endsWith("/v1")) {
+        apiUrl += "/chat/completions";
+      } else if (!apiUrl.includes("/chat/completions")) {
+        apiUrl += "/v1/chat/completions";
+      }
+    }
+
+    const response = await fetch(apiUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiConfigToUse.key}`,
+      },
+      body: JSON.stringify({
+        model: apiConfigToUse.model,
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
+        ],
+        temperature: 0.7,
+        stream: false,
+      }),
+    });
+
+    if (!response.ok) {
+      console.error("心声API请求失败:", response.status);
+      return;
+    }
+
+    const data = await response.json();
+    let content = data.choices?.[0]?.message?.content?.trim();
+
+    if (!content) return;
+
+    // 清理可能的markdown代码块
+    content = content
+      .replace(/```json\n?/g, "")
+      .replace(/```\n?/g, "")
+      .trim();
+
+    // 解析JSON
+    let heartData;
+    try {
+      heartData = JSON.parse(content);
+    } catch (e) {
+      console.error("心声JSON解析失败:", content);
+      return;
+    }
+
+    const heartVoice = {
+      action: heartData.action || "",
+      outfit: heartData.outfit || "",
+      mood: heartData.mood || "",
+      secret: heartData.secret || "",
+      timestamp: Date.now(),
+    };
+
+    // 保存心声数据
+    if (!window.heartVoiceData[charId]) {
+      window.heartVoiceData[charId] = { current: null, history: [] };
+    }
+
+    // 如果有当前心声，移到历史
+    if (window.heartVoiceData[charId].current) {
+      window.heartVoiceData[charId].history.push(
+        window.heartVoiceData[charId].current
+      );
+      // 只保留最近20条历史
+      if (window.heartVoiceData[charId].history.length > 20) {
+        window.heartVoiceData[charId].history.shift();
+      }
+    }
+
+    window.heartVoiceData[charId].current = heartVoice;
+
+    // 保存到本地
+    await localforage.setItem("heartVoiceData", window.heartVoiceData);
+
+    // 显示新心声提示
+    const heartBtn = document.getElementById("heartVoiceBtn");
+    if (heartBtn) {
+      heartBtn.classList.add("has-new");
+      // 3秒后移除提示
+      setTimeout(() => heartBtn.classList.remove("has-new"), 3000);
+    }
+
+    console.log("并行心声生成成功:", heartVoice);
+  } catch (error) {
+    console.error("并行心声生成失败:", error);
+  }
+}
+
 // 导出函数
 window.generateHeartVoice = generateHeartVoice;
+window.generateHeartVoiceParallel = generateHeartVoiceParallel;
 
 /* ==================== 修复：语音条无法多选的问题 ==================== */
 
@@ -17738,9 +18033,217 @@ function acceptIncomingCall() {
 
 // 拒绝来电通知
 function declineIncomingCall() {
+  // 【修复】保存来电角色ID，用于后续发送拒绝后的消息
+  const savedCharId = callState.charId;
+  const savedCallType = callState.type; // 保存通话类型（voice/video）
+  
   document.getElementById("incomingCallOverlay").classList.remove("active");
   callState.status = "idle";
   callState.charId = null;
+  
+  // 【新增】添加拒绝来电卡片
+  if (savedCharId) {
+    addDeclineCallCard(savedCharId, savedCallType);
+    
+    // 延迟一点再触发AI发消息，确保卡片已显示
+    setTimeout(() => {
+      triggerDeclineCallMessage(savedCharId, savedCallType);
+    }, 500);
+  }
+}
+
+// 【新增】添加拒绝来电卡片
+function addDeclineCallCard(charId, callType) {
+  if (!charId) return;
+  
+  const icon = callType === "video" ? "▶" : "☎";
+  const callTypeText = callType === "video" ? "视频通话" : "语音通话";
+  const iconColor = callType === "video" ? "#4caf50" : "#ff9800";
+  
+  const callHtml = `
+    <div style="background:white; padding:10px 14px; border-radius:10px; display:flex; align-items:center; gap:10px; box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+      <div style="background:#ffebee; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#f44336;">${icon}</div>
+      <div>
+        <div style="font-size:0.9rem;">${callTypeText}</div>
+        <div style="font-size:0.7rem; color:#f44336;">已拒绝</div>
+      </div>
+    </div>
+  `;
+  
+  if (!chatHistories[charId]) {
+    chatHistories[charId] = [];
+  }
+  
+  // 添加拒绝来电卡片（显示在用户这边，因为是用户拒绝的）
+  chatHistories[charId].push({
+    role: "user",
+    content: callHtml,
+    isHtml: true,
+    isCallCard: true,
+    time: new Date().toLocaleTimeString("zh-CN", {
+      hour: "2-digit",
+      minute: "2-digit",
+    }),
+    timestamp: Date.now(),
+  });
+  
+  // 更新聊天列表预览
+  const previewText = callType === "video" ? "[已拒绝视频通话]" : "[已拒绝语音通话]";
+  if (typeof updateCharacterLastMessage === "function") {
+    updateCharacterLastMessage(charId, previewText);
+  }
+  
+  // 保存聊天记录并刷新界面
+  localforage.setItem("chatHistories", chatHistories).then(() => {
+    requestAnimationFrame(() => {
+      if (currentChatCharId && currentChatCharId == charId) {
+        renderConversation();
+      }
+      if (typeof renderCharacterList === "function") {
+        renderCharacterList();
+      }
+    });
+  });
+}
+
+// 【新增】AI来电被拒绝后发消息
+async function triggerDeclineCallMessage(charId, callType) {
+  if (!charId) return;
+  
+  const char = characters.find((c) => c.id === charId);
+  if (!char) return;
+  
+  const settings = chatSettings[charId] || {};
+  const apiConfig = getActiveApiConfig();
+  if (!apiConfig || !apiConfig.url || !apiConfig.key) {
+    console.log("来电拒绝后AI消息: API未配置");
+    return;
+  }
+  
+  // 不需要在当前聊天界面才能发消息
+  // 直接添加一条AI消息到聊天历史
+  
+  if (!chatHistories[charId]) {
+    chatHistories[charId] = [];
+  }
+  
+  // 构建提示词
+  const charName = settings.charName || char.note || char.name || "AI";
+  const persona = settings.persona || char.description || "";
+  const callTypeText = callType === "video" ? "视频通话" : "语音通话";
+  
+  const systemPrompt = `你正在扮演${charName}。
+${persona ? `【角色设定】\n${persona}\n` : ""}
+【情境】
+你刚才给对方打了${callTypeText}，但是对方拒绝接听了。
+请以${charName}的身份发一条消息，表达你的反应。可以是疑惑、失落、撒娇、生气等情绪，要符合角色性格。
+消息要自然简短，不超过50字。直接输出消息内容，不要加引号或其他格式。`;
+
+  try {
+    // 【修复】如果在当前聊天界面，显示正在输入动画
+    const isCurrentChat = currentChatCharId === charId;
+    let typingIndicator = null;
+    
+    if (isCurrentChat) {
+      const container = document.getElementById("convMessages");
+      if (container) {
+        const typingHtml = `
+          <div class="msg-row ai" id="declineCallTypingIndicator">
+            <div class="msg-bubble">
+              <div class="msg-typing"><span></span><span></span><span></span></div>
+            </div>
+          </div>`;
+        container.insertAdjacentHTML("beforeend", typingHtml);
+        container.scrollTop = container.scrollHeight;
+        typingIndicator = document.getElementById("declineCallTypingIndicator");
+      }
+    }
+    
+    // 确保URL格式正确
+    let apiUrl = apiConfig.url.replace(/\/$/, "");
+    if (!apiUrl.endsWith("/chat/completions")) {
+      if (apiUrl.endsWith("/v1")) {
+        apiUrl += "/chat/completions";
+      } else if (!apiUrl.includes("/chat/completions")) {
+        apiUrl += "/v1/chat/completions";
+      }
+    }
+    
+    const response = await fetch(apiUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiConfig.key}`,
+      },
+      body: JSON.stringify({
+        model: apiConfig.model,
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: `你的${callTypeText}被拒绝了，请发一条消息。` },
+        ],
+        temperature: 0.8,
+        stream: false,
+      }),
+    });
+    
+    // 【修复】移除正在输入动画
+    if (typingIndicator) {
+      typingIndicator.remove();
+    }
+    
+    if (!response.ok) {
+      console.error("来电拒绝后AI消息API请求失败:", response.status);
+      return;
+    }
+    
+    const data = await response.json();
+    let aiReply = data.choices?.[0]?.message?.content?.trim();
+    
+    if (!aiReply) {
+      console.log("来电拒绝后AI消息: AI返回空内容");
+      return;
+    }
+    
+    // 过滤思维链标签
+    if (typeof filterThinkingTags === "function") {
+      aiReply = filterThinkingTags(aiReply);
+    }
+    
+    // 添加AI消息到聊天历史
+    const msgObj = {
+      role: "assistant",
+      content: aiReply,
+      time: new Date().toLocaleTimeString("zh-CN", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      timestamp: Date.now(),
+    };
+    
+    chatHistories[charId].push(msgObj);
+    await localforage.setItem("chatHistories", chatHistories);
+    
+    // 更新列表预览
+    updateCharacterLastMessage(charId, aiReply);
+    
+    // 如果当前在这个聊天界面，渲染消息
+    if (currentChatCharId === charId) {
+      renderConversation();
+    } else {
+      // 不在聊天界面，显示通知
+      showMessageNotification(charId, char.note || char.name, char.avatar, aiReply);
+      addUnreadMessage(charId);
+    }
+    
+    console.log("来电拒绝后AI消息发送成功:", aiReply);
+  } catch (error) {
+    // 【修复】发生错误时也要移除正在输入动画
+    const typingIndicator = document.getElementById("declineCallTypingIndicator");
+    if (typingIndicator) {
+      typingIndicator.remove();
+    }
+    console.error("来电拒绝后AI消息发送失败:", error);
+  }
 }
 
 function sendFakeLocation() {
@@ -26473,6 +26976,8 @@ Object.assign(window, {
   aiInitiateCall,
   acceptIncomingCall,
   declineIncomingCall,
+  addDeclineCallCard,
+  triggerDeclineCallMessage,
   sendCallMessage,
   handleCallInputKeydown,
   toggleVideoSelf,

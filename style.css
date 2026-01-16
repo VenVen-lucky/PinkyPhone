@@ -1352,6 +1352,8 @@ body::before {
   flex-direction: row;
   flex-wrap: nowrap;
   align-items: flex-end;
+  align-self: flex-end; /* 【修复】让用户消息靠右 */
+  margin-left: auto; /* 【修复】确保用户消息靠右 */
 }
 .msg-row.user.group-msg .msg-user-avatar {
   position: absolute;
@@ -10733,7 +10735,7 @@ input[type="range"]::-webkit-slider-thumb {
   display: flex;
   align-items: flex-end;
   padding: 6px 12px;
-  padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(4px + env(safe-area-inset-bottom, 0px)); /* 【修复】减少底部padding */
   gap: 8px;
   background: transparent;
   border: none;
@@ -10758,7 +10760,7 @@ input[type="range"]::-webkit-slider-thumb {
   color: #555;
   cursor: pointer;
   flex-shrink: 0;
-  margin-bottom: 2px;
+  margin-bottom: 0; /* 【修复】移除底部margin */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
@@ -10779,10 +10781,10 @@ input[type="range"]::-webkit-slider-thumb {
   min-width: 0;
   background: rgba(255, 255, 255, 0.85);
   border-radius: 20px;
-  padding: 8px 12px;
+  padding: 6px 12px; /* 【修复】减少上下padding */
   display: flex;
   align-items: flex-end;
-  min-height: 36px;
+  min-height: 34px; /* 【修复】减少最小高度 */
   margin: 0 !important;
   border: none !important;
   border-top: none !important;
