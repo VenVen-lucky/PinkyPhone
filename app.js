@@ -26,23 +26,29 @@ window.editingEntryIndex = null; // 正在编辑的条目索引
 window.tempWorldbookEntries = []; // 临时条目列表
 
 // 转发卡片渲染函数（备份，如果forum_app.js未加载则使用此函数）
-window.renderRetweetCard = window.renderRetweetCard || function(cardData) {
-  if (!cardData) return '';
-  
-  const avatarHtml = cardData.authorAvatar 
-    ? `<img src="${cardData.authorAvatar}" alt="">`
-    : (cardData.authorName ? cardData.authorName.charAt(0) : '📝');
-  
-  // 转义HTML
-  const escapeHtml = (text) => {
-    if (!text) return '';
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-  };
-  
-  return `
-    <div class="retweet-card" onclick="if(typeof openForumPostFromCard==='function')openForumPostFromCard(${cardData.postId})">
+window.renderRetweetCard =
+  window.renderRetweetCard ||
+  function (cardData) {
+    if (!cardData) return "";
+
+    const avatarHtml = cardData.authorAvatar
+      ? `<img src="${cardData.authorAvatar}" alt="">`
+      : cardData.authorName
+      ? cardData.authorName.charAt(0)
+      : "📝";
+
+    // 转义HTML
+    const escapeHtml = (text) => {
+      if (!text) return "";
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    };
+
+    return `
+    <div class="retweet-card" onclick="if(typeof openForumPostFromCard==='function')openForumPostFromCard(${
+      cardData.postId
+    })">
       <div class="retweet-card-label">
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M17 1l4 4-4 4"></path>
@@ -56,8 +62,10 @@ window.renderRetweetCard = window.renderRetweetCard || function(cardData) {
         <div class="retweet-card-header">
           <div class="retweet-card-avatar">${avatarHtml}</div>
           <div class="retweet-card-author-info">
-            <span class="retweet-card-author">${escapeHtml(cardData.authorName)}</span>
-            <span class="retweet-card-handle">@${cardData.handle || ''}</span>
+            <span class="retweet-card-author">${escapeHtml(
+              cardData.authorName
+            )}</span>
+            <span class="retweet-card-handle">@${cardData.handle || ""}</span>
           </div>
         </div>
         <div class="retweet-card-content">${escapeHtml(cardData.content)}</div>
@@ -87,7 +95,7 @@ window.renderRetweetCard = window.renderRetweetCard || function(cardData) {
       </div>
     </div>
   `;
-};
+  };
 
 // 全局安全读取函数，处理数据损坏情况
 async function safeLocalforageGet(key) {
@@ -125,7 +133,7 @@ async function initApp() {
       safeGet("worldbookGroups"),
       safeGet("groupChats"), // 添加群聊数据加载
       safeGet("userAvatar"), // 新版用户头像
-      safeGet("userName"),   // 新版用户名称
+      safeGet("userName"), // 新版用户名称
     ]);
 
     // 赋值（如果读取为 null，就用默认值）
@@ -161,7 +169,7 @@ async function initApp() {
 
     // 群聊数据
     groupChats = values[14] || [];
-    
+
     // 全局用户资料（用于聊天界面等）
     window.globalUserAvatar = values[15] || values[10] || ""; // 优先使用新版，兼容旧版
     window.globalUserName = values[16] || "用户";
@@ -213,13 +221,13 @@ async function initApp() {
     initUserPersonaPresets();
     initPresetSystem(); // 初始化预设系统
     loadSavedData(); // 加载名片、标签、小组件数据
-    
+
     // ========== 加载新版名片数据（profile-widget-new）==========
     await loadNewProfileData();
-    
+
     // ========== 加载神秘卡片小组件数据 ==========
     await loadMysteryWidgetData();
-    
+
     // ========== 加载拍立得小组件数据 ==========
     await loadPolaroidData();
 
@@ -257,7 +265,7 @@ async function initApp() {
       initUserPersonaPresets();
       initPresetSystem();
       loadSavedData(); // 加载名片、标签、小组件数据
-      
+
       // 尝试加载小组件数据
       loadNewProfileData();
       loadMysteryWidgetData();
@@ -284,7 +292,7 @@ async function initPresetSystem() {
   try {
     // 初始化激活系统
     await initActivationSystem();
-    
+
     let savedPresets = null;
     try {
       savedPresets = await safeLocalforageGet("userPresets");
@@ -820,34 +828,34 @@ let isActivated = false;
 // 生成设备指纹
 async function generateDeviceFingerprint() {
   const components = [];
-  
+
   // 浏览器信息
   components.push(navigator.userAgent);
   components.push(navigator.language);
   components.push(navigator.platform);
-  
+
   // 屏幕信息
-  components.push(screen.width + 'x' + screen.height);
+  components.push(screen.width + "x" + screen.height);
   components.push(screen.colorDepth);
   components.push(window.devicePixelRatio);
-  
+
   // 时区
   components.push(Intl.DateTimeFormat().resolvedOptions().timeZone);
-  
+
   // Canvas指纹
   try {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    ctx.textBaseline = 'top';
-    ctx.font = '14px Arial';
-    ctx.fillText('PinkyPhone', 2, 2);
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    ctx.textBaseline = "top";
+    ctx.font = "14px Arial";
+    ctx.fillText("PinkyPhone", 2, 2);
     components.push(canvas.toDataURL().slice(-50));
   } catch (e) {}
-  
+
   // 生成哈希
-  const str = components.join('|');
+  const str = components.join("|");
   const hash = await simpleHash(str);
-  
+
   // 返回8位设备码
   return hash.substring(0, 8).toUpperCase();
 }
@@ -856,23 +864,23 @@ async function generateDeviceFingerprint() {
 async function simpleHash(str) {
   const encoder = new TextEncoder();
   const data = encoder.encode(str);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
 // 初始化激活系统
 async function initActivationSystem() {
   // 生成设备指纹
   deviceFingerprint = await generateDeviceFingerprint();
-  
+
   // 检查激活状态
-  const savedActivation = await localforage.getItem('presetActivation');
+  const savedActivation = await localforage.getItem("presetActivation");
   if (savedActivation && savedActivation.deviceCode === deviceFingerprint) {
     isActivated = true;
   }
-  
-  console.log('设备码:', deviceFingerprint, '激活状态:', isActivated);
+
+  console.log("设备码:", deviceFingerprint, "激活状态:", isActivated);
 }
 
 // 检查是否已激活
@@ -885,56 +893,63 @@ async function checkActivation() {
 
 // 打开激活弹窗
 function openActivationModal() {
-  document.getElementById('activationDeviceCode').textContent = deviceFingerprint || '加载中...';
-  document.getElementById('activationCodeInput').value = '';
-  document.getElementById('activationModal').classList.add('active');
+  document.getElementById("activationDeviceCode").textContent =
+    deviceFingerprint || "加载中...";
+  document.getElementById("activationCodeInput").value = "";
+  document.getElementById("activationModal").classList.add("active");
 }
 
 // 关闭激活弹窗
 function closeActivationModal() {
-  document.getElementById('activationModal').classList.remove('active');
+  document.getElementById("activationModal").classList.remove("active");
 }
 
 // 复制设备码
 async function copyDeviceCode() {
   try {
     await navigator.clipboard.writeText(deviceFingerprint);
-    showToast('设备码已复制');
+    showToast("设备码已复制");
   } catch (e) {
-    showToast('复制失败，请手动复制');
+    showToast("复制失败，请手动复制");
   }
 }
 
 // 验证激活码
 async function verifyActivationCode() {
-  const inputCode = document.getElementById('activationCodeInput').value.trim().toUpperCase();
-  
+  const inputCode = document
+    .getElementById("activationCodeInput")
+    .value.trim()
+    .toUpperCase();
+
   if (!inputCode) {
-    showToast('请输入激活码');
+    showToast("请输入激活码");
     return;
   }
-  
+
   // 获取管理员密钥哈希
-  const adminKeyHash = await localforage.getItem('adminKeyHash');
+  const adminKeyHash = await localforage.getItem("adminKeyHash");
   if (!adminKeyHash) {
-    showToast('系统未初始化，请联系管理员');
+    showToast("系统未初始化，请联系管理员");
     return;
   }
-  
+
   // 验证激活码：密钥哈希前8位 + 设备码 的哈希
-  const expectedCode = await generateActivationCodeFromKey(adminKeyHash, deviceFingerprint);
-  
+  const expectedCode = await generateActivationCodeFromKey(
+    adminKeyHash,
+    deviceFingerprint
+  );
+
   if (inputCode === expectedCode) {
     // 激活成功
     isActivated = true;
-    await localforage.setItem('presetActivation', {
+    await localforage.setItem("presetActivation", {
       deviceCode: deviceFingerprint,
-      activatedAt: new Date().toISOString()
+      activatedAt: new Date().toISOString(),
     });
-    showToast('🎉 激活成功！');
+    showToast("🎉 激活成功！");
     closeActivationModal();
   } else {
-    showToast('激活码无效，请检查后重试');
+    showToast("激活码无效，请检查后重试");
   }
 }
 
@@ -947,60 +962,67 @@ async function generateActivationCodeFromKey(keyHash, deviceCode) {
 
 // 打开管理员弹窗
 function openAdminActivationModal() {
-  document.getElementById('adminSecretKey').value = '';
-  document.getElementById('userDeviceCodeInput').value = '';
-  document.getElementById('generatedCodeSection').style.display = 'none';
-  document.getElementById('adminActivationModal').classList.add('active');
+  document.getElementById("adminSecretKey").value = "";
+  document.getElementById("userDeviceCodeInput").value = "";
+  document.getElementById("generatedCodeSection").style.display = "none";
+  document.getElementById("adminActivationModal").classList.add("active");
 }
 
 // 关闭管理员弹窗
 function closeAdminActivationModal() {
-  document.getElementById('adminActivationModal').classList.remove('active');
+  document.getElementById("adminActivationModal").classList.remove("active");
 }
 
 // 生成激活码（管理员用）
 async function generateActivationCode() {
-  const secretKey = document.getElementById('adminSecretKey').value.trim();
-  const userDeviceCode = document.getElementById('userDeviceCodeInput').value.trim().toUpperCase();
-  
+  const secretKey = document.getElementById("adminSecretKey").value.trim();
+  const userDeviceCode = document
+    .getElementById("userDeviceCodeInput")
+    .value.trim()
+    .toUpperCase();
+
   if (!secretKey) {
-    showToast('请输入管理员密钥');
+    showToast("请输入管理员密钥");
     return;
   }
-  
+
   if (!userDeviceCode || userDeviceCode.length !== 8) {
-    showToast('请输入有效的8位设备码');
+    showToast("请输入有效的8位设备码");
     return;
   }
-  
+
   // 检查或设置管理员密钥
   const keyHash = await simpleHash(secretKey);
-  const savedKeyHash = await localforage.getItem('adminKeyHash');
-  
+  const savedKeyHash = await localforage.getItem("adminKeyHash");
+
   if (!savedKeyHash) {
     // 首次设置管理员密钥
-    await localforage.setItem('adminKeyHash', keyHash);
-    showToast('管理员密钥已设置');
+    await localforage.setItem("adminKeyHash", keyHash);
+    showToast("管理员密钥已设置");
   } else if (savedKeyHash !== keyHash) {
-    showToast('管理员密钥错误');
+    showToast("管理员密钥错误");
     return;
   }
-  
+
   // 生成激活码
-  const activationCode = await generateActivationCodeFromKey(keyHash, userDeviceCode);
-  
-  document.getElementById('generatedActivationCode').textContent = activationCode;
-  document.getElementById('generatedCodeSection').style.display = 'block';
+  const activationCode = await generateActivationCodeFromKey(
+    keyHash,
+    userDeviceCode
+  );
+
+  document.getElementById("generatedActivationCode").textContent =
+    activationCode;
+  document.getElementById("generatedCodeSection").style.display = "block";
 }
 
 // 复制生成的激活码
 async function copyGeneratedCode() {
-  const code = document.getElementById('generatedActivationCode').textContent;
+  const code = document.getElementById("generatedActivationCode").textContent;
   try {
     await navigator.clipboard.writeText(code);
-    showToast('激活码已复制');
+    showToast("激活码已复制");
   } catch (e) {
-    showToast('复制失败，请手动复制');
+    showToast("复制失败，请手动复制");
   }
 }
 
@@ -1011,34 +1033,34 @@ let adminClickTimer = null;
 // ========== 【安全配置】管理员访问密码 ==========
 // 修改下面的 ADMIN_ACCESS_PASSWORD 为你自己的密码
 // 这个密码用于进入管理员面板，与生成激活码的密钥是分开的
-const ADMIN_ACCESS_PASSWORD = "your_secret_password_here"; // ← 改成你的密码
+const ADMIN_ACCESS_PASSWORD = "pinkyphone2026"; // ← 改成你的密码
 
 // 简单的密码哈希函数（与 simpleHash 保持一致）
 async function hashPassword(password) {
   const encoder = new TextEncoder();
   const data = encoder.encode(password + "_pinkyphone_admin_salt_2024");
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
 // 预计算密码哈希（首次加载时计算）
 let adminPasswordHash = null;
-(async function() {
+(async function () {
   adminPasswordHash = await hashPassword(ADMIN_ACCESS_PASSWORD);
 })();
 
 function handlePresetTitleClick(event) {
   adminClickCount++;
-  
+
   if (adminClickTimer) {
     clearTimeout(adminClickTimer);
   }
-  
+
   adminClickTimer = setTimeout(() => {
     adminClickCount = 0;
   }, 2000); // 2秒内连续点击
-  
+
   if (adminClickCount >= 5) {
     adminClickCount = 0;
     // 不直接打开，先验证密码
@@ -1049,13 +1071,13 @@ function handlePresetTitleClick(event) {
 // 验证管理员访问密码
 async function verifyAdminAccess() {
   const inputPassword = prompt("请输入管理员访问密码：");
-  
+
   if (!inputPassword) {
     return; // 用户取消
   }
-  
+
   const inputHash = await hashPassword(inputPassword);
-  
+
   if (inputHash === adminPasswordHash) {
     openAdminActivationModal();
   } else {
@@ -1109,7 +1131,7 @@ async function importPresetFromClipboard() {
     openActivationModal();
     return;
   }
-  
+
   try {
     const text = await navigator.clipboard.readText();
     const data = JSON.parse(text);
@@ -1772,7 +1794,7 @@ async function handleLoveWidgetBgUpload(input) {
 async function loadSavedData() {
   // 注意：这个函数加载的是旧版名片数据（profile-widget），
   // 新版名片（profile-widget-new）的数据由文件末尾的代码加载
-  
+
   // Avatar (旧版)
   try {
     const avatarData = await localforage.getItem("avatarImg");
@@ -1823,7 +1845,7 @@ async function loadSavedData() {
 
   // 加载恋爱纪念组件数据
   loadLoveWidgetData();
-  
+
   console.log("✓ loadSavedData 完成");
 }
 
@@ -1932,7 +1954,9 @@ function switchChatTab(tabName) {
   const chatHeader = document.querySelector(".chat-app > .chat-header");
   if (chatHeader) {
     chatHeader.style.display =
-      tabName === "moments" || tabName === "profile" || tabName === "todo" ? "none" : "";
+      tabName === "moments" || tabName === "profile" || tabName === "todo"
+        ? "none"
+        : "";
   }
 
   // 切换到moments时清除朋友圈小红点
@@ -2436,20 +2460,30 @@ async function loadGroupMessages(groupId) {
         let contentHtml = isHtmlMsg
           ? msg.content
           : processAtMentions(escapeHtml(msg.content));
-        
+
         // 检测是否有转发卡片数据
-        if (msg.retweetCard && typeof renderRetweetCard === 'function') {
+        if (msg.retweetCard && typeof renderRetweetCard === "function") {
           // 如果是纯转发消息或内容为空，只显示卡片
-          if (msg.isRetweetOnly || !msg.content || msg.content.trim() === '' || /^\[转发帖子\]/.test((msg.content || '').trim())) {
+          if (
+            msg.isRetweetOnly ||
+            !msg.content ||
+            msg.content.trim() === "" ||
+            /^\[转发帖子\]/.test((msg.content || "").trim())
+          ) {
             contentHtml = renderRetweetCard(msg.retweetCard);
           } else {
             contentHtml += renderRetweetCard(msg.retweetCard);
           }
         }
-        
+
         // 检测是否只有转发卡片
-        const isRetweetOnly = msg.retweetCard && (msg.isRetweetOnly || !msg.content || msg.content.trim() === '' || /^\[转发帖子\]/.test((msg.content || '').trim()));
-        
+        const isRetweetOnly =
+          msg.retweetCard &&
+          (msg.isRetweetOnly ||
+            !msg.content ||
+            msg.content.trim() === "" ||
+            /^\[转发帖子\]/.test((msg.content || "").trim()));
+
         // 检测是否是表情包消息
         const isSticker =
           isHtmlMsg &&
@@ -2476,9 +2510,9 @@ async function loadGroupMessages(groupId) {
         }
 
         // 转发卡片特殊样式
-        const retweetStyle = isRetweetOnly 
-          ? 'style="background:transparent!important;box-shadow:none!important;padding:0!important;"' 
-          : '';
+        const retweetStyle = isRetweetOnly
+          ? 'style="background:transparent!important;box-shadow:none!important;padding:0!important;"'
+          : "";
 
         return `
         <div class="msg-row user group-msg" 
@@ -2707,9 +2741,14 @@ async function loadGroupMessages(groupId) {
         }
 
         // 检测是否有转发卡片数据
-        if (msg.retweetCard && typeof renderRetweetCard === 'function') {
+        if (msg.retweetCard && typeof renderRetweetCard === "function") {
           // 如果是纯转发消息或内容为空，只显示卡片
-          if (msg.isRetweetOnly || !msg.content || msg.content.trim() === '' || /^\[转发帖子\]/.test((msg.content || '').trim())) {
+          if (
+            msg.isRetweetOnly ||
+            !msg.content ||
+            msg.content.trim() === "" ||
+            /^\[转发帖子\]/.test((msg.content || "").trim())
+          ) {
             contentHtml = renderRetweetCard(msg.retweetCard);
           } else {
             contentHtml += renderRetweetCard(msg.retweetCard);
@@ -2717,7 +2756,12 @@ async function loadGroupMessages(groupId) {
         }
 
         // 检测是否只有转发卡片
-        const isRetweetOnly = msg.retweetCard && (msg.isRetweetOnly || !msg.content || msg.content.trim() === '' || /^\[转发帖子\]/.test((msg.content || '').trim()));
+        const isRetweetOnly =
+          msg.retweetCard &&
+          (msg.isRetweetOnly ||
+            !msg.content ||
+            msg.content.trim() === "" ||
+            /^\[转发帖子\]/.test((msg.content || "").trim()));
 
         // 检测是否是表情包消息
         const isSticker =
@@ -4548,7 +4592,7 @@ ${memberInfos
       body: JSON.stringify({
         model: preset.model || "gpt-3.5-turbo",
         messages: messages,
-        
+
         temperature:
           preset.temperature !== undefined ? Number(preset.temperature) : 0.8,
       }),
@@ -4887,19 +4931,28 @@ function setGroupQuote(msgIndex) {
 
     let content = msg.content || "";
     let displayContent = "";
-    
+
     // 检测是否为表情包消息
-    if (/^\[(sticker|表情|表情包)[：:]/i.test(content) || content.includes('class="sticker-img"')) {
+    if (
+      /^\[(sticker|表情|表情包)[：:]/i.test(content) ||
+      content.includes('class="sticker-img"')
+    ) {
       displayContent = "[表情包]";
     }
     // 检测是否为语音消息
-    else if (/^\[voice[：:]/i.test(content) || /^\[语音[：:]/i.test(content) || content.includes('voice-message') || content.includes('voice-bar')) {
+    else if (
+      /^\[voice[：:]/i.test(content) ||
+      /^\[语音[：:]/i.test(content) ||
+      content.includes("voice-message") ||
+      content.includes("voice-bar")
+    ) {
       displayContent = "[语音消息]";
     }
     // 普通文本消息
     else {
       displayContent = content.replace(/<[^>]+>/g, "").trim();
-      if (displayContent.length > 50) displayContent = displayContent.substring(0, 50) + "...";
+      if (displayContent.length > 50)
+        displayContent = displayContent.substring(0, 50) + "...";
     }
 
     currentGroupQuote = {
@@ -4915,7 +4968,8 @@ function setGroupQuote(msgIndex) {
     const preview = document.getElementById("groupQuotePreview");
     preview.classList.add("active");
     document.getElementById("groupQuotePreviewSender").textContent = senderName;
-    document.getElementById("groupQuotePreviewText").textContent = displayContent;
+    document.getElementById("groupQuotePreviewText").textContent =
+      displayContent;
 
     // 聚焦输入框
     document.getElementById("convInput").focus();
@@ -5923,36 +5977,42 @@ var lastStatusUpdateTime = {};
 async function generateAiStatus(charId) {
   // 检查是否是群聊，群聊不更新状态
   if (currentGroupId) return;
-  
+
   // 节流检查：3分钟内不重复更新
   const now = Date.now();
   const lastUpdate = lastStatusUpdateTime[charId] || 0;
-  if (now - lastUpdate < 180000) { // 3分钟 = 180000ms
+  if (now - lastUpdate < 180000) {
+    // 3分钟 = 180000ms
     console.log("状态更新节流中，跳过");
     return;
   }
-  
+
   const apiConfig = getActiveApiConfig();
   if (!apiConfig || !apiConfig.url || !apiConfig.key) return;
-  
-  const char = characters.find(c => c.id === charId);
+
+  const char = characters.find((c) => c.id === charId);
   if (!char) return;
-  
+
   const settings = chatSettings[charId] || {};
   const history = chatHistories[charId] || [];
-  
-  // 获取最近几条消息作为上下文
-  const recentMessages = history.slice(-6).map(m => {
-    const role = m.role === 'user' ? '用户' : char.name;
-    return `${role}: ${m.content}`;
-  }).join('\n');
-  
-  if (!recentMessages) return;
-  
-  try {
-    const prompt = `你是一个状态生成器。根据以下聊天记录，为AI角色"${settings.charName || char.name}"生成一个简短的状态文字（类似社交软件的在线状态）。
 
-【角色人设】${settings.persona || char.persona || '友好的聊天伴侣'}
+  // 获取最近几条消息作为上下文
+  const recentMessages = history
+    .slice(-6)
+    .map((m) => {
+      const role = m.role === "user" ? "用户" : char.name;
+      return `${role}: ${m.content}`;
+    })
+    .join("\n");
+
+  if (!recentMessages) return;
+
+  try {
+    const prompt = `你是一个状态生成器。根据以下聊天记录，为AI角色"${
+      settings.charName || char.name
+    }"生成一个简短的状态文字（类似社交软件的在线状态）。
+
+【角色人设】${settings.persona || char.persona || "友好的聊天伴侣"}
 
 【最近聊天】
 ${recentMessages}
@@ -5993,13 +6053,16 @@ ${recentMessages}
     });
 
     if (!response.ok) return;
-    
+
     const data = await response.json();
     let status = data.choices[0]?.message?.content || "";
-    
+
     // 清理状态文字
-    status = status.trim().replace(/^["']|["']$/g, '').replace(/^状态[:：]?\s*/i, '');
-    
+    status = status
+      .trim()
+      .replace(/^["']|["']$/g, "")
+      .replace(/^状态[:：]?\s*/i, "");
+
     if (status && status.length <= 20) {
       // 检查是否和上次状态重复
       const oldStatus = aiCharacterStatus[charId]?.status;
@@ -6007,16 +6070,16 @@ ${recentMessages}
         console.log("状态与之前相同，跳过更新");
         return;
       }
-      
+
       aiCharacterStatus[charId] = {
         status: status,
-        lastUpdate: Date.now()
+        lastUpdate: Date.now(),
       };
       await saveAiCharacterStatus();
-      
+
       // 记录更新时间
       lastStatusUpdateTime[charId] = now;
-      
+
       // 如果当前正在查看这个角色的对话，更新显示
       if (currentChatCharId === charId && !currentGroupId) {
         updateConvStatus(status);
@@ -6683,9 +6746,14 @@ window.renderMessageGroup = function (
       }
 
       // 检测是否有转发卡片数据
-      if (m.retweetCard && typeof renderRetweetCard === 'function') {
+      if (m.retweetCard && typeof renderRetweetCard === "function") {
         // 如果是纯转发消息或内容为空，只显示卡片
-        if (m.isRetweetOnly || !rawContent || rawContent.trim() === '' || /^\[转发帖子\]/.test(rawContent.trim())) {
+        if (
+          m.isRetweetOnly ||
+          !rawContent ||
+          rawContent.trim() === "" ||
+          /^\[转发帖子\]/.test(rawContent.trim())
+        ) {
           contentHtml = renderRetweetCard(m.retweetCard);
         } else {
           contentHtml += renderRetweetCard(m.retweetCard);
@@ -6697,12 +6765,18 @@ window.renderMessageGroup = function (
         contentHtml.includes("transfer-card") ||
         contentHtml.includes("location-card") ||
         contentHtml.includes("retweet-card");
-      
+
       // 如果只有转发卡片，不需要气泡背景
-      const isRetweetOnly = m.retweetCard && (m.isRetweetOnly || !rawContent || rawContent.trim() === '' || /^\[转发帖子\]/.test(rawContent.trim()));
-      const specialBubbleStyle = (isSpecialCard || isRetweetOnly)
-        ? 'style="background:transparent!important;box-shadow:none!important;padding:0!important;"'
-        : "";
+      const isRetweetOnly =
+        m.retweetCard &&
+        (m.isRetweetOnly ||
+          !rawContent ||
+          rawContent.trim() === "" ||
+          /^\[转发帖子\]/.test(rawContent.trim()));
+      const specialBubbleStyle =
+        isSpecialCard || isRetweetOnly
+          ? 'style="background:transparent!important;box-shadow:none!important;padding:0!important;"'
+          : "";
 
       // 生成引用显示HTML
       let quoteHtml = "";
@@ -7439,11 +7513,14 @@ ${m.content}`;
     const userMessages =
       chatHistories[savedCharId]?.filter((m) => m.role === "user") || [];
     const lastUserMsg = userMessages[userMessages.length - 1]?.content || "";
-    
+
     // 异步启动心声生成（不等待结果，与AI回复并行执行）
     let heartVoicePromise = null;
     if (typeof generateHeartVoiceParallel === "function") {
-      heartVoicePromise = generateHeartVoiceParallel(savedCharId, lastUserMsg).catch((e) => {
+      heartVoicePromise = generateHeartVoiceParallel(
+        savedCharId,
+        lastUserMsg
+      ).catch((e) => {
         console.error("心声生成错误:", e);
       });
     }
@@ -7744,16 +7821,16 @@ ${m.content}`;
         // 检查是否包含引用标签 [引用:xxx]内容
         let quoteInfo = null;
         let actualContent = partContent;
-        
+
         // 检查是否以 [引用: 或 [引用： 开头
         if (/^\[引用[:：]/i.test(partContent)) {
           // 找到引用内容的结束位置（配对的方括号）
           let bracketCount = 0;
           let quoteEndPos = -1;
-          
+
           for (let ci = 0; ci < partContent.length; ci++) {
-            if (partContent[ci] === '[') bracketCount++;
-            else if (partContent[ci] === ']') {
+            if (partContent[ci] === "[") bracketCount++;
+            else if (partContent[ci] === "]") {
               bracketCount--;
               if (bracketCount === 0) {
                 quoteEndPos = ci;
@@ -7761,18 +7838,23 @@ ${m.content}`;
               }
             }
           }
-          
+
           if (quoteEndPos > 0) {
             // 提取引用内容（跳过 [引用: 前缀）
             const prefixMatch = partContent.match(/^\[引用[:：]\s*/);
             const prefixLen = prefixMatch ? prefixMatch[0].length : 4;
-            let quoteContent = partContent.substring(prefixLen, quoteEndPos).trim();
-            
+            let quoteContent = partContent
+              .substring(prefixLen, quoteEndPos)
+              .trim();
+
             // 处理引用内容
             let displayQuote = quoteContent;
-            
+
             // 检测表情包
-            if (/^\[?(sticker|表情|表情包)[：:]/i.test(quoteContent) || /表情包/.test(quoteContent)) {
+            if (
+              /^\[?(sticker|表情|表情包)[：:]/i.test(quoteContent) ||
+              /表情包/.test(quoteContent)
+            ) {
               displayQuote = "[表情包]";
             }
             // 检测语音
@@ -7782,16 +7864,17 @@ ${m.content}`;
             // 普通文本
             else {
               displayQuote = quoteContent.replace(/<[^>]+>/g, "").trim();
-              if (displayQuote.length > 50) displayQuote = displayQuote.substring(0, 50) + "...";
+              if (displayQuote.length > 50)
+                displayQuote = displayQuote.substring(0, 50) + "...";
             }
-            
+
             quoteInfo = {
               sender: "我",
               senderRole: "user",
               content: displayQuote,
               displayContent: displayQuote,
             };
-            
+
             // 提取引用后的实际内容
             actualContent = partContent.substring(quoteEndPos + 1).trim();
           }
@@ -7903,7 +7986,8 @@ ${m.content}`;
   } finally {
     btn.disabled = false;
     btn.classList.remove("loading");
-    btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
+    btn.innerHTML =
+      '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
   }
 }
 
@@ -11668,10 +11752,11 @@ document.addEventListener("DOMContentLoaded", function () {
     replyBtn.innerHTML =
       '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
     wrapper.insertBefore(replyBtn, sendBtn);
-    
+
     // 修改发送按钮为箭头图标
     if (sendBtn) {
-      sendBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>';
+      sendBtn.innerHTML =
+        '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>';
     }
     const input = document.getElementById("convInput");
     if (input) input.style.marginRight = "4px";
@@ -12110,8 +12195,12 @@ function renderConversation() {
         );
         currentGroup = [];
       }
-      const todoTypeClass = msg.todoType === "todo_complete" ? "complete" : 
-                           msg.todoType === "todo_add" ? "add" : "binding";
+      const todoTypeClass =
+        msg.todoType === "todo_complete"
+          ? "complete"
+          : msg.todoType === "todo_add"
+          ? "add"
+          : "binding";
       html += `<div class="msg-todo-card-wrap">
         <div class="todo-notification-card ${todoTypeClass}">
           <div class="todo-card-icon"></div>
@@ -12473,7 +12562,11 @@ function showForwardModal() {
     if (char.id === currentChatCharId) return;
 
     html += `
-      <div class="forward-chat-item" data-target-id="${char.id}" data-target-type="private" onclick="toggleForwardTarget(this, '${char.id}', 'private')">
+      <div class="forward-chat-item" data-target-id="${
+        char.id
+      }" data-target-type="private" onclick="toggleForwardTarget(this, '${
+      char.id
+    }', 'private')">
         <div class="forward-check-indicator" style="width:20px;height:20px;border:2px solid #ddd;border-radius:50%;margin-right:10px;display:flex;align-items:center;justify-content:center;transition:all 0.2s;">
           <span style="display:none;color:#4caf50;font-weight:bold;">✓</span>
         </div>
@@ -12495,7 +12588,11 @@ function showForwardModal() {
   if (window.groupChats && window.groupChats.length > 0) {
     window.groupChats.forEach((group) => {
       html += `
-        <div class="forward-chat-item" data-target-id="${group.id}" data-target-type="group" onclick="toggleForwardTarget(this, '${group.id}', 'group')">
+        <div class="forward-chat-item" data-target-id="${
+          group.id
+        }" data-target-type="group" onclick="toggleForwardTarget(this, '${
+        group.id
+      }', 'group')">
           <div class="forward-check-indicator" style="width:20px;height:20px;border:2px solid #ddd;border-radius:50%;margin-right:10px;display:flex;align-items:center;justify-content:center;transition:all 0.2s;">
             <span style="display:none;color:#4caf50;font-weight:bold;">✓</span>
           </div>
@@ -12539,37 +12636,38 @@ function showForwardModal() {
 // 【新增】切换转发目标选中状态
 function toggleForwardTarget(element, targetId, targetType) {
   const key = `${targetType}_${targetId}`;
-  const checkIndicator = element.querySelector('.forward-check-indicator');
-  const checkMark = checkIndicator.querySelector('span');
-  
+  const checkIndicator = element.querySelector(".forward-check-indicator");
+  const checkMark = checkIndicator.querySelector("span");
+
   if (forwardSelectedTargets.has(key)) {
     // 取消选中
     forwardSelectedTargets.delete(key);
-    element.style.background = '';
-    checkIndicator.style.borderColor = '#ddd';
-    checkIndicator.style.background = '';
-    checkMark.style.display = 'none';
+    element.style.background = "";
+    checkIndicator.style.borderColor = "#ddd";
+    checkIndicator.style.background = "";
+    checkMark.style.display = "none";
   } else {
     // 选中
     forwardSelectedTargets.add(key);
-    element.style.background = 'linear-gradient(135deg, rgba(244,143,177,0.1), rgba(206,147,216,0.1))';
-    checkIndicator.style.borderColor = '#4caf50';
-    checkIndicator.style.background = 'rgba(76,175,80,0.1)';
-    checkMark.style.display = 'block';
+    element.style.background =
+      "linear-gradient(135deg, rgba(244,143,177,0.1), rgba(206,147,216,0.1))";
+    checkIndicator.style.borderColor = "#4caf50";
+    checkIndicator.style.background = "rgba(76,175,80,0.1)";
+    checkMark.style.display = "block";
   }
-  
+
   // 更新确认按钮状态
   updateForwardConfirmBtn();
 }
 
 // 【新增】更新确认转发按钮状态
 function updateForwardConfirmBtn() {
-  const btn = document.getElementById('forwardConfirmBtn');
+  const btn = document.getElementById("forwardConfirmBtn");
   if (btn) {
     const count = forwardSelectedTargets.size;
     btn.textContent = `确认转发 (${count})`;
     btn.disabled = count === 0;
-    btn.style.opacity = count === 0 ? '0.5' : '1';
+    btn.style.opacity = count === 0 ? "0.5" : "1";
   }
 }
 
@@ -12579,7 +12677,7 @@ async function confirmMultiForward() {
     showToast("请选择至少一个转发对象");
     return;
   }
-  
+
   const currentChar = characters.find((c) => c.id === currentChatCharId);
   const sortedIndices = Array.from(selectedIndices).sort((a, b) => a - b);
   const sourceName = currentChar?.note || currentChar?.name || "未知";
@@ -12599,22 +12697,34 @@ async function confirmMultiForward() {
       });
     }
   });
-  
+
   // 遍历所有选中的目标进行转发
   let successCount = 0;
   for (const key of forwardSelectedTargets) {
-    const [targetType, targetId] = key.split('_');
-    
+    const [targetType, targetId] = key.split("_");
+
     if (forwardMode === "single") {
       // 【修改】传入false禁止单个转发显示toast
-      await forwardSingleMessages(targetId, targetType, forwardedMessages, sourceName, false);
+      await forwardSingleMessages(
+        targetId,
+        targetType,
+        forwardedMessages,
+        sourceName,
+        false
+      );
     } else {
       // 【修改】传入false禁止单个转发显示toast
-      await forwardMergedMessages(targetId, targetType, forwardedMessages, sourceName, false);
+      await forwardMergedMessages(
+        targetId,
+        targetType,
+        forwardedMessages,
+        sourceName,
+        false
+      );
     }
     successCount++;
   }
-  
+
   hideForwardModal();
   exitSelectionMode();
   showToast(`已转发到 ${successCount} 个聊天`);
@@ -12670,11 +12780,12 @@ function forwardMergedMessages(
   chatType,
   forwardedMessages,
   sourceName,
-  showNotification = true  // 【新增】是否显示toast通知
+  showNotification = true // 【新增】是否显示toast通知
 ) {
   const previewCount = Math.min(3, forwardedMessages.length);
   const hasMore = forwardedMessages.length > 3;
-  const forwardId = "fwd_" + Date.now() + "_" + Math.random().toString(36).substr(2, 5);
+  const forwardId =
+    "fwd_" + Date.now() + "_" + Math.random().toString(36).substr(2, 5);
 
   const previewHtml = forwardedMessages
     .slice(0, previewCount)
@@ -12759,7 +12870,7 @@ async function forwardSingleMessages(
   chatType,
   forwardedMessages,
   sourceName,
-  showNotification = true  // 【新增】是否显示toast通知
+  showNotification = true // 【新增】是否显示toast通知
 ) {
   const timestamp = Date.now();
 
@@ -13149,19 +13260,28 @@ function handleQuoteMsg() {
   // 清理消息内容用于显示
   let content = msg.content || "";
   let displayContent = "";
-  
+
   // 检测是否为表情包消息
-  if (/^\[(sticker|表情|表情包)[：:]/i.test(content) || content.includes('class="sticker-img"')) {
+  if (
+    /^\[(sticker|表情|表情包)[：:]/i.test(content) ||
+    content.includes('class="sticker-img"')
+  ) {
     displayContent = "[表情包]";
   }
   // 检测是否为语音消息
-  else if (/^\[voice[：:]/i.test(content) || /^\[语音[：:]/i.test(content) || content.includes('voice-message') || content.includes('voice-bar')) {
+  else if (
+    /^\[voice[：:]/i.test(content) ||
+    /^\[语音[：:]/i.test(content) ||
+    content.includes("voice-message") ||
+    content.includes("voice-bar")
+  ) {
     displayContent = "[语音消息]";
   }
   // 普通文本消息
   else {
     displayContent = content.replace(/<[^>]+>/g, "").trim();
-    if (displayContent.length > 50) displayContent = displayContent.substring(0, 50) + "...";
+    if (displayContent.length > 50)
+      displayContent = displayContent.substring(0, 50) + "...";
   }
 
   // 保存引用信息
@@ -13465,7 +13585,7 @@ async function playVoiceMessage(event, msgIndex) {
 // 播放音频
 function playAudioFromUrl(url, voiceBar) {
   console.log("[Voice] Playing audio from URL:", url);
-  
+
   // 先停止之前正在播放的音频
   if (currentPlayingAudio) {
     try {
@@ -13478,10 +13598,10 @@ function playAudioFromUrl(url, voiceBar) {
       currentPlayingBar.classList.remove("playing");
     }
   }
-  
+
   const audio = new Audio();
   audio.preload = "auto";
-  
+
   currentPlayingAudio = audio;
   currentPlayingBar = voiceBar;
   voiceBar.classList.add("playing");
@@ -13511,10 +13631,11 @@ function playAudioFromUrl(url, voiceBar) {
 
   // 设置src并播放
   audio.src = url;
-  
+
   // 使用setTimeout确保在下一个事件循环中播放，避免一些浏览器问题
   setTimeout(() => {
-    audio.play()
+    audio
+      .play()
       .then(() => {
         console.log("[Voice] Audio playing...");
       })
@@ -14399,11 +14520,15 @@ async function generateHeartVoiceParallel(charId, userMessage) {
 
     // 获取最近的对话上下文
     const recentHistory = chatHistories[charId]?.slice(-6) || [];
-    const contextSummary = recentHistory.map(m => {
-      const role = m.role === 'user' ? '用户' : charName;
-      const content = (m.content || '').replace(/<[^>]+>/g, '').substring(0, 50);
-      return `${role}: ${content}`;
-    }).join('\n');
+    const contextSummary = recentHistory
+      .map((m) => {
+        const role = m.role === "user" ? "用户" : charName;
+        const content = (m.content || "")
+          .replace(/<[^>]+>/g, "")
+          .substring(0, 50);
+        return `${role}: ${content}`;
+      })
+      .join("\n");
 
     const systemPrompt = `你要为角色"${charName}"生成内心状态描述。用简单自然的语言，像朋友间聊天那样，不要用华丽的文学修辞。
 
@@ -14429,7 +14554,7 @@ ${persona || "(无特定人设)"}
 只输出JSON，不要其他内容。`;
 
     const userPrompt = `【近期对话上下文】
-${contextSummary || '(暂无上下文)'}
+${contextSummary || "(暂无上下文)"}
 
 【用户刚才说】
 "${userMessage}"
@@ -14695,7 +14820,9 @@ async function initStickerPanel() {
   }
 
   // 【新增】默认选中第一个非默认分组（如果有的话）
-  const nonDefaultCategories = window.stickerCategories.filter(cat => cat !== "默认");
+  const nonDefaultCategories = window.stickerCategories.filter(
+    (cat) => cat !== "默认"
+  );
   if (nonDefaultCategories.length > 0) {
     window.currentCategory = nonDefaultCategories[0];
   } else {
@@ -14757,8 +14884,8 @@ function renderCategoryBar() {
 
   // 【修改】重新排序分类：把"默认"放到最后
   const sortedCategories = [
-    ...window.stickerCategories.filter(cat => cat !== "默认"),
-    ...window.stickerCategories.filter(cat => cat === "默认")
+    ...window.stickerCategories.filter((cat) => cat !== "默认"),
+    ...window.stickerCategories.filter((cat) => cat === "默认"),
   ];
 
   // 渲染所有分类标签（使用排序后的分类）
@@ -14945,7 +15072,7 @@ async function deleteCategory(cat) {
     ]);
 
     // 【修改】切换到第一个非默认分类，如果没有则切换到默认
-    const nonDefaultCats = window.stickerCategories.filter(c => c !== "默认");
+    const nonDefaultCats = window.stickerCategories.filter((c) => c !== "默认");
     if (nonDefaultCats.length > 0) {
       switchCategory(nonDefaultCats[0]);
     } else {
@@ -18356,15 +18483,15 @@ function declineIncomingCall() {
   // 【修复】保存来电角色ID，用于后续发送拒绝后的消息
   const savedCharId = callState.charId;
   const savedCallType = callState.type; // 保存通话类型（voice/video）
-  
+
   document.getElementById("incomingCallOverlay").classList.remove("active");
   callState.status = "idle";
   callState.charId = null;
-  
+
   // 【新增】添加拒绝来电卡片
   if (savedCharId) {
     addDeclineCallCard(savedCharId, savedCallType);
-    
+
     // 延迟一点再触发AI发消息，确保卡片已显示
     setTimeout(() => {
       triggerDeclineCallMessage(savedCharId, savedCallType);
@@ -18375,11 +18502,11 @@ function declineIncomingCall() {
 // 【新增】添加拒绝来电卡片
 function addDeclineCallCard(charId, callType) {
   if (!charId) return;
-  
+
   const icon = callType === "video" ? "▶" : "☎";
   const callTypeText = callType === "video" ? "视频通话" : "语音通话";
   const iconColor = callType === "video" ? "#4caf50" : "#ff9800";
-  
+
   const callHtml = `
     <div style="background:white; padding:10px 14px; border-radius:10px; display:flex; align-items:center; gap:10px; box-shadow:0 1px 3px rgba(0,0,0,0.1);">
       <div style="background:#ffebee; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#f44336;">${icon}</div>
@@ -18389,11 +18516,11 @@ function addDeclineCallCard(charId, callType) {
       </div>
     </div>
   `;
-  
+
   if (!chatHistories[charId]) {
     chatHistories[charId] = [];
   }
-  
+
   // 添加拒绝来电卡片（显示在用户这边，因为是用户拒绝的）
   chatHistories[charId].push({
     role: "user",
@@ -18406,13 +18533,14 @@ function addDeclineCallCard(charId, callType) {
     }),
     timestamp: Date.now(),
   });
-  
+
   // 更新聊天列表预览
-  const previewText = callType === "video" ? "[已拒绝视频通话]" : "[已拒绝语音通话]";
+  const previewText =
+    callType === "video" ? "[已拒绝视频通话]" : "[已拒绝语音通话]";
   if (typeof updateCharacterLastMessage === "function") {
     updateCharacterLastMessage(charId, previewText);
   }
-  
+
   // 保存聊天记录并刷新界面
   localforage.setItem("chatHistories", chatHistories).then(() => {
     requestAnimationFrame(() => {
@@ -18429,29 +18557,29 @@ function addDeclineCallCard(charId, callType) {
 // 【新增】AI来电被拒绝后发消息
 async function triggerDeclineCallMessage(charId, callType) {
   if (!charId) return;
-  
+
   const char = characters.find((c) => c.id === charId);
   if (!char) return;
-  
+
   const settings = chatSettings[charId] || {};
   const apiConfig = getActiveApiConfig();
   if (!apiConfig || !apiConfig.url || !apiConfig.key) {
     console.log("来电拒绝后AI消息: API未配置");
     return;
   }
-  
+
   // 不需要在当前聊天界面才能发消息
   // 直接添加一条AI消息到聊天历史
-  
+
   if (!chatHistories[charId]) {
     chatHistories[charId] = [];
   }
-  
+
   // 构建提示词
   const charName = settings.charName || char.note || char.name || "AI";
   const persona = settings.persona || char.description || "";
   const callTypeText = callType === "video" ? "视频通话" : "语音通话";
-  
+
   const systemPrompt = `你正在扮演${charName}。
 ${persona ? `【角色设定】\n${persona}\n` : ""}
 【情境】
@@ -18463,7 +18591,7 @@ ${persona ? `【角色设定】\n${persona}\n` : ""}
     // 【修复】如果在当前聊天界面，显示正在输入动画
     const isCurrentChat = currentChatCharId === charId;
     let typingIndicator = null;
-    
+
     if (isCurrentChat) {
       const container = document.getElementById("convMessages");
       if (container) {
@@ -18478,7 +18606,7 @@ ${persona ? `【角色设定】\n${persona}\n` : ""}
         typingIndicator = document.getElementById("declineCallTypingIndicator");
       }
     }
-    
+
     // 确保URL格式正确
     let apiUrl = apiConfig.url.replace(/\/$/, "");
     if (!apiUrl.endsWith("/chat/completions")) {
@@ -18488,7 +18616,7 @@ ${persona ? `【角色设定】\n${persona}\n` : ""}
         apiUrl += "/v1/chat/completions";
       }
     }
-    
+
     const response = await fetch(apiUrl, {
       method: "POST",
       headers: {
@@ -18499,36 +18627,39 @@ ${persona ? `【角色设定】\n${persona}\n` : ""}
         model: apiConfig.model,
         messages: [
           { role: "system", content: systemPrompt },
-          { role: "user", content: `你的${callTypeText}被拒绝了，请发一条消息。` },
+          {
+            role: "user",
+            content: `你的${callTypeText}被拒绝了，请发一条消息。`,
+          },
         ],
         temperature: 0.8,
         stream: false,
       }),
     });
-    
+
     // 【修复】移除正在输入动画
     if (typingIndicator) {
       typingIndicator.remove();
     }
-    
+
     if (!response.ok) {
       console.error("来电拒绝后AI消息API请求失败:", response.status);
       return;
     }
-    
+
     const data = await response.json();
     let aiReply = data.choices?.[0]?.message?.content?.trim();
-    
+
     if (!aiReply) {
       console.log("来电拒绝后AI消息: AI返回空内容");
       return;
     }
-    
+
     // 过滤思维链标签
     if (typeof filterThinkingTags === "function") {
       aiReply = filterThinkingTags(aiReply);
     }
-    
+
     // 添加AI消息到聊天历史
     const msgObj = {
       role: "assistant",
@@ -18539,26 +18670,33 @@ ${persona ? `【角色设定】\n${persona}\n` : ""}
       }),
       timestamp: Date.now(),
     };
-    
+
     chatHistories[charId].push(msgObj);
     await localforage.setItem("chatHistories", chatHistories);
-    
+
     // 更新列表预览
     updateCharacterLastMessage(charId, aiReply);
-    
+
     // 如果当前在这个聊天界面，渲染消息
     if (currentChatCharId === charId) {
       renderConversation();
     } else {
       // 不在聊天界面，显示通知
-      showMessageNotification(charId, char.note || char.name, char.avatar, aiReply);
+      showMessageNotification(
+        charId,
+        char.note || char.name,
+        char.avatar,
+        aiReply
+      );
       addUnreadMessage(charId);
     }
-    
+
     console.log("来电拒绝后AI消息发送成功:", aiReply);
   } catch (error) {
     // 【修复】发生错误时也要移除正在输入动画
-    const typingIndicator = document.getElementById("declineCallTypingIndicator");
+    const typingIndicator = document.getElementById(
+      "declineCallTypingIndicator"
+    );
     if (typingIndicator) {
       typingIndicator.remove();
     }
@@ -20767,8 +20905,6 @@ function advanceReadingProgress() {
   // 已禁用自动翻页功能，用户手动翻页
 }
 
-
-
 // ==================== 待办事项功能（四象限月历版） ====================
 window.todoList = [];
 window.todoAiBindings = {};
@@ -20796,7 +20932,7 @@ async function initTodoSystem() {
 
     // 重置重复任务
     await resetRepeatTodos();
-    
+
     // 渲染UI
     renderTodoCalendar();
     renderTodoQuadrants();
@@ -20814,10 +20950,10 @@ async function resetRepeatTodos() {
 
   window.todoList.forEach((todo) => {
     if (!todo.repeat || todo.repeat === "none") return;
-    
+
     const now = new Date();
     let shouldReset = false;
-    
+
     switch (todo.repeat) {
       case "daily":
         shouldReset = true;
@@ -20830,7 +20966,7 @@ async function resetRepeatTodos() {
         shouldReset = now.getDay() === 1;
         break;
     }
-    
+
     if (shouldReset && todo.done) {
       todo.done = false;
       todo.doneAt = null;
@@ -20852,10 +20988,14 @@ function todoNavMonth(dir) {
     window.todoCurrentMonth = 11;
     window.todoCurrentYear--;
   }
-  
+
   // 更新选中日期为该月1号
-  window.selectedTodoDate = new Date(window.todoCurrentYear, window.todoCurrentMonth, 1);
-  
+  window.selectedTodoDate = new Date(
+    window.todoCurrentYear,
+    window.todoCurrentMonth,
+    1
+  );
+
   renderTodoCalendar();
   renderTodoQuadrants();
 }
@@ -20865,15 +21005,19 @@ function todoGoToday() {
   window.todoCurrentYear = today.getFullYear();
   window.todoCurrentMonth = today.getMonth();
   window.selectedTodoDate = today;
-  
+
   renderTodoCalendar();
   renderTodoQuadrants();
-  
+
   // 滚动到今天
   setTimeout(() => {
-    const todayEl = document.querySelector('.todo-day-item.today');
+    const todayEl = document.querySelector(".todo-day-item.today");
     if (todayEl) {
-      todayEl.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      todayEl.scrollIntoView({
+        behavior: "smooth",
+        inline: "center",
+        block: "nearest",
+      });
     }
   }, 100);
 }
@@ -20887,28 +21031,30 @@ function renderTodoCalendar() {
   const year = window.todoCurrentYear;
   const month = window.todoCurrentMonth;
   const today = new Date();
-  
+
   // 获取当月天数
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const weekdays = ["日", "一", "二", "三", "四", "五", "六"];
-  
+
   let html = "";
-  
+
   for (let day = 1; day <= daysInMonth; day++) {
     const date = new Date(year, month, day);
     const dayOfWeek = date.getDay();
     const dateStr = date.toDateString();
-    
+
     const isToday = dateStr === today.toDateString();
     const isSelected = dateStr === window.selectedTodoDate.toDateString();
-    
+
     // 获取该日期的任务
     const tasksForDate = getTodosForDate(date);
     const hasTasks = tasksForDate.length > 0;
-    const allDone = hasTasks && tasksForDate.every(t => t.done);
+    const allDone = hasTasks && tasksForDate.every((t) => t.done);
 
     html += `
-      <div class="todo-day-item ${isSelected ? 'selected' : ''} ${isToday ? 'today' : ''} ${hasTasks ? 'has-tasks' : ''} ${allDone ? 'all-done' : ''}"
+      <div class="todo-day-item ${isSelected ? "selected" : ""} ${
+      isToday ? "today" : ""
+    } ${hasTasks ? "has-tasks" : ""} ${allDone ? "all-done" : ""}"
            onclick="selectTodoDate(${year}, ${month}, ${day})">
         <div class="todo-day-weekday">${weekdays[dayOfWeek]}</div>
         <div class="todo-day-num">${day}</div>
@@ -20923,12 +21069,16 @@ function renderTodoCalendar() {
   if (monthText) {
     monthText.textContent = `${year}年${month + 1}月`;
   }
-  
+
   // 滚动到选中日期
   setTimeout(() => {
-    const selectedEl = container.querySelector('.todo-day-item.selected');
+    const selectedEl = container.querySelector(".todo-day-item.selected");
     if (selectedEl) {
-      selectedEl.scrollIntoView({ behavior: 'auto', inline: 'center', block: 'nearest' });
+      selectedEl.scrollIntoView({
+        behavior: "auto",
+        inline: "center",
+        block: "nearest",
+      });
     }
   }, 50);
 }
@@ -20940,42 +21090,44 @@ function getTodosForDate(date) {
   today.setHours(0, 0, 0, 0);
   const targetDate = new Date(date);
   targetDate.setHours(0, 0, 0, 0);
-  
-  return window.todoList.filter(t => {
-    const taskDate = new Date(t.createdAt);
-    taskDate.setHours(0, 0, 0, 0);
-    
-    // 非重复任务：只在创建日期显示
-    if (!t.repeat || t.repeat === "none") {
-      return taskDate.toDateString() === dateStr;
-    }
-    
-    // 重复任务：只在创建日期及之后显示
-    if (targetDate < taskDate) return false;
-    
-    // 检查重复规则
-    switch(t.repeat) {
-      case "daily":
-        return true;
-      case "weekly":
-        return taskDate.getDay() === targetDate.getDay();
-      case "monthly":
-        return taskDate.getDate() === targetDate.getDate();
-      default:
-        return false;
-    }
-  }).map(t => {
-    // 对于重复任务，判断在目标日期是否完成
-    // 只有今天的完成状态才是真实的，其他日期都显示未完成
-    if (t.repeat && t.repeat !== "none") {
-      const isTargetToday = targetDate.getTime() === today.getTime();
-      return {
-        ...t,
-        done: isTargetToday ? t.done : false
-      };
-    }
-    return t;
-  });
+
+  return window.todoList
+    .filter((t) => {
+      const taskDate = new Date(t.createdAt);
+      taskDate.setHours(0, 0, 0, 0);
+
+      // 非重复任务：只在创建日期显示
+      if (!t.repeat || t.repeat === "none") {
+        return taskDate.toDateString() === dateStr;
+      }
+
+      // 重复任务：只在创建日期及之后显示
+      if (targetDate < taskDate) return false;
+
+      // 检查重复规则
+      switch (t.repeat) {
+        case "daily":
+          return true;
+        case "weekly":
+          return taskDate.getDay() === targetDate.getDay();
+        case "monthly":
+          return taskDate.getDate() === targetDate.getDate();
+        default:
+          return false;
+      }
+    })
+    .map((t) => {
+      // 对于重复任务，判断在目标日期是否完成
+      // 只有今天的完成状态才是真实的，其他日期都显示未完成
+      if (t.repeat && t.repeat !== "none") {
+        const isTargetToday = targetDate.getTime() === today.getTime();
+        return {
+          ...t,
+          done: isTargetToday ? t.done : false,
+        };
+      }
+      return t;
+    });
 }
 
 function selectTodoDate(year, month, day) {
@@ -21007,7 +21159,9 @@ function renderTodoDatePicker() {
   const currentYear = new Date().getFullYear();
   let yearHtml = "";
   for (let y = currentYear - 10; y <= currentYear + 10; y++) {
-    yearHtml += `<div class="todo-picker-item ${y === window.todoPickerYear ? 'selected' : ''}" 
+    yearHtml += `<div class="todo-picker-item ${
+      y === window.todoPickerYear ? "selected" : ""
+    }" 
                      onclick="selectTodoPickerYear(${y})">${y}年</div>`;
   }
   yearPicker.innerHTML = yearHtml;
@@ -21015,15 +21169,17 @@ function renderTodoDatePicker() {
   // 月份列表
   let monthHtml = "";
   for (let m = 0; m < 12; m++) {
-    monthHtml += `<div class="todo-picker-item ${m === window.todoPickerMonth ? 'selected' : ''}"
+    monthHtml += `<div class="todo-picker-item ${
+      m === window.todoPickerMonth ? "selected" : ""
+    }"
                       onclick="selectTodoPickerMonth(${m})">${m + 1}月</div>`;
   }
   monthPicker.innerHTML = monthHtml;
 
   // 滚动到选中项
   setTimeout(() => {
-    yearPicker.querySelector('.selected')?.scrollIntoView({ block: 'center' });
-    monthPicker.querySelector('.selected')?.scrollIntoView({ block: 'center' });
+    yearPicker.querySelector(".selected")?.scrollIntoView({ block: "center" });
+    monthPicker.querySelector(".selected")?.scrollIntoView({ block: "center" });
   }, 50);
 }
 
@@ -21040,7 +21196,11 @@ function selectTodoPickerMonth(month) {
 function confirmTodoDatePicker() {
   window.todoCurrentYear = window.todoPickerYear;
   window.todoCurrentMonth = window.todoPickerMonth;
-  window.selectedTodoDate = new Date(window.todoPickerYear, window.todoPickerMonth, 1);
+  window.selectedTodoDate = new Date(
+    window.todoPickerYear,
+    window.todoPickerMonth,
+    1
+  );
   closeTodoDatePicker();
   renderTodoCalendar();
   renderTodoQuadrants();
@@ -21052,17 +21212,17 @@ function renderTodoQuadrants() {
   const q2List = document.getElementById("todoQ2List");
   const q3List = document.getElementById("todoQ3List");
   const q4List = document.getElementById("todoQ4List");
-  
+
   if (!q1List || !q2List || !q3List || !q4List) return;
 
   // 使用getTodosForDate获取当天任务（正确处理重复任务的完成状态）
   const todayTodos = getTodosForDate(window.selectedTodoDate);
 
   // 按象限分类
-  const q1 = todayTodos.filter(t => t.quadrant === "q1");
-  const q2 = todayTodos.filter(t => t.quadrant === "q2");
-  const q3 = todayTodos.filter(t => t.quadrant === "q3");
-  const q4 = todayTodos.filter(t => t.quadrant === "q4" || !t.quadrant);
+  const q1 = todayTodos.filter((t) => t.quadrant === "q1");
+  const q2 = todayTodos.filter((t) => t.quadrant === "q2");
+  const q3 = todayTodos.filter((t) => t.quadrant === "q3");
+  const q4 = todayTodos.filter((t) => t.quadrant === "q4" || !t.quadrant);
 
   q1List.innerHTML = renderQuadrantTasks(q1);
   q2List.innerHTML = renderQuadrantTasks(q2);
@@ -21089,21 +21249,33 @@ function renderQuadrantTasks(tasks) {
     return b.createdAt - a.createdAt;
   });
 
-  return tasks.map(todo => {
-    const repeatLabel = todo.repeat && todo.repeat !== "none" ? REPEAT_TYPES[todo.repeat] : "";
-    
-    return `
-      <div class="quadrant-task ${todo.done ? 'done' : ''}" data-id="${todo.id}">
-        <div class="quadrant-task-checkbox" onclick="toggleTodoDone('${todo.id}')">
+  return tasks
+    .map((todo) => {
+      const repeatLabel =
+        todo.repeat && todo.repeat !== "none" ? REPEAT_TYPES[todo.repeat] : "";
+
+      return `
+      <div class="quadrant-task ${todo.done ? "done" : ""}" data-id="${
+        todo.id
+      }">
+        <div class="quadrant-task-checkbox" onclick="toggleTodoDone('${
+          todo.id
+        }')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="20 6 9 17 4 12"></polyline>
           </svg>
         </div>
-        <div class="quadrant-task-content" onclick="toggleTodoDone('${todo.id}')">
+        <div class="quadrant-task-content" onclick="toggleTodoDone('${
+          todo.id
+        }')">
           <div class="quadrant-task-text">${escapeHtml(todo.text)}</div>
           <div class="quadrant-task-meta">
-            <span class="quadrant-task-time">${formatTodoTime(todo.createdAt)}</span>
-            ${repeatLabel ? `<span class="quadrant-task-repeat">
+            <span class="quadrant-task-time">${formatTodoTime(
+              todo.createdAt
+            )}</span>
+            ${
+              repeatLabel
+                ? `<span class="quadrant-task-repeat">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M17 1l4 4-4 4"></path>
                 <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
@@ -21111,10 +21283,14 @@ function renderQuadrantTasks(tasks) {
                 <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
               </svg>
               ${repeatLabel}
-            </span>` : ''}
+            </span>`
+                : ""
+            }
           </div>
         </div>
-        <button class="quadrant-task-delete" onclick="deleteTodoItem('${todo.id}')">
+        <button class="quadrant-task-delete" onclick="deleteTodoItem('${
+          todo.id
+        }')">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="18" y1="6" x2="6" y2="18"></line>
             <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -21122,18 +21298,25 @@ function renderQuadrantTasks(tasks) {
         </button>
       </div>
     `;
-  }).join("");
+    })
+    .join("");
 }
 
 function formatTodoTime(ts) {
-  const d = new Date(ts), now = new Date();
+  const d = new Date(ts),
+    now = new Date();
   if (d.toDateString() === now.toDateString()) {
-    return "今天 " + d.getHours().toString().padStart(2, "0") + ":" + d.getMinutes().toString().padStart(2, "0");
+    return (
+      "今天 " +
+      d.getHours().toString().padStart(2, "0") +
+      ":" +
+      d.getMinutes().toString().padStart(2, "0")
+    );
   }
   const y = new Date(now);
   y.setDate(y.getDate() - 1);
   if (d.toDateString() === y.toDateString()) return "昨天";
-  return (d.getMonth() + 1) + "/" + d.getDate();
+  return d.getMonth() + 1 + "/" + d.getDate();
 }
 
 function escapeHtml(t) {
@@ -21148,15 +21331,23 @@ function openTodoModal() {
   if (modal) {
     modal.classList.add("active");
     document.getElementById("todoInputText").value = "";
-    
+
     // 重置象限选择
-    document.querySelectorAll(".todo-quadrant-option").forEach(el => el.classList.remove("selected"));
-    document.querySelector('.todo-quadrant-option[data-quadrant="q1"]')?.classList.add("selected");
-    
+    document
+      .querySelectorAll(".todo-quadrant-option")
+      .forEach((el) => el.classList.remove("selected"));
+    document
+      .querySelector('.todo-quadrant-option[data-quadrant="q1"]')
+      ?.classList.add("selected");
+
     // 重置重复选择
-    document.querySelectorAll(".todo-repeat-item").forEach(el => el.classList.remove("selected"));
-    document.querySelector('.todo-repeat-item[data-repeat="none"]')?.classList.add("selected");
-    
+    document
+      .querySelectorAll(".todo-repeat-item")
+      .forEach((el) => el.classList.remove("selected"));
+    document
+      .querySelector('.todo-repeat-item[data-repeat="none"]')
+      ?.classList.add("selected");
+
     setTimeout(() => document.getElementById("todoInputText")?.focus(), 100);
   }
 }
@@ -21166,12 +21357,16 @@ function closeTodoModal() {
 }
 
 function selectTodoQuadrant(el) {
-  document.querySelectorAll(".todo-quadrant-option").forEach(o => o.classList.remove("selected"));
+  document
+    .querySelectorAll(".todo-quadrant-option")
+    .forEach((o) => o.classList.remove("selected"));
   el.classList.add("selected");
 }
 
 function selectTodoRepeat(el) {
-  document.querySelectorAll(".todo-repeat-item").forEach(o => o.classList.remove("selected"));
+  document
+    .querySelectorAll(".todo-repeat-item")
+    .forEach((o) => o.classList.remove("selected"));
   el.classList.add("selected");
 }
 
@@ -21204,13 +21399,13 @@ async function saveTodoItem() {
   renderTodoCalendar();
   renderTodoQuadrants();
   showToast("添加成功");
-  
+
   // 通知绑定的AI角色
   triggerTodoAddNotification(newTodo);
 }
 
 async function toggleTodoDone(id) {
-  const todo = window.todoList.find(t => t.id === id);
+  const todo = window.todoList.find((t) => t.id === id);
   if (todo) {
     const wasDone = todo.done;
     todo.done = !todo.done;
@@ -21227,7 +21422,7 @@ async function toggleTodoDone(id) {
 }
 
 async function deleteTodoItem(id) {
-  window.todoList = window.todoList.filter(t => t.id !== id);
+  window.todoList = window.todoList.filter((t) => t.id !== id);
   await localforage.setItem("todoList", window.todoList);
   renderTodoCalendar();
   renderTodoQuadrants();
@@ -21236,14 +21431,16 @@ async function deleteTodoItem(id) {
 
 // AI督促 - 完成任务后发送消息到聊天
 async function triggerTodoAiNotification(todo) {
-  const bindingIds = Object.keys(window.todoAiBindings).filter(id => window.todoAiBindings[id]);
+  const bindingIds = Object.keys(window.todoAiBindings).filter(
+    (id) => window.todoAiBindings[id]
+  );
   if (bindingIds.length === 0) return;
 
   const quadrantNames = {
     q1: "重要且紧急",
-    q2: "重要不紧急", 
+    q2: "重要不紧急",
     q3: "紧急不重要",
-    q4: "不重要不紧急"
+    q4: "不重要不紧急",
   };
   const categoryName = quadrantNames[todo.quadrant] || "其他";
 
@@ -21260,15 +21457,17 @@ async function triggerTodoAiNotification(todo) {
   }
 
   for (const charId of bindingIds) {
-    const char = characters.find(c => String(c.id) === String(charId));
+    const char = characters.find((c) => String(c.id) === String(charId));
     if (!char) continue;
 
     // 获取角色完整人设
     const settings = chatSettings[charId] || {};
     const persona = settings.persona || char.description || char.persona || "";
     const charName = settings.charName || char.name || "助手";
-    
-    const systemPrompt = persona ? `你是${charName}。${persona}` : `你是${charName}，一个温柔体贴的AI助手。`;
+
+    const systemPrompt = persona
+      ? `你是${charName}。${persona}`
+      : `你是${charName}，一个温柔体贴的AI助手。`;
     const userPrompt = `用户刚刚完成了一个待办事项：「${todo.text}」（分类：${categoryName}）。请用简短温馨的话鼓励用户，表达你对ta完成任务的认可，不超过50字，符合你的性格特点。`;
 
     try {
@@ -21284,7 +21483,6 @@ async function triggerTodoAiNotification(todo) {
             { role: "system", content: systemPrompt },
             { role: "user", content: userPrompt },
           ],
-          
         }),
       });
 
@@ -21293,7 +21491,13 @@ async function triggerTodoAiNotification(todo) {
         const reply = data.choices?.[0]?.message?.content?.trim();
         if (reply) {
           // 添加消息到聊天记录
-          await addTodoNotificationToChat(charId, char, todo, reply, "todo_complete");
+          await addTodoNotificationToChat(
+            charId,
+            char,
+            todo,
+            reply,
+            "todo_complete"
+          );
           showToast(`${char.name} 发来鼓励~`);
         }
       }
@@ -21305,14 +21509,16 @@ async function triggerTodoAiNotification(todo) {
 
 // AI督促 - 添加任务后发送消息到聊天
 async function triggerTodoAddNotification(todo) {
-  const bindingIds = Object.keys(window.todoAiBindings).filter(id => window.todoAiBindings[id]);
+  const bindingIds = Object.keys(window.todoAiBindings).filter(
+    (id) => window.todoAiBindings[id]
+  );
   if (bindingIds.length === 0) return;
 
   const quadrantNames = {
     q1: "重要且紧急",
-    q2: "重要不紧急", 
+    q2: "重要不紧急",
     q3: "紧急不重要",
-    q4: "不重要不紧急"
+    q4: "不重要不紧急",
   };
   const categoryName = quadrantNames[todo.quadrant] || "其他";
 
@@ -21329,15 +21535,17 @@ async function triggerTodoAddNotification(todo) {
   }
 
   for (const charId of bindingIds) {
-    const char = characters.find(c => String(c.id) === String(charId));
+    const char = characters.find((c) => String(c.id) === String(charId));
     if (!char) continue;
 
     // 获取角色完整人设
     const settings = chatSettings[charId] || {};
     const persona = settings.persona || char.description || char.persona || "";
     const charName = settings.charName || char.name || "助手";
-    
-    const systemPrompt = persona ? `你是${charName}。${persona}` : `你是${charName}，一个温柔体贴的AI助手。`;
+
+    const systemPrompt = persona
+      ? `你是${charName}。${persona}`
+      : `你是${charName}，一个温柔体贴的AI助手。`;
     const userPrompt = `用户刚刚添加了一个新的待办事项：「${todo.text}」（分类：${categoryName}）。请用简短的话回应，可以是鼓励、提醒重要性、或者表示会帮助督促等，不超过50字，符合你的性格特点。`;
 
     try {
@@ -21353,7 +21561,6 @@ async function triggerTodoAddNotification(todo) {
             { role: "system", content: systemPrompt },
             { role: "user", content: userPrompt },
           ],
-          
         }),
       });
 
@@ -21362,7 +21569,13 @@ async function triggerTodoAddNotification(todo) {
         const reply = data.choices?.[0]?.message?.content?.trim();
         if (reply) {
           // 添加消息到聊天记录
-          await addTodoNotificationToChat(charId, char, todo, reply, "todo_add");
+          await addTodoNotificationToChat(
+            charId,
+            char,
+            todo,
+            reply,
+            "todo_add"
+          );
           showToast(`${char.name} 收到了~`);
         }
       }
@@ -21373,17 +21586,23 @@ async function triggerTodoAddNotification(todo) {
 }
 
 // 将督促消息添加到聊天记录
-async function addTodoNotificationToChat(charId, char, todo, reply, notificationType = "todo_complete") {
+async function addTodoNotificationToChat(
+  charId,
+  char,
+  todo,
+  reply,
+  notificationType = "todo_complete"
+) {
   // 确保chatHistories中有该角色的记录
   if (!chatHistories[charId]) {
     chatHistories[charId] = [];
   }
-  
+
   // 根据类型设置不同的卡片信息
   let cardTitle = "";
   let cardDesc = "";
-  
-  switch(notificationType) {
+
+  switch (notificationType) {
     case "binding":
       cardTitle = "督促助手已绑定";
       cardDesc = `${char.name}现在会关注你的待办事项`;
@@ -21398,7 +21617,7 @@ async function addTodoNotificationToChat(charId, char, todo, reply, notification
       cardDesc = todo.text;
       break;
   }
-  
+
   // 添加待办通知卡片
   const todoCard = {
     type: "todo-card",
@@ -21407,22 +21626,22 @@ async function addTodoNotificationToChat(charId, char, todo, reply, notification
     cardDesc: cardDesc,
     timestamp: Date.now() - 1000,
   };
-  
+
   // 添加AI回复消息
   const aiReply = {
     role: "assistant",
     content: reply,
     timestamp: Date.now(),
   };
-  
+
   chatHistories[charId].push(todoCard, aiReply);
-  
+
   // 保存到localforage
   await localforage.setItem("chatHistories", chatHistories);
-  
+
   // 统一使用字符串类型的charId
   const charIdStr = String(charId);
-  
+
   // 如果当前正在查看这个角色的对话，刷新显示
   if (String(currentChatCharId) === charIdStr) {
     if (typeof renderConversation === "function") {
@@ -21430,7 +21649,7 @@ async function addTodoNotificationToChat(charId, char, todo, reply, notification
     }
   } else {
     // 不在当前对话，增加未读消息计数并显示弹窗
-    const charObj = characters.find(c => String(c.id) === charIdStr);
+    const charObj = characters.find((c) => String(c.id) === charIdStr);
     if (charObj) {
       // 使用addUnreadMessage来正确更新未读
       if (typeof addUnreadMessage === "function") {
@@ -21438,13 +21657,18 @@ async function addTodoNotificationToChat(charId, char, todo, reply, notification
       }
       // 显示消息弹窗通知
       if (typeof showMessageNotification === "function") {
-        showMessageNotification(charObj.id, charObj.note || charObj.name, charObj.avatar, reply);
+        showMessageNotification(
+          charObj.id,
+          charObj.note || charObj.name,
+          charObj.avatar,
+          reply
+        );
       }
     }
   }
-  
+
   // 更新消息列表预览
-  const charObj = characters.find(c => String(c.id) === charIdStr);
+  const charObj = characters.find((c) => String(c.id) === charIdStr);
   if (charObj && typeof updateCharacterLastMessage === "function") {
     updateCharacterLastMessage(charObj.id, reply);
   }
@@ -21460,14 +21684,16 @@ function renderTodoAiCharList() {
   }
 
   let html = "";
-  characters.forEach(char => {
+  characters.forEach((char) => {
     const isActive = window.todoAiBindings[char.id];
     const avatar = char.avatar
       ? `<img src="${char.avatar}" />`
       : char.name.charAt(0);
 
     html += `
-      <div class="todo-ai-item ${isActive ? 'active' : ''}" onclick="toggleTodoAiBinding('${char.id}')">
+      <div class="todo-ai-item ${
+        isActive ? "active" : ""
+      }" onclick="toggleTodoAiBinding('${char.id}')">
         <div class="todo-ai-avatar">${avatar}</div>
         <div class="todo-ai-name">${char.name}</div>
       </div>
@@ -21482,7 +21708,7 @@ async function toggleTodoAiBinding(charId) {
   window.todoAiBindings[charId] = !window.todoAiBindings[charId];
   await localforage.setItem("todoAiBindings", window.todoAiBindings);
   renderTodoAiCharList();
-  
+
   if (window.todoAiBindings[charId] && !wasBinding) {
     showToast("已绑定督促助手");
     // 发送绑定欢迎消息
@@ -21494,26 +21720,26 @@ async function toggleTodoAiBinding(charId) {
 
 // AI绑定时发送欢迎消息
 async function triggerTodoAiBindingMessage(charId) {
-  const char = characters.find(c => String(c.id) === String(charId));
+  const char = characters.find((c) => String(c.id) === String(charId));
   if (!char) return;
-  
+
   const apiConfig = getActiveApiConfig();
   if (!apiConfig || !apiConfig.url || !apiConfig.key) {
     console.log("未配置API，跳过绑定欢迎消息");
     return;
   }
-  
+
   // 获取角色人设
   const settings = chatSettings[charId] || {};
   const persona = settings.persona || char.description || char.persona || "";
   const charName = settings.charName || char.name || "助手";
-  
+
   // 获取当前待办列表
-  const pending = window.todoList.filter(t => !t.done);
+  const pending = window.todoList.filter((t) => !t.done);
   let todoInfo = "";
   if (pending.length > 0) {
     todoInfo = `\n用户当前有${pending.length}个待办事项：\n`;
-    pending.slice(0, 3).forEach(t => {
+    pending.slice(0, 3).forEach((t) => {
       todoInfo += `- ${t.text}\n`;
     });
     if (pending.length > 3) {
@@ -21522,15 +21748,17 @@ async function triggerTodoAiBindingMessage(charId) {
   } else {
     todoInfo = "\n用户目前没有待办事项。";
   }
-  
+
   let apiUrl = apiConfig.url.replace(/\/$/, "");
   if (!apiUrl.endsWith("/chat/completions")) {
     apiUrl += "/chat/completions";
   }
-  
-  const systemPrompt = persona ? `你是${charName}。${persona}` : `你是${charName}，一个温柔体贴的AI助手。`;
+
+  const systemPrompt = persona
+    ? `你是${charName}。${persona}`
+    : `你是${charName}，一个温柔体贴的AI助手。`;
   const userPrompt = `用户刚刚把你设为了待办事项督促助手，你现在可以看到用户的待办事项了。${todoInfo}\n\n请用符合你性格的方式打个招呼，表示你会帮助用户管理待办事项。简短温馨，不超过80字。`;
-  
+
   try {
     const resp = await fetch(apiUrl, {
       method: "POST",
@@ -21544,15 +21772,20 @@ async function triggerTodoAiBindingMessage(charId) {
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
-        
       }),
     });
-    
+
     if (resp.ok) {
       const data = await resp.json();
       const reply = data.choices?.[0]?.message?.content?.trim();
       if (reply) {
-        await addTodoNotificationToChat(charId, char, { text: "绑定督促助手" }, reply, "binding");
+        await addTodoNotificationToChat(
+          charId,
+          char,
+          { text: "绑定督促助手" },
+          reply,
+          "binding"
+        );
         showToast(`${char.name} 发来消息~`);
       }
     }
@@ -21565,33 +21798,33 @@ async function triggerTodoAiBindingMessage(charId) {
 function generateTodoPromptForAi(charId) {
   if (!window.todoAiBindings[charId]) return "";
 
-  const pending = window.todoList.filter(t => !t.done);
+  const pending = window.todoList.filter((t) => !t.done);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const todayTime = today.getTime();
-  
+
   // 获取今天完成的待办
-  const completedToday = window.todoList.filter(t => {
+  const completedToday = window.todoList.filter((t) => {
     if (!t.done || !t.doneAt) return false;
     return t.doneAt >= todayTime;
   });
-  
+
   // 如果没有待办事项，返回空
   if (pending.length === 0 && completedToday.length === 0) return "";
 
   const quadrantNames = {
     q1: "重要且紧急",
     q2: "重要不紧急",
-    q3: "紧急不重要", 
-    q4: "不重要不紧急"
+    q3: "紧急不重要",
+    q4: "不重要不紧急",
   };
 
   let prompt = "\n\n[待办事项信息]\n";
-  
+
   // 显示未完成的待办
   if (pending.length > 0) {
     prompt += "未完成的待办：\n";
-    pending.slice(0, 5).forEach(t => {
+    pending.slice(0, 5).forEach((t) => {
       const qName = quadrantNames[t.quadrant] || "其他";
       prompt += `- ${t.text} (${qName})\n`;
     });
@@ -21599,20 +21832,21 @@ function generateTodoPromptForAi(charId) {
       prompt += `...还有${pending.length - 5}项未完成\n`;
     }
   }
-  
+
   // 显示今天已完成的待办
   if (completedToday.length > 0) {
     prompt += "\n今天已完成：\n";
-    completedToday.slice(0, 3).forEach(t => {
+    completedToday.slice(0, 3).forEach((t) => {
       prompt += `- ✓ ${t.text}\n`;
     });
     if (completedToday.length > 3) {
       prompt += `...还有${completedToday.length - 3}项已完成\n`;
     }
   }
-  
+
   if (pending.length > 0) {
-    prompt += "\n请在合适的时机温柔地提醒用户完成待办，也可以表扬用户完成的事项。";
+    prompt +=
+      "\n请在合适的时机温柔地提醒用户完成待办，也可以表扬用户完成的事项。";
   } else {
     prompt += "\n用户今天完成了所有待办，可以适当表扬鼓励！";
   }
@@ -22197,7 +22431,9 @@ function renderVisibilityOptions() {
     const typeIcon = group.type === "exclude" ? "🙈" : "👁️";
     html += `<div class="ig-visibility-option custom-group ${
       isSelected ? "selected" : ""
-    }" data-value="custom_${group.id}" onclick="toggleVisibilityGroup('custom_${group.id}', this)">
+    }" data-value="custom_${group.id}" onclick="toggleVisibilityGroup('custom_${
+      group.id
+    }', this)">
       <span class="check-icon">✓</span> 
       <span class="group-type-badge">${typeIcon}</span>
       ${group.name}
@@ -22283,7 +22519,7 @@ function closeGroupManageModal() {
 function renderCustomGroupList() {
   const container = document.getElementById("customGroupList");
   if (!container) return;
-  
+
   if (customVisibilityGroups.length === 0) {
     container.innerHTML = `
       <div class="ig-group-empty">
@@ -22299,13 +22535,13 @@ function renderCustomGroupList() {
     `;
     return;
   }
-  
+
   let html = "";
-  customVisibilityGroups.forEach(group => {
+  customVisibilityGroups.forEach((group) => {
     const typeIcon = group.type === "exclude" ? "🙈" : "👁️";
     const typeTag = group.type === "exclude" ? "不给谁看" : "部分可见";
     const typeClass = group.type === "exclude" ? "exclude" : "";
-    
+
     html += `
       <div class="ig-group-item" data-group-id="${group.id}">
         <div class="ig-group-icon ${typeClass}">${typeIcon}</div>
@@ -22333,7 +22569,7 @@ function renderCustomGroupList() {
       </div>
     `;
   });
-  
+
   container.innerHTML = html;
 }
 
@@ -22342,49 +22578,49 @@ function openIgGroupModal() {
   editingCustomGroupId = null;
   tempGroupMembers = [];
   tempGroupType = "include";
-  
+
   document.getElementById("igGroupTitle").textContent = "新建分组";
   document.getElementById("customGroupNameInput").value = "";
-  
+
   // 重置类型选择
-  document.querySelectorAll(".ig-group-type-option").forEach(opt => {
+  document.querySelectorAll(".ig-group-type-option").forEach((opt) => {
     opt.classList.remove("selected");
     if (opt.dataset.type === "include") {
       opt.classList.add("selected");
     }
   });
-  
+
   updateMembersLabel();
   renderGroupMemberList();
   updateGroupMemberCount();
-  
+
   document.getElementById("igCreateGroupModal").classList.add("active");
 }
 
 // 编辑分组
 function editCustomGroup(groupId) {
-  const group = customVisibilityGroups.find(g => g.id === groupId);
+  const group = customVisibilityGroups.find((g) => g.id === groupId);
   if (!group) return;
-  
+
   editingCustomGroupId = groupId;
   tempGroupMembers = [...group.members];
   tempGroupType = group.type;
-  
+
   document.getElementById("igGroupTitle").textContent = "编辑分组";
   document.getElementById("customGroupNameInput").value = group.name;
-  
+
   // 设置类型选择
-  document.querySelectorAll(".ig-group-type-option").forEach(opt => {
+  document.querySelectorAll(".ig-group-type-option").forEach((opt) => {
     opt.classList.remove("selected");
     if (opt.dataset.type === group.type) {
       opt.classList.add("selected");
     }
   });
-  
+
   updateMembersLabel();
   renderGroupMemberList();
   updateGroupMemberCount();
-  
+
   document.getElementById("igCreateGroupModal").classList.add("active");
 }
 
@@ -22397,7 +22633,7 @@ function closeIgGroupModal() {
 // 选择分组类型
 function selectGroupType(type, el) {
   tempGroupType = type;
-  document.querySelectorAll(".ig-group-type-option").forEach(opt => {
+  document.querySelectorAll(".ig-group-type-option").forEach((opt) => {
     opt.classList.remove("selected");
   });
   el.classList.add("selected");
@@ -22408,7 +22644,8 @@ function selectGroupType(type, el) {
 function updateMembersLabel() {
   const label = document.getElementById("membersLabel");
   if (label) {
-    label.textContent = tempGroupType === "exclude" ? "选择不给谁看" : "选择可见的人";
+    label.textContent =
+      tempGroupType === "exclude" ? "选择不给谁看" : "选择可见的人";
   }
 }
 
@@ -22416,32 +22653,32 @@ function updateMembersLabel() {
 function renderGroupMemberList(searchTerm = "") {
   const container = document.getElementById("groupMemberList");
   if (!container) return;
-  
+
   const chars = window.characters || [];
-  
+
   if (chars.length === 0) {
     container.innerHTML = `<div class="ig-members-empty">还没有好友，去聊天页面添加角色吧</div>`;
     return;
   }
-  
+
   let filteredChars = chars;
   if (searchTerm) {
     const term = searchTerm.toLowerCase();
-    filteredChars = chars.filter(char => {
+    filteredChars = chars.filter((char) => {
       const name = (char.note || char.name || "").toLowerCase();
       return name.includes(term);
     });
   }
-  
+
   if (filteredChars.length === 0) {
     container.innerHTML = `<div class="ig-members-empty">没有找到匹配的好友</div>`;
     return;
   }
-  
+
   let html = "";
-  filteredChars.forEach(char => {
+  filteredChars.forEach((char) => {
     const isSelected = tempGroupMembers.includes(String(char.id));
-    
+
     let avatarHtml = "";
     if (char.avatar) {
       if (char.avatar.startsWith("data:") || char.avatar.startsWith("http")) {
@@ -22452,18 +22689,18 @@ function renderGroupMemberList(searchTerm = "") {
     } else {
       avatarHtml = `<span class="avatar-emoji">🤖</span>`;
     }
-    
+
     html += `
-      <div class="ig-member-item ${isSelected ? 'selected' : ''}" 
+      <div class="ig-member-item ${isSelected ? "selected" : ""}" 
            data-char-id="${char.id}" 
            onclick="toggleGroupMember('${char.id}', this)">
-        <div class="ig-member-checkbox">${isSelected ? '✓' : ''}</div>
+        <div class="ig-member-checkbox">${isSelected ? "✓" : ""}</div>
         <div class="ig-member-avatar">${avatarHtml}</div>
-        <div class="ig-member-name">${char.note || char.name || '未命名'}</div>
+        <div class="ig-member-name">${char.note || char.name || "未命名"}</div>
       </div>
     `;
   });
-  
+
   container.innerHTML = html;
 }
 
@@ -22476,7 +22713,7 @@ function filterGroupMemberList(value) {
 function toggleGroupMember(charId, el) {
   const id = String(charId);
   const index = tempGroupMembers.indexOf(id);
-  
+
   if (index > -1) {
     tempGroupMembers.splice(index, 1);
     el.classList.remove("selected");
@@ -22486,22 +22723,26 @@ function toggleGroupMember(charId, el) {
     el.classList.add("selected");
     el.querySelector(".ig-member-checkbox").textContent = "✓";
   }
-  
+
   updateGroupMemberCount();
 }
 
 // 全选成员
 function selectAllGroupMembers() {
   const chars = window.characters || [];
-  tempGroupMembers = chars.map(c => String(c.id));
-  renderGroupMemberList(document.getElementById("groupMemberSearch")?.value || "");
+  tempGroupMembers = chars.map((c) => String(c.id));
+  renderGroupMemberList(
+    document.getElementById("groupMemberSearch")?.value || ""
+  );
   updateGroupMemberCount();
 }
 
 // 清空选择
 function deselectAllGroupMembers() {
   tempGroupMembers = [];
-  renderGroupMemberList(document.getElementById("groupMemberSearch")?.value || "");
+  renderGroupMemberList(
+    document.getElementById("groupMemberSearch")?.value || ""
+  );
   updateGroupMemberCount();
 }
 
@@ -22516,26 +22757,28 @@ function updateGroupMemberCount() {
 // 保存分组
 async function saveCustomGroup() {
   const name = document.getElementById("customGroupNameInput").value.trim();
-  
+
   if (!name) {
     showToast("请输入分组名称");
     return;
   }
-  
+
   if (tempGroupMembers.length === 0) {
     showToast("请至少选择一个人");
     return;
   }
-  
+
   if (editingCustomGroupId) {
     // 编辑模式
-    const index = customVisibilityGroups.findIndex(g => g.id === editingCustomGroupId);
+    const index = customVisibilityGroups.findIndex(
+      (g) => g.id === editingCustomGroupId
+    );
     if (index > -1) {
       customVisibilityGroups[index] = {
         ...customVisibilityGroups[index],
         name: name,
         type: tempGroupType,
-        members: [...tempGroupMembers]
+        members: [...tempGroupMembers],
       };
     }
     showToast("分组已更新");
@@ -22546,12 +22789,12 @@ async function saveCustomGroup() {
       name: name,
       type: tempGroupType,
       members: [...tempGroupMembers],
-      createdAt: Date.now()
+      createdAt: Date.now(),
     };
     customVisibilityGroups.push(newGroup);
     showToast("分组创建成功");
   }
-  
+
   await saveCustomGroups();
   closeIgGroupModal();
   renderCustomGroupList();
@@ -22561,8 +22804,10 @@ async function saveCustomGroup() {
 // 删除分组
 async function deleteCustomGroup(groupId) {
   if (!confirm("确定要删除这个分组吗？")) return;
-  
-  customVisibilityGroups = customVisibilityGroups.filter(g => g.id !== groupId);
+
+  customVisibilityGroups = customVisibilityGroups.filter(
+    (g) => g.id !== groupId
+  );
   await saveCustomGroups();
   renderCustomGroupList();
   renderVisibilityOptions();
@@ -22680,13 +22925,15 @@ async function aiInteractWithPost(post) {
     eligibleChars = window.characters.filter((char) => {
       const settings = chatSettings[char.id] || {};
       const charId = String(char.id);
-      
+
       for (const groupKey of post.visibleGroups) {
         // 检查是否是自定义分组
         if (groupKey.startsWith("custom_")) {
           const customGroupId = groupKey.replace("custom_", "");
-          const customGroup = customVisibilityGroups.find(g => g.id === customGroupId);
-          
+          const customGroup = customVisibilityGroups.find(
+            (g) => g.id === customGroupId
+          );
+
           if (customGroup) {
             if (customGroup.type === "include") {
               // 部分可见：只有在成员列表中的才能看
@@ -22709,7 +22956,7 @@ async function aiInteractWithPost(post) {
       }
       return false;
     });
-    
+
     console.log(
       "可见分组:",
       post.visibleGroups,
@@ -22952,7 +23199,7 @@ ${hasRealImage ? "6. 动态中包含一张图片，请根据图片内容来评�
         body: JSON.stringify({
           model: apiConfigToUse.model,
           messages: [{ role: "user", content: simplePrompt }],
-          
+
           temperature: 0.7,
         }),
       });
@@ -24630,7 +24877,7 @@ async function sendBackgroundMessage(charId, content) {
   if (document.visibilityState === "hidden") {
     console.log("后台活动：App在后台，发送系统通知...");
     let notifyName = char.note || char.name || "AI伴侣";
-    
+
     if ("serviceWorker" in navigator && navigator.serviceWorker.controller) {
       navigator.serviceWorker.ready
         .then((registration) => {
@@ -24807,12 +25054,13 @@ function showMomentNotification(char, content) {
   if (document.visibilityState === "hidden") {
     console.log("动态通知：App在后台，发送系统通知...");
     let notifyName = char.note || char.name || "AI伴侣";
-    
+
     if ("serviceWorker" in navigator && navigator.serviceWorker.controller) {
       navigator.serviceWorker.ready
         .then((registration) => {
           registration.showNotification(notifyName + " 发布了新动态", {
-            body: content.length > 50 ? content.substring(0, 50) + "..." : content,
+            body:
+              content.length > 50 ? content.substring(0, 50) + "..." : content,
             icon: char.avatar || "https://i.postimg.cc/8kmQwCr0/IMG-2897.jpg",
             tag: "moment-" + Date.now(),
             renotify: true,
@@ -27625,26 +27873,26 @@ function parseStickersFromText(text) {
 // ========== 存储诊断工具 ==========
 async function diagnoseStorage() {
   console.log("========== 存储诊断开始 ==========");
-  
+
   // 1. 检查 localforage 是否可用
-  if (typeof localforage === 'undefined') {
+  if (typeof localforage === "undefined") {
     console.error("❌ localforage 库未加载！");
     alert("错误：localforage 库未加载，数据无法保存！");
     return;
   }
   console.log("✓ localforage 库已加载");
-  
+
   // 2. 检查当前使用的存储驱动
   const driver = localforage.driver();
   console.log("当前存储驱动:", driver);
-  
+
   // 3. 测试写入和读取
   try {
     const testKey = "__test_" + Date.now();
     await localforage.setItem(testKey, "test_value");
     const retrieved = await localforage.getItem(testKey);
     await localforage.removeItem(testKey);
-    
+
     if (retrieved === "test_value") {
       console.log("✓ 存储读写测试通过");
     } else {
@@ -27653,12 +27901,12 @@ async function diagnoseStorage() {
   } catch (err) {
     console.error("❌ 存储读写测试失败:", err);
   }
-  
+
   // 4. 列出所有已保存的键
   try {
     const keys = await localforage.keys();
     console.log("已保存的数据键 (" + keys.length + " 个):", keys);
-    
+
     // 5. 计算大致存储大小
     let totalSize = 0;
     for (const key of keys) {
@@ -27666,32 +27914,45 @@ async function diagnoseStorage() {
         const value = await localforage.getItem(key);
         const size = new Blob([JSON.stringify(value)]).size;
         totalSize += size;
-        if (size > 100000) { // 大于100KB的数据
-          console.log(`  ⚠️ 大数据: ${key} = ${(size/1024/1024).toFixed(2)} MB`);
+        if (size > 100000) {
+          // 大于100KB的数据
+          console.log(
+            `  ⚠️ 大数据: ${key} = ${(size / 1024 / 1024).toFixed(2)} MB`
+          );
         }
       } catch (e) {
         console.log(`  ❌ 无法读取: ${key}`);
       }
     }
-    console.log("总存储大小约: " + (totalSize/1024/1024).toFixed(2) + " MB");
-    
+    console.log(
+      "总存储大小约: " + (totalSize / 1024 / 1024).toFixed(2) + " MB"
+    );
+
     // 6. 检查关键数据是否存在
-    const criticalKeys = ['userBg', 'userAvatar', 'userName', 'userBio', 'characters', 'chatHistories', 'mysteryTitle', 'polaroidImg'];
+    const criticalKeys = [
+      "userBg",
+      "userAvatar",
+      "userName",
+      "userBio",
+      "characters",
+      "chatHistories",
+      "mysteryTitle",
+      "polaroidImg",
+    ];
     console.log("--- 关键数据检查 ---");
     for (const key of criticalKeys) {
       const value = await localforage.getItem(key);
       if (value) {
         const size = new Blob([JSON.stringify(value)]).size;
-        console.log(`  ✓ ${key}: ${(size/1024).toFixed(1)} KB`);
+        console.log(`  ✓ ${key}: ${(size / 1024).toFixed(1)} KB`);
       } else {
         console.log(`  ○ ${key}: 未设置`);
       }
     }
-    
   } catch (err) {
     console.error("❌ 无法获取存储键:", err);
   }
-  
+
   // 7. 检查存储配额（如果浏览器支持）
   if (navigator.storage && navigator.storage.estimate) {
     try {
@@ -27699,8 +27960,10 @@ async function diagnoseStorage() {
       const usedMB = (estimate.usage / 1024 / 1024).toFixed(2);
       const quotaMB = (estimate.quota / 1024 / 1024).toFixed(2);
       const percent = ((estimate.usage / estimate.quota) * 100).toFixed(1);
-      console.log(`存储配额: 已用 ${usedMB} MB / 总共 ${quotaMB} MB (${percent}%)`);
-      
+      console.log(
+        `存储配额: 已用 ${usedMB} MB / 总共 ${quotaMB} MB (${percent}%)`
+      );
+
       if (percent > 80) {
         console.warn("⚠️ 存储空间使用超过80%！");
       }
@@ -27708,9 +27971,11 @@ async function diagnoseStorage() {
       console.log("无法获取存储配额信息");
     }
   }
-  
+
   console.log("========== 存储诊断结束 ==========");
-  console.log("提示：如果看到错误，请尝试在设置中清理不需要的数据，或导出重要数据后清除浏览器缓存");
+  console.log(
+    "提示：如果看到错误，请尝试在设置中清理不需要的数据，或导出重要数据后清除浏览器缓存"
+  );
 }
 
 // 页面加载后自动运行诊断
@@ -27771,7 +28036,7 @@ async function loadPolaroidData() {
       const el = document.getElementById("polaroidTextDisplay");
       if (el) el.innerText = savedP_Text;
     }
-    
+
     console.log("✓ 拍立得数据加载完成");
   } catch (err) {
     console.error("读取拍立得数据出错:", err);
@@ -27890,10 +28155,13 @@ async function loadMysteryWidgetData() {
     const savedImg1 = await localforage.getItem("mysteryImg1");
     const savedImg2 = await localforage.getItem("mysteryImg2");
 
-    if (savedTitle) document.getElementById("mysteryTitle").innerText = savedTitle;
-    if (savedText1) document.getElementById("mysteryText1").innerText = savedText1;
-    if (savedText2) document.getElementById("mysteryText2").innerText = savedText2;
-    
+    if (savedTitle)
+      document.getElementById("mysteryTitle").innerText = savedTitle;
+    if (savedText1)
+      document.getElementById("mysteryText1").innerText = savedText1;
+    if (savedText2)
+      document.getElementById("mysteryText2").innerText = savedText2;
+
     // 加载图片时隐藏emoji
     if (savedImg1) {
       const img1 = document.getElementById("mysteryImg1");
@@ -27913,7 +28181,7 @@ async function loadMysteryWidgetData() {
       }
       if (emoji2) emoji2.style.display = "none";
     }
-    
+
     console.log("✓ 神秘卡片数据加载完成");
   } catch (err) {
     console.error("读取神秘卡片数据出错:", err);
@@ -27961,11 +28229,11 @@ function handleMysteryImgUpload(cardNum, input) {
       const result = e.target.result;
       const imgEl = document.getElementById("mysteryImg" + cardNum);
       const emojiEl = document.getElementById("mysteryEmoji" + cardNum);
-      
+
       imgEl.src = result;
       imgEl.style.display = "block";
       if (emojiEl) emojiEl.style.display = "none";
-      
+
       try {
         await localforage.setItem("mysteryImg" + cardNum, result);
         console.log("✓ 图片已保存");
