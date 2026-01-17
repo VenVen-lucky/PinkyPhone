@@ -926,11 +926,13 @@ async function verifyActivationCode() {
     return;
   }
 
-  // 获取管理员密钥哈希
-  const adminKeyHash = await localforage.getItem("adminKeyHash");
+  // 获取或自动创建管理员密钥哈希
+  let adminKeyHash = await localforage.getItem("adminKeyHash");
   if (!adminKeyHash) {
-    showToast("系统未初始化，请联系管理员");
-    return;
+    // 自动初始化默认密钥（首次使用时）
+    const defaultKey = "pinkyphone_default_key_2026";
+    adminKeyHash = await simpleHash(defaultKey);
+    await localforage.setItem("adminKeyHash", adminKeyHash);
   }
 
   // 验证激活码：密钥哈希前8位 + 设备码 的哈希
@@ -26231,43 +26233,46 @@ function applyAppearanceSettings() {
       el.style.color = settings.fontColor;
     });
 
-  // 应用APP名称和图标 (love-widget是第1个子元素，所以app从第2个开始)
+  // 应用APP名称和图标 - 修复后的选择器
   const appMappings = {
-    chat: {
-      iconSelector: ".apps-grid > .app-item:nth-child(2) .app-icon",
-      nameSelector: ".apps-grid > .app-item:nth-child(2) .app-name",
-    },
-    worldbook: {
-      iconSelector: ".apps-grid > .app-item:nth-child(3) .app-icon",
-      nameSelector: ".apps-grid > .app-item:nth-child(3) .app-name",
-    },
-    preset: {
-      iconSelector: ".apps-grid > .app-item:nth-child(4) .app-icon",
-      nameSelector: ".apps-grid > .app-item:nth-child(4) .app-name",
-    },
-    forum: {
-      iconSelector: ".apps-grid > .app-item:nth-child(5) .app-icon",
-      nameSelector: ".apps-grid > .app-item:nth-child(5) .app-name",
-    },
+    // 左侧区域 (apps-left 内, mystery-widget是第1个)
     couple: {
-      iconSelector: ".apps-grid > .app-item:nth-child(6) .app-icon",
-      nameSelector: ".apps-grid > .app-item:nth-child(6) .app-name",
+      iconSelector: ".apps-left > .app-item:nth-child(2) .app-icon",
+      nameSelector: ".apps-left > .app-item:nth-child(2) .app-name",
     },
     companion: {
-      iconSelector: ".apps-grid > .app-item:nth-child(7) .app-icon",
-      nameSelector: ".apps-grid > .app-item:nth-child(7) .app-name",
+      iconSelector: ".apps-left > .app-item:nth-child(3) .app-icon",
+      nameSelector: ".apps-left > .app-item:nth-child(3) .app-name",
     },
+    // 右侧区域 (apps-right 内)
+    chat: {
+      iconSelector: ".apps-right > .app-item:nth-child(1) .app-icon",
+      nameSelector: ".apps-right > .app-item:nth-child(1) .app-name",
+    },
+    worldbook: {
+      iconSelector: ".apps-right > .app-item:nth-child(2) .app-icon",
+      nameSelector: ".apps-right > .app-item:nth-child(2) .app-name",
+    },
+    preset: {
+      iconSelector: ".apps-right > .app-item:nth-child(3) .app-icon",
+      nameSelector: ".apps-right > .app-item:nth-child(3) .app-name",
+    },
+    forum: {
+      iconSelector: ".apps-right > .app-item:nth-child(4) .app-icon",
+      nameSelector: ".apps-right > .app-item:nth-child(4) .app-name",
+    },
+    // dock 底部栏
     api: {
-      iconSelector: ".dock .dock-item:nth-child(1) .dock-icon",
-      nameSelector: ".dock .dock-item:nth-child(1) .dock-label",
+      iconSelector: ".dock > .dock-item:nth-child(1) .dock-icon",
+      nameSelector: ".dock > .dock-item:nth-child(1) .dock-label",
     },
     font: {
-      iconSelector: ".dock .dock-item:nth-child(2) .dock-icon",
-      nameSelector: ".dock .dock-item:nth-child(2) .dock-label",
+      iconSelector: ".dock > .dock-item:nth-child(2) .dock-icon",
+      nameSelector: ".dock > .dock-item:nth-child(2) .dock-label",
     },
     appearance: {
-      iconSelector: ".dock .dock-item:nth-child(3) .dock-icon",
-      nameSelector: ".dock .dock-item:nth-child(3) .dock-label",
+      iconSelector: ".dock > .dock-item:nth-child(3) .dock-icon",
+      nameSelector: ".dock > .dock-item:nth-child(3) .dock-label",
     },
   };
 
