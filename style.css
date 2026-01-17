@@ -6,11 +6,13 @@
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
+  outline: none;
+  font-family: inherit;
 }
 
 /* 全局修复：确保没有意外的右侧阴影或边框 */
 html, body, .phone-container, .main-content, .page, .chat-app {
-  border-right: none !important;
+  border: none !important;
   box-shadow: none !important;
   outline: none !important;
 }
@@ -34,6 +36,10 @@ html, body, .phone-container, .main-content, .page, .chat-app {
   --accent-green: #c5e1a5;
   --shadow: rgba(0, 0, 0, 0.08);
   --font-main: "Noto Sans SC", -apple-system, BlinkMacSystemFont, sans-serif;
+  
+  /* 安全区域变量 - 适配不同iPhone机型 */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
 
   /* Z-Index层级管理 */
   --z-base: 1;
@@ -63,17 +69,27 @@ html, body, .phone-container, .main-content, .page, .chat-app {
 
 html {
   -webkit-text-size-adjust: 100%;
-  height: 100%;
+  width: 100%;
+  height: 100vh;
   background: #fce4ec;
+  overflow: hidden;
+  overscroll-behavior: none;
 }
 
 body {
   margin: 0;
-  height: 100%;
+  padding: 0;
+  width: 100%;
+  height: 100vh;
   overflow: hidden;
   position: relative;
   font-family: var(--font-main);
   background: var(--bg-pink);
+  overscroll-behavior: none;
+  -webkit-user-select: none;
+  user-select: none;
+  /* 防止右侧阴影 */
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Polka dot background */
@@ -133,20 +149,23 @@ body::before {
 
 .phone-container {
   width: 100%;
-  height: 100vh;
+  height: 100%;
   position: relative;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   background: var(--bg-pink);
+  border: none;
+  box-shadow: none;
+  outline: none;
 }
 
 /* Main scrollable content */
 .main-content {
   flex: 1;
   padding: 16px;
-  padding-top: calc(16px + env(safe-area-inset-top));
-  padding-bottom: 90px;
+  padding-top: calc(16px + var(--safe-top));
+  padding-bottom: calc(120px + var(--safe-bottom));
   overflow-y: auto;
   overflow-x: hidden;
 }
@@ -683,7 +702,7 @@ body::before {
 /* Bottom Dock - iOS风格浮动胶囊 */
 .dock {
   position: fixed;
-  bottom: 24px;
+  bottom: 25px;
   left: 50%;
   transform: translateX(-50%);
   width: calc(100% - 40px);
@@ -781,16 +800,18 @@ body::before {
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
+  width: 100%;
+  height: 100%;
   background: var(--bg-pink);
   z-index: var(--z-nav);
   padding: 16px;
   padding-top: calc(16px + env(safe-area-inset-top));
   padding-bottom: calc(20px + env(safe-area-inset-bottom));
   overflow-y: auto;
-  border: none;
-  box-shadow: none;
+  overflow-x: hidden;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
 }
 
 .page::before {
@@ -16463,4 +16484,64 @@ input[type="range"]::-webkit-slider-thumb {
 .msg-bubble.voice-message-bubble {
   border-radius: 7.5px !important;
   margin: 0 !important;
+}
+
+/* ============ 全局边缘阴影修复 ============ */
+/* 防止iOS Safari产生边缘阴影 */
+html, body, .phone-container, .main-content, .page {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
+/* 确保所有固定定位元素不超出屏幕 */
+[style*="position: fixed"],
+[style*="position:fixed"] {
+  max-width: 100vw !important;
+}
+
+
+/* ============ 全局修复：确保所有弹出页面默认隐藏 ============ */
+/* 这些页面在没有 .active 或 .open 类时应该完全隐藏 */
+.music-together-page,
+.phone-peek-page,
+.read-together-page,
+.chat-settings-page,
+.chat-conversation-page {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+}
+
+/* 只有当添加 active/open 类时才显示 */
+.music-together-page.active,
+.music-together-page.open,
+.phone-peek-page.active,
+.phone-peek-page.open,
+.read-together-page.active,
+.read-together-page.open,
+.chat-settings-page.active,
+.chat-settings-page.open,
+.chat-conversation-page.active,
+.chat-conversation-page.open {
+  display: flex !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  opacity: 1 !important;
+}
+
+/* 选择器overlay也要默认隐藏 */
+.phone-peek-selector-overlay {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+}
+
+.phone-peek-selector-overlay.active,
+.phone-peek-selector-overlay.open {
+  display: flex !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  opacity: 1 !important;
 }

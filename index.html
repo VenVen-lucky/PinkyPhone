@@ -8440,7 +8440,18 @@
       }
 
       // 可以在用户首次点击页面任意位置时触发申请权限，或者做一个专门的按钮
-      document.body.addEventListener("click", requestNotificationPermission, {
+      // 修复：使用更安全的方式请求通知权限，避免干扰其他功能
+      document.body.addEventListener("click", function(e) {
+        // 确保不是点击在任何弹出页面或overlay上
+        const ignoredElements = [
+          '.phone-peek-page', '.music-together-page', '.read-together-page',
+          '.phone-peek-selector-overlay', '.modal', '.overlay', '.popup'
+        ];
+        if (ignoredElements.some(sel => e.target.closest(sel))) {
+          return;
+        }
+        requestNotificationPermission();
+      }, {
         once: true,
       });
     </script>
