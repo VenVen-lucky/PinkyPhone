@@ -231,6 +231,9 @@ async function initApp() {
     // ========== 加载拍立得小组件数据 ==========
     await loadPolaroidData();
 
+    // ========== 加载气泡样式预设 ==========
+    await loadBubbleStylePresets();
+
     // 如果有自定义字体，应用它
     if (window.activeFontId !== "system") {
       const font = window.fontPresets.find((f) => f.id == window.activeFontId);
@@ -8192,6 +8195,12 @@ function openChatSettings() {
 
   // Show settings page
   document.getElementById("chatSettingsPage").classList.add("active");
+  
+  // 初始化CSS实时预览监听
+  setTimeout(initCSSPreviewListener, 100);
+  
+  // 更新气泡样式预设下拉框
+  setTimeout(updateBubbleStyleDropdown, 100);
 }
 
 // 打开群聊设置
@@ -10592,6 +10601,12 @@ function applyCustomStyles(settings) {
   const existingBubbleStyle = document.getElementById("bubbleColorStyle");
   if (existingBubbleStyle) existingBubbleStyle.remove();
 
+  // 如果有自定义CSS，移除颜色选择器样式
+  if (settings.customCSS && settings.customCSS.trim()) {
+    const existingBgStyle = document.getElementById("chatBubbleBgStyle");
+    if (existingBgStyle) existingBgStyle.remove();
+  }
+
   // Apply background to the entire conversation page
   const convPage = document.getElementById("chatConversationPage");
   const convMessages = document.getElementById("convMessages");
@@ -10612,23 +10627,39 @@ function applyCustomStyles(settings) {
   const bubbles = document.querySelectorAll(".msg-bubble");
   bubbles.forEach((b) => (b.style.fontSize = settings.fontSize + "px"));
 
-  // Apply bubble text colors
-  const userColor = settings.userBubbleColor || "#c2185b";
-  const aiColor = settings.aiBubbleColor || "#37474f";
-  const bubbleColorStyle = document.createElement("style");
-  bubbleColorStyle.id = "bubbleColorStyle";
-  bubbleColorStyle.textContent = `
-    .msg-row.user .msg-bubble { color: ${userColor} !important; }
-    .msg-row.ai .msg-bubble { color: ${aiColor} !important; }
-  `;
-  document.head.appendChild(bubbleColorStyle);
+  // 如果没有自定义CSS，才应用颜色选择器的字体颜色
+  if (!settings.customCSS || !settings.customCSS.trim()) {
+    // Apply bubble text colors
+    const userColor = settings.userBubbleColor || "#c2185b";
+    const aiColor = settings.aiBubbleColor || "#37474f";
+    const bubbleColorStyle = document.createElement("style");
+    bubbleColorStyle.id = "bubbleColorStyle";
+    bubbleColorStyle.textContent = `
+      .msg-row.user .msg-bubble { color: ${userColor} !important; }
+      .msg-row.ai .msg-bubble { color: ${aiColor} !important; }
+    `;
+    document.head.appendChild(bubbleColorStyle);
+  }
 
-  // Apply custom CSS - 使用 !important 确保用户样式优先级最高
-  if (settings.customCSS) {
+  // Apply custom CSS - 自动添加 !important 确保样式生效
+  if (settings.customCSS && settings.customCSS.trim()) {
     const style = document.createElement("style");
     style.id = "chatCustomStyle";
-    // 用户自定义CSS放在最后，优先级最高
-    style.textContent = `/* 用户自定义样式 - 优先级最高 */\n${settings.customCSS}`;
+    // 处理用户CSS，为关键属性添加 !important
+    let processedCSS = settings.customCSS;
+    // 为常见属性添加 !important（如果没有的话）
+    const propsToEnhance = ['background', 'background-color', 'color', 'border-radius', 'border', 'box-shadow', 'backdrop-filter', '-webkit-backdrop-filter'];
+    propsToEnhance.forEach(prop => {
+      // 匹配属性值但不包含 !important 的情况
+      const regex = new RegExp(`(${prop}\\s*:\\s*)([^;!]+)(;)`, 'gi');
+      processedCSS = processedCSS.replace(regex, (match, p1, p2, p3) => {
+        if (!p2.includes('!important')) {
+          return `${p1}${p2.trim()} !important${p3}`;
+        }
+        return match;
+      });
+    });
+    style.textContent = `/* 用户自定义样式 */\n${processedCSS}`;
     document.head.appendChild(style);
   }
 }
@@ -10967,7 +10998,247 @@ function triggerManualSummary() {
 }
 
 function manageBubbleStyles() {
-  alert("气泡样式管理功能开发中...");
+  // 创建气泡样式管理弹窗
+  const overlay = document.createElement("div");
+  overlay.id = "bubbleStyleManagerOverlay";
+  overlay.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  `;
+  
+  const modal = document.createElement("div");
+  modal.style.cssText = `
+    background: white;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 400px;
+    max-height: 80vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  `;
+  
+  const presets = window.bubbleStylePresets || [];
+  
+  // SVG图标
+  const saveIcon = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>`;
+  const trashIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`;
+  const paletteIcon = `<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5"></circle><circle cx="17.5" cy="10.5" r=".5"></circle><circle cx="8.5" cy="7.5" r=".5"></circle><circle cx="6.5" cy="12" r=".5"></circle><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.555C21.965 6.012 17.461 2 12 2z"></path></svg>`;
+  
+  modal.innerHTML = `
+    <div style="padding: 20px; border-bottom: 1px solid #eee;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h3 style="margin: 0; font-size: 18px; color: #333;">气泡样式预设</h3>
+        <button onclick="closeBubbleStyleManager()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #999; line-height: 1;">×</button>
+      </div>
+    </div>
+    <div style="flex: 1; overflow-y: auto; padding: 16px;">
+      <div style="margin-bottom: 16px;">
+        <button onclick="saveBubbleStylePreset()" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #f8bbd9, #f48fb1); color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+          ${saveIcon} 保存当前样式为预设
+        </button>
+      </div>
+      <div id="bubblePresetList">
+        ${presets.length === 0 ? `
+          <div style="text-align: center; padding: 40px 20px; color: #999;">
+            <div style="margin-bottom: 12px;">${paletteIcon}</div>
+            <p>还没有保存的预设</p>
+            <p style="font-size: 12px;">在自定义CSS中编写样式后<br>点击上方按钮保存</p>
+          </div>
+        ` : presets.map((p, i) => `
+          <div style="background: #f9f9f9; border-radius: 14px; padding: 14px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px;">
+            <div style="flex: 1;">
+              <div style="font-weight: 600; color: #333; margin-bottom: 4px;">${p.name}</div>
+              <div style="font-size: 12px; color: #999;">${p.createdAt || '未知时间'}</div>
+            </div>
+            <button onclick="applyBubblePreset(${i})" style="padding: 8px 16px; background: #f48fb1; color: white; border: none; border-radius: 8px; font-size: 13px; cursor: pointer;">应用</button>
+            <button onclick="deleteBubblePreset(${i})" style="padding: 8px 12px; background: #ff5252; color: white; border: none; border-radius: 8px; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center;">${trashIcon}</button>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+  
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+  
+  // 点击遮罩关闭
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) closeBubbleStyleManager();
+  });
+}
+
+function closeBubbleStyleManager() {
+  const overlay = document.getElementById('bubbleStyleManagerOverlay');
+  if (overlay) overlay.remove();
+}
+
+// 保存当前样式为预设
+async function saveBubbleStylePreset() {
+  const css = document.getElementById("settingsCustomCSS").value.trim();
+  if (!css) {
+    showToast("请先在自定义CSS中编写样式");
+    return;
+  }
+  
+  const name = prompt("请输入预设名称：");
+  if (!name) return;
+  
+  if (!window.bubbleStylePresets) window.bubbleStylePresets = [];
+  
+  window.bubbleStylePresets.push({
+    name: name,
+    css: css,
+    createdAt: new Date().toLocaleDateString('zh-CN')
+  });
+  
+  await localforage.setItem('bubbleStylePresets', window.bubbleStylePresets);
+  showToast("预设已保存");
+  closeBubbleStyleManager();
+  updateBubbleStyleDropdown(); // 刷新下拉框
+  manageBubbleStyles(); // 重新打开刷新列表
+}
+
+// 应用预设
+function applyBubblePreset(index) {
+  const preset = window.bubbleStylePresets[index];
+  if (preset) {
+    document.getElementById("settingsCustomCSS").value = preset.css;
+    updateCSSPreview();
+    updateBubbleStyleDropdown(); // 刷新下拉框
+    // 设置下拉框选中状态
+    const select = document.getElementById("settingsBubbleStyle");
+    if (select) select.value = `preset_${index}`;
+    showToast(`已应用「${preset.name}」`);
+    closeBubbleStyleManager();
+  }
+}
+
+// 删除预设
+async function deleteBubblePreset(index) {
+  if (!confirm("确定要删除这个预设吗？")) return;
+  
+  window.bubbleStylePresets.splice(index, 1);
+  await localforage.setItem('bubbleStylePresets', window.bubbleStylePresets);
+  showToast("已删除");
+  updateBubbleStyleDropdown(); // 刷新下拉框
+  closeBubbleStyleManager();
+  manageBubbleStyles();
+}
+
+// 加载气泡预设
+async function loadBubbleStylePresets() {
+  try {
+    const saved = await localforage.getItem('bubbleStylePresets');
+    window.bubbleStylePresets = saved || [];
+  } catch(e) {
+    window.bubbleStylePresets = [];
+  }
+}
+
+// CSS实时预览功能
+function updateCSSPreview() {
+  const css = document.getElementById("settingsCustomCSS")?.value || "";
+  
+  // 移除旧的预览样式
+  const existingPreview = document.getElementById("cssPreviewStyle");
+  if (existingPreview) existingPreview.remove();
+  
+  if (!css.trim()) return;
+  
+  // 将用户的CSS转换为预览区域的样式
+  let previewCSS = css
+    // 处理各种可能的选择器格式
+    // .msg-row.user .msg-bubble 或 .msg-row.user.msg-bubble
+    .replace(/\.msg-row\.user\s*\.msg-bubble/gi, '.preview-msg-row.right .preview-bubble')
+    .replace(/\.msg-row\.ai\s*\.msg-bubble/gi, '.preview-msg-row:not(.right) .preview-bubble')
+    // 处理带伪元素的选择器（先处理，避免被后面的规则影响）
+    .replace(/\.msg-row\.user\s*\.msg-bubble::after/gi, '.preview-msg-row.right .preview-bubble::after')
+    .replace(/\.msg-row\.ai\s*\.msg-bubble::after/gi, '.preview-msg-row:not(.right) .preview-bubble::after')
+    // 处理通用 .msg-bubble（注意不要匹配已经转换过的）
+    .replace(/(?<!preview-)\.msg-bubble(?![\w-])/g, '.preview-bubble');
+  
+  // 移除伪元素样式（预览区不需要尾巴）
+  previewCSS = previewCSS.replace(/\.preview-bubble::after\s*\{[^}]*\}/gi, '');
+  
+  // 添加预览样式
+  const style = document.createElement("style");
+  style.id = "cssPreviewStyle";
+  style.textContent = `/* CSS预览样式 */\n${previewCSS}`;
+  document.head.appendChild(style);
+}
+
+// 初始化CSS输入框的实时预览监听
+function initCSSPreviewListener() {
+  const cssInput = document.getElementById("settingsCustomCSS");
+  if (cssInput && !cssInput.dataset.previewInit) {
+    cssInput.addEventListener("input", updateCSSPreview);
+    cssInput.dataset.previewInit = "true";
+    // 初始化时也更新一次预览
+    updateCSSPreview();
+  }
+}
+
+// 更新气泡样式预设下拉框
+function updateBubbleStyleDropdown() {
+  const select = document.getElementById("settingsBubbleStyle");
+  if (!select) return;
+  
+  const presets = window.bubbleStylePresets || [];
+  const settings = chatSettings[currentChatCharId] || {};
+  const currentPresetId = settings.bubbleStylePresetId || "none";
+  
+  // 清空并重建选项（只保留"无预设"）
+  select.innerHTML = '<option value="none">-- 无预设 --</option>';
+  
+  // 添加用户保存的预设
+  presets.forEach((preset, index) => {
+    const option = document.createElement("option");
+    option.value = `preset_${index}`;
+    option.textContent = preset.name;
+    if (`preset_${index}` === currentPresetId) {
+      option.selected = true;
+    }
+    select.appendChild(option);
+  });
+  
+  // 添加change事件监听
+  if (!select.dataset.listenerInit) {
+    select.addEventListener("change", onBubbleStyleSelect);
+    select.dataset.listenerInit = "true";
+  }
+}
+
+// 当选择预设时
+function onBubbleStyleSelect(e) {
+  const value = e.target.value;
+  
+  if (value === "none") {
+    // 清空自定义CSS
+    document.getElementById("settingsCustomCSS").value = "";
+    updateCSSPreview();
+    return;
+  }
+  
+  // 应用用户预设
+  if (value.startsWith("preset_")) {
+    const index = parseInt(value.replace("preset_", ""));
+    const preset = window.bubbleStylePresets[index];
+    if (preset) {
+      document.getElementById("settingsCustomCSS").value = preset.css;
+      updateCSSPreview();
+      showToast(`已应用「${preset.name}」`);
+    }
+  }
 }
 
 function exportBubbleStyle() {
@@ -16248,6 +16519,19 @@ function applyChatBubbleStyle(
   aiBgOpacity,
   aiTextColor
 ) {
+  // 检查是否有自定义CSS - 如果有，则跳过颜色选择器的样式
+  // 同时检查已保存的设置和当前输入框的值
+  const settings = chatSettings[currentChatCharId] || {};
+  const currentInputCSS = document.getElementById("settingsCustomCSS")?.value || "";
+  const hasCustomCSS = (settings.customCSS && settings.customCSS.trim()) || currentInputCSS.trim();
+  
+  if (hasCustomCSS) {
+    // 有自定义CSS，不应用颜色选择器的样式
+    const existingStyle = document.getElementById("chatBubbleBgStyle");
+    if (existingStyle) existingStyle.remove();
+    return;
+  }
+  
   // 转换颜色为RGBA
   const hexToRgba = (hex, opacity) => {
     const r = parseInt(hex.slice(1, 3), 16);

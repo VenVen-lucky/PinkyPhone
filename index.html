@@ -56,6 +56,7 @@
     <link rel="stylesheet" href="continue_chat.css" />
     <link rel="stylesheet" href="forum_app.css" />
     <link rel="stylesheet" href="companion.css" />
+    <link rel="stylesheet" href="couple_space.css" />
   </head>
   <body>
     <!-- Decorative stars -->
@@ -148,39 +149,75 @@
               <!-- 神秘卡片小组件 (占两列) -->
               <div class="mystery-widget widget-2x2" id="mysteryWidget">
                 <!-- 手写体标题 -->
-                <div class="mystery-title" id="mysteryTitle" onclick="editMysteryTitle()">
+                <div
+                  class="mystery-title"
+                  id="mysteryTitle"
+                  onclick="editMysteryTitle()"
+                >
                   Pinky Phone
                 </div>
-                
+
                 <!-- 第一个胶囊卡片：图片在左 -->
-                <div class="mystery-capsule capsule-img-left" onclick="handleMysteryCard1Click(event)">
-                  <div class="mystery-capsule-img" onclick="event.stopPropagation(); document.getElementById('mysteryImg1Input').click()">
+                <div
+                  class="mystery-capsule capsule-img-left"
+                  onclick="handleMysteryCard1Click(event)"
+                >
+                  <div
+                    class="mystery-capsule-img"
+                    onclick="event.stopPropagation(); document.getElementById('mysteryImg1Input').click()"
+                  >
                     <span class="mystery-emoji" id="mysteryEmoji1">🐰</span>
-                    <img id="mysteryImg1" src="" style="display: none" alt="">
+                    <img id="mysteryImg1" src="" style="display: none" alt="" />
                   </div>
-                  <div class="mystery-capsule-text" id="mysteryText1" onclick="event.stopPropagation(); editMysteryText(1)">
+                  <div
+                    class="mystery-capsule-text"
+                    id="mysteryText1"
+                    onclick="event.stopPropagation(); editMysteryText(1)"
+                  >
                     请输入文字
                   </div>
                 </div>
-                
+
                 <!-- 第二个胶囊卡片：图片在右 -->
-                <div class="mystery-capsule capsule-img-right" onclick="handleMysteryCard2Click(event)">
-                  <div class="mystery-capsule-text" id="mysteryText2" onclick="event.stopPropagation(); editMysteryText(2)">
+                <div
+                  class="mystery-capsule capsule-img-right"
+                  onclick="handleMysteryCard2Click(event)"
+                >
+                  <div
+                    class="mystery-capsule-text"
+                    id="mysteryText2"
+                    onclick="event.stopPropagation(); editMysteryText(2)"
+                  >
                     请输入文字
                   </div>
-                  <div class="mystery-capsule-img" onclick="event.stopPropagation(); document.getElementById('mysteryImg2Input').click()">
+                  <div
+                    class="mystery-capsule-img"
+                    onclick="event.stopPropagation(); document.getElementById('mysteryImg2Input').click()"
+                  >
                     <span class="mystery-emoji" id="mysteryEmoji2">🐰</span>
-                    <img id="mysteryImg2" src="" style="display: none" alt="">
+                    <img id="mysteryImg2" src="" style="display: none" alt="" />
                   </div>
                 </div>
-                
+
                 <!-- 隐藏的文件输入 -->
-                <input type="file" id="mysteryImg1Input" class="hidden-input" accept="image/*" onchange="handleMysteryImgUpload(1, this)">
-                <input type="file" id="mysteryImg2Input" class="hidden-input" accept="image/*" onchange="handleMysteryImgUpload(2, this)">
+                <input
+                  type="file"
+                  id="mysteryImg1Input"
+                  class="hidden-input"
+                  accept="image/*"
+                  onchange="handleMysteryImgUpload(1, this)"
+                />
+                <input
+                  type="file"
+                  id="mysteryImg2Input"
+                  class="hidden-input"
+                  accept="image/*"
+                  onchange="handleMysteryImgUpload(2, this)"
+                />
               </div>
 
               <!-- 左侧APP -->
-              <div class="app-item" onclick="openPage('coupleSpacePage')">
+              <div class="app-item" onclick="openCoupleSpace()">
                 <div class="app-icon gradient-pink">情侣</div>
                 <span class="app-name">情侣空间</span>
               </div>
@@ -190,8 +227,22 @@
               </div>
               <div class="app-item" onclick="openPhonePeekSelector()">
                 <div class="app-icon gradient-cyan" id="appIcon_phonepeek">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                    <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                  >
+                    <rect
+                      x="5"
+                      y="2"
+                      width="14"
+                      height="20"
+                      rx="2"
+                      ry="2"
+                    ></rect>
                     <line x1="12" y1="18" x2="12.01" y2="18"></line>
                   </svg>
                 </div>
@@ -220,13 +271,30 @@
 
               <!-- 拍立得小组件 -->
               <div class="polaroid-widget widget-2x2" id="polaroidWidget">
-                <div class="polaroid-photo-area" onclick="triggerPolaroidUpload()">
-                  <img id="polaroidImgDisplay" src="https://images.unsplash.com/photo-1516961642265-531546e84af2?auto=format&fit=crop&w=400&q=80" alt="拍立得"/>
+                <div
+                  class="polaroid-photo-area"
+                  onclick="triggerPolaroidUpload()"
+                >
+                  <img
+                    id="polaroidImgDisplay"
+                    src="https://images.unsplash.com/photo-1516961642265-531546e84af2?auto=format&fit=crop&w=400&q=80"
+                    alt="拍立得"
+                  />
                 </div>
-                <div class="polaroid-caption" id="polaroidTextDisplay" onclick="editPolaroidText(event)">
+                <div
+                  class="polaroid-caption"
+                  id="polaroidTextDisplay"
+                  onclick="editPolaroidText(event)"
+                >
                   My Moment
                 </div>
-                <input type="file" id="polaroidInput" hidden accept="image/*" onchange="handlePolaroidChange(this)">
+                <input
+                  type="file"
+                  id="polaroidInput"
+                  hidden
+                  accept="image/*"
+                  onchange="handlePolaroidChange(this)"
+                />
               </div>
             </div>
           </div>
@@ -1560,7 +1628,8 @@
           <button class="preset-back-btn" onclick="closePage('presetPage')">
             ←
           </button>
-          <span class="preset-title"
+          <span
+            class="preset-title"
             onclick="handlePresetTitleClick(event)"
             data-click-count="0"
             ><svg
@@ -1786,80 +1855,125 @@
           </button>
         </div>
       </div>
-      
+
       <!-- 激活码弹窗 -->
       <div class="activation-modal" id="activationModal">
         <div class="activation-modal-content">
           <div class="activation-modal-header">
             <span class="activation-modal-title">🔐 导入功能激活</span>
-            <button class="activation-modal-close" onclick="closeActivationModal()">✕</button>
+            <button
+              class="activation-modal-close"
+              onclick="closeActivationModal()"
+            >
+              ✕
+            </button>
           </div>
           <div class="activation-modal-body">
             <div class="activation-device-section">
               <div class="activation-label">您的设备码</div>
-              <div class="activation-device-code" id="activationDeviceCode">加载中...</div>
-              <button class="activation-copy-btn" onclick="copyDeviceCode()">📋 复制设备码</button>
-              <div class="activation-hint">请将此设备码发送给管理员获取激活码</div>
+              <div class="activation-device-code" id="activationDeviceCode">
+                加载中...
+              </div>
+              <button class="activation-copy-btn" onclick="copyDeviceCode()">
+                📋 复制设备码
+              </button>
+              <div class="activation-hint">
+                请将此设备码发送给管理员获取激活码
+              </div>
             </div>
             <div class="activation-input-section">
               <div class="activation-label">输入激活码</div>
-              <input 
-                type="text" 
-                class="activation-input" 
-                id="activationCodeInput" 
+              <input
+                type="text"
+                class="activation-input"
+                id="activationCodeInput"
                 placeholder="请输入管理员提供的激活码..."
                 maxlength="32"
               />
             </div>
           </div>
           <div class="activation-modal-footer">
-            <button class="activation-btn cancel" onclick="closeActivationModal()">取消</button>
-            <button class="activation-btn confirm" onclick="verifyActivationCode()">激活</button>
+            <button
+              class="activation-btn cancel"
+              onclick="closeActivationModal()"
+            >
+              取消
+            </button>
+            <button
+              class="activation-btn confirm"
+              onclick="verifyActivationCode()"
+            >
+              激活
+            </button>
           </div>
         </div>
       </div>
-      
+
       <!-- 管理员激活码生成弹窗 -->
       <div class="activation-modal" id="adminActivationModal">
         <div class="activation-modal-content">
           <div class="activation-modal-header">
             <span class="activation-modal-title">🔑 管理员 - 生成激活码</span>
-            <button class="activation-modal-close" onclick="closeAdminActivationModal()">✕</button>
+            <button
+              class="activation-modal-close"
+              onclick="closeAdminActivationModal()"
+            >
+              ✕
+            </button>
           </div>
           <div class="activation-modal-body">
             <div class="activation-input-section">
               <div class="activation-label">管理员密钥</div>
-              <input 
-                type="password" 
-                class="activation-input" 
-                id="adminSecretKey" 
+              <input
+                type="password"
+                class="activation-input"
+                id="adminSecretKey"
                 placeholder="输入您设置的管理员密钥..."
               />
               <div class="activation-hint">首次使用会自动设置为管理员密钥</div>
             </div>
             <div class="activation-input-section">
               <div class="activation-label">用户设备码</div>
-              <input 
-                type="text" 
-                class="activation-input" 
-                id="userDeviceCodeInput" 
+              <input
+                type="text"
+                class="activation-input"
+                id="userDeviceCodeInput"
                 placeholder="粘贴用户发送的设备码..."
                 maxlength="16"
               />
             </div>
-            <div class="activation-result-section" id="generatedCodeSection" style="display:none">
+            <div
+              class="activation-result-section"
+              id="generatedCodeSection"
+              style="display: none"
+            >
               <div class="activation-label">生成的激活码</div>
-              <div class="activation-generated-code" id="generatedActivationCode"></div>
-              <button class="activation-copy-btn" onclick="copyGeneratedCode()">📋 复制激活码</button>
+              <div
+                class="activation-generated-code"
+                id="generatedActivationCode"
+              ></div>
+              <button class="activation-copy-btn" onclick="copyGeneratedCode()">
+                📋 复制激活码
+              </button>
             </div>
           </div>
           <div class="activation-modal-footer">
-            <button class="activation-btn cancel" onclick="closeAdminActivationModal()">取消</button>
-            <button class="activation-btn confirm" onclick="generateActivationCode()">生成激活码</button>
+            <button
+              class="activation-btn cancel"
+              onclick="closeAdminActivationModal()"
+            >
+              取消
+            </button>
+            <button
+              class="activation-btn confirm"
+              onclick="generateActivationCode()"
+            >
+              生成激活码
+            </button>
           </div>
         </div>
       </div>
-      
+
       <input
         type="file"
         id="presetFileInput"
@@ -2209,16 +2323,6 @@
         <div class="page-content" id="forumPageContent" style="padding: 0">
           <!-- 由JS动态渲染 -->
         </div>
-      </div>
-
-      <div id="coupleSpacePage" class="page">
-        <div class="page-header">
-          <button class="back-btn" onclick="closePage('coupleSpacePage')">
-            ←
-          </button>
-          <h1 class="page-title">情侣空间</h1>
-        </div>
-        <div class="page-content">情侣空间功能开发中...</div>
       </div>
 
       <div id="companionPage" class="page">
@@ -4108,7 +4212,9 @@
               stroke-linecap="round"
               stroke-linejoin="round"
             >
-              <path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3z"></path>
+              <path
+                d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3z"
+              ></path>
               <path d="M9.5 17v1a2.5 2.5 0 0 0 5 0v-1"></path>
             </svg>
           </button>
@@ -6216,10 +6322,6 @@
               <div class="form-select-wrapper">
                 <select class="form-select" id="settingsBubbleStyle">
                   <option value="none">-- 无预设 --</option>
-                  <option value="simple">简约风格</option>
-                  <option value="bubble">气泡风格</option>
-                  <option value="modern">现代风格</option>
-                  <option value="retro">复古风格</option>
                 </select>
                 <button class="form-btn-small" onclick="manageBubbleStyles()">
                   管理
@@ -8343,5 +8445,15 @@
       });
     </script>
     <script src="companion_patch.js"></script>
+    <script src="couple_space.js"></script>
+    <div class="page" id="coupleSpacePage">
+      <div class="page-header">
+        <button class="back-btn" onclick="closePage('coupleSpacePage')">
+          ←
+        </button>
+        <span class="page-title">情侣空间</span>
+      </div>
+      <div class="page-content"></div>
+    </div>
   </body>
 </html>
