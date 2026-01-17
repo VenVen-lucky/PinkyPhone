@@ -26177,6 +26177,7 @@ window.appearanceSettings = {
     appearance: { name: "外观设置", icon: null },
     couple: { name: "情侣空间", icon: null },
     companion: { name: "陪伴", icon: null },
+    phonepeek: { name: "查手机", icon: null },
   },
 };
 
@@ -26196,6 +26197,7 @@ async function loadAppearanceSettings() {
         appearance: { name: "外观设置", icon: null },
         couple: { name: "情侣空间", icon: null },
         companion: { name: "陪伴", icon: null },
+        phonepeek: { name: "查手机", icon: null },
       };
       window.appearanceSettings = {
         ...saved,
@@ -26243,6 +26245,10 @@ function applyAppearanceSettings() {
     companion: {
       iconSelector: ".apps-left > .app-item:nth-child(3) .app-icon",
       nameSelector: ".apps-left > .app-item:nth-child(3) .app-name",
+    },
+    phonepeek: {
+      iconSelector: ".apps-left > .app-item:nth-child(4) .app-icon",
+      nameSelector: ".apps-left > .app-item:nth-child(4) .app-name",
     },
     // 右侧区域 (apps-right 内)
     chat: {
