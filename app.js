@@ -12026,6 +12026,9 @@ function applySystemFont() {
   // 移除全局样式
   const style = document.getElementById("global-custom-font");
   if (style) style.remove();
+  
+  // 重置CSS变量
+  document.documentElement.style.setProperty('--font-main', '"Noto Sans SC", -apple-system, BlinkMacSystemFont, sans-serif');
 
   renderFontPresets();
   showToast("已恢复默认字体");
@@ -12045,8 +12048,24 @@ function injectGlobalFont(sourceStr) {
                                   src: ${sourceStr};
                                   font-display: swap;
                               }
+                              /* 设置CSS变量 */
+                              :root {
+                                  --font-main: 'CustomGlobalFont', "Noto Sans SC", sans-serif !important;
+                              }
                               /* 强制覆盖所有元素的字体 */
-                              body, button, input, textarea, select, .chat-title, .message-preview, .msg-bubble {
+                              *, *::before, *::after,
+                              body, html,
+                              button, input, textarea, select, option,
+                              h1, h2, h3, h4, h5, h6, p, span, div, a, li, label,
+                              .chat-title, .message-preview, .msg-bubble, .msg-text,
+                              .app-name, .dock-label, .page-title, .section-title,
+                              .preset-name, .preset-detail, .preset-item,
+                              .form-label, .form-input, .form-textarea,
+                              .modal-title, .modal-content,
+                              .toast, .btn, .tag,
+                              .cs-name, .cs-days-num, .cs-feature-name,
+                              .cs-pet-name, .cs-mood-label,
+                              [class*="title"], [class*="text"], [class*="label"], [class*="name"], [class*="content"] {
                                   font-family: 'CustomGlobalFont', "Noto Sans SC", sans-serif !important;
                               }
                             `;
