@@ -6492,20 +6492,37 @@
               </button>
             </div>
             <div class="form-group" style="margin-top: 16px">
-              <label class="form-label">自定义CSS</label>
-              <button
-                class="form-btn-small"
-                onclick="resetCustomCSS()"
-                style="float: right; margin-top: -28px"
-              >
-                重置
-              </button>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <label class="form-label" style="margin-bottom: 0;">自定义CSS</label>
+                <button class="form-btn-small" onclick="resetCustomCSS()">
+                  重置
+                </button>
+              </div>
               <div class="css-editor-container">
                 <textarea
                   class="css-editor"
                   id="settingsCustomCSS"
                   placeholder="/* 在此输入自定义CSS代码 */"
                 ></textarea>
+              </div>
+              <!-- 保存按钮区域 -->
+              <div style="margin-top: 12px; display: flex; gap: 8px;">
+                <button 
+                  id="bubbleSavePresetBtn"
+                  class="action-btn" 
+                  onclick="saveOrUpdateBubblePreset()"
+                  style="flex: 1; background: linear-gradient(135deg, #f8bbd9, #f48fb1); color: white; border: none;"
+                >
+                  <span id="bubbleSavePresetBtnText">💾 保存为新预设</span>
+                </button>
+                <button 
+                  class="action-btn" 
+                  onclick="saveAsNewBubblePreset()"
+                  style="padding: 10px 14px; background: #fff; color: #f48fb1; border: 2px solid #f48fb1;"
+                  title="另存为新预设"
+                >
+                  ＋
+                </button>
               </div>
             </div>
 

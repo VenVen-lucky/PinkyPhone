@@ -25,6 +25,9 @@ window.editingWorldbookId = null; // 正在编辑的世界书ID
 window.editingEntryIndex = null; // 正在编辑的条目索引
 window.tempWorldbookEntries = []; // 临时条目列表
 
+// 气泡样式系统变量
+window.currentBubblePresetIndex = null; // 当前选中的气泡预设索引
+
 // 转发卡片渲染函数（备份，如果forum_app.js未加载则使用此函数）
 window.renderRetweetCard =
   window.renderRetweetCard ||
@@ -11207,6 +11210,7 @@ function updateBubbleStyleDropdown() {
     option.textContent = preset.name;
     if (`preset_${index}` === currentPresetId) {
       option.selected = true;
+      window.currentBubblePresetIndex = index; // 同步当前预设索引
     }
     select.appendChild(option);
   });
@@ -11216,6 +11220,8 @@ function updateBubbleStyleDropdown() {
     select.addEventListener("change", onBubbleStyleSelect);
     select.dataset.listenerInit = "true";
   }
+  
+  updateSavePresetButton(); // 更新按钮状态
 }
 
 // 当选择预设时
@@ -11225,7 +11231,9 @@ function onBubbleStyleSelect(e) {
   if (value === "none") {
     // 清空自定义CSS
     document.getElementById("settingsCustomCSS").value = "";
+    window.currentBubblePresetIndex = null; // 清除当前预设索引
     updateCSSPreview();
+    updateSavePresetButton(); // 更新按钮状态
     return;
   }
   
@@ -11235,7 +11243,9 @@ function onBubbleStyleSelect(e) {
     const preset = window.bubbleStylePresets[index];
     if (preset) {
       document.getElementById("settingsCustomCSS").value = preset.css;
+      window.currentBubblePresetIndex = index; // 记录当前预设索引
       updateCSSPreview();
+      updateSavePresetButton(); // 更新按钮状态
       showToast(`已应用「${preset.name}」`);
     }
   }
@@ -11244,19 +11254,166 @@ function onBubbleStyleSelect(e) {
 function exportBubbleStyle() {
   const css = document.getElementById("settingsCustomCSS").value;
   if (!css) {
-    alert("没有自定义样式可导出");
+    showToast("没有自定义样式可导出");
     return;
   }
+  
+  const overlay = document.createElement("div");
+  overlay.id = "exportBubbleOverlay";
+  overlay.style.cssText = `
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  `;
+  
+  let presetName = "自定义样式";
+  if (window.currentBubblePresetIndex !== null && window.bubbleStylePresets[window.currentBubblePresetIndex]) {
+    presetName = window.bubbleStylePresets[window.currentBubblePresetIndex].name;
+  }
+  
+  const modal = document.createElement("div");
+  modal.style.cssText = `
+    background: white;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 340px;
+    overflow: hidden;
+  `;
+  
+  modal.innerHTML = `
+    <div style="padding: 20px; border-bottom: 1px solid #eee;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h3 style="margin: 0; font-size: 18px; color: #333;">导出样式</h3>
+        <button onclick="document.getElementById('exportBubbleOverlay').remove()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #999;">×</button>
+      </div>
+    </div>
+    <div style="padding: 20px;">
+      <div style="margin-bottom: 16px; padding: 12px; background: #f5f5f5; border-radius: 10px; font-size: 13px; color: #666;">
+        <strong style="color: #333;">${presetName}</strong>
+        <div style="margin-top: 4px; font-size: 12px; color: #999;">${css.length} 字符</div>
+      </div>
+      
+      <button onclick="exportBubbleAsFile()" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #f8bbd9, #f48fb1); color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        📁 下载为文件
+      </button>
+      
+      <button onclick="exportBubbleToClipboard()" style="width: 100%; padding: 14px; background: #fff; color: #f48fb1; border: 2px solid #f48fb1; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        📋 复制到剪贴板
+      </button>
+    </div>
+  `;
+  
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+  
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) overlay.remove();
+  });
+}
+
+function exportBubbleAsFile() {
+  const css = document.getElementById("settingsCustomCSS").value;
+  let fileName = "bubble-style";
+  
+  if (window.currentBubblePresetIndex !== null && window.bubbleStylePresets[window.currentBubblePresetIndex]) {
+    fileName = window.bubbleStylePresets[window.currentBubblePresetIndex].name;
+  }
+  
   const blob = new Blob([css], { type: "text/css" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = "chat-style.css";
+  a.download = `${fileName}.css`;
   a.click();
   URL.revokeObjectURL(url);
+  
+  document.getElementById('exportBubbleOverlay')?.remove();
+  showToast("已下载 ✓");
+}
+
+async function exportBubbleToClipboard() {
+  const css = document.getElementById("settingsCustomCSS").value;
+  try {
+    await navigator.clipboard.writeText(css);
+    document.getElementById('exportBubbleOverlay')?.remove();
+    showToast("已复制到剪贴板 ✓");
+  } catch (e) {
+    const textarea = document.createElement('textarea');
+    textarea.value = css;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+    document.getElementById('exportBubbleOverlay')?.remove();
+    showToast("已复制到剪贴板 ✓");
+  }
 }
 
 function importBubbleStyle() {
+  const overlay = document.createElement("div");
+  overlay.id = "importBubbleOverlay";
+  overlay.style.cssText = `
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  `;
+  
+  const modal = document.createElement("div");
+  modal.style.cssText = `
+    background: white;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 340px;
+    overflow: hidden;
+  `;
+  
+  modal.innerHTML = `
+    <div style="padding: 20px; border-bottom: 1px solid #eee;">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h3 style="margin: 0; font-size: 18px; color: #333;">导入样式</h3>
+        <button onclick="document.getElementById('importBubbleOverlay').remove()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #999;">×</button>
+      </div>
+    </div>
+    <div style="padding: 20px;">
+      <button onclick="importBubbleFromFile()" style="width: 100%; padding: 14px; background: linear-gradient(135deg, #f8bbd9, #f48fb1); color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        📁 从文件导入
+      </button>
+      
+      <div style="text-align: center; color: #999; font-size: 13px; margin: 12px 0;">或者</div>
+      
+      <div style="margin-bottom: 12px;">
+        <textarea id="importBubbleCSSInput" placeholder="在此粘贴CSS代码..." style="width: 100%; height: 120px; padding: 12px; border: 2px solid #eee; border-radius: 12px; font-size: 13px; font-family: monospace; resize: none; box-sizing: border-box;"></textarea>
+      </div>
+      
+      <button onclick="importBubbleFromInput()" style="width: 100%; padding: 14px; background: #fff; color: #f48fb1; border: 2px solid #f48fb1; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        ✓ 应用粘贴的代码
+      </button>
+      
+      <div style="margin-top: 12px; padding: 10px; background: #fff8e1; border-radius: 8px; font-size: 12px; color: #f57c00;">
+        💡 提示：导入后记得点保存按钮保存为预设哦
+      </div>
+    </div>
+  `;
+  
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+  
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) overlay.remove();
+  });
+}
+
+function importBubbleFromFile() {
   const input = document.createElement("input");
   input.type = "file";
   input.accept = ".css,.txt";
@@ -11266,6 +11423,11 @@ function importBubbleStyle() {
       const reader = new FileReader();
       reader.onload = function (e) {
         document.getElementById("settingsCustomCSS").value = e.target.result;
+        window.currentBubblePresetIndex = null;
+        updateCSSPreview();
+        updateSavePresetButton();
+        document.getElementById('importBubbleOverlay')?.remove();
+        showToast("导入成功 ✓");
       };
       reader.readAsText(file);
     }
@@ -11273,10 +11435,116 @@ function importBubbleStyle() {
   input.click();
 }
 
+function importBubbleFromInput() {
+  const css = document.getElementById("importBubbleCSSInput")?.value?.trim();
+  if (!css) {
+    showToast("请先粘贴CSS代码");
+    return;
+  }
+  
+  document.getElementById("settingsCustomCSS").value = css;
+  window.currentBubblePresetIndex = null;
+  updateCSSPreview();
+  updateSavePresetButton();
+  document.getElementById('importBubbleOverlay')?.remove();
+  showToast("导入成功 ✓");
+}
+
 function resetCustomCSS() {
   if (confirm("确定要重置自定义CSS吗？")) {
     document.getElementById("settingsCustomCSS").value = "";
+    window.currentBubblePresetIndex = null;
+    updateCSSPreview();
+    updateSavePresetButton();
   }
+}
+
+// 更新保存按钮状态
+function updateSavePresetButton() {
+  const saveBtn = document.getElementById("bubbleSavePresetBtn");
+  const saveBtnText = document.getElementById("bubbleSavePresetBtnText");
+  if (!saveBtn || !saveBtnText) return;
+  
+  if (window.currentBubblePresetIndex !== null && window.bubbleStylePresets && window.bubbleStylePresets[window.currentBubblePresetIndex]) {
+    const preset = window.bubbleStylePresets[window.currentBubblePresetIndex];
+    saveBtnText.textContent = `💾 保存到「${preset.name}」`;
+    saveBtn.classList.add("has-preset");
+  } else {
+    saveBtnText.textContent = "💾 保存为新预设";
+    saveBtn.classList.remove("has-preset");
+  }
+}
+
+// 保存或更新预设
+async function saveOrUpdateBubblePreset() {
+  const css = document.getElementById("settingsCustomCSS").value.trim();
+  if (!css) {
+    showToast("请先在自定义CSS中编写样式");
+    return;
+  }
+  
+  if (!window.bubbleStylePresets) window.bubbleStylePresets = [];
+  
+  if (window.currentBubblePresetIndex !== null && window.bubbleStylePresets[window.currentBubblePresetIndex]) {
+    const preset = window.bubbleStylePresets[window.currentBubblePresetIndex];
+    preset.css = css;
+    preset.updatedAt = new Date().toLocaleDateString('zh-CN');
+    
+    await localforage.setItem('bubbleStylePresets', window.bubbleStylePresets);
+    showToast(`「${preset.name}」已更新 ✓`);
+  } else {
+    const name = prompt("请输入预设名称：");
+    if (!name) return;
+    
+    const newIndex = window.bubbleStylePresets.length;
+    window.bubbleStylePresets.push({
+      name: name,
+      css: css,
+      createdAt: new Date().toLocaleDateString('zh-CN')
+    });
+    
+    await localforage.setItem('bubbleStylePresets', window.bubbleStylePresets);
+    
+    window.currentBubblePresetIndex = newIndex;
+    const select = document.getElementById("settingsBubbleStyle");
+    if (select) select.value = `preset_${newIndex}`;
+    
+    showToast(`预设「${name}」已创建 ✓`);
+  }
+  
+  updateBubbleStyleDropdown();
+  updateSavePresetButton();
+}
+
+// 另存为新预设
+async function saveAsNewBubblePreset() {
+  const css = document.getElementById("settingsCustomCSS").value.trim();
+  if (!css) {
+    showToast("请先在自定义CSS中编写样式");
+    return;
+  }
+  
+  const name = prompt("请输入新预设名称：");
+  if (!name) return;
+  
+  if (!window.bubbleStylePresets) window.bubbleStylePresets = [];
+  
+  const newIndex = window.bubbleStylePresets.length;
+  window.bubbleStylePresets.push({
+    name: name,
+    css: css,
+    createdAt: new Date().toLocaleDateString('zh-CN')
+  });
+  
+  await localforage.setItem('bubbleStylePresets', window.bubbleStylePresets);
+  
+  window.currentBubblePresetIndex = newIndex;
+  const select = document.getElementById("settingsBubbleStyle");
+  if (select) select.value = `preset_${newIndex}`;
+  
+  updateBubbleStyleDropdown();
+  updateSavePresetButton();
+  showToast(`预设「${name}」已创建 ✓`);
 }
 
 function importChatHistory() {
@@ -27785,6 +28053,13 @@ Object.assign(window, {
   exportBubbleStyle,
   importBubbleStyle,
   resetCustomCSS,
+  exportBubbleAsFile,
+  exportBubbleToClipboard,
+  importBubbleFromFile,
+  importBubbleFromInput,
+  saveOrUpdateBubblePreset,
+  saveAsNewBubblePreset,
+  updateSavePresetButton,
   // 聊天历史导入导出
   importChatHistory,
   exportChatHistory,
