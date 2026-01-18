@@ -57,6 +57,129 @@
     <link rel="stylesheet" href="forum_app.css" />
     <link rel="stylesheet" href="companion.css" />
     <link rel="stylesheet" href="couple_space.css" />
+  
+    <style>
+    /* ============ 主屏幕双页滑动样式 ============ */
+    .home-wallpaper {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 0;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      pointer-events: none;
+    }
+
+    .home-pages-container {
+      display: flex;
+      width: 200%;
+      height: 100%;
+      transition: transform 0.3s ease-out;
+      position: relative;
+      z-index: 1;
+    }
+
+    .home-page {
+      width: 50%;
+      height: 100%;
+      flex-shrink: 0;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .home-page .main-content {
+      height: 100%;
+      overflow-y: auto;
+      overflow-x: hidden;
+      background: transparent;
+    }
+
+    .widgets-page-content {
+      padding: 16px;
+      padding-top: calc(50px + env(safe-area-inset-top, 0px));
+      padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px));
+      min-height: 100%;
+    }
+
+    .widgets-page-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: rgba(60, 60, 60, 0.85);
+      margin-bottom: 20px;
+      text-align: center;
+      text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+    }
+
+    .widgets-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .widget-placeholder {
+      grid-column: span 2;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.3));
+      backdrop-filter: blur(12px) saturate(150%);
+      -webkit-backdrop-filter: blur(12px) saturate(150%);
+      border-radius: 24px;
+      padding: 40px 20px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .widget-placeholder-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.6;
+    }
+
+    .widget-placeholder-text {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: rgba(60, 60, 60, 0.7);
+      margin-bottom: 8px;
+    }
+
+    .widget-placeholder-hint {
+      font-size: 0.85rem;
+      color: rgba(60, 60, 60, 0.5);
+    }
+
+    .home-page-indicator {
+      position: fixed;
+      bottom: calc(85px + env(safe-area-inset-bottom, 0px));
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 8px;
+      z-index: 100;
+      padding: 6px 12px;
+      background: rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 20px;
+    }
+
+    .indicator-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(100, 100, 100, 0.3);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .indicator-dot.active {
+      background: rgba(244, 143, 177, 0.9);
+      width: 20px;
+      border-radius: 4px;
+    }
+    </style>
+
   </head>
   <body>
     <!-- Decorative stars -->
@@ -67,7 +190,14 @@
     <div class="star star-5"></div>
 
     <div class="phone-container">
-      <div class="main-content">
+      <!-- 主屏幕壁纸背景层 -->
+      <div class="home-wallpaper" id="homeWallpaper"></div>
+      
+      <!-- 双页滑动容器 -->
+      <div class="home-pages-container" id="homePagesContainer">
+        <!-- 第一页：原主屏幕内容 -->
+        <div class="home-page home-page-1" id="homePage1">
+          <div class="main-content">
         <div class="profile-widget-new">
           <div class="profile-bg-container" onclick="triggerBgUpload()">
             <img
@@ -299,6 +429,31 @@
             </div>
           </div>
         </div>
+          </div>
+        </div>
+        
+        <!-- 第二页：小组件页面 -->
+        <div class="home-page home-page-2" id="homePage2">
+          <div class="main-content">
+            <div class="widgets-page-content">
+              <div class="widgets-page-title">🎨 小组件</div>
+              <div class="widgets-grid" id="widgetsGrid">
+                <!-- 小组件占位提示 -->
+                <div class="widget-placeholder">
+                  <div class="widget-placeholder-icon">📦</div>
+                  <div class="widget-placeholder-text">即将添加更多小组件</div>
+                  <div class="widget-placeholder-hint">敬请期待...</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 页面指示器 -->
+      <div class="home-page-indicator" id="homePageIndicator">
+        <div class="indicator-dot active" data-page="0"></div>
+        <div class="indicator-dot" data-page="1"></div>
       </div>
 
       <!-- Pages -->
@@ -8290,6 +8445,17 @@
     <script src="continue_chat.js"></script>
     <script src="forum_app.js"></script>
 
+    <!-- 情侣空间页面 -->
+    <div class="page" id="coupleSpacePage">
+      <div class="page-header">
+        <button class="back-btn" onclick="closePage('coupleSpacePage')">
+          ←
+        </button>
+        <span class="page-title">情侣空间</span>
+      </div>
+      <div class="page-content"></div>
+    </div>
+
     <!-- 查手机角色选择弹窗 -->
     <div class="phone-peek-selector-overlay" id="phonePeekSelectorOverlay">
       <div class="phone-peek-selector-modal">
@@ -8413,6 +8579,136 @@
       </div>
     </div>
     <script>
+      // ============ 主屏幕双页滑动功能 ============
+      (function() {
+        let currentPage = 0;
+        let startX = 0;
+        let startY = 0;
+        let isDragging = false;
+        let currentTranslate = 0;
+        let prevTranslate = 0;
+        
+        function init() {
+          const container = document.getElementById('homePagesContainer');
+          const indicator = document.getElementById('homePageIndicator');
+          const homeWallpaper = document.getElementById('homeWallpaper');
+          
+          if (!container) {
+            console.log('homePagesContainer not found');
+            return;
+          }
+          
+          // 应用壁纸到主屏幕背景
+          function applyHomeWallpaper() {
+            const savedWallpaper = localStorage.getItem('pinkyphone_wallpaper');
+            if (savedWallpaper && homeWallpaper) {
+              homeWallpaper.style.backgroundImage = 'url(' + savedWallpaper + ')';
+            }
+          }
+          
+          applyHomeWallpaper();
+          window.addEventListener('storage', applyHomeWallpaper);
+          
+          function setSliderPosition() {
+            container.style.transform = 'translateX(' + currentTranslate + 'px)';
+          }
+          
+          function updateIndicator() {
+            if (!indicator) return;
+            const dots = indicator.querySelectorAll('.indicator-dot');
+            dots.forEach(function(dot, index) {
+              dot.classList.toggle('active', index === currentPage);
+            });
+          }
+          
+          function goToPage(pageIndex) {
+            currentPage = pageIndex;
+            const pageWidth = window.innerWidth;
+            currentTranslate = -pageIndex * pageWidth;
+            prevTranslate = currentTranslate;
+            container.style.transition = 'transform 0.3s ease-out';
+            setSliderPosition();
+            updateIndicator();
+          }
+          
+          function touchStart(event) {
+            var openPages = document.querySelectorAll('.page');
+            for (var i = 0; i < openPages.length; i++) {
+              var p = openPages[i];
+              if (p.style.transform === 'translateX(0px)') return;
+            }
+            startX = event.touches[0].clientX;
+            startY = event.touches[0].clientY;
+            isDragging = true;
+            container.style.transition = 'none';
+          }
+          
+          function touchMove(event) {
+            if (!isDragging) return;
+            var currentX = event.touches[0].clientX;
+            var currentY = event.touches[0].clientY;
+            var diffX = currentX - startX;
+            var diffY = currentY - startY;
+            
+            if (Math.abs(diffY) > Math.abs(diffX) * 1.2) {
+              isDragging = false;
+              return;
+            }
+            
+            var pageWidth = window.innerWidth;
+            var newTranslate = prevTranslate + diffX;
+            
+            if (newTranslate > 50) {
+              newTranslate = 50 + (newTranslate - 50) * 0.2;
+            }
+            if (newTranslate < -pageWidth - 50) {
+              newTranslate = -pageWidth - 50 + (newTranslate + pageWidth + 50) * 0.2;
+            }
+            
+            currentTranslate = newTranslate;
+            setSliderPosition();
+          }
+          
+          function touchEnd() {
+            if (!isDragging) return;
+            isDragging = false;
+            var pageWidth = window.innerWidth;
+            var movedBy = currentTranslate - prevTranslate;
+            
+            if (movedBy < -50 && currentPage < 1) {
+              currentPage++;
+            } else if (movedBy > 50 && currentPage > 0) {
+              currentPage--;
+            }
+            goToPage(currentPage);
+          }
+          
+          container.addEventListener('touchstart', touchStart, { passive: true });
+          container.addEventListener('touchmove', touchMove, { passive: false });
+          container.addEventListener('touchend', touchEnd);
+          
+          if (indicator) {
+            indicator.addEventListener('click', function(e) {
+              if (e.target.classList.contains('indicator-dot')) {
+                var pageIndex = parseInt(e.target.dataset.page);
+                goToPage(pageIndex);
+              }
+            });
+          }
+          
+          window.addEventListener('resize', function() { goToPage(currentPage); });
+          window.goToHomePage = goToPage;
+          window.applyHomeWallpaper = applyHomeWallpaper;
+        }
+        
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', init);
+        } else {
+          init();
+        }
+      })();
+    </script>
+    <script>
       // 注册 Service Worker
       if ("serviceWorker" in navigator) {
         window.addEventListener("load", () => {
@@ -8440,31 +8736,11 @@
       }
 
       // 可以在用户首次点击页面任意位置时触发申请权限，或者做一个专门的按钮
-      // 修复：使用更安全的方式请求通知权限，避免干扰其他功能
-      document.body.addEventListener("click", function(e) {
-        // 确保不是点击在任何弹出页面或overlay上
-        const ignoredElements = [
-          '.phone-peek-page', '.music-together-page', '.read-together-page',
-          '.phone-peek-selector-overlay', '.modal', '.overlay', '.popup'
-        ];
-        if (ignoredElements.some(sel => e.target.closest(sel))) {
-          return;
-        }
-        requestNotificationPermission();
-      }, {
+      document.body.addEventListener("click", requestNotificationPermission, {
         once: true,
       });
     </script>
     <script src="companion_patch.js"></script>
     <script src="couple_space.js"></script>
-    <div class="page" id="coupleSpacePage">
-      <div class="page-header">
-        <button class="back-btn" onclick="closePage('coupleSpacePage')">
-          ←
-        </button>
-        <span class="page-title">情侣空间</span>
-      </div>
-      <div class="page-content"></div>
-    </div>
   </body>
 </html>

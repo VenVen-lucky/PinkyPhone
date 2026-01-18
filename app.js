@@ -28618,3 +28618,141 @@ async function editPolaroidText(event) {
     }
   }
 }
+
+// ============ 主屏幕双页滑动功能 ============
+(function initHomePageSlider() {
+  console.log('🏠 开始初始化主屏幕滑动...');
+  
+  let currentPage = 0;
+  let startX = 0;
+  let startY = 0;
+  let isDragging = false;
+  let currentTranslate = 0;
+  let prevTranslate = 0;
+  
+  const container = document.getElementById('homePagesContainer');
+  const indicator = document.getElementById('homePageIndicator');
+  const homeWallpaper = document.getElementById('homeWallpaper');
+  
+  if (!container) {
+    console.error('❌ homePagesContainer 未找到！');
+    return;
+  }
+  
+  console.log('✓ 找到 homePagesContainer');
+  
+  // 应用壁纸
+  function applyHomeWallpaper() {
+    const savedWallpaper = localStorage.getItem('pinkyphone_wallpaper');
+    if (savedWallpaper && homeWallpaper) {
+      homeWallpaper.style.backgroundImage = 'url(' + savedWallpaper + ')';
+    }
+  }
+  applyHomeWallpaper();
+  
+  function setSliderPosition() {
+    container.style.transform = 'translateX(' + currentTranslate + 'px)';
+  }
+  
+  function updateIndicator() {
+    if (!indicator) return;
+    const dots = indicator.querySelectorAll('.indicator-dot');
+    dots.forEach(function(dot, index) {
+      dot.classList.toggle('active', index === currentPage);
+    });
+  }
+  
+  function goToPage(pageIndex) {
+    currentPage = pageIndex;
+    const pageWidth = window.innerWidth;
+    currentTranslate = -pageIndex * pageWidth;
+    prevTranslate = currentTranslate;
+    container.style.transition = 'transform 0.3s ease-out';
+    setSliderPosition();
+    updateIndicator();
+  }
+  
+  function touchStart(event) {
+    // 检查是否有页面打开
+    var openPages = document.querySelectorAll('.page');
+    for (var i = 0; i < openPages.length; i++) {
+      if (openPages[i].style.transform === 'translateX(0px)') {
+        return;
+      }
+    }
+    startX = event.touches[0].clientX;
+    startY = event.touches[0].clientY;
+    isDragging = true;
+    container.style.transition = 'none';
+  }
+  
+  function touchMove(event) {
+    if (!isDragging) return;
+    
+    var currentX = event.touches[0].clientX;
+    var currentY = event.touches[0].clientY;
+    var diffX = currentX - startX;
+    var diffY = currentY - startY;
+    
+    // 垂直滑动大于水平滑动时，不处理
+    if (Math.abs(diffY) > Math.abs(diffX) * 1.2) {
+      isDragging = false;
+      return;
+    }
+    
+    var pageWidth = window.innerWidth;
+    var newTranslate = prevTranslate + diffX;
+    
+    // 边缘弹性
+    if (newTranslate > 50) {
+      newTranslate = 50 + (newTranslate - 50) * 0.2;
+    }
+    if (newTranslate < -pageWidth - 50) {
+      newTranslate = -pageWidth - 50 + (newTranslate + pageWidth + 50) * 0.2;
+    }
+    
+    currentTranslate = newTranslate;
+    setSliderPosition();
+  }
+  
+  function touchEnd() {
+    if (!isDragging) return;
+    isDragging = false;
+    
+    var pageWidth = window.innerWidth;
+    var movedBy = currentTranslate - prevTranslate;
+    
+    if (movedBy < -50 && currentPage < 1) {
+      currentPage++;
+    } else if (movedBy > 50 && currentPage > 0) {
+      currentPage--;
+    }
+    goToPage(currentPage);
+  }
+  
+  // 绑定触摸事件
+  container.addEventListener('touchstart', touchStart, { passive: true });
+  container.addEventListener('touchmove', touchMove, { passive: false });
+  container.addEventListener('touchend', touchEnd);
+  
+  // 点击指示器
+  if (indicator) {
+    indicator.addEventListener('click', function(e) {
+      if (e.target.classList.contains('indicator-dot')) {
+        var pageIndex = parseInt(e.target.dataset.page);
+        goToPage(pageIndex);
+      }
+    });
+  }
+  
+  // 窗口resize时重新计算
+  window.addEventListener('resize', function() { 
+    goToPage(currentPage); 
+  });
+  
+  // 暴露全局方法
+  window.goToHomePage = goToPage;
+  window.applyHomeWallpaper = applyHomeWallpaper;
+  
+  console.log('✅ Home page slider initialized successfully!');
+})();
